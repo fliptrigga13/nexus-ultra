@@ -1,0 +1,6 @@
+node_modules/
+.env
+nexus.log
+captures/
+drop-zone/
+*.ps1

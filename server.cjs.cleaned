@@ -1,0 +1,69 @@
+﻿const path = require('path');
+const express = require('express');
+const cors = require('cors');
+const { exec } = require('child_process');
+
+const SECRET = "Burton";
+const HOST = "127.0.0.1";
+const PORT = 3000;
+
+const ALLOWED = {
+  "force-stabilize": "local-scripts/force-stabilize.ps1",
+  "execute": "local-scripts/execute.ps1",
+  "trigger-n8n": "local-scripts/trigger-n8n.ps1"
+};
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+app.use(express.static(__dirname));
+
+function safeScriptPath(action) {
+  if (!ALLOWED[action]) return null;
+  const resolved = path.resolve(__dirname, ALLOWED[action]);
+  if (!resolved.startsWith(path.resolve(__dirname))) return null;
+  return resolved;
+}
+
+app.post('/run', (req, res) => {
+  if (req.headers['x-api-key'] !== SECRET) return res.status(403).json({ ok: false, error: "Forbidden" });
+  const action = req.body && req.body.action;
+  if (!action || !ALLOWED[action]) return res.status(400).json({ ok: false, error: "Invalid action" });
+  const script = safeScriptPath(action);
+  if (!script) return res.status(400).json({ ok: false, error: "Invalid script path" });
+  const cmd = `powershell -NoProfile -ExecutionPolicy Bypass -File "${script}"`;
+  exec(cmd, { windowsHide: true, timeout: 30000 }, (err, stdout, stderr) => {
+    if (err) return res.status(500).json({ ok: false, error: stderr || err.message });
+    return res.json({ ok: true, output: stdout.trim() });
+  });
+});
+
+// --- START: /tabs handler ---
+let storedTabs = null;
+
+app.post('/tabs', (req, res) => {
+  console.log('POST /tabs headers:', req.headers);
+
+  if (!req.body || !req.body.edge_all_open_tabs) {
+    return res.status(400).json({ ok: false, error: 'missing edge_all_open_tabs' });
+  }
+
+  if (req.headers['x-api-key'] !== SECRET) {
+    console.log('POST /tabs rejected: bad x-api-key', req.headers['x-api-key']);
+    return res.status(403).json({ ok: false, error: 'Forbidden' });
+  }
+
+  storedTabs = req.body.edge_all_open_tabs;
+  console.log('Stored tabs count:', Array.isArray(storedTabs) ? storedTabs.length : 0);
+  return res.json({ ok: true, stored: Array.isArray(storedTabs) ? storedTabs.length : 0 });
+});
+
+app.get('/tabs', (req, res) => {
+  return res.json({ ok: true, edge_all_open_tabs: storedTabs || [] });
+});
+// --- END: /tabs handler ---
+
+app.listen(PORT, HOST, () => {
+  console.log(`Backend running on http://${HOST}:${PORT}`);
+});
+

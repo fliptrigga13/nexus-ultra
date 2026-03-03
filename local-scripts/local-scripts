@@ -1,0 +1,39 @@
+reinforce.ps1
+stabilize.ps1
+test.ps1
+async function runTest() {
+  const log = document.getElementById("log");
+  log.value += "\n[TEST] sending command...";
+
+  const response = await fetch("http://127.0.0.1:3000/run", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": "Burton"
+    },
+    body: JSON.stringify({ action: "test" })
+  });
+
+  const result = await response.json();
+  log.value += `\n[TEST] ${result.output || JSON.stringify(result)}`;
+}
+async function flushQueue() {
+  const log = document.getElementById("log");
+  log.value += "\n[FLUSH QUEUE] sending command...";
+
+  try {
+    const response = await fetch("http://127.0.0.1:3000/run", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": "Burton"
+      },
+      body: JSON.stringify({ action: "flush_queue" })
+    });
+
+    const result = await response.json();
+    log.value += `\n[FLUSH QUEUE] ${result.output || JSON.stringify(result)}`;
+  } catch (err) {
+    log.value += `\n[FLUSH QUEUE] ERROR: ${err.message}`;
+  }
+}

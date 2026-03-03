@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Confirmed — VeilPiercer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --void: #020408;
+            --vis: #00e5ff;
+            --saf: #00ff88;
+            --t1: #ddeaf5;
+            --t2: rgba(221, 234, 245, .45);
+            --gold: #ffd166;
+        }
+
+        body {
+            background: var(--void);
+            color: var(--t1);
+            font-family: 'JetBrains Mono', monospace;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            opacity: .4;
+        }
+
+        .card {
+            position: relative;
+            z-index: 1;
+            border: 1px solid rgba(0, 229, 255, .2);
+            background: #060e18;
+            padding: 64px 56px;
+            max-width: 540px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 0 80px rgba(0, 229, 255, .06), 0 40px 120px rgba(0, 0, 0, .8);
+            animation: rise .6s cubic-bezier(.25, .46, .45, .94);
+        }
+
+        @keyframes rise {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        .check-ring {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 2px solid var(--saf);
+            background: rgba(0, 255, 136, .07);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 32px;
+            animation: pulse 2s ease infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 255, 136, .3)
+            }
+
+            50% {
+                box-shadow: 0 0 0 16px rgba(0, 255, 136, 0)
+            }
+        }
+
+        .check-mark {
+            font-family: 'Unbounded', sans-serif;
+            font-weight: 900;
+            font-size: 32px;
+            color: var(--saf);
+            line-height: 1;
+        }
+
+        .tag {
+            font-size: 8px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--vis);
+            margin-bottom: 16px;
+        }
+
+        h1 {
+            font-family: 'Unbounded', sans-serif;
+            font-weight: 900;
+            font-size: clamp(28px, 5vw, 40px);
+            letter-spacing: -1.5px;
+            line-height: 1.1;
+            margin-bottom: 16px;
+            color: var(--t1);
+        }
+
+        .sub {
+            font-size: 11px;
+            color: var(--t2);
+            line-height: 1.9;
+            margin-bottom: 40px;
+        }
+
+        .sub strong {
+            color: var(--vis);
+        }
+
+        .detail-box {
+            background: #030b14;
+            border: 1px solid rgba(0, 229, 255, .1);
+            padding: 20px 24px;
+            margin-bottom: 36px;
+            text-align: left;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10px;
+            color: var(--t2);
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(0, 229, 255, .05);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-row strong {
+            color: var(--t1);
+            font-weight: 700;
+        }
+
+        .detail-row .val {
+            color: var(--saf);
+            font-weight: 700;
+        }
+
+        .btn-back {
+            display: inline-block;
+            font-family: 'Unbounded', sans-serif;
+            font-weight: 700;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--black, #020408);
+            background: var(--vis);
+            padding: 15px 36px;
+            text-decoration: none;
+            transition: all .15s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-back:hover {
+            background: #fff;
+        }
+
+        .note {
+            font-size: 9px;
+            color: var(--t2);
+            margin-top: 24px;
+            letter-spacing: .5px;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="bg"></canvas>
+
+    <div class="card">
+        <div class="tag">— Transaction Complete —</div>
+        <div class="check-ring">
+            <div class="check-mark">✓</div>
+        </div>
+        <h1>Payment<br>Confirmed</h1>
+        <p class="sub" id="msg">Verifying your payment with Stripe...</p>
+
+        <div class="detail-box" id="details" style="display:none">
+            <div class="detail-row"><strong>Plan</strong><span class="val" id="d-tier">—</span></div>
+            <div class="detail-row"><strong>Email</strong><span id="d-email">—</span></div>
+            <div class="detail-row"><strong>Amount</strong><span class="val" id="d-amount">—</span></div>
+            <div class="detail-row"><strong>Status</strong><span class="val">PAID ✓</span></div>
+        </div>
+
+        <a href="/veilpiercer-pitch.html" class="btn-back">← Back to VeilPiercer</a>
+        <p class="note">Check your email for your receipt and download link.</p>
+    </div>
+
+    <script>
+        // ── Background particles ─────────────
+        const canvas = document.getElementById('bg');
+        const ctx = canvas.getContext('2d');
+        let W, H, pts = [];
+        function resize() { W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
+        resize(); window.addEventListener('resize', resize);
+        for (let i = 0; i < 60; i++) pts.push({ x: Math.random() * 1920, y: Math.random() * 1080, vx: (Math.random() - .5) * .3, vy: (Math.random() - .5) * .3 });
+        (function tick() {
+            ctx.clearRect(0, 0, W, H);
+            pts.forEach(p => {
+                p.x += p.vx; p.y += p.vy;
+                if (p.x < 0 || p.x > W) p.vx *= -1; if (p.y < 0 || p.y > H) p.vy *= -1;
+                ctx.beginPath(); ctx.arc(p.x, p.y, 1, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(0,229,255,.5)'; ctx.fill();
+            });
+            requestAnimationFrame(tick);
+        })();
+
+        // ── Verify payment with NEXUS ────────
+        const params = new URLSearchParams(location.search);
+        const sessionId = params.get('session_id');
+        const tier = params.get('tier') || '';
+
+        async function verify() {
+            if (!sessionId) {
+                document.getElementById('msg').textContent = 'No session ID found. If you completed payment, check your email for confirmation.';
+                return;
+            }
+            try {
+                const r = await fetch(`http://127.0.0.1:3000/stripe/confirm-session?session_id=${sessionId}`);
+                const data = await r.json();
+                if (data.ok && data.paid) {
+                    document.getElementById('msg').innerHTML =
+                        `Welcome to VeilPiercer, <strong style="color:var(--vis)">${data.email || 'valued customer'}</strong>!<br>Your access is being provisioned now.`;
+                    document.getElementById('d-tier').textContent = data.tier || tier;
+                    document.getElementById('d-email').textContent = data.email || '—';
+                    document.getElementById('d-amount').textContent = data.amount ? '$' + (data.amount / 100).toFixed(2) : '—';
+                    document.getElementById('details').style.display = '';
+                    // Log to NEXUS
+                    await fetch('http://127.0.0.1:3000/capture', {
+                        method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': 'Burton' },
+                        body: JSON.stringify({ note: 'PAID: ' + data.tier + ' — ' + data.email })
+                    }).catch(() => { });
+                } else {
+                    document.getElementById('msg').textContent = 'Payment is being processed. You will receive a confirmation email shortly.';
+                }
+            } catch (_) {
+                document.getElementById('msg').textContent = 'Payment received! Check your email for your receipt and access details.';
+            }
+        }
+        verify();
+    </script>
+</body>
+
+</html>

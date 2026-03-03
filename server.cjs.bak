@@ -1,0 +1,127 @@
+﻿const path = require('path');
+const fs = require('fs');
+const express = require('express');
+const cors = require('cors');
+const { exec } = require('child_process');
+
+const SECRET = "Burton";
+const HOST = "127.0.0.1";
+const PORT = 3000;
+
+const ALLOWED = {
+  "force-stabilize": "local-scripts/force-stabilize.ps1",
+  "execute": "local-scripts/execute.ps1",
+  "trigger-n8n": "local-scripts/trigger-n8n.ps1"
+};
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+app.use(express.static(__dirname));
+
+// Resolve and validate allowed script paths
+function safeScriptPath(action) {
+  if (!ALLOWED[action]) return null;
+  const resolved = path.resolve(__dirname, ALLOWED[action]);
+  if (!resolved.startsWith(path.resolve(__dirname))) return null;
+  return resolved;
+}
+
+// /run endpoint: execute whitelisted PowerShell scripts
+app.post('/run', (req, res) => {
+  if (req.headers['x-api-key'] !== SECRET) return res.status(403).json({ ok: false, error: "Forbidden" });
+  const action = req.body && req.body.action;
+  if (!action || !ALLOWED[action]) return res.status(400).json({ ok: false, error: "Invalid action" });
+  const script = safeScriptPath(action);
+  if (!script) return res.status(400).json({ ok: false, error: "Invalid script path" });
+  const cmd = `powershell -NoProfile -ExecutionPolicy Bypass -File "${script}"`;
+  exec(cmd, { windowsHide: true, timeout: 30000 }, (err, stdout, stderr) => {
+    if (err) return res.status(500).json({ ok: false, error: stderr || err.message });
+    return res.json({ ok: true, output: stdout.trim() });
+  });
+});
+
+// --- tabs persistence ---
+const TABS_FILE = path.resolve(__dirname, 'tabs.json');
+let storedTabs = null;
+
+// Load persisted tabs on startup (if present)
+try {
+  if (fs.existsSync(TABS_FILE)) {
+    const raw = fs.readFileSync(TABS_FILE, 'utf8');
+    storedTabs = JSON.parse(raw);
+    console.log('Loaded storedTabs from tabs.json, count:', Array.isArray(storedTabs) ? storedTabs.length : 0);
+  }
+} catch (e) {
+  console.error('Failed to load tabs.json:', e && e.message);
+  storedTabs = null;
+}
+
+function persistTabs(tabs) {
+  try {
+    const tmp = TABS_FILE + '.tmp';
+    fs.writeFileSync(tmp, JSON.stringify(tabs, null, 2), { encoding: 'utf8' });
+    fs.renameSync(tmp, TABS_FILE);
+    console.log('Persisted tabs to tabs.json, count:', Array.isArray(tabs) ? tabs.length : 0);
+    return true;
+  } catch (err) {
+    console.error('Failed to persist tabs:', err && err.message);
+    return false;
+  }
+}
+
+app.post('/tabs', (req, res) => {
+  console.log('POST /tabs headers:', req.headers);
+  if (!req.body || !req.body.edge_all_open_tabs) {
+    return res.status(400).json({ ok: false, error: 'missing edge_all_open_tabs' });
+  }
+  if (req.headers['x-api-key'] !== SECRET) {
+    console.log('POST /tabs rejected: bad x-api-key', req.headers['x-api-key']);
+    return res.status(403).json({ ok: false, error: 'Forbidden' });
+  }
+  storedTabs = req.body.edge_all_open_tabs;
+  const saved = persistTabs(storedTabs);
+  if (!saved) return res.status(500).json({ ok: false, error: 'Failed to persist tabs' });
+  console.log('Stored tabs count:', Array.isArray(storedTabs) ? storedTabs.length : 0);
+  return res.json({ ok: true, stored: Array.isArray(storedTabs) ? storedTabs.length : 0 });
+});
+
+app.get('/tabs', (req, res) => {
+  return res.json({ ok: true, edge_all_open_tabs: storedTabs || [] });
+});
+
+app.delete('/tabs', (req, res) => {
+  if (req.headers['x-api-key'] !== SECRET) return res.status(403).json({ ok: false, error: 'Forbidden' });
+  storedTabs = null;
+  try { if (fs.existsSync(TABS_FILE)) fs.unlinkSync(TABS_FILE); } catch (e) { console.error('Failed to delete tabs.json:', e && e.message); return res.status(500).json({ ok: false, error: 'Failed to delete tabs.json' }); }
+  console.log('Cleared stored tabs and removed tabs.json');
+  return res.json({ ok: true, cleared: true });
+});
+
+// --- cmd endpoint (whitelisted ad-hoc commands) ---
+const CMD_WHITELIST = [
+  'dir',
+  'type',
+  'echo',
+  'whoami',
+  'hostname',
+  'git --version',
+  'node --version',
+  'npm --version'
+];
+
+app.post('/cmd', (req, res) => {
+  if (req.headers['x-api-key'] !== SECRET) return res.status(403).json({ ok: false, error: 'Forbidden' });
+  const cmd = (req.body && req.body.cmd) ? String(req.body.cmd).trim() : '';
+  if (!cmd) return res.status(400).json({ ok: false, error: 'missing cmd' });
+  const allowed = CMD_WHITELIST.some(prefix => cmd === prefix || cmd.startsWith(prefix + ' '));
+  if (!allowed) return res.status(400).json({ ok: false, error: 'command not allowed' });
+  exec(cmd, { windowsHide: true, timeout: 30000 }, (err, stdout, stderr) => {
+    if (err) return res.status(500).json({ ok: false, error: stderr || err.message });
+    return res.json({ ok: true, output: stdout.trim() });
+  });
+});
+
+app.listen(PORT, HOST, () => {
+  console.log(`Backend running on http://${HOST}:${PORT}`);
+});

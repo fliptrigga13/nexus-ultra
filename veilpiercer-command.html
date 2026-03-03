@@ -1,0 +1,1626 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>VEILPIERCER — Command Protocol</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #020a14;
+      --deep: #010710;
+      --panel: #04111f;
+      --card: #071828;
+      --rim: #0e2538;
+      --rim2: #1a3a55;
+
+      --vis: #00eeff;
+      --saf: #00ff99;
+      --priv: #cc44ff;
+      --warn: #ffaa00;
+      --fail: #ff3355;
+      --ok: #00ff99;
+
+      --t1: #c2d8f0;
+      --t2: #456070;
+      --t3: #1a3045;
+
+      --lockdown-bg: #0f0208;
+      --lockdown-rim: #ff3355;
+      --amplify-bg: #020f08;
+      --amplify-rim: #00ff99;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    body {
+      background: var(--bg);
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--t1);
+      display: grid;
+      grid-template-rows: 48px 1fr 56px;
+    }
+
+    /* ── MODE OVERLAY ── */
+    body.lockdown {
+      --bg: #0f0208;
+      animation: lockFlash 0.4s ease;
+    }
+
+    body.amplify {
+      --bg: #020f08;
+      animation: ampFlash 0.4s ease;
+    }
+
+    @keyframes lockFlash {
+      0% {
+        background: #3f0010
+      }
+
+      100% {
+        background: var(--lockdown-bg)
+      }
+    }
+
+    @keyframes ampFlash {
+      0% {
+        background: #003f18
+      }
+
+      100% {
+        background: var(--amplify-bg)
+      }
+    }
+
+    /* ── TOPBAR ── */
+    #topbar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 0 18px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--rim);
+      position: relative;
+      z-index: 30;
+      transition: border-color 0.4s;
+    }
+
+    .logo {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: 12px;
+      letter-spacing: 5px;
+      color: var(--vis);
+    }
+
+    .mode-badge {
+      font-size: 9px;
+      letter-spacing: 2px;
+      font-weight: 700;
+      padding: 3px 12px;
+      border-radius: 2px;
+      text-transform: uppercase;
+      transition: all 0.3s;
+    }
+
+    .mode-badge.nominal {
+      background: rgba(0, 238, 255, 0.08);
+      color: var(--vis);
+      border: 1px solid rgba(0, 238, 255, 0.3);
+    }
+
+    .mode-badge.lockdown {
+      background: rgba(255, 51, 85, 0.15);
+      color: var(--fail);
+      border: 1px solid var(--fail);
+      animation: badgePulse 1s ease infinite;
+    }
+
+    .mode-badge.amplify {
+      background: rgba(0, 255, 153, 0.12);
+      color: var(--ok);
+      border: 1px solid var(--ok);
+      animation: badgePulse 1s ease infinite;
+    }
+
+    @keyframes badgePulse {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: 0.6
+      }
+    }
+
+    .tb-stats {
+      margin-left: auto;
+      display: flex;
+      gap: 16px;
+    }
+
+    .tb-s {
+      font-size: 9px;
+      color: var(--t2);
+    }
+
+    .tb-s strong {
+      color: var(--t1);
+      font-size: 10px;
+    }
+
+    /* ── MAIN ── */
+    #main {
+      display: grid;
+      grid-template-columns: 240px 1fr 260px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ── LEFT: USE CASES ── */
+    #left-panel {
+      background: var(--panel);
+      border-right: 1px solid var(--rim);
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .lp-title {
+      font-size: 8px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--t2);
+      padding: 12px 14px 8px;
+      border-bottom: 1px solid var(--rim);
+      position: sticky;
+      top: 0;
+      background: var(--panel);
+      z-index: 2;
+    }
+
+    .uc-card {
+      margin: 8px;
+      border-radius: 3px;
+      border: 1px solid var(--rim);
+      background: var(--card);
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .uc-card:hover {
+      border-color: var(--rim2);
+      background: #0a1e30;
+    }
+
+    .uc-card.active-vis {
+      border-color: var(--vis);
+      background: rgba(0, 238, 255, 0.04);
+    }
+
+    .uc-card.active-saf {
+      border-color: var(--saf);
+      background: rgba(0, 255, 153, 0.04);
+    }
+
+    .uc-card.active-priv {
+      border-color: var(--priv);
+      background: rgba(204, 68, 255, 0.04);
+    }
+
+    .uc-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 5px;
+    }
+
+    .uc-icon {
+      font-size: 14px;
+    }
+
+    .uc-name {
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .uc-desc {
+      font-size: 8px;
+      color: var(--t2);
+      line-height: 1.7;
+    }
+
+    .uc-impact {
+      margin-top: 6px;
+      font-size: 8px;
+      padding: 3px 6px;
+      border-radius: 2px;
+      display: inline-block;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── CENTER: CANVAS ── */
+    #scene {
+      position: relative;
+      overflow: hidden;
+    }
+
+    #bg-canvas,
+    #node-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    #bg-canvas {
+      z-index: 0;
+    }
+
+    #node-canvas {
+      z-index: 1;
+      cursor: crosshair;
+    }
+
+    /* Pillar score overlays */
+    .pillar-hud {
+      position: absolute;
+      pointer-events: none;
+      z-index: 5;
+      width: 130px;
+      text-align: center;
+    }
+
+    #ph-vis {
+      top: 14px;
+      left: 14px;
+    }
+
+    #ph-saf {
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    #ph-priv {
+      top: 14px;
+      right: 14px;
+    }
+
+    .ph-score {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 28px;
+      font-weight: 900;
+      line-height: 1;
+      transition: color 0.5s;
+    }
+
+    .ph-label {
+      font-size: 7px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-top: 3px;
+    }
+
+    .ph-bar {
+      height: 2px;
+      border-radius: 1px;
+      margin: 5px auto;
+      width: 80px;
+      background: var(--rim);
+      overflow: hidden;
+    }
+
+    .ph-fill {
+      height: 100%;
+      border-radius: 1px;
+      transition: width 0.6s ease, background 0.4s;
+    }
+
+    .ph-event {
+      font-size: 7.5px;
+      color: var(--t2);
+      margin-top: 4px;
+      line-height: 1.5;
+      min-height: 28px;
+    }
+
+    /* ── RIGHT: COMMAND ── */
+    #right-panel {
+      background: var(--panel);
+      border-left: 1px solid var(--rim);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .rp-section-title {
+      font-size: 8px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--t2);
+      padding: 10px 14px 7px;
+      border-bottom: 1px solid var(--rim);
+      flex-shrink: 0;
+    }
+
+    /* Protocol buttons */
+    .protocol-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      padding: 10px;
+      border-bottom: 1px solid var(--rim);
+      flex-shrink: 0;
+    }
+
+    .proto-btn {
+      padding: 9px 6px;
+      border-radius: 3px;
+      border: 1px solid;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+      background: transparent;
+    }
+
+    .proto-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-lockdown {
+      border-color: var(--fail);
+      color: var(--fail);
+    }
+
+    .btn-lockdown:hover {
+      background: rgba(255, 51, 85, 0.12);
+      box-shadow: 0 0 12px rgba(255, 51, 85, 0.2);
+    }
+
+    .btn-amplify {
+      border-color: var(--ok);
+      color: var(--ok);
+    }
+
+    .btn-amplify:hover {
+      background: rgba(0, 255, 153, 0.08);
+      box-shadow: 0 0 12px rgba(0, 255, 153, 0.15);
+    }
+
+    .btn-nominal {
+      border-color: var(--vis);
+      color: var(--vis);
+    }
+
+    .btn-nominal:hover {
+      background: rgba(0, 238, 255, 0.08);
+    }
+
+    .btn-selective {
+      border-color: var(--warn);
+      color: var(--warn);
+    }
+
+    .btn-selective:hover {
+      background: rgba(255, 170, 0, 0.08);
+    }
+
+    /* Command input */
+    .cmd-area {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--rim);
+      flex-shrink: 0;
+    }
+
+    .cmd-label {
+      font-size: 8px;
+      color: var(--t2);
+      letter-spacing: 2px;
+      margin-bottom: 5px;
+    }
+
+    .cmd-input-wrap {
+      position: relative;
+    }
+
+    #cmd-input {
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--rim2);
+      color: var(--t1);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      padding: 8px 36px 8px 10px;
+      border-radius: 3px;
+      outline: none;
+      resize: none;
+      height: 56px;
+      transition: border-color 0.2s;
+    }
+
+    #cmd-input:focus {
+      border-color: var(--vis);
+    }
+
+    #cmd-input::placeholder {
+      color: var(--t3);
+    }
+
+    .cmd-send {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--vis);
+      font-size: 16px;
+      cursor: pointer;
+      padding: 4px;
+      transition: transform 0.15s;
+    }
+
+    .cmd-send:hover {
+      transform: translateY(-50%) scale(1.2);
+    }
+
+    /* Quick commands */
+    .quick-cmds {
+      padding: 6px 10px;
+      border-bottom: 1px solid var(--rim);
+      flex-shrink: 0;
+    }
+
+    .qc-label {
+      font-size: 7px;
+      color: var(--t3);
+      letter-spacing: 2px;
+      margin-bottom: 5px;
+    }
+
+    .qc-list {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .qc-btn {
+      font-size: 9px;
+      color: var(--t2);
+      background: transparent;
+      border: 1px solid var(--rim);
+      border-radius: 2px;
+      padding: 4px 8px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .qc-btn:hover {
+      color: var(--t1);
+      border-color: var(--rim2);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* AI response feed */
+    .ai-feed {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+    }
+
+    .ai-entry {
+      margin-bottom: 8px;
+      border-radius: 3px;
+      padding: 8px 10px;
+      font-size: 9px;
+      line-height: 1.8;
+      animation: aiIn 0.3s ease;
+      border-left: 2px solid;
+    }
+
+    @keyframes aiIn {
+      from {
+        opacity: 0;
+        transform: translateY(4px)
+      }
+
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    .ai-entry.user {
+      border-color: var(--vis);
+      background: rgba(0, 238, 255, 0.04);
+    }
+
+    .ai-entry.agent {
+      border-color: var(--rim2);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .ai-entry.system {
+      border-color: var(--warn);
+      background: rgba(255, 170, 0, 0.04);
+    }
+
+    .ai-who {
+      font-weight: 700;
+      font-size: 8px;
+      letter-spacing: 1.5px;
+      margin-bottom: 3px;
+      text-transform: uppercase;
+    }
+
+    .ai-loading {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      padding: 4px 0;
+    }
+
+    .ai-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--vis);
+      animation: dotPulse 1.2s ease infinite;
+    }
+
+    .ai-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .ai-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes dotPulse {
+
+      0%,
+      100% {
+        opacity: 0.2;
+        transform: scale(0.8)
+      }
+
+      50% {
+        opacity: 1;
+        transform: scale(1)
+      }
+    }
+
+    /* ── BOTTOM COMMAND BAR ── */
+    #cmdbar {
+      background: var(--panel);
+      border-top: 1px solid var(--rim);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 18px;
+      font-size: 9px;
+      color: var(--t2);
+      position: relative;
+      z-index: 10;
+    }
+
+    .cb-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      letter-spacing: 1px;
+    }
+
+    .cb-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    #cb-mode-text {
+      transition: color 0.3s;
+    }
+
+    .cb-sep {
+      color: var(--t3);
+    }
+
+    .cb-hint {
+      margin-left: auto;
+      opacity: 0.4;
+      letter-spacing: 1.5px;
+      font-size: 8px;
+    }
+
+    /* Tooltip */
+    #ntip {
+      position: fixed;
+      z-index: 40;
+      background: rgba(2, 10, 20, 0.97);
+      border: 1px solid var(--rim2);
+      border-radius: 4px;
+      padding: 10px 14px;
+      pointer-events: none;
+      display: none;
+      font-size: 9px;
+      line-height: 1.9;
+      min-width: 190px;
+      max-width: 230px;
+      backdrop-filter: blur(16px);
+    }
+
+    #ntip .nt-name {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      margin-bottom: 5px;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--rim);
+      border-radius: 2px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- TOPBAR -->
+  <div id="topbar">
+    <div class="logo">VEILPIERCER</div>
+    <div class="mode-badge nominal" id="mode-badge">● NOMINAL</div>
+    <div class="tb-stats">
+      <div class="tb-s">VIS <strong id="tb-vis">—</strong></div>
+      <div class="tb-s">SAF <strong id="tb-saf">—</strong></div>
+      <div class="tb-s">PRIV <strong id="tb-priv">—</strong></div>
+      <div class="tb-s">RUNS <strong id="tb-runs">0</strong></div>
+      <div class="tb-s">EVENTS <strong id="tb-evs">0</strong></div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div id="main">
+
+    <!-- LEFT: USE CASES -->
+    <div id="left-panel">
+      <div class="lp-title">What This Is Used For</div>
+
+      <div class="uc-card active-vis" onclick="selectUseCase('ai-support')">
+        <div class="uc-header">
+          <div class="uc-icon">🤖</div>
+          <div class="uc-name" style="color:var(--vis)">AI Customer Support</div>
+        </div>
+        <div class="uc-desc">Multi-agent support systems hallucinate and drift silently. Veilpiercer traces every node
+          decision so you see WHY and WHEN quality degrades.</div>
+        <div class="uc-impact" style="background:rgba(0,238,255,0.08);color:var(--vis)">LOCKDOWN when escalation spikes
+        </div>
+      </div>
+
+      <div class="uc-card" onclick="selectUseCase('fintech')">
+        <div class="uc-header">
+          <div class="uc-icon">💹</div>
+          <div class="uc-name" style="color:var(--saf)">FinTech Compliance</div>
+        </div>
+        <div class="uc-desc">SEC & FINRA require full agent decision trails. Safety nodes catch rule violations before
+          they're executed. One miss = investigation.</div>
+        <div class="uc-impact" style="background:rgba(0,255,153,0.08);color:var(--saf)">LOCKDOWN before audits</div>
+      </div>
+
+      <div class="uc-card" onclick="selectUseCase('healthcare')">
+        <div class="uc-header">
+          <div class="uc-icon">🏥</div>
+          <div class="uc-name" style="color:var(--fail)">Healthcare Routing</div>
+        </div>
+        <div class="uc-desc">Patient routing agents must never fail silently. A null-check miss at node 3 routes the
+          wrong patient. HIPAA also requires PII to never enter logs.</div>
+        <div class="uc-impact" style="background:rgba(255,51,85,0.08);color:var(--fail)">LOCKDOWN + PRIVACY MAX</div>
+      </div>
+
+      <div class="uc-card" onclick="selectUseCase('ecommerce')">
+        <div class="uc-header">
+          <div class="uc-icon">🛒</div>
+          <div class="uc-name" style="color:var(--warn)">E-Commerce Agents</div>
+        </div>
+        <div class="uc-desc">Pricing, inventory, and recommendation agents run 24/7. Token cost spikes appear as latency
+          anomalies first — catch them at $50 not $4,200.</div>
+        <div class="uc-impact" style="background:rgba(255,170,0,0.08);color:var(--warn)">AMPLIFY during peak traffic
+        </div>
+      </div>
+
+      <div class="uc-card" onclick="selectUseCase('legal')">
+        <div class="uc-header">
+          <div class="uc-icon">⚖️</div>
+          <div class="uc-name" style="color:var(--priv)">Legal Document AI</div>
+        </div>
+        <div class="uc-desc">Legal AI processes PII, contracts, and privileged info. Every log line is a potential
+          privilege breach. Privacy gate + redaction is not optional.</div>
+        <div class="uc-impact" style="background:rgba(204,68,255,0.08);color:var(--priv)">PRIVACY LOCKDOWN always</div>
+      </div>
+
+      <div class="uc-card" onclick="selectUseCase('devops')">
+        <div class="uc-header">
+          <div class="uc-icon">⚙️</div>
+          <div class="uc-name" style="color:var(--vis)">DevOps / CI-CD Agents</div>
+        </div>
+        <div class="uc-desc">Autonomous deploy agents need amplified visibility during rollouts and instant lockdown if
+          anomalies spike. This is the ops console for that.</div>
+        <div class="uc-impact" style="background:rgba(0,238,255,0.08);color:var(--vis)">AMPLIFY on deploy, LOCK on
+          incident</div>
+      </div>
+
+      <div class="uc-card" onclick="selectUseCase('stan')">
+        <div class="uc-header">
+          <div class="uc-icon">💼</div>
+          <div class="uc-name" style="color:var(--saf)">Your Stan Store Product</div>
+        </div>
+        <div class="uc-desc">This dashboard IS the product. Sell it as an AI Agent Observatory to creators, agencies,
+          and developers who run automated pipelines and need control.</div>
+        <div class="uc-impact" style="background:rgba(0,255,153,0.08);color:var(--saf)">Recurring SaaS / info product
+        </div>
+      </div>
+    </div>
+
+    <!-- CENTER: CANVAS -->
+    <div id="scene">
+      <canvas id="bg-canvas"></canvas>
+      <canvas id="node-canvas"></canvas>
+
+      <!-- Pillar HUDs -->
+      <div class="pillar-hud" id="ph-vis">
+        <div class="ph-score" id="vis-score" style="color:var(--vis)">—</div>
+        <div class="ph-label" style="color:var(--vis)">Visibility</div>
+        <div class="ph-bar">
+          <div class="ph-fill" id="vis-fill" style="background:var(--vis)"></div>
+        </div>
+        <div class="ph-event" id="vis-event"></div>
+      </div>
+      <div class="pillar-hud" id="ph-saf">
+        <div class="ph-score" id="saf-score" style="color:var(--saf)">—</div>
+        <div class="ph-label" style="color:var(--saf)">Safety</div>
+        <div class="ph-bar">
+          <div class="ph-fill" id="saf-fill" style="background:var(--saf)"></div>
+        </div>
+        <div class="ph-event" id="saf-event"></div>
+      </div>
+      <div class="pillar-hud" id="ph-priv">
+        <div class="ph-score" id="priv-score" style="color:var(--priv)">—</div>
+        <div class="ph-label" style="color:var(--priv)">Privacy</div>
+        <div class="ph-bar">
+          <div class="ph-fill" id="priv-fill" style="background:var(--priv)"></div>
+        </div>
+        <div class="ph-event" id="priv-event"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: COMMAND -->
+    <div id="right-panel">
+      <div class="rp-section-title">Protocol Control</div>
+
+      <div class="protocol-grid">
+        <button class="proto-btn btn-lockdown" onclick="applyProtocol('lockdown')">🔴 LOCK DOWN</button>
+        <button class="proto-btn btn-amplify" onclick="applyProtocol('amplify')">🟢 AMPLIFY</button>
+        <button class="proto-btn btn-nominal" onclick="applyProtocol('nominal')">🔵 NOMINAL</button>
+        <button class="proto-btn btn-selective" onclick="applyProtocol('selective')">🟡 SELECTIVE</button>
+      </div>
+
+      <div class="cmd-area">
+        <div class="cmd-label">▸ COMMAND INPUT</div>
+        <div class="cmd-input-wrap">
+          <textarea id="cmd-input"
+            placeholder="e.g. lock down privacy nodes&#10;amplify visibility for audit&#10;what can this be used for?"></textarea>
+          <button class="cmd-send" onclick="sendCommand()">⏎</button>
+        </div>
+      </div>
+
+      <div class="quick-cmds">
+        <div class="qc-label">Quick Commands</div>
+        <div class="qc-list">
+          <button class="qc-btn" onclick="quickCmd('lock down all protocols')">🔴 lock down all protocols</button>
+          <button class="qc-btn" onclick="quickCmd('amplify visibility to maximum')">📡 amplify visibility to
+            max</button>
+          <button class="qc-btn" onclick="quickCmd('lockdown privacy — GDPR audit')">🔒 lockdown privacy — GDPR
+            audit</button>
+          <button class="qc-btn" onclick="quickCmd('amplify safety — deploy in progress')">🛡 amplify safety — deploy
+            active</button>
+          <button class="qc-btn" onclick="quickCmd('what can this be used for?')">💡 what can this be used for?</button>
+          <button class="qc-btn" onclick="quickCmd('show me real world impact')">📊 show real world impact</button>
+          <button class="qc-btn" onclick="quickCmd('reset to nominal')">↺ reset to nominal</button>
+        </div>
+      </div>
+
+      <div class="ai-feed" id="ai-feed"></div>
+    </div>
+  </div>
+
+  <!-- BOTTOM BAR -->
+  <div id="cmdbar">
+    <div class="cb-item">
+      <div class="cb-dot" id="cb-dot" style="background:var(--vis)"></div>
+      <span id="cb-mode-text" style="color:var(--vis)">NOMINAL PROTOCOL</span>
+    </div>
+    <span class="cb-sep">·</span>
+    <div class="cb-item"><span id="cb-nodes">9 nodes active</span></div>
+    <span class="cb-sep">·</span>
+    <div class="cb-item"><span id="cb-use-case">AI Customer Support</span></div>
+    <div class="cb-hint">DRAG NODES · TAP BOOST · TYPE COMMANDS</div>
+  </div>
+
+  <div id="ntip">
+    <div class="nt-name" id="nt-name"></div>
+    <div id="nt-body"></div>
+  </div>
+
+  <script>
+    // ════════════════════════════════════════════════════════════
+    //  VEILPIERCER — Protocol Command Interface
+    //  Lock Down · Amplify · Selective · Nominal
+    //  AI-powered command interpreter + node visualization
+    // ════════════════════════════════════════════════════════════
+
+    const bgC = document.getElementById('bg-canvas');
+    const nc = document.getElementById('node-canvas');
+    const bgX = bgC.getContext('2d');
+    const ctx = nc.getContext('2d');
+
+    const scene = document.getElementById('scene');
+    function W() { return nc.width; }
+    function H() { return nc.height; }
+
+    function resize() {
+      bgC.width = nc.width = scene.clientWidth;
+      bgC.height = nc.height = scene.clientHeight;
+      initPositions();
+    }
+    window.addEventListener('resize', resize);
+
+    // ── STARS ────────────────────────────────────────────────────
+    const STARS = Array.from({ length: 180 }, () => ({
+      x: Math.random(), y: Math.random(),
+      r: Math.random() * 1.2 + 0.2,
+      p: Math.random() * Math.PI * 2,
+      sp: 0.0008 + Math.random() * 0.002
+    }));
+    function drawBg(t) {
+      bgX.fillStyle = getComputedStyle(document.body).getPropertyValue('--bg') || '#020a14';
+      bgX.fillRect(0, 0, W(), H());
+      STARS.forEach(s => {
+        const a = (Math.sin(s.p + t * s.sp) * 0.35 + 0.55) * 0.55;
+        bgX.beginPath(); bgX.arc(s.x * W(), s.y * H(), s.r, 0, Math.PI * 2);
+        bgX.fillStyle = `rgba(160,210,240,${a})`; bgX.fill();
+      });
+    }
+
+    // ════════════════════════════════════════════════════════════
+    //  PROTOCOL SYSTEM
+    // ════════════════════════════════════════════════════════════
+    const PROTOCOLS = {
+      nominal: { vis: [0.78, 0.65, 0.70], saf: [0.82, 0.60, 0.72], priv: [0.88, 0.91, 1.00], label: 'NOMINAL', color: 'var(--vis)', dot: '#00eeff' },
+      lockdown: { vis: [0.95, 0.95, 0.98], saf: [1.00, 0.95, 0.98], priv: [1.00, 1.00, 1.00], label: 'LOCKDOWN', color: 'var(--fail)', dot: '#ff3355' },
+      amplify: { vis: [1.00, 1.00, 1.00], saf: [0.60, 0.50, 0.55], priv: [0.65, 0.70, 0.80], label: 'AMPLIFY', color: 'var(--ok)', dot: '#00ff99' },
+      selective: { vis: [0.85, 0.60, 0.75], saf: [0.95, 0.85, 0.90], priv: [1.00, 1.00, 1.00], label: 'SELECTIVE', color: 'var(--warn)', dot: '#ffaa00' },
+    };
+
+    let currentProtocol = 'nominal';
+
+    // ── NODES ────────────────────────────────────────────────────
+    const NODES = [
+      { id: 'v1', pillar: 'vis', color: '#00eeff', icon: '👁', label: 'TRACE', role: 'Chain trace depth', power: 0.78, default: 0.78 },
+      { id: 'v2', pillar: 'vis', color: '#00bbff', icon: '📡', label: 'SIGNAL', role: 'Telemetry emission rate', power: 0.65, default: 0.65 },
+      { id: 'v3', pillar: 'vis', color: '#0099ff', icon: '🔍', label: 'DRIFT', role: 'Model drift detection', power: 0.70, default: 0.70 },
+      { id: 's1', pillar: 'saf', color: '#00ff99', icon: '🛡', label: 'CATCH', role: 'Error catch gate', power: 0.82, default: 0.82 },
+      { id: 's2', pillar: 'saf', color: '#00dd77', icon: '🔄', label: 'HEAL', role: 'Auto-recovery rate', power: 0.60, default: 0.60 },
+      { id: 's3', pillar: 'saf', color: '#88ff44', icon: '⚠', label: 'ANOMALY', role: 'Anomaly threshold Δ', power: 0.72, default: 0.72 },
+      { id: 'p1', pillar: 'priv', color: '#cc44ff', icon: '🔒', label: 'GATE', role: 'safeLog allowlist gate', power: 0.88, default: 0.88 },
+      { id: 'p2', pillar: 'priv', color: '#9922ff', icon: '🚫', label: 'REDACT', role: 'Field redaction coverage', power: 0.91, default: 0.91 },
+      { id: 'p3', pillar: 'priv', color: '#6600cc', icon: '🛡', label: 'SHIELD', role: 'Prototype pollution guard', power: 1.00, default: 1.00 },
+    ];
+
+    const EDGES = [
+      { f: 'v1', t: 's1' }, { f: 'v3', t: 's3' }, { f: 's1', t: 'p1' }, { f: 's3', t: 'p2' },
+      { f: 'p1', t: 'v1' }, { f: 'p3', t: 'v2' }, { f: 'v1', t: 'v2' }, { f: 's1', t: 's2' },
+      { f: 'p1', t: 'p2' }, { f: 'v2', t: 's2' }, { f: 's2', t: 'p3' },
+    ];
+
+    function initPositions() {
+      const cw = W(), ch = H();
+      const CL = {
+        vis: { cx: cw * 0.22, cy: ch * 0.55 },
+        saf: { cx: cw * 0.50, cy: ch * 0.32 },
+        priv: { cx: cw * 0.78, cy: ch * 0.55 },
+      };
+      NODES.forEach(nd => {
+        const cl = CL[nd.pillar];
+        const idx = NODES.filter(n => n.pillar === nd.pillar).indexOf(nd);
+        const angle = (idx / 3) * Math.PI * 2 - Math.PI / 2;
+        const r = Math.min(cw, ch) * 0.13;
+        nd.cx = cl.cx; nd.cy = cl.cy; nd.orbitR = r;
+        nd.orbitAngle = angle;
+        nd.orbitSpeed = (0.00014 + Math.random() * 0.00018) * (Math.random() > .5 ? 1 : -1);
+        nd.x = cl.cx + Math.cos(angle) * r;
+        nd.y = cl.cy + Math.sin(angle) * r;
+        nd.R = 28; nd.fireT = 0; nd.pulseT = 0; nd.dragging = false;
+        nd.targetPower = nd.power;
+      });
+    }
+
+    // ── SIM ──────────────────────────────────────────────────────
+    const SIM = {
+      vis: { score: 0, logs: 0 },
+      saf: { score: 0, catches: 0, recoveries: 0 },
+      priv: { score: 0, clean: 0, redacted: 0 },
+      total: 0, events: 0, particles: []
+    };
+
+    const VIS_EVTS = [
+      'chain_trace: node 4 → booking_agent drift +8%',
+      'token_budget: prompt_node latency 2.7× → alert',
+      'signal_gap: nodes 3-5 not emitting — blind spot',
+      'replay_ok: 6-node support_agent reconstructed',
+      'hallucination_delta: output_key mismatch +11%',
+    ];
+    const SAF_EVTS = [
+      'catch_gate: null at triage_node → recovery triggered',
+      'self_heal: invoice_agent retry ok in 38ms',
+      'anomaly_flag: kinetic latency 3.9× avg → alert',
+      'cascade_blocked: fault isolated before node 5',
+      'guardrail: financial_bot output rejected',
+    ];
+    const PRIV_EVTS = [
+      'pii_blocked: email in nodeId → [REDACTED]',
+      'gdpr_gate: 3 fields stripped before Datadog ship',
+      'proto_shield: constructor injection → stopped',
+      'hipaa: zero PHI in 980 consecutive entries',
+      'allowlist: payload field rejected → [REDACTED]',
+    ];
+
+    let lastTick = 0;
+    function tick(now) {
+      if (now - lastTick < 170) return;
+      lastTick = now; SIM.total++;
+
+      // Ease powers toward targets
+      NODES.forEach(nd => {
+        nd.power += (nd.targetPower - nd.power) * 0.05;
+      });
+
+      const vn = NODES.filter(n => n.pillar === 'vis');
+      const sn = NODES.filter(n => n.pillar === 'saf');
+      const pn = NODES.filter(n => n.pillar === 'priv');
+
+      SIM.vis.score = (vn[0].power * 0.4 + vn[1].power * 0.3 + vn[2].power * 0.3) * 100;
+      SIM.saf.score = (sn[0].power * 0.4 + sn[1].power * 0.35 + sn[2].power * 0.25) * 100;
+      SIM.priv.score = (pn[0].power * 0.4 + pn[1].power * 0.35 + pn[2].power * 0.25) * 100;
+      SIM.vis.logs += Math.round(vn[1].power * 5 + 1);
+
+      if (Math.random() < sn[0].power * 0.2) SIM.saf.catches++;
+      if (Math.random() < sn[1].power * 0.15) SIM.saf.recoveries++;
+      if (Math.random() < (1 - pn[0].power) * 0.2) SIM.priv.redacted++;
+      else SIM.priv.clean++;
+
+      if (SIM.total % 6 === 0) emitEvent(rnd(VIS_EVTS), 'vis');
+      if (SIM.total % 9 === 0) emitEvent(rnd(SAF_EVTS), 'saf');
+      if (SIM.total % 13 === 0) emitEvent(rnd(PRIV_EVTS), 'priv');
+
+      NODES.forEach(nd => {
+        if (Math.random() < nd.power * 0.1) { nd.fireT = now; for (let i = 0; i < 3; i++) spawnP(nd); }
+      });
+      EDGES.forEach(e => { if (Math.random() < 0.18) spawnEdgeP(e); });
+
+      updateHUD();
+    }
+
+    function updateHUD() {
+      const f = v => v.toFixed(1) + '%';
+      document.getElementById('vis-score').textContent = f(SIM.vis.score);
+      document.getElementById('vis-fill').style.width = SIM.vis.score + '%';
+      document.getElementById('saf-score').textContent = f(SIM.saf.score);
+      document.getElementById('saf-fill').style.width = SIM.saf.score + '%';
+      document.getElementById('priv-score').textContent = f(SIM.priv.score);
+      document.getElementById('priv-fill').style.width = SIM.priv.score + '%';
+      document.getElementById('tb-vis').textContent = f(SIM.vis.score);
+      document.getElementById('tb-saf').textContent = f(SIM.saf.score);
+      document.getElementById('tb-priv').textContent = f(SIM.priv.score);
+      document.getElementById('tb-runs').textContent = SIM.total;
+      document.getElementById('tb-evs').textContent = SIM.events;
+    }
+
+    function emitEvent(msg, pillar) {
+      SIM.events++;
+      const el = document.getElementById(pillar + '-event');
+      if (el) el.textContent = msg;
+    }
+
+    function rnd(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+    // ── PARTICLES ────────────────────────────────────────────────
+    function spawnP(nd) {
+      const a = Math.random() * Math.PI * 2, sp = 1.2 + Math.random() * 2;
+      SIM.particles.push({
+        x: nd.x, y: nd.y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp,
+        life: 1, decay: 0.03 + Math.random() * 0.025, color: nd.color, size: 1.8 + Math.random() * 2
+      });
+    }
+    function spawnEdgeP(e) {
+      const fn = NODES.find(n => n.id === e.f), tn = NODES.find(n => n.id === e.t);
+      if (!fn || !tn) return;
+      SIM.particles.push({
+        x: fn.x, y: fn.y, tx: tn.x, ty: tn.y, isEdge: true,
+        progress: 0, speed: 0.01 + Math.random() * 0.02, color: fn.color, size: 2.5, life: 1
+      });
+    }
+
+    // ── PROTOCOL APPLY ───────────────────────────────────────────
+    function applyProtocol(name) {
+      const p = PROTOCOLS[name];
+      currentProtocol = name;
+
+      // Set node targets
+      const vn = NODES.filter(n => n.pillar === 'vis');
+      const sn = NODES.filter(n => n.pillar === 'saf');
+      const pn = NODES.filter(n => n.pillar === 'priv');
+      vn.forEach((nd, i) => { nd.targetPower = p.vis[i]; nd.pulseT = performance.now(); });
+      sn.forEach((nd, i) => { nd.targetPower = p.saf[i]; nd.pulseT = performance.now(); });
+      pn.forEach((nd, i) => { nd.targetPower = p.priv[i]; nd.pulseT = performance.now(); });
+
+      // UI feedback
+      document.body.className = name === 'lockdown' ? 'lockdown' : name === 'amplify' ? 'amplify' : '';
+      const badge = document.getElementById('mode-badge');
+      badge.textContent = name === 'lockdown' ? '🔴 LOCKDOWN ACTIVE' :
+        name === 'amplify' ? '🟢 AMPLIFY ACTIVE' :
+          name === 'selective' ? '🟡 SELECTIVE MODE' : '● NOMINAL';
+      badge.className = 'mode-badge ' + (name === 'nominal' ? 'nominal' : name);
+
+      document.getElementById('cb-dot').style.background = p.dot;
+      document.getElementById('cb-mode-text').textContent = p.label + ' PROTOCOL';
+      document.getElementById('cb-mode-text').style.color = p.color;
+
+      // Particle burst on all nodes
+      NODES.forEach(nd => { for (let i = 0; i < 6; i++) spawnP(nd); });
+
+      // System message in feed
+      const msgs = {
+        lockdown: '🔴 LOCKDOWN ENGAGED — All pillars elevated. Trace depth maxed. Privacy gate hardened. Safety catch at 100%. Use: pre-audit, incident response, compliance review.',
+        amplify: '🟢 AMPLIFY ENGAGED — Visibility maxed for full observability. Safety relaxed for throughput. Use: live deployment, load testing, debug sessions.',
+        selective: '🟡 SELECTIVE MODE — Privacy locked at 100%, Safety elevated, Visibility balanced. Use: production with PII, healthcare, legal document agents.',
+        nominal: '🔵 NOMINAL RESTORED — Balanced defaults across all 3 pillars. Standard operating mode.',
+      };
+      addAI('SYSTEM', msgs[name], 'system');
+    }
+
+    // ── USE CASE SELECTOR ─────────────────────────────────────────
+    const USE_CASES = {
+      'ai-support': {
+        label: 'AI Customer Support',
+        recommend: 'amplify',
+        why: 'High observability needed to catch hallucination drift. Safety for escalation routing. Privacy for customer PII.'
+      },
+      'fintech': {
+        label: 'FinTech Compliance',
+        recommend: 'selective',
+        why: 'Safety maxed for SEC audit trails. Privacy locked for customer financial data. Visibility balanced.'
+      },
+      'healthcare': {
+        label: 'Healthcare Routing',
+        recommend: 'lockdown',
+        why: 'HIPAA demands privacy lockdown. Safety at 100% — a missed null routes the wrong patient. No exceptions.'
+      },
+      'ecommerce': {
+        label: 'E-Commerce Agents',
+        recommend: 'amplify',
+        why: 'Amplify during peak. Visibility catches token cost spikes early. Privacy moderate for anonymous sessions.'
+      },
+      'legal': {
+        label: 'Legal Document AI',
+        recommend: 'selective',
+        why: 'Privilege protection requires full privacy lockdown. Safety high. Visibility for audit only.'
+      },
+      'devops': {
+        label: 'DevOps / CI-CD',
+        recommend: 'amplify',
+        why: 'Amplify on deploy for max trace depth. Switch to lockdown on incident. This is your ops console.'
+      },
+      'stan': {
+        label: 'Your Stan Store Product',
+        recommend: 'nominal',
+        why: 'This dashboard is the deliverable. Sell as SaaS or info product to devs and AI creators building agent systems.'
+      },
+    };
+
+    function selectUseCase(id) {
+      const uc = USE_CASES[id];
+      document.querySelectorAll('.uc-card').forEach(c => c.className = 'uc-card');
+      event.currentTarget.className = 'uc-card active-' + (uc.recommend === 'lockdown' ? 'priv' : uc.recommend === 'amplify' ? 'vis' : 'saf');
+      document.getElementById('cb-use-case').textContent = uc.label;
+      addAI('VEILPIERCER', `Use case: <strong>${uc.label}</strong><br>Recommended protocol: <strong>${uc.recommend.toUpperCase()}</strong><br>${uc.why}`, 'agent');
+    }
+
+    // ── COMMAND INTERPRETER ──────────────────────────────────────
+    // Pattern-matches natural language to node actions + AI response
+    const CMD_PATTERNS = [
+      {
+        re: /lock.?down|secure|harden|restrict|shutdown|freeze/i,
+        action: () => applyProtocol('lockdown'),
+        response: `🔴 <strong>LOCKDOWN PROTOCOL ENGAGED</strong><br><br>What just happened to your nodes:<br>
+• TRACE, SIGNAL, DRIFT → 95–98% (max observability)<br>
+• CATCH, HEAL, ANOMALY → 95–100% (zero tolerance for faults)<br>
+• GATE, REDACT, SHIELD → 100% (no PII leaves this system)<br><br>
+<strong>Use this when:</strong> GDPR audit, SEC review, incident response, healthcare compliance, pre-production security sweep.<br><br>
+<strong>Real impact:</strong> In lockdown, the prototype pollution guard catches <em>constructor</em> injection attacks. The GDPR gate strips emails from nodeIds before Datadog ingestion. The CATCH gate prevents any node fault from propagating silently.`
+      },
+      {
+        re: /amplif|boost|max|increase|ramp|surge|scale.?up|full.?power/i,
+        action: () => applyProtocol('amplify'),
+        response: `🟢 <strong>AMPLIFY PROTOCOL ENGAGED</strong><br><br>What just happened to your nodes:<br>
+• TRACE, SIGNAL, DRIFT → 100% (every node emits full telemetry)<br>
+• CATCH, HEAL, ANOMALY → reduced (prioritizing throughput over caution)<br>
+• GATE, REDACT, SHIELD → relaxed (faster log writes, less filtering)<br><br>
+<strong>Use this when:</strong> Live deployment, load testing, debugging a production incident, or when you need full observability and performance matters more than privacy overhead.<br><br>
+<strong>Real impact:</strong> Token cost spikes appear as latency anomalies first. At full amplification, the DRIFT node catches model degradation 3–5× earlier than industry average.`
+      },
+      {
+        re: /selective|partial|custom|target|specific/i,
+        action: () => applyProtocol('selective'),
+        response: `🟡 <strong>SELECTIVE PROTOCOL ENGAGED</strong><br><br>What just happened to your nodes:<br>
+• TRACE → 85%, SIGNAL → 60%, DRIFT → 75%<br>
+• CATCH → 95%, HEAL → 85%, ANOMALY → 90%<br>
+• GATE, REDACT, SHIELD → 100% locked<br><br>
+<strong>Use this when:</strong> Running agents that process PII in production — legal document AI, healthcare routing, financial advice bots. You want full privacy protection without sacrificing safety.`
+      },
+      {
+        re: /nominal|reset|normal|default|restore|balance/i,
+        action: () => applyProtocol('nominal'),
+        response: `🔵 <strong>NOMINAL PROTOCOL RESTORED</strong><br><br>All 9 nodes eased back to balanced defaults. Standard operating mode.<br><br>
+Visibility 78% · Safety 82% · Privacy 88%<br><br>
+This is the baseline from which you run. From here you can LOCK DOWN before an audit or AMPLIFY before a deploy — and return here after.`
+      },
+      {
+        re: /what.*(use|for|do|purpose|point)|why.*need|use.?case/i,
+        action: null,
+        response: `<strong>What Veilpiercer Is Used For</strong><br><br>
+It's an <em>AI Agent Observatory</em> — a control plane for the 3 things that silently kill production AI systems:<br><br>
+👁 <strong>Visibility</strong> — You can't fix what you can't see. Multi-agent chains fail silently. Drift accumulates invisibly. Token costs spike while you sleep.<br><br>
+🛡 <strong>Safety</strong> — One uncaught node fault cascades. SEC requires decision trails. Healthcare routing errors route the wrong patient. A $4,200/day token burn started as a 3× latency anomaly.<br><br>
+🔒 <strong>Privacy</strong> — Every log line is a breach vector. A single email in a nodeId failed a GDPR audit at $2.4M. The constructor injection bug we patched is a real attack vector against logging pipelines.<br><br>
+<strong>Who buys this:</strong> Dev teams running AI agents in production · Compliance officers at FinTech and healthcare companies · AI creators selling automation to agencies · DevOps engineers managing CI/CD agent pipelines.`
+      },
+      {
+        re: /real.?world|impact|cost|money|roi|worth/i,
+        action: null,
+        response: `<strong>Real-World Impact Numbers</strong><br><br>
+💸 <strong>$4,200/day</strong> — token cost from a single prompt loop that went undetected without anomaly detection<br>
+💸 <strong>$2.4M fine</strong> — GDPR audit failure caused by an email address logged in a nodeId field<br>
+🏥 <strong>Patient rerouting</strong> — null-check miss at node 3 in a healthcare agent — invisible without a catch gate<br>
+📉 <strong>3–5× drift</strong> — AI customer support quality degradation over 90 days without trace logging<br>
+⚖️ <strong>SEC investigation risk</strong> — no agent decision audit trail = compliance exposure for financial bots<br><br>
+These are not hypotheticals. Each one is a documented production failure mode that Veilpiercer's 3 pillars directly prevent.`
+      },
+      {
+        re: /privacy|gdpr|hipaa|pii|redact|leak/i,
+        action: () => { NODES.filter(n => n.pillar === 'priv').forEach(nd => { nd.targetPower = 1.0; nd.pulseT = performance.now(); }); },
+        response: `🔒 <strong>PRIVACY NODES MAXED</strong><br><br>
+GATE → 100% · REDACT → 100% · SHIELD → 100%<br><br>
+The three privacy nodes now enforce:<br>
+• <strong>GATE</strong>: Strict allowlist — any unknown field is logged by name, value never captured<br>
+• <strong>REDACT</strong>: Email addresses, paths, API keys → [REDACTED] before any log exits<br>
+• <strong>SHIELD</strong>: hasOwnProperty on both sides — constructor/prototype injection blocked<br><br>
+At this level, zero PII reaches Datadog, Splunk, or any 3rd party collector.`
+      },
+      {
+        re: /safety|catch|recover|heal|anomaly|fault/i,
+        action: () => { NODES.filter(n => n.pillar === 'saf').forEach(nd => { nd.targetPower = 1.0; nd.pulseT = performance.now(); }); },
+        response: `🛡 <strong>SAFETY NODES MAXED</strong><br><br>
+CATCH → 100% · HEAL → 100% · ANOMALY Δ → 100%<br><br>
+• Every node fault is caught before it propagates<br>
+• Auto-recovery fires on first failure<br>
+• Latency anomalies flagged at 1× above average (hair-trigger)<br><br>
+Use this before a live deploy, during an incident, or when running healthcare/financial agents where a missed fault has real-world consequences.`
+      },
+      {
+        re: /visib|trace|signal|drift|log|monitor/i,
+        action: () => { NODES.filter(n => n.pillar === 'vis').forEach(nd => { nd.targetPower = 1.0; nd.pulseT = performance.now(); }); },
+        response: `👁 <strong>VISIBILITY NODES MAXED</strong><br><br>
+TRACE → 100% · SIGNAL → 100% · DRIFT → 100%<br><br>
+• Full chain position logging — every node in every chain emits telemetry<br>
+• Maximum signal rate — OpenTelemetry spans for all evaluations<br>
+• Drift detection at highest sensitivity — output key changes caught immediately<br><br>
+At this level you can reconstruct any agent chain from logs and detect model degradation the same day it begins.`
+      },
+    ];
+
+    function sendCommand() {
+      const input = document.getElementById('cmd-input');
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+      processCommand(text);
+    }
+
+    function quickCmd(text) {
+      document.getElementById('cmd-input').value = text;
+      processCommand(text);
+    }
+
+    function processCommand(text) {
+      addAI('YOU', text, 'user');
+      const loading = addLoading();
+
+      setTimeout(() => {
+        removeLoading(loading);
+        let matched = false;
+        for (const p of CMD_PATTERNS) {
+          if (p.re.test(text)) {
+            if (p.action) p.action();
+            addAI('VEILPIERCER', p.response, 'agent');
+            matched = true;
+            break;
+          }
+        }
+        if (!matched) {
+          addAI('VEILPIERCER',
+            `Command received: "<em>${text}</em>"<br><br>Try: <strong>lock down</strong>, <strong>amplify</strong>, <strong>selective</strong>, <strong>nominal</strong>, or ask what this can be used for.<br><br>You can also target a pillar: "amplify visibility", "lock down privacy", "max safety nodes".`,
+            'agent');
+        }
+      }, 600 + Math.random() * 400);
+    }
+
+    document.getElementById('cmd-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendCommand(); }
+    });
+
+    let loadingEl = null;
+    function addLoading() {
+      const feed = document.getElementById('ai-feed');
+      const el = document.createElement('div');
+      el.className = 'ai-entry agent';
+      el.innerHTML = '<div class="ai-who" style="color:var(--vis)">VEILPIERCER</div><div class="ai-loading"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div>';
+      feed.prepend(el);
+      return el;
+    }
+    function removeLoading(el) { if (el && el.parentNode) el.parentNode.removeChild(el); }
+
+    function addAI(who, msg, type) {
+      const feed = document.getElementById('ai-feed');
+      const colors = { YOU: 'var(--vis)', VEILPIERCER: 'var(--saf)', SYSTEM: 'var(--warn)' };
+      const el = document.createElement('div');
+      el.className = `ai-entry ${type}`;
+      el.innerHTML = `<div class="ai-who" style="color:${colors[who] || 'var(--t2)'}">${who}</div><div>${msg}</div>`;
+      feed.prepend(el);
+      while (feed.children.length > 40) feed.removeChild(feed.lastChild);
+    }
+
+    // ── DRAW ─────────────────────────────────────────────────────
+    function draw(now) {
+      drawBg(now * 0.001);
+      ctx.clearRect(0, 0, W(), H());
+
+      // Pillar glows
+      [{ cx: W() * 0.22, cy: H() * 0.55, c: '#00eeff' }, { cx: W() * .5, cy: H() * .32, c: '#00ff99' }, { cx: W() * .78, cy: H() * .55, c: '#cc44ff' }].forEach(o => {
+        const g = ctx.createRadialGradient(o.cx, o.cy, 0, o.cx, o.cy, 170);
+        g.addColorStop(0, o.c + '12'); g.addColorStop(1, 'transparent');
+        ctx.beginPath(); ctx.arc(o.cx, o.cy, 170, 0, Math.PI * 2);
+        ctx.fillStyle = g; ctx.fill();
+      });
+
+      // Orbit rings
+      NODES.forEach(nd => {
+        ctx.beginPath(); ctx.arc(nd.cx, nd.cy, nd.orbitR, 0, Math.PI * 2);
+        ctx.strokeStyle = nd.color + '0c'; ctx.lineWidth = 0.7;
+        ctx.setLineDash([2, 10]); ctx.stroke(); ctx.setLineDash([]);
+      });
+
+      // Edges
+      EDGES.forEach(e => {
+        const fn = NODES.find(n => n.id === e.f), tn = NODES.find(n => n.id === e.t);
+        if (!fn || !tn) return;
+        ctx.beginPath(); ctx.moveTo(fn.x, fn.y);
+        const mx = (fn.x + tn.x) / 2 + (tn.y - fn.y) * 0.2, my = (fn.y + tn.y) / 2 - (tn.x - fn.x) * 0.2;
+        ctx.quadraticCurveTo(mx, my, tn.x, tn.y);
+        ctx.strokeStyle = fn.color + '20'; ctx.lineWidth = 1.2;
+        ctx.setLineDash([3, 12]); ctx.stroke(); ctx.setLineDash([]);
+      });
+
+      // Particles
+      for (let i = SIM.particles.length - 1; i >= 0; i--) {
+        const p = SIM.particles[i];
+        if (p.isEdge) {
+          p.progress += p.speed;
+          if (p.progress >= 1) { SIM.particles.splice(i, 1); continue; }
+          p.x += (p.tx - p.x) * p.speed * 1.15; p.y += (p.ty - p.y) * p.speed * 1.15;
+          const a = Math.round((1 - p.progress) * 200).toString(16).padStart(2, '0');
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.size * (1 - p.progress * .4), 0, Math.PI * 2);
+          ctx.fillStyle = p.color + a; ctx.fill();
+        } else {
+          p.x += p.vx; p.y += p.vy; p.life -= p.decay;
+          if (p.life <= 0) { SIM.particles.splice(i, 1); continue; }
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+          ctx.fillStyle = p.color + Math.round(p.life * 150).toString(16).padStart(2, '0');
+          ctx.fill();
+        }
+      }
+
+      // Nodes
+      NODES.forEach(nd => {
+        if (!nd.dragging) {
+          nd.orbitAngle += nd.orbitSpeed;
+          nd.x = nd.cx + Math.cos(nd.orbitAngle) * nd.orbitR;
+          nd.y = nd.cy + Math.sin(nd.orbitAngle) * nd.orbitR;
+        }
+        const fAge = now - nd.fireT, pAge = now - nd.pulseT;
+        const firing = fAge < 700, pulsed = pAge < 600;
+        const col = nd.color, R = nd.R;
+
+        if (firing || pulsed) {
+          const age = firing ? fAge / 700 : pAge / 600;
+          ctx.beginPath(); ctx.arc(nd.x, nd.y, R + (1 - age) * 22, 0, Math.PI * 2);
+          ctx.strokeStyle = col + Math.round((1 - age) * 90).toString(16).padStart(2, '0');
+          ctx.lineWidth = 2.5; ctx.stroke();
+        }
+
+        // Power arc bg
+        ctx.beginPath(); ctx.arc(nd.x, nd.y, R + 7, 0, Math.PI * 2);
+        ctx.strokeStyle = col + '1a'; ctx.lineWidth = 6; ctx.stroke();
+        // Power arc fill
+        ctx.beginPath(); ctx.arc(nd.x, nd.y, R + 7, -Math.PI / 2, -Math.PI / 2 + nd.power * Math.PI * 2);
+        ctx.strokeStyle = col; ctx.lineWidth = 6; ctx.lineCap = 'round';
+        ctx.shadowColor = col; ctx.shadowBlur = nd.power > 0.9 ? 16 : 8; ctx.stroke();
+        ctx.shadowBlur = 0; ctx.lineCap = 'butt';
+
+        // Body
+        const g = ctx.createRadialGradient(nd.x - R * .25, nd.y - R * .25, 2, nd.x, nd.y, R);
+        g.addColorStop(0, '#0c1e32'); g.addColorStop(1, '#020a14');
+        ctx.beginPath(); ctx.arc(nd.x, nd.y, R, 0, Math.PI * 2);
+        ctx.fillStyle = g; ctx.fill();
+        ctx.strokeStyle = firing ? col : col + '55'; ctx.lineWidth = firing ? 2 : 1.5;
+        if (firing) { ctx.shadowColor = col; ctx.shadowBlur = 14; } ctx.stroke(); ctx.shadowBlur = 0;
+
+        // Icon
+        ctx.font = '13px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillStyle = col; ctx.fillText(nd.icon, nd.x, nd.y - 4);
+        // Label
+        ctx.font = '600 7px "JetBrains Mono"'; ctx.fillStyle = col + '99'; ctx.textBaseline = 'top';
+        ctx.fillText(nd.label, nd.x, nd.y + R * .42);
+        // Power
+        ctx.font = '700 8px "Orbitron"'; ctx.fillStyle = col; ctx.textBaseline = 'bottom';
+        ctx.fillText(Math.round(nd.power * 100) + '%', nd.x, nd.y - R * .32);
+        // Pillar dot
+        const dc = { vis: '#00eeff', saf: '#00ff99', priv: '#cc44ff' }[nd.pillar];
+        ctx.beginPath(); ctx.arc(nd.x + R * .62, nd.y - R * .62, 3, 0, Math.PI * 2);
+        ctx.fillStyle = dc; ctx.fill();
+      });
+
+      tick(now);
+      requestAnimationFrame(draw);
+    }
+
+    // ── INTERACTION ───────────────────────────────────────────────
+    let dragNode = null, dragStartY = 0, dragStartP = 0, longT = null, lastTap = 0;
+
+    function gpos(e) {
+      const r = nc.getBoundingClientRect();
+      if (e.touches && e.touches.length) return { x: e.touches[0].clientX - r.left, y: e.touches[0].clientY - r.top };
+      return { x: e.clientX - r.left, y: e.clientY - r.top };
+    }
+    function hittest(x, y) { for (let i = NODES.length - 1; i >= 0; i--) { const n = NODES[i]; if (Math.hypot(x - n.x, y - n.y) < n.R + 12) return n; } return null; }
+
+    nc.addEventListener('mousedown', onDown, { passive: false });
+    nc.addEventListener('mousemove', onMove, { passive: false });
+    nc.addEventListener('mouseup', onUp, { passive: false });
+    nc.addEventListener('click', onTap, { passive: false });
+    nc.addEventListener('mouseleave', hideTip);
+    nc.addEventListener('touchstart', onDown, { passive: false });
+    nc.addEventListener('touchmove', onMove, { passive: false });
+    nc.addEventListener('touchend', e => { onUp(e); onTap(e); }, { passive: false });
+
+    function onDown(e) { e.preventDefault(); const p = gpos(e), nd = hittest(p.x, p.y); if (!nd) return; dragNode = nd; dragStartY = p.y; dragStartP = nd.power; nd.dragging = true; longT = setTimeout(() => { if (dragNode) { dragNode.targetPower = 1.0; dragNode.pulseT = performance.now(); for (let i = 0; i < 10; i++) spawnP(dragNode); showTip(dragNode, '⚡ MAXED'); } }, 600); }
+    function onMove(e) { e.preventDefault(); const p = gpos(e); if (!dragNode) { const nd = hittest(p.x, p.y); if (nd) { showTip(nd, ''); moveTip(e); } else hideTip(); return; } clearTimeout(longT); const dy = (dragStartY - p.y) / (H() * 0.3); dragNode.targetPower = Math.max(0.05, Math.min(1.0, dragStartP + dy)); dragNode.fireT = performance.now(); showTip(dragNode, '↕ tuning'); moveTip(e); }
+    function onUp(e) { clearTimeout(longT); if (dragNode) { dragNode.dragging = false; dragNode = null; } setTimeout(hideTip, 1200); }
+    function onTap(e) { e.preventDefault(); const p = gpos(e), nd = hittest(p.x, p.y); if (!nd) return; const now = Date.now(), dbl = now - lastTap < 320; lastTap = now; if (dbl) { nd.targetPower = 1.0; for (let i = 0; i < 14; i++) spawnP(nd); showTip(nd, '⚡ MAXED'); } else { nd.targetPower = Math.min(1.0, nd.targetPower + 0.1); for (let i = 0; i < 4; i++) spawnP(nd); showTip(nd, '+10%'); } nd.pulseT = performance.now(); setTimeout(hideTip, 1000); }
+
+    function showTip(nd, action) {
+      const tip = document.getElementById('ntip');
+      const pl = { vis: 'VISIBILITY', saf: 'SAFETY', priv: 'PRIVACY' }[nd.pillar];
+      const pc = { vis: 'var(--vis)', saf: 'var(--saf)', priv: 'var(--priv)' }[nd.pillar];
+      document.getElementById('nt-name').textContent = nd.label;
+      document.getElementById('nt-name').style.color = nd.color;
+      document.getElementById('nt-body').innerHTML = `<span style="color:${pc}">${pl}</span> · ${nd.role}<br>Power: <span style="color:${nd.color}">${Math.round(nd.power * 100)}%</span><br><span style="color:var(--warn)">${action || nd.role}</span>`;
+      tip.style.display = 'block';
+    }
+    function moveTip(e) { const tip = document.getElementById('ntip'), x = e.touches ? e.touches[0].clientX : e.clientX, y = e.touches ? e.touches[0].clientY : e.clientY; tip.style.left = Math.min(x + 16, window.innerWidth - 240) + 'px'; tip.style.top = Math.max(y - 50, 8) + 'px'; }
+    function hideTip() { document.getElementById('ntip').style.display = 'none'; }
+
+    // ── INIT ─────────────────────────────────────────────────────
+    resize();
+    addAI('VEILPIERCER',
+      `System online. 9 nodes active across 3 pillars.<br><br>
+  Type a command or tap a protocol button. Try <strong>"lock down"</strong>, <strong>"amplify"</strong>, or <strong>"what can this be used for?"</strong>`,
+      'agent'
+    );
+    requestAnimationFrame(draw);
+
+    // ════════════════════════════════════════════════════════════
+    //  NEXUS ULTRA — BACKEND CONNECTION
+    //  Fires real server actions on every protocol activation
+    // ════════════════════════════════════════════════════════════
+    const NX = {
+      base: 'http://127.0.0.1:3000',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': 'Burton' },
+      async get(path) {
+        try {
+          const r = await fetch(this.base + path, { signal: AbortSignal.timeout(4000) });
+          return r.json();
+        } catch (e) { return { ok: false, error: e.message }; }
+      },
+      async post(path, body) {
+        try {
+          const r = await fetch(this.base + path, {
+            method: 'POST', headers: this.headers,
+            body: JSON.stringify(body), signal: AbortSignal.timeout(8000)
+          });
+          return r.json();
+        } catch (e) { return { ok: false, error: e.message }; }
+      }
+    };
+
+    // ── NEXUS STATUS INDICATOR IN TOPBAR ─────────────────────────
+    const nxIndicator = document.createElement('div');
+    nxIndicator.id = 'nx-ind';
+    nxIndicator.innerHTML = `<span id="nx-ind-dot" style="width:6px;height:6px;border-radius:50%;background:#ff9500;display:inline-block;margin-right:5px;animation:nxblink .9s infinite"></span><span id="nx-ind-txt" style="font-size:8px;letter-spacing:1.5px;color:rgba(0,238,255,.5)">NEXUS…</span>`;
+    nxIndicator.style.cssText = 'display:flex;align-items:center;margin-left:12px;';
+    document.querySelector('.tb-stats').prepend(nxIndicator);
+
+    // ── NEXUS LOG PANEL (injected into right panel bottom) ────────
+    const logPanel = document.createElement('div');
+    logPanel.id = 'nx-log-panel';
+    logPanel.style.cssText = 'padding:6px 10px;border-top:1px solid var(--rim);flex-shrink:0;max-height:110px;overflow-y:auto;';
+    logPanel.innerHTML = `<div style="font-size:7px;letter-spacing:2px;color:var(--t3);margin-bottom:4px;text-transform:uppercase">NEXUS Live Log</div><div id="nx-log-lines" style="font-size:8px;color:rgba(194,216,240,.35);line-height:1.9;"></div>`;
+    document.getElementById('right-panel').appendChild(logPanel);
+
+    // ── STYLES ────────────────────────────────────────────────────
+    const sty = document.createElement('style');
+    sty.textContent = `
+  @keyframes nxblink{0%,100%{opacity:1}50%{opacity:.3}}
+  #nx-log-panel::-webkit-scrollbar{width:2px}
+  #nx-log-panel::-webkit-scrollbar-thumb{background:var(--rim)}
+  .nx-log-ok{color:#00ff99!important}
+  .nx-log-err{color:#ff3355!important}
+  #nx-nav-link{
+    position:fixed;bottom:68px;right:12px;z-index:50;
+    font-family:'Orbitron',sans-serif;font-size:8px;font-weight:700;
+    letter-spacing:1.5px;text-transform:uppercase;
+    padding:8px 14px;background:rgba(4,17,31,.95);
+    border:1px solid rgba(0,238,255,.25);color:rgba(0,238,255,.6);
+    text-decoration:none;transition:all .2s;
+  }
+  #nx-nav-link:hover{border-color:var(--vis);color:var(--vis);background:rgba(0,238,255,.07);}
+  #nx-toast-cmd{position:fixed;top:60px;left:50%;transform:translateX(-50%);
+    background:rgba(0,255,153,.12);border:1px solid #00ff99;
+    color:#00ff99;font-family:'JetBrains Mono',monospace;font-size:9px;
+    letter-spacing:1.5px;padding:7px 18px;z-index:100;
+    opacity:0;transition:opacity .25s;pointer-events:none;}
+  #nx-toast-cmd.show{opacity:1}
+  #nx-toast-cmd.nx-err{background:rgba(255,51,85,.12);border-color:#ff3355;color:#ff3355}
+`;
+    document.head.appendChild(sty);
+
+    // ── PITCH PAGE LINK ───────────────────────────────────────────
+    const navLink = document.createElement('a');
+    navLink.id = 'nx-nav-link';
+    navLink.href = '/veilpiercer-pitch.html';
+    navLink.textContent = '← Pitch Page';
+    document.body.appendChild(navLink);
+
+    // ── TOAST ─────────────────────────────────────────────────────
+    const toastEl = document.createElement('div');
+    toastEl.id = 'nx-toast-cmd';
+    document.body.appendChild(toastEl);
+    function showToast(msg, isErr) {
+      toastEl.textContent = msg;
+      toastEl.className = 'show' + (isErr ? ' nx-err' : '');
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => { toastEl.className = ''; }, 3000);
+    }
+
+    // ── LOG RENDER ────────────────────────────────────────────────
+    function renderNxLogs(data) {
+      if (!data.ok) return;
+      const lines = (data.lines || []).slice(-6).reverse();
+      document.getElementById('nx-log-lines').innerHTML = lines.map(l => {
+        const ts = (l.match(/^\[([^\]]+)\]/) || [])[1] || '';
+        const msg = l.replace(/^\[[^\]]+\]\s*/, '');
+        const cls = /err|fail/i.test(msg) ? 'nx-log-err' : /OK|ONLINE|ACTIVE/i.test(msg) ? 'nx-log-ok' : '';
+        return `<div class="${cls}" style="border-bottom:1px solid var(--rim3,#0a1a28);padding:1px 0"><span style="color:rgba(0,238,255,.2);margin-right:4px">${ts.slice(11, 19)}</span>${msg}</div>`;
+      }).join('');
+    }
+
+    // ── POLL STATUS + LOGS ────────────────────────────────────────
+    async function nxPoll() {
+      const d = await NX.get('/status');
+      const dot = document.getElementById('nx-ind-dot');
+      const txt = document.getElementById('nx-ind-txt');
+      if (d.ok) {
+        dot.style.background = '#00ff99';
+        dot.style.animation = 'nxblink 2.2s infinite';
+        txt.textContent = 'NEXUS ONLINE · UP ' + d.uptime;
+        txt.style.color = 'rgba(0,255,153,.6)';
+      } else {
+        dot.style.background = '#ff3355';
+        dot.style.animation = 'none';
+        txt.textContent = 'NEXUS OFFLINE';
+        txt.style.color = 'rgba(255,51,85,.6)';
+      }
+      renderNxLogs(await NX.get('/logs?lines=10'));
+    }
+    nxPoll();
+    setInterval(nxPoll, 5000);
+
+    // ── PATCH applyProtocol → also fires NEXUS /run ───────────────
+    const _origApply = applyProtocol;
+    window.applyProtocol = async function (name) {
+      _origApply(name);   // run the original visual/node logic
+
+      // Fire the real NEXUS action
+      const res = await NX.post('/run', { action: 'force-stabilize' });
+
+      if (res.ok) {
+        showToast('NEXUS: ' + name.toUpperCase() + ' protocol fired on server');
+        addAI('NEXUS', `✓ Server confirmed: <strong>force-stabilize</strong> executed for <strong>${name.toUpperCase()}</strong> protocol. Uptime stable.`, 'system');
+      } else {
+        showToast('NEXUS offline — local only', true);
+        addAI('NEXUS', `⚠ Server unreachable — protocol applied locally only. Start NEXUS ULTRA to sync.`, 'system');
+      }
+
+      // Log a capture for audit trail
+      await NX.post('/capture', {});
+      await NX.post('/tabs', {
+        edge_all_open_tabs: [{ url: window.location.href, title: 'VeilPiercer Command — ' + name.toUpperCase(), active: true }]
+      });
+
+      // Refresh logs immediately
+      renderNxLogs(await NX.get('/logs?lines=10'));
+    };
+
+    // ── AUTO-REGISTER TAB ─────────────────────────────────────────
+    window.addEventListener('load', () => {
+      NX.post('/tabs', {
+        edge_all_open_tabs: [{ url: window.location.href, title: document.title, active: true }]
+      });
+    });
+  </script>
+</body>
+
+</html>
