@@ -1,0 +1,7 @@
+{
+  "install": "npm install",
+  "start": "node server.cjs",
+  "watch": {
+    "ignore": ["nexus.log", "captures/", "drop-zone/"]
+  }
+}
