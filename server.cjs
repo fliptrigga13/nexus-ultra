@@ -581,6 +581,96 @@ app.post('/ollama/agent', async (req, res) => {
   }
 });
 
+// ── Gemini Integration ──────────────────
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta';
+
+// GET /gemini/status
+app.get('/gemini/status', (req, res) => {
+  const configured = !!(GEMINI_API_KEY && !GEMINI_API_KEY.includes('PASTE'));
+  res.json({ ok: configured, status: configured ? 'configured' : 'missing_key', model: GEMINI_MODEL });
+});
+
+// POST /gemini/generate — send prompt to Gemini free API
+// Body: { "prompt": "...", "system": "..." }
+app.post('/gemini/generate', async (req, res) => {
+  if (!GEMINI_API_KEY) return res.status(503).json({ ok: false, error: 'GEMINI_API_KEY not set in .env' });
+  const { prompt, system } = req.body || {};
+  if (!prompt) return res.status(400).json({ ok: false, error: 'prompt required' });
+  try {
+    const https = require('https');
+    const payload = JSON.stringify({
+      system_instruction: system ? { parts: [{ text: system }] } : undefined,
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { maxOutputTokens: 1024, temperature: 0.7 }
+    });
+    const data = await new Promise((resolve, reject) => {
+      const url = `${GEMINI_BASE}/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+      const u = new URL(url);
+      const options = {
+        hostname: u.hostname, path: u.pathname + u.search, method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) }
+      };
+      const r = https.request(options, resp => {
+        let body = '';
+        resp.on('data', d => body += d);
+        resp.on('end', () => { try { resolve(JSON.parse(body)); } catch { reject(new Error('Bad JSON')); } });
+      });
+      r.on('error', reject);
+      r.setTimeout(30000, () => { r.destroy(); reject(new Error('Gemini timeout')); });
+      r.write(payload); r.end();
+    });
+    if (data.error) throw new Error(data.error.message);
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    log(`GEMINI [${GEMINI_MODEL}]: "${prompt.substring(0, 50)}..." → ${text.length} chars`);
+    res.json({ ok: true, response: text, model: GEMINI_MODEL });
+  } catch (e) {
+    log(`GEMINI ERROR: ${e.message}`);
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+// POST /gemini/agent — same structured tasks as Ollama but via Gemini
+app.post('/gemini/agent', async (req, res) => {
+  if (!GEMINI_API_KEY) return res.status(503).json({ ok: false, error: 'GEMINI_API_KEY not set in .env' });
+  const { task, data } = req.body || {};
+  const promptFn = AGENT_PROMPTS[task];
+  if (!promptFn) return res.status(400).json({ ok: false, error: `Unknown task. Available: ${Object.keys(AGENT_PROMPTS).join(', ')}` });
+  const { system, prompt } = promptFn(data || {});
+  try {
+    const https = require('https');
+    const payload = JSON.stringify({
+      system_instruction: { parts: [{ text: system }] },
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { maxOutputTokens: 1024, temperature: 0.7 }
+    });
+    const result = await new Promise((resolve, reject) => {
+      const url = `${GEMINI_BASE}/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+      const u = new URL(url);
+      const options = {
+        hostname: u.hostname, path: u.pathname + u.search, method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) }
+      };
+      const r = https.request(options, resp => {
+        let body = '';
+        resp.on('data', d => body += d);
+        resp.on('end', () => { try { resolve(JSON.parse(body)); } catch { reject(new Error('Bad JSON')); } });
+      });
+      r.on('error', reject);
+      r.setTimeout(30000, () => { r.destroy(); reject(new Error('timeout')); });
+      r.write(payload); r.end();
+    });
+    if (result.error) throw new Error(result.error.message);
+    const text = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    log(`GEMINI AGENT [${task}]: complete (${text.length} chars)`);
+    res.json({ ok: true, task, response: text, model: GEMINI_MODEL });
+  } catch (e) {
+    log(`GEMINI AGENT ERROR: ${e.message}`);
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
 // ── Boot ─────────────────────────────────
 app.listen(PORT, HOST, () => {
   log('╔══════════════════════════════════════════╗');
@@ -592,6 +682,7 @@ app.listen(PORT, HOST, () => {
   log(`Stripe cfg  → ${STRIPE_PK ? 'pk loaded (' + (STRIPE_PK.startsWith('pk_live') ? 'LIVE' : 'TEST') + ')' : 'NOT SET'}`);
   log(`Stripe sk   → ${stripe ? 'ACTIVE' : 'NOT SET — add sk_live_... to .env'}`);
   log(`Ollama      → ${OLLAMA_URL} (model: ${OLLAMA_MODEL})`);
+  log(`Gemini      → ${GEMINI_API_KEY ? 'CONFIGURED (' + GEMINI_MODEL + ')' : 'NOT SET — add GEMINI_API_KEY to .env'}`);
   log(`n8n         → ${N8N_URL}`);
   log(`Drop Zone   → ${DROP_DIR}`);
   log(`Scheduled   → ${Object.keys(jobs).length} job(s) active`);
