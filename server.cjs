@@ -797,12 +797,11 @@ app.listen(PORT, HOST, async () => {
   log(`Stripe cfg  → ${STRIPE_PK ? 'pk loaded (' + (STRIPE_PK.startsWith('pk_live') ? 'LIVE' : 'TEST') + ')' : 'NOT SET'}`);
   log(`Stripe sk   → ${stripe ? 'ACTIVE' : 'NOT SET'}`);
   log(`Ollama      → ${OLLAMA_URL} (model: ${OLLAMA_MODEL})`);
-  log(`Gemini      → ${GEMINI_API_KEY ? 'CONFIGURED' : 'NOT SET'}`);
   log(`n8n         → ${N8N_URL}`);
   log(`Email       → ${EMAIL_USER || 'NOT SET'}`);
   log(`Scheduled   → ${Object.keys(jobs).length} job(s) active`);
 
-  // ── Auto-detect ngrok public URL ─────────
+  // ── Auto-detect ngrok public URL + resend broken links ──
   setTimeout(async () => {
     try {
       const http = require('http');
@@ -816,10 +815,42 @@ app.listen(PORT, HOST, async () => {
       if (tunnel) {
         PUBLIC_URL = tunnel.public_url;
         log(`PUBLIC URL  → ${PUBLIC_URL} (ngrok live)`);
-        // Save to desktop for easy access
+
+        // Save to Desktop
         const desktopFile = require('path').join(require('os').homedir(), 'Desktop', 'VEILPIERCER-LIVE-URL.txt');
-        require('fs').writeFileSync(desktopFile, `NEXUS PUBLIC URL\n${PUBLIC_URL}\n\nAccess Portal: ${PUBLIC_URL}/access.html\nDashboard: ${PUBLIC_URL}\n\nUpdated: ${new Date().toISOString()}`);
+        require('fs').writeFileSync(desktopFile,
+          `NEXUS PUBLIC URL\n${PUBLIC_URL}\n\nAccess Portal: ${PUBLIC_URL}/access.html\nDashboard: ${PUBLIC_URL}\n\nUpdated: ${new Date().toISOString()}`);
         log(`URL saved   → Desktop/VEILPIERCER-LIVE-URL.txt`);
+
+        // ── Resend fresh links to buyers who haven't opened their portal yet ──
+        if (transporter) {
+          const db = loadAccessDB();
+          const unseen = Object.entries(db).filter(([, d]) => (d.used || 0) < 2 && d.email);
+          if (unseen.length > 0) {
+            log(`RESEND: ${unseen.length} buyer(s) with unvisited portals — refreshing links...`);
+            for (const [token, d] of unseen) {
+              const accessUrl = `${PUBLIC_URL}/access.html?token=${token}`;
+              const subject = `Your VeilPiercer ${d.tier} Access Link (Updated)`;
+              const html = `
+                <div style="font-family:Inter,sans-serif;max-width:560px;margin:0 auto;background:#050508;color:#e2e8f0;padding:40px;border-radius:16px;">
+                  <p style="font-size:12px;letter-spacing:0.2em;color:#7c3aed;text-transform:uppercase;font-weight:700;text-align:center;">NEXUS ULTRA</p>
+                  <h2 style="text-align:center;margin:16px 0 8px;">Your access link has been refreshed</h2>
+                  <p style="color:#64748b;text-align:center;margin-bottom:32px;">Use this updated link to access your VeilPiercer ${d.tier} portal</p>
+                  <div style="text-align:center;">
+                    <a href="${accessUrl}" style="display:inline-block;padding:16px 32px;background:linear-gradient(135deg,#7c3aed,#9333ea);color:white;text-decoration:none;border-radius:12px;font-weight:700;font-size:16px;">🔓 Open Access Portal</a>
+                  </div>
+                  <p style="text-align:center;color:#64748b;font-size:12px;margin-top:24px;">Tier: ${d.tier} — this link is unique to you</p>
+                </div>`;
+              try {
+                await transporter.sendMail({ from: EMAIL_FROM, to: d.email, subject, html, text: `Your updated VeilPiercer ${d.tier} portal: ${accessUrl}` });
+                log(`RESEND OK → ${d.email} [${d.tier}]`);
+              } catch (e) { log(`RESEND FAIL → ${d.email}: ${e.message}`); }
+              await new Promise(r => setTimeout(r, 1000)); // 1s delay between emails
+            }
+          } else {
+            log(`RESEND: all buyers have visited their portal — no resend needed`);
+          }
+        }
       } else {
         log(`PUBLIC URL  → ${PUBLIC_URL} (ngrok not detected, using local)`);
       }
@@ -828,3 +859,4 @@ app.listen(PORT, HOST, async () => {
     }
   }, 3000);
 });
+
