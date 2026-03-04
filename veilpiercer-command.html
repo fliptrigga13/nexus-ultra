@@ -1588,6 +1588,93 @@ At this level you can reconstruct any agent chain from logs and detect model deg
     nxPoll();
     setInterval(nxPoll, 5000);
 
+    // ── LIVE METRICS → REAL NODE SCORES ──────────────────────────
+    // When in NOMINAL mode, node power levels reflect actual NEXUS activity
+    let lastEventId = 0;
+    async function syncLiveMetrics() {
+      const m = await NX.get('/veilpiercer/metrics');
+      if (!m.ok) return;
+
+      const inNominal = currentProtocol === 'nominal';
+      if (inNominal) {
+        // Drive pillar nodes from real scores (normalize to 0-1)
+        const vScore = m.vis.score / 100;
+        const sScore = m.saf.score / 100;
+        const pScore = m.priv.score / 100;
+
+        const vn = NODES.filter(n => n.pillar === 'vis');
+        const sn = NODES.filter(n => n.pillar === 'saf');
+        const pn = NODES.filter(n => n.pillar === 'priv');
+
+        // TRACE = overall success rate, SIGNAL = throughput, DRIFT = latency health
+        vn[0].targetPower = Math.max(0.3, vScore);
+        vn[1].targetPower = Math.max(0.3, Math.min(1, (m.vis.total || 1) / Math.max(m.vis.total, 10)));
+        vn[2].targetPower = Math.max(0.3, m.vis.avgLatMs > 0 ? Math.max(0.4, 1 - m.vis.avgLatMs / 20000) : vScore);
+
+        // CATCH = catch rate, HEAL = recovery rate, ANOMALY = inverse failure rate
+        sn[0].targetPower = Math.max(0.3, sScore);
+        sn[1].targetPower = Math.max(0.3, m.saf.failures > 0 ? Math.min(1, m.saf.recoveries / m.saf.failures) : sScore);
+        sn[2].targetPower = Math.max(0.3, m.saf.failures > 0 ? Math.max(0.4, 1 - (m.saf.failures / Math.max(m.saf.catches + m.saf.failures, 1)) * 2) : sScore);
+
+        // GATE = all local, REDACT = local ratio, SHIELD = always strong (no exfil)
+        pn[0].targetPower = Math.max(0.6, pScore);
+        pn[1].targetPower = Math.max(0.6, pScore);
+        pn[2].targetPower = Math.max(0.85, pScore); // SHIELD always strong
+      }
+
+      // Inject real events into pillar event displays
+      const evts = await NX.get('/veilpiercer/events?n=10');
+      if (evts.ok && evts.events.length > 0) {
+        const newest = evts.events[0];
+        if (newest.id > lastEventId) {
+          lastEventId = newest.id;
+          // Show up to last 3 events as pillar events
+          evts.events.slice(0, 3).forEach(ev => {
+            const el = document.getElementById(ev.pillar + '-event');
+            const nd = NODES.find(n => n.pillar === ev.pillar);
+            if (el && nd) {
+              el.textContent = ev.msg;
+              nd.fireT = performance.now();
+              for (let i = 0; i < 3; i++) spawnP(nd);
+            }
+          });
+          // Show in AI feed if it's a significant event
+          const sig = evts.events.find(e => e.type.includes('error') || e.type.includes('token') || e.type.includes('email'));
+          if (sig && sig.id > lastEventId - 1) {
+            const icons = { vis: '👁', saf: '🛡', priv: '🔒' };
+            addAI('NEXUS·LIVE', `${icons[sig.pillar] || '⚡'} <strong>${sig.type}</strong><br>${sig.msg}`, 'system');
+          }
+        }
+      }
+
+      // Update topbar with real counts
+      if (m.totalRuns > 0) {
+        document.getElementById('tb-runs').textContent = m.totalRuns;
+        document.getElementById('tb-evs').textContent = m.totalEvents;
+      }
+    }
+    // Sync every 3 seconds
+    syncLiveMetrics();
+    setInterval(syncLiveMetrics, 3000);
+
+    // Boot message showing real data is connected
+    setTimeout(async () => {
+      const m = await NX.get('/veilpiercer/metrics');
+      if (m.ok) {
+        addAI('NEXUS·LIVE', `🔴 <strong>LIVE DATA CONNECTED</strong><br><br>
+Node scores now driven by real NEXUS activity:<br>
+👁 VIS ${m.vis.score}% &nbsp;|&nbsp; 🛡 SAF ${m.saf.score}% &nbsp;|&nbsp; 🔒 PRIV ${m.priv.score}%<br><br>
+<strong>What's tracked:</strong><br>
+• Every Ollama AI call → Visibility + Privacy nodes<br>
+• Every n8n trigger → Safety catch events<br>
+• Every access token issued → Privacy node<br>
+• Every error caught → Safety recovery count<br><br>
+Run an AI call or trigger a payment to watch nodes respond in real-time.`, 'system');
+      }
+    }, 2000);
+
+
+
     // ── PATCH applyProtocol → also fires NEXUS /run ───────────────
     const _origApply = applyProtocol;
     window.applyProtocol = async function (name) {

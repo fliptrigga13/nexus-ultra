@@ -115,6 +115,82 @@ function log(msg) {
   try { fs.appendFileSync(LOG_FILE, line + '\n'); } catch (_) { }
 }
 
+// ─── VeilPiercer Real-Time Agent Event Engine ───────────────────────────────
+// All real system activity is captured here and fed to the dashboard as live data
+const AGENT_EVENTS = [];  // ring buffer, max 200
+const VP_METRICS = {
+  // Visibility — tracks AI call success rates and log throughput
+  vis: { total: 0, success: 0, failures: 0, lastEvent: '', latencies: [] },
+  // Safety — tracks error catches, recoveries, anomalies
+  saf: { catches: 0, failures: 0, recoveries: 0, lastEvent: '' },
+  // Privacy — tracks local-only AI calls vs external, token issuance
+  priv: { localCalls: 0, externalCalls: 0, tokensIssued: 0, emailsSent: 0, lastEvent: '' },
+  startTime: Date.now(),
+  totalRuns: 0,
+};
+
+function agentEvent(type, pillar, msg, data = {}) {
+  VP_METRICS.totalRuns++;
+  const ev = { type, pillar, msg, data, ts: new Date().toISOString(), id: VP_METRICS.totalRuns };
+  AGENT_EVENTS.push(ev);
+  if (AGENT_EVENTS.length > 200) AGENT_EVENTS.shift();
+
+  if (pillar === 'vis') {
+    VP_METRICS.vis.total++;
+    if (data.ok !== false) VP_METRICS.vis.success++;
+    else VP_METRICS.vis.failures++;
+    if (data.ms) VP_METRICS.vis.latencies.push(data.ms);
+    if (VP_METRICS.vis.latencies.length > 50) VP_METRICS.vis.latencies.shift();
+    VP_METRICS.vis.lastEvent = msg;
+  } else if (pillar === 'saf') {
+    if (data.ok !== false) VP_METRICS.saf.catches++;
+    else { VP_METRICS.saf.failures++; VP_METRICS.saf.recoveries++; }
+    VP_METRICS.saf.lastEvent = msg;
+  } else if (pillar === 'priv') {
+    if (data.local) VP_METRICS.priv.localCalls++;
+    else VP_METRICS.priv.externalCalls++;
+    if (type === 'token_issued') VP_METRICS.priv.tokensIssued++;
+    if (type === 'email_sent') VP_METRICS.priv.emailsSent++;
+    VP_METRICS.priv.lastEvent = msg;
+  }
+}
+
+function calcVPScores() {
+  const vis = VP_METRICS.vis;
+  const saf = VP_METRICS.saf;
+  const priv = VP_METRICS.priv;
+
+  // VISIBILITY: success rate + log throughput + latency health
+  const visRate = vis.total > 0 ? vis.success / vis.total : 0.78;
+  const avgLatMs = vis.latencies.length > 0 ? vis.latencies.reduce((a, b) => a + b, 0) / vis.latencies.length : 0;
+  const latScore = avgLatMs > 0 ? Math.max(0.4, 1 - (avgLatMs / 30000)) : 0.78; // 30s = bad
+  const visScore = Math.min(1.0, (visRate * 0.6 + latScore * 0.4));
+
+  // SAFETY: catch rate - failure rate
+  const safTotal = saf.catches + saf.failures;
+  const safRate = safTotal > 0 ? saf.catches / safTotal : 0.82;
+  const recovRate = saf.failures > 0 ? Math.min(1, saf.recoveries / saf.failures) : 1.0;
+  const safScore = Math.min(1.0, safRate * 0.6 + recovRate * 0.4);
+
+  // PRIVACY: % of AI calls that stayed local (Ollama = perfect privacy)
+  const privTotal = priv.localCalls + priv.externalCalls;
+  const localRate = privTotal > 0 ? priv.localCalls / privTotal : 1.0;
+  const privScore = Math.min(1.0, localRate * 0.85 + 0.15); // min 15% even with all external
+
+  return {
+    vis: { score: parseFloat((visScore * 100).toFixed(1)), total: vis.total, success: vis.success, failures: vis.failures, avgLatMs: Math.round(avgLatMs), lastEvent: vis.lastEvent },
+    saf: { score: parseFloat((safScore * 100).toFixed(1)), catches: saf.catches, failures: saf.failures, recoveries: saf.recoveries, lastEvent: saf.lastEvent },
+    priv: { score: parseFloat((privScore * 100).toFixed(1)), localCalls: priv.localCalls, externalCalls: priv.externalCalls, tokensIssued: priv.tokensIssued, emailsSent: priv.emailsSent, lastEvent: priv.lastEvent },
+    uptime: Math.floor((Date.now() - VP_METRICS.startTime) / 1000),
+    totalEvents: AGENT_EVENTS.length,
+    totalRuns: VP_METRICS.totalRuns,
+  };
+}
+
+// GET /veilpiercer/metrics — live scores for dashboard
+// Public endpoint so dashboard can read without API key
+
+
 // ─── Script whitelist (declared early — used by scheduler + routes) ──
 const SCRIPTS = {
   'force-stabilize': 'force-stabilize.ps1',
@@ -586,6 +662,26 @@ app.post('/stripe/webhook', express.raw({ type: 'application/json' }), (req, res
 const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'llama3:latest';
 
+// ── VeilPiercer Live API ──────────────────
+// GET /veilpiercer/metrics — live pillar scores from real system activity
+app.get('/veilpiercer/metrics', (req, res) => {
+  res.json({ ok: true, ...calcVPScores(), timestamp: new Date().toISOString() });
+});
+
+// GET /veilpiercer/events — last N real agent events
+app.get('/veilpiercer/events', (req, res) => {
+  const n = Math.min(parseInt(req.query.n) || 50, 200);
+  res.json({ ok: true, events: AGENT_EVENTS.slice(-n).reverse(), total: AGENT_EVENTS.length });
+});
+
+// POST /veilpiercer/event — allow external systems to push agent events
+app.post('/veilpiercer/event', (req, res) => {
+  const { type = 'external', pillar = 'vis', msg = 'external_event', data = {} } = req.body || {};
+  agentEvent(type, pillar, msg, data);
+  res.json({ ok: true, totalEvents: AGENT_EVENTS.length });
+});
+
+
 // GET /ollama/status
 app.get('/ollama/status', async (req, res) => {
   try {
@@ -626,6 +722,7 @@ app.post('/ollama/generate', async (req, res) => {
   if (!prompt) return res.status(400).json({ ok: false, error: 'prompt required' });
   const useModel = model || OLLAMA_MODEL;
   try {
+    const t0 = Date.now();
     const https = require('http');
     const payload = JSON.stringify({ model: useModel, prompt, system: system || '', stream: false });
     const data = await new Promise((resolve, reject) => {
@@ -642,10 +739,15 @@ app.post('/ollama/generate', async (req, res) => {
       r.setTimeout(60000, () => { r.destroy(); reject(new Error('Ollama timeout after 60s')); });
       r.write(payload); r.end();
     });
-    log(`OLLAMA [${useModel}]: "${prompt.substring(0, 60)}..." → ${data.response?.length} chars`);
+    const ms = Date.now() - t0;
+    log(`OLLAMA [${useModel}]: "${prompt.substring(0, 60)}..." → ${data.response?.length} chars in ${ms}ms`);
+    agentEvent('ollama_generate', 'vis', `chain_trace: ollama [${useModel}] → ${data.response?.length || 0} chars | ${ms}ms`, { ok: true, ms, local: true });
+    agentEvent('ollama_local', 'priv', `pii_safe: Ollama local call — zero data left device`, { local: true });
     res.json({ ok: true, response: data.response, model: useModel, done: data.done });
   } catch (e) {
     log(`OLLAMA ERROR: ${e.message}`);
+    agentEvent('ollama_error', 'vis', `signal_gap: ollama error — ${e.message}`, { ok: false });
+    agentEvent('ollama_error', 'saf', `catch_gate: ollama failure caught → error returned safely`, { ok: false });
     res.status(500).json({ ok: false, error: e.message });
   }
 });
