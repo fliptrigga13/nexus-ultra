@@ -284,11 +284,83 @@ app.post('/cmd', auth, (req, res) => {
   });
 });
 
+// ── n8n integration ──────────────────────
+
+// helper: fire a named n8n webhook (NEXUS → n8n)
+async function nexusTrigger(name, payload = {}) {
+  const url = `${N8N_URL}/webhook/${name}`;
+  try {
+    const http = require('http');
+    const body = JSON.stringify({ source: 'nexus-ultra', event: name, ts: new Date().toISOString(), ...payload });
+    await new Promise((resolve, reject) => {
+      const req = http.request(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) }
+      }, res => { res.resume(); res.on('end', resolve); });
+      req.on('error', reject);
+      req.setTimeout(3000, () => { req.destroy(); reject(new Error('timeout')); });
+      req.write(body); req.end();
+    });
+    log(`N8N → ${name}: OK`);
+    return true;
+  } catch (e) {
+    log(`N8N → ${name}: ${e.message}`);
+    return false;
+  }
+}
+
+// GET /n8n/status — check if n8n is running
+app.get('/n8n/status', async (req, res) => {
+  try {
+    const http = require('http');
+    await new Promise((resolve, reject) => {
+      const r = http.get(`${N8N_URL}/healthz`, resp => { resp.resume(); resolve(); });
+      r.on('error', reject);
+      r.setTimeout(2000, () => { r.destroy(); reject(new Error('timeout')); });
+    });
+    res.json({ ok: true, status: 'online', url: N8N_URL });
+  } catch {
+    res.json({ ok: false, status: 'offline', url: N8N_URL });
+  }
+});
+
+// POST /n8n/trigger — manually fire any n8n webhook from NEXUS dashboard
+// Body: { "webhook": "payment-confirmed", "data": { ... } }
+app.post('/n8n/trigger', auth, async (req, res) => {
+  const { webhook, data } = req.body || {};
+  if (!webhook) return res.status(400).json({ ok: false, error: 'webhook name required' });
+  const fired = await nexusTrigger(webhook, data || {});
+  res.json({ ok: fired, webhook });
+});
+
+// POST /n8n/action — n8n calls NEXUS to run a script or action
+// n8n HTTP Request node → POST http://127.0.0.1:3000/n8n/action
+// Body: { "action": "force-stabilize" | "capture" }
+app.post('/n8n/action', async (req, res) => {
+  const { action, params } = req.body || {};
+  log(`N8N ACTION: ${action}`);
+  if (action === 'capture') {
+    const ts = new Date().toISOString();
+    const file = path.join(CAPTURE_DIR, `n8n-capture-${ts.replace(/[:.]/g, '-')}.json`);
+    fs.writeFileSync(file, JSON.stringify({ ts, source: 'n8n', params }, null, 2));
+    log(`N8N CAPTURE saved: ${file}`);
+    return res.json({ ok: true, action, file });
+  }
+  const allowed = ['force-stabilize', 'system-scan'];
+  if (!allowed.includes(action)) return res.status(400).json({ ok: false, error: 'action not allowed' });
+  const ps1 = path.join(ROOT, 'local-scripts', `${action}.ps1`);
+  exec(`powershell -ExecutionPolicy Bypass -File "${ps1}"`, { windowsHide: true, timeout: 30000 }, (err, out, stderr) => {
+    if (err) return res.status(500).json({ ok: false, error: stderr || err.message });
+    res.json({ ok: true, action, output: out.trim() });
+  });
+});
+
 // ── Stripe: public key ────────────────────
 app.get('/stripe/config', (req, res) => {
   if (!STRIPE_PK) return res.status(503).json({ ok: false, error: 'Stripe not configured' });
   res.json({ ok: true, publishableKey: STRIPE_PK });
 });
+
 
 // ── Stripe: Checkout Session ──────────────
 const PRODUCTS = {
@@ -371,7 +443,13 @@ app.post('/stripe/webhook', express.raw({ type: 'application/json' }), (req, res
     case 'checkout.session.completed': {
       const s = event.data.object;
       log(`WEBHOOK: checkout.session.completed — ${s.customer_email} — $${(s.amount_total / 100).toFixed(2)} — ${s.metadata?.tier}`);
-      // TODO: provision access, send welcome email, etc.
+      // Fire n8n workflow for post-payment automation
+      nexusTrigger('payment-confirmed', {
+        email: s.customer_email,
+        tier: s.metadata?.tier,
+        amount: s.amount_total,
+        sessionId: s.id,
+      });
       break;
     }
     case 'payment_intent.succeeded':
@@ -387,6 +465,122 @@ app.post('/stripe/webhook', express.raw({ type: 'application/json' }), (req, res
   res.json({ received: true });
 });
 
+// ── Ollama Integration ────────────────────
+const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'llama3:latest';
+
+// GET /ollama/status
+app.get('/ollama/status', async (req, res) => {
+  try {
+    const http = require('http');
+    await new Promise((resolve, reject) => {
+      const r = http.get(OLLAMA_URL, resp => { resp.resume(); resolve(); });
+      r.on('error', reject);
+      r.setTimeout(2000, () => { r.destroy(); reject(new Error('timeout')); });
+    });
+    res.json({ ok: true, status: 'online', url: OLLAMA_URL, model: OLLAMA_MODEL });
+  } catch {
+    res.json({ ok: false, status: 'offline', url: OLLAMA_URL });
+  }
+});
+
+// GET /ollama/models
+app.get('/ollama/models', async (req, res) => {
+  try {
+    const http = require('http');
+    const data = await new Promise((resolve, reject) => {
+      const r = http.get(`${OLLAMA_URL}/api/tags`, resp => {
+        let body = '';
+        resp.on('data', d => body += d);
+        resp.on('end', () => resolve(JSON.parse(body)));
+      });
+      r.on('error', reject);
+    });
+    res.json({ ok: true, models: data.models.map(m => ({ name: m.name, size: m.size })) });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+// POST /ollama/generate — proxy a prompt to local Ollama LLM
+// Body: { "prompt": "...", "model": "llama3:latest", "system": "..." }
+app.post('/ollama/generate', async (req, res) => {
+  const { prompt, model, system } = req.body || {};
+  if (!prompt) return res.status(400).json({ ok: false, error: 'prompt required' });
+  const useModel = model || OLLAMA_MODEL;
+  try {
+    const https = require('http');
+    const payload = JSON.stringify({ model: useModel, prompt, system: system || '', stream: false });
+    const data = await new Promise((resolve, reject) => {
+      const options = {
+        hostname: 'localhost', port: 11434, path: '/api/generate', method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) }
+      };
+      const r = https.request(options, resp => {
+        let body = '';
+        resp.on('data', d => body += d);
+        resp.on('end', () => { try { resolve(JSON.parse(body)); } catch { reject(new Error('Bad JSON')); } });
+      });
+      r.on('error', reject);
+      r.setTimeout(60000, () => { r.destroy(); reject(new Error('Ollama timeout after 60s')); });
+      r.write(payload); r.end();
+    });
+    log(`OLLAMA [${useModel}]: "${prompt.substring(0, 60)}..." → ${data.response?.length} chars`);
+    res.json({ ok: true, response: data.response, model: useModel, done: data.done });
+  } catch (e) {
+    log(`OLLAMA ERROR: ${e.message}`);
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+// POST /ollama/agent — run a structured AI agent task
+// Body: { "task": "write-welcome-email", "data": { email, tier, amount } }
+const AGENT_PROMPTS = {
+  'write-welcome-email': (d) => ({
+    system: 'You are a friendly but authoritative AI assistant for VeilPiercer, an elite AI agent observatory. Write concise, compelling emails. No markdown.',
+    prompt: `Write a short welcome email (max 150 words) for a new VeilPiercer ${d.tier} customer. Their email is ${d.email}. They paid $${((d.amount || 0) / 100).toFixed(2)}. Make it feel exclusive and exciting. Include: welcome, what they unlocked, a hint about next steps. Sign off as "The NEXUS ULTRA Team".`
+  }),
+  'analyze-logs': (d) => ({
+    system: 'You are a system analyst. Summarize logs concisely, flag issues, and suggest actions.',
+    prompt: `Analyze these NEXUS system logs and give a 3-bullet summary with any warnings:\n\n${(d.logs || []).slice(-20).join('\n')}`
+  }),
+  'sales-summary': (d) => ({
+    system: 'You are a business analyst. Give sharp, data-driven summaries.',
+    prompt: `Write a daily sales summary for VeilPiercer. Data: ${JSON.stringify(d)}. Include total revenue, top tier, and one actionable insight. Max 100 words.`
+  }),
+};
+
+app.post('/ollama/agent', async (req, res) => {
+  const { task, data, model } = req.body || {};
+  const promptFn = AGENT_PROMPTS[task];
+  if (!promptFn) return res.status(400).json({ ok: false, error: `Unknown task. Available: ${Object.keys(AGENT_PROMPTS).join(', ')}` });
+  const { system, prompt } = promptFn(data || {});
+  const useModel = model || OLLAMA_MODEL;
+  try {
+    const payload = JSON.stringify({ model: useModel, system, prompt, stream: false });
+    const http = require('http');
+    const result = await new Promise((resolve, reject) => {
+      const options = {
+        hostname: 'localhost', port: 11434, path: '/api/generate', method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) }
+      };
+      const r = http.request(options, resp => {
+        let body = '';
+        resp.on('data', d => body += d);
+        resp.on('end', () => { try { resolve(JSON.parse(body)); } catch { reject(new Error('Bad JSON')); } });
+      });
+      r.on('error', reject);
+      r.setTimeout(60000, () => { r.destroy(); reject(new Error('timeout')); });
+      r.write(payload); r.end();
+    });
+    log(`OLLAMA AGENT [${task}]: complete (${result.response?.length} chars)`);
+    res.json({ ok: true, task, response: result.response, model: useModel });
+  } catch (e) {
+    log(`OLLAMA AGENT ERROR: ${e.message}`);
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
 // ── Boot ─────────────────────────────────
 app.listen(PORT, HOST, () => {
   log('╔══════════════════════════════════════════╗');
@@ -397,6 +591,9 @@ app.listen(PORT, HOST, () => {
   log(`Command     → http://${HOST}:${PORT}/veilpiercer-command.html`);
   log(`Stripe cfg  → ${STRIPE_PK ? 'pk loaded (' + (STRIPE_PK.startsWith('pk_live') ? 'LIVE' : 'TEST') + ')' : 'NOT SET'}`);
   log(`Stripe sk   → ${stripe ? 'ACTIVE' : 'NOT SET — add sk_live_... to .env'}`);
+  log(`Ollama      → ${OLLAMA_URL} (model: ${OLLAMA_MODEL})`);
+  log(`n8n         → ${N8N_URL}`);
   log(`Drop Zone   → ${DROP_DIR}`);
   log(`Scheduled   → ${Object.keys(jobs).length} job(s) active`);
 });
+

@@ -1,0 +1,124 @@
+{
+    "name": "VeilPiercer — Payment Confirmed",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "payment-confirmed",
+                "responseMode": "onReceived",
+                "options": {}
+            },
+            "id": "a1b2c3d4-0001-0001-0001-000000000001",
+            "name": "NEXUS Webhook",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                240,
+                300
+            ],
+            "webhookId": "payment-confirmed"
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "string": [
+                        {
+                            "value1": "={{ $json.event }}",
+                            "value2": "payment-confirmed"
+                        }
+                    ]
+                }
+            },
+            "id": "a1b2c3d4-0001-0001-0001-000000000002",
+            "name": "Verify Payment Event",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 1,
+            "position": [
+                460,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "fromEmail": "noreply@veilpiercer.com",
+                "toEmail": "={{ $json.email }}",
+                "subject": "Welcome to VeilPiercer {{ $json.tier }} — Your Access is Ready",
+                "text": "Hi there,\n\nThank you for purchasing VeilPiercer {{ $json.tier }}!\n\nYour payment of ${{ ($json.amount / 100).toFixed(2) }} has been confirmed.\n\nYou'll receive your download link and access details shortly.\n\nWelcome to the protocol.\n\n— VeilPiercer Team",
+                "options": {}
+            },
+            "id": "a1b2c3d4-0001-0001-0001-000000000003",
+            "name": "Send Welcome Email",
+            "type": "n8n-nodes-base.emailSend",
+            "typeVersion": 1,
+            "position": [
+                680,
+                220
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "http://127.0.0.1:3000/n8n/action",
+                "options": {},
+                "bodyParametersUi": {
+                    "parameter": [
+                        {
+                            "name": "action",
+                            "value": "capture"
+                        },
+                        {
+                            "name": "params",
+                            "value": "={{ { email: $json.email, tier: $json.tier, amount: $json.amount } }}"
+                        }
+                    ]
+                }
+            },
+            "id": "a1b2c3d4-0001-0001-0001-000000000004",
+            "name": "Log to NEXUS",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 3,
+            "position": [
+                680,
+                380
+            ]
+        }
+    ],
+    "connections": {
+        "NEXUS Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "Verify Payment Event",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Verify Payment Event": {
+            "main": [
+                [
+                    {
+                        "node": "Send Welcome Email",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Log to NEXUS",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                []
+            ]
+        }
+    },
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "tags": [
+        {
+            "name": "VeilPiercer"
+        }
+    ]
+}

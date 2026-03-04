@@ -1,0 +1,115 @@
+{
+    "name": "VeilPiercer — Daily Sales Report",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "cronExpression",
+                            "expression": "0 8 * * *"
+                        }
+                    ]
+                }
+            },
+            "id": "b2c3d4e5-0002-0002-0002-000000000001",
+            "name": "Every Morning 8am",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1,
+            "position": [
+                240,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "url": "http://127.0.0.1:3000/logs",
+                "options": {},
+                "headerParametersUi": {
+                    "parameter": [
+                        {
+                            "name": "x-api-key",
+                            "value": "Burton"
+                        }
+                    ]
+                }
+            },
+            "id": "b2c3d4e5-0002-0002-0002-000000000002",
+            "name": "Fetch NEXUS Logs",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 3,
+            "position": [
+                460,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "url": "http://127.0.0.1:3000/status",
+                "options": {}
+            },
+            "id": "b2c3d4e5-0002-0002-0002-000000000003",
+            "name": "Fetch NEXUS Status",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 3,
+            "position": [
+                460,
+                460
+            ]
+        },
+        {
+            "parameters": {
+                "fromEmail": "nexus@veilpiercer.com",
+                "toEmail": "you@youremail.com",
+                "subject": "VeilPiercer Daily Report — {{ $now.format('MMM D, YYYY') }}",
+                "text": "=== NEXUS ULTRA DAILY REPORT ===\nDate: {{ $now.format('MMMM D, YYYY') }}\n\nSYSTEM STATUS\n- Uptime: {{ $('Fetch NEXUS Status').item.json.uptime }}s\n- Total Captures: {{ $('Fetch NEXUS Status').item.json.captures }}\n\nRECENT ACTIVITY (last 20 log lines)\n{{ $('Fetch NEXUS Logs').item.json.lines.slice(-20).join('\\n') }}\n\n— NEXUS ULTRA AUTO-REPORT",
+                "options": {}
+            },
+            "id": "b2c3d4e5-0002-0002-0002-000000000004",
+            "name": "Email Daily Report",
+            "type": "n8n-nodes-base.emailSend",
+            "typeVersion": 1,
+            "position": [
+                700,
+                380
+            ]
+        }
+    ],
+    "connections": {
+        "Every Morning 8am": {
+            "main": [
+                [
+                    {
+                        "node": "Fetch NEXUS Logs",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Fetch NEXUS Status",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Fetch NEXUS Logs": {
+            "main": [
+                [
+                    {
+                        "node": "Email Daily Report",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "tags": [
+        {
+            "name": "VeilPiercer"
+        }
+    ]
+}
