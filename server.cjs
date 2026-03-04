@@ -585,8 +585,8 @@ app.post('/stripe/create-checkout-session', async (req, res) => {
         quantity: 1,
       }],
       mode: 'payment',
-      success_url: `http://${HOST}:${PORT}/success.html?session_id={CHECKOUT_SESSION_ID}&tier=${tier}`,
-      cancel_url: `http://${HOST}:${PORT}/veilpiercer-pitch.html#pricing`,
+      success_url: `${PUBLIC_URL}/access.html?session_id={CHECKOUT_SESSION_ID}&tier=${tier}`,
+      cancel_url: `${PUBLIC_URL}/veilpiercer-pitch.html#pricing`,
       metadata: { tier, source: 'veilpiercer-pitch' },
     });
 

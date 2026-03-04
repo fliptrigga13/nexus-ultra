@@ -2098,10 +2098,10 @@
 
     // ══════════════════════════════════════════════════
     //  NEXUS ULTRA BACKEND CONNECTION LAYER
-    //  Live connection to http://127.0.0.1:3000
+    //  Uses same origin as the page — works on ngrok, Koyeb, or local
     // ══════════════════════════════════════════════════
     const NX = {
-      base: 'http://127.0.0.1:3000',
+      base: window.location.origin,  // ← dynamic: works from any public URL
       headers: { 'Content-Type': 'application/json', 'x-api-key': 'Burton' },
       async get(path) {
         try {
