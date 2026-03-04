@@ -3,10 +3,12 @@
 // ╚══════════════════════════════════════════╝
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 const express = require('express');
 const cors = require('cors');
 const { exec } = require('child_process');
 const cron = require('node-cron');
+const nodemailer = require('nodemailer');
 
 // ─── Load .env ────────────────────────────
 try {
@@ -30,9 +32,10 @@ if (STRIPE_SK && !STRIPE_SK.includes('PASTE_YOUR')) {
 const SECRET = process.env.API_SECRET || "Burton";
 const HOST = process.env.HOST || "0.0.0.0";
 const PORT = parseInt(process.env.PORT || "3000", 10);
-const PUBLIC_URL = process.env.PUBLIC_URL || `http://127.0.0.1:${PORT}`;
 const N8N_URL = "http://localhost:5678";
 
+// PUBLIC_URL is resolved dynamically after boot (set by ngrok detection)
+let PUBLIC_URL = process.env.PUBLIC_URL || `http://127.0.0.1:${PORT}`;
 
 // ─── Paths ────────────────────────────────
 const ROOT = __dirname;
@@ -40,10 +43,69 @@ const LOG_FILE = path.join(ROOT, 'nexus.log');
 const DROP_DIR = path.join(ROOT, 'drop-zone');
 const CAPTURE_DIR = path.join(ROOT, 'captures');
 const TABS_FILE = path.join(ROOT, 'tabs.json');
+const ACCESS_DB = path.join(ROOT, 'access-tokens.json');
 
 // ─── Bootstrap dirs ───────────────────────
 for (const d of [DROP_DIR, CAPTURE_DIR]) {
   if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true });
+}
+
+// ─── Access Token Store ───────────────────
+function loadAccessDB() {
+  try { return JSON.parse(fs.readFileSync(ACCESS_DB, 'utf8')); } catch { return {}; }
+}
+function saveAccessDB(db) {
+  fs.writeFileSync(ACCESS_DB, JSON.stringify(db, null, 2));
+}
+function createAccessToken(email, tier, amount, sessionId) {
+  const token = crypto.randomBytes(32).toString('hex');
+  const db = loadAccessDB();
+  db[token] = { email, tier, amount, sessionId, createdAt: new Date().toISOString(), used: 0 };
+  saveAccessDB(db);
+  log(`ACCESS TOKEN created for ${email} [${tier}]`);
+  return token;
+}
+
+// ─── Email Transporter ───────────────────
+const EMAIL_USER = process.env.EMAIL_USER || '';
+const EMAIL_PASS = process.env.EMAIL_PASS || '';
+const EMAIL_FROM = process.env.EMAIL_FROM || 'NEXUS ULTRA <noreply@veilpiercer.com>';
+
+let transporter = null;
+if (EMAIL_USER && EMAIL_PASS) {
+  transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: { user: EMAIL_USER, pass: EMAIL_PASS }
+  });
+  log(`Email transport ready: ${EMAIL_USER}`);
+}
+
+async function sendAccessEmail(email, tier, amount, token, aiEmailText) {
+  if (!transporter) { log('EMAIL SKIP: no email credentials configured'); return false; }
+  const accessUrl = `${PUBLIC_URL}/access.html?token=${token}`;
+  const subject = `Your VeilPiercer ${tier} Access Is Ready`;
+  const text = `${aiEmailText || `Welcome to VeilPiercer ${tier}!`}\n\nAccess your portal here:\n${accessUrl}\n\nThis link is unique to you — keep it safe.\n\n— The NEXUS ULTRA Team`;
+  const html = `
+    <div style="font-family:Inter,sans-serif;max-width:560px;margin:0 auto;background:#050508;color:#e2e8f0;padding:40px;border-radius:16px;">
+      <div style="text-align:center;margin-bottom:32px;">
+        <p style="font-size:12px;letter-spacing:0.2em;color:#7c3aed;text-transform:uppercase;font-weight:700;">NEXUS ULTRA</p>
+        <h1 style="font-size:28px;font-weight:900;margin:8px 0;">VeilPiercer ${tier}</h1>
+        <p style="color:#64748b;">Your access is confirmed</p>
+      </div>
+      <div style="background:#0d0d14;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:24px;margin:24px 0;white-space:pre-wrap;line-height:1.7;font-size:15px;">${aiEmailText || 'Welcome — your access is now active.'}</div>
+      <div style="text-align:center;margin:32px 0;">
+        <a href="${accessUrl}" style="display:inline-block;padding:16px 32px;background:linear-gradient(135deg,#7c3aed,#9333ea);color:white;text-decoration:none;border-radius:12px;font-weight:700;font-size:16px;">🔓 Open Your Access Portal</a>
+      </div>
+      <p style="text-align:center;color:#64748b;font-size:12px;">Amount paid: $${((amount || 0) / 100).toFixed(2)} &nbsp;|&nbsp; Tier: ${tier}</p>
+    </div>`;
+  try {
+    await transporter.sendMail({ from: EMAIL_FROM, to: email, subject, text, html });
+    log(`EMAIL SENT to ${email} (${tier}) — access link included`);
+    return true;
+  } catch (e) {
+    log(`EMAIL ERROR: ${e.message}`);
+    return false;
+  }
 }
 
 // ─── Logging ──────────────────────────────
@@ -155,8 +217,63 @@ app.get('/status', (req, res) => {
     drop_zone_files: (() => { try { return fs.readdirSync(DROP_DIR).length; } catch (_) { return 0; } })(),
     captures: (() => { try { return fs.readdirSync(CAPTURE_DIR).length; } catch (_) { return 0; } })(),
     log_size_kb: (() => { try { return (fs.statSync(LOG_FILE).size / 1024).toFixed(1); } catch (_) { return 0; } })(),
+    access_tokens: (() => { try { return Object.keys(loadAccessDB()).length; } catch { return 0; } })(),
+    email_configured: !!(EMAIL_USER && EMAIL_PASS),
   });
 });
+
+// ── GET /access/verify ───────────────────
+// Called by access.html to verify a token and return buyer data
+app.get('/access/verify', (req, res) => {
+  const { token } = req.query;
+  if (!token) return res.status(400).json({ ok: false, error: 'token required' });
+  const db = loadAccessDB();
+  const entry = db[token];
+  if (!entry) return res.status(404).json({ ok: false, error: 'Token not found or expired' });
+  // Increment usage count
+  entry.used = (entry.used || 0) + 1;
+  entry.lastAccessed = new Date().toISOString();
+  saveAccessDB(db);
+  log(`ACCESS VERIFIED: ${entry.email} [${entry.tier}] (visit #${entry.used})`);
+  res.json({ ok: true, email: entry.email, tier: entry.tier, amount: entry.amount, welcomeEmail: entry.welcomeEmail || null });
+});
+
+// ── POST /access/create ──────────────────
+// Create an access token manually (for testing or admin use)
+app.post('/access/create', auth, async (req, res) => {
+  const { email, tier, amount, sessionId, sendEmail } = req.body || {};
+  if (!email || !tier) return res.status(400).json({ ok: false, error: 'email and tier required' });
+  const token = createAccessToken(email, tier, amount || 0, sessionId || 'manual');
+  let emailSent = false;
+  let aiEmail = '';
+  if (sendEmail) {
+    // Generate AI welcome email
+    try {
+      const payload = JSON.stringify({ model: 'llama3.2:1b', system: 'You are a friendly VeilPiercer assistant. Write concise welcome emails. No markdown.', prompt: `Write a short welcome email (max 100 words) for a new VeilPiercer ${tier} customer (${email}). They paid $${((amount || 0) / 100).toFixed(2)}. Sign off as "The NEXUS ULTRA Team".`, stream: false });
+      const http = require('http');
+      const result = await new Promise((resolve, reject) => {
+        const r = http.request({ hostname: 'localhost', port: 11434, path: '/api/generate', method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) } }, resp => { let b = ''; resp.on('data', d => b += d); resp.on('end', () => { try { resolve(JSON.parse(b)); } catch { resolve({}); } }); });
+        r.on('error', reject); r.setTimeout(30000, () => { r.destroy(); reject(new Error('timeout')); }); r.write(payload); r.end();
+      });
+      aiEmail = result.response || '';
+      // Store AI email in token
+      const db = loadAccessDB(); if (db[token]) { db[token].welcomeEmail = aiEmail; saveAccessDB(db); }
+    } catch (e) { log(`AI email error: ${e.message}`); }
+    emailSent = await sendAccessEmail(email, tier, amount || 0, token, aiEmail);
+  }
+  const accessUrl = `${PUBLIC_URL}/access.html?token=${token}`;
+  res.json({ ok: true, token, accessUrl, emailSent });
+});
+
+// ── GET /access/list ─────────────────────
+// Admin view of all issued access tokens
+app.get('/access/list', auth, (req, res) => {
+  const db = loadAccessDB();
+  const list = Object.entries(db).map(([token, d]) => ({ token: token.substring(0, 8) + '...', email: d.email, tier: d.tier, amount: d.amount, used: d.used, createdAt: d.createdAt }));
+  res.json({ ok: true, count: list.length, tokens: list });
+});
+
+
 
 // ── GET /logs ────────────────────────────
 app.get('/logs', (req, res) => {
@@ -672,19 +789,42 @@ app.post('/gemini/agent', async (req, res) => {
 });
 
 // ── Boot ─────────────────────────────────
-app.listen(PORT, HOST, () => {
+app.listen(PORT, HOST, async () => {
   log('╔══════════════════════════════════════════╗');
   log('║      NEXUS ULTRA v2 // ONLINE            ║');
   log('╚══════════════════════════════════════════╝');
   log(`Dashboard   → http://${HOST}:${PORT}`);
-  log(`Pitch page  → http://${HOST}:${PORT}/veilpiercer-pitch.html`);
-  log(`Command     → http://${HOST}:${PORT}/veilpiercer-command.html`);
   log(`Stripe cfg  → ${STRIPE_PK ? 'pk loaded (' + (STRIPE_PK.startsWith('pk_live') ? 'LIVE' : 'TEST') + ')' : 'NOT SET'}`);
-  log(`Stripe sk   → ${stripe ? 'ACTIVE' : 'NOT SET — add sk_live_... to .env'}`);
+  log(`Stripe sk   → ${stripe ? 'ACTIVE' : 'NOT SET'}`);
   log(`Ollama      → ${OLLAMA_URL} (model: ${OLLAMA_MODEL})`);
-  log(`Gemini      → ${GEMINI_API_KEY ? 'CONFIGURED (' + GEMINI_MODEL + ')' : 'NOT SET — add GEMINI_API_KEY to .env'}`);
+  log(`Gemini      → ${GEMINI_API_KEY ? 'CONFIGURED' : 'NOT SET'}`);
   log(`n8n         → ${N8N_URL}`);
-  log(`Drop Zone   → ${DROP_DIR}`);
+  log(`Email       → ${EMAIL_USER || 'NOT SET'}`);
   log(`Scheduled   → ${Object.keys(jobs).length} job(s) active`);
-});
 
+  // ── Auto-detect ngrok public URL ─────────
+  setTimeout(async () => {
+    try {
+      const http = require('http');
+      const ngrokData = await new Promise((resolve, reject) => {
+        const r = http.get('http://localhost:4040/api/tunnels', resp => {
+          let body = ''; resp.on('data', d => body += d); resp.on('end', () => { try { resolve(JSON.parse(body)); } catch { reject(); } });
+        });
+        r.on('error', reject); r.setTimeout(2000, () => { r.destroy(); reject(); });
+      });
+      const tunnel = ngrokData.tunnels?.find(t => t.proto === 'https');
+      if (tunnel) {
+        PUBLIC_URL = tunnel.public_url;
+        log(`PUBLIC URL  → ${PUBLIC_URL} (ngrok live)`);
+        // Save to desktop for easy access
+        const desktopFile = require('path').join(require('os').homedir(), 'Desktop', 'VEILPIERCER-LIVE-URL.txt');
+        require('fs').writeFileSync(desktopFile, `NEXUS PUBLIC URL\n${PUBLIC_URL}\n\nAccess Portal: ${PUBLIC_URL}/access.html\nDashboard: ${PUBLIC_URL}\n\nUpdated: ${new Date().toISOString()}`);
+        log(`URL saved   → Desktop/VEILPIERCER-LIVE-URL.txt`);
+      } else {
+        log(`PUBLIC URL  → ${PUBLIC_URL} (ngrok not detected, using local)`);
+      }
+    } catch {
+      log(`PUBLIC URL  → ${PUBLIC_URL} (ngrok offline, using local)`);
+    }
+  }, 3000);
+});

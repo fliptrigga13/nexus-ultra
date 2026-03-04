@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VeilPiercer — Your Access Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #050508;
+            --surface: #0d0d14;
+            --border: rgba(255, 255, 255, 0.07);
+            --accent: #7c3aed;
+            --accent2: #06b6d4;
+            --gold: #f59e0b;
+            --text: #e2e8f0;
+            --muted: #64748b;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Background */
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background-image: linear-gradient(rgba(124, 58, 237, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(124, 58, 237, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        .bg-glow {
+            position: fixed;
+            top: -20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 500px;
+            background: radial-gradient(ellipse, rgba(124, 58, 237, 0.12) 0%, transparent 70%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 40px 20px 80px;
+        }
+
+        /* Loading State */
+        #loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+            gap: 24px;
+            text-align: center;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid rgba(124, 58, 237, 0.2);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Error State */
+        #error {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+            gap: 16px;
+            text-align: center;
+        }
+
+        .error-icon {
+            font-size: 64px;
+        }
+
+        #error h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ef4444;
+        }
+
+        #error p {
+            color: var(--muted);
+            max-width: 400px;
+            line-height: 1.6;
+        }
+
+        /* Portal content */
+        #portal {
+            display: none;
+        }
+
+        /* Header */
+        .portal-header {
+            text-align: center;
+            padding: 60px 0 40px;
+        }
+
+        .tier-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            border: 1px solid;
+            margin-bottom: 24px;
+        }
+
+        .tier-badge.Starter {
+            background: rgba(6, 182, 212, 0.1);
+            border-color: rgba(6, 182, 212, 0.3);
+            color: var(--accent2);
+        }
+
+        .tier-badge.Pro {
+            background: rgba(124, 58, 237, 0.1);
+            border-color: rgba(124, 58, 237, 0.3);
+            color: #a78bfa;
+        }
+
+        .tier-badge.Agency {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.3);
+            color: var(--gold);
+        }
+
+        .portal-header h1 {
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 900;
+            line-height: 1.15;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #fff 0%, rgba(255, 255, 255, 0.7) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .portal-header p {
+            color: var(--muted);
+            font-size: 1.05rem;
+        }
+
+        .welcome-email-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px 28px;
+            margin: 32px 0;
+            text-align: left;
+        }
+
+        .welcome-email-box p {
+            color: var(--text);
+            line-height: 1.8;
+            font-size: 0.95rem;
+            white-space: pre-wrap;
+        }
+
+        /* Content sections */
+        .section {
+            margin-bottom: 32px;
+        }
+
+        .section-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* Cards grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .card:hover {
+            border-color: rgba(124, 58, 237, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(124, 58, 237, 0.15);
+        }
+
+        .card-icon {
+            font-size: 2rem;
+        }
+
+        .card h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .card p {
+            font-size: 0.8rem;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .card .badge {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 2px 8px;
+            border-radius: 4px;
+            align-self: flex-start;
+        }
+
+        .badge-new {
+            background: rgba(124, 58, 237, 0.2);
+            color: #a78bfa;
+        }
+
+        .badge-pro {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--gold);
+        }
+
+        .badge-agency {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+        }
+
+        /* Download button */
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 28px;
+            background: linear-gradient(135deg, var(--accent), #9333ea);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(124, 58, 237, 0.4);
+        }
+
+        /* AI onboarding */
+        .ai-box {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.08), rgba(6, 182, 212, 0.05));
+            border: 1px solid rgba(124, 58, 237, 0.2);
+            border-radius: 16px;
+            padding: 28px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ai-box::before {
+            content: '🧠';
+            position: absolute;
+            right: 24px;
+            top: 24px;
+            font-size: 2rem;
+            opacity: 0.3;
+        }
+
+        .ai-box h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .ai-box p {
+            color: var(--muted);
+            font-size: 0.9rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+
+        #ai-loading {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .ai-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: pulse 1.2s infinite;
+        }
+
+        .ai-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .ai-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 0.3;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* Footer */
+        .portal-footer {
+            text-align: center;
+            margin-top: 60px;
+            padding-top: 32px;
+            border-top: 1px solid var(--border);
+            color: var(--muted);
+            font-size: 0.8rem;
+        }
+
+        /* Animations */
+        .animate-in {
+            animation: fadeUp 0.6s ease forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .delay-1 {
+            animation-delay: 0.1s;
+        }
+
+        .delay-2 {
+            animation-delay: 0.2s;
+        }
+
+        .delay-3 {
+            animation-delay: 0.3s;
+        }
+
+        .delay-4 {
+            animation-delay: 0.4s;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-glow"></div>
+
+    <div class="container">
+
+        <!-- Loading -->
+        <div id="loading">
+            <div class="spinner"></div>
+            <div>
+                <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:8px;">Verifying your access...</h2>
+                <p style="color:var(--muted);font-size:0.9rem;">Authenticating your purchase token</p>
+            </div>
+        </div>
+
+        <!-- Error -->
+        <div id="error">
+            <div class="error-icon">🔐</div>
+            <h2 id="error-title">Access Denied</h2>
+            <p id="error-msg">This access link is invalid or has expired. Please check your email for the correct link
+                or contact support.</p>
+            <a href="/veilpiercer-pitch.html"
+                style="margin-top:16px;color:var(--accent);text-decoration:none;font-size:0.9rem;">← Back to
+                VeilPiercer</a>
+        </div>
+
+        <!-- Portal -->
+        <div id="portal">
+
+            <div class="portal-header animate-in">
+                <div class="tier-badge" id="tier-badge">⚡ Pro</div>
+                <h1 id="welcome-title">Welcome to VeilPiercer</h1>
+                <p id="welcome-sub">Your access is confirmed. Everything is ready below.</p>
+            </div>
+
+            <!-- AI Welcome Message -->
+            <div class="section animate-in delay-1">
+                <div class="section-label">Your Personal Welcome</div>
+                <div class="welcome-email-box">
+                    <p id="welcome-email-text"><span id="ai-loading"><span class="ai-dot"></span><span
+                                class="ai-dot"></span><span class="ai-dot"></span> &nbsp;AI writing your welcome
+                            message...</span></p>
+                </div>
+            </div>
+
+            <!-- Core Access -->
+            <div class="section animate-in delay-2">
+                <div class="section-label">Your Access</div>
+                <div class="cards-grid" id="access-cards"></div>
+            </div>
+
+            <!-- AI Onboarding Guide -->
+            <div class="section animate-in delay-3">
+                <div class="section-label">AI Onboarding Guide</div>
+                <div class="ai-box">
+                    <h3>Your Personalized Next Steps</h3>
+                    <p id="ai-guide-text"><span class="ai-loading-inner">Generating your custom roadmap with
+                            Ollama...</span></p>
+                </div>
+            </div>
+
+            <!-- Support -->
+            <div class="section animate-in delay-4">
+                <div class="section-label">Support</div>
+                <div
+                    style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:gap:16px;">
+                    <div>
+                        <h3 style="font-size:0.95rem;font-weight:600;margin-bottom:4px;">Need Help?</h3>
+                        <p style="font-size:0.85rem;color:var(--muted);">The NEXUS ULTRA team responds within 24 hours
+                        </p>
+                    </div>
+                    <a href="mailto:support@veilpiercer.com" class="download-btn"
+                        style="padding:10px 20px;font-size:0.85rem;">✉️ Contact Support</a>
+                </div>
+            </div>
+
+            <div class="portal-footer">
+                <p>VeilPiercer — NEXUS ULTRA &nbsp;|&nbsp; <span id="footer-email"></span> &nbsp;|&nbsp; <span
+                        id="footer-tier"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const NEXUS = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? `http://127.0.0.1:3000` : ``;
+
+        const TIER_CONTENT = {
+            Starter: [
+                { icon: '🖥️', title: 'VeilPiercer Dashboard', desc: 'Full interactive agent observatory with 4 protocol modes', badge: 'included', link: '/veilpiercer-pitch.html' },
+                { icon: '📦', title: 'Source Code Bundle', desc: 'Complete frontend source — HTML, CSS, JavaScript', badge: null, link: '#' },
+                { icon: '📄', title: 'Setup Guide', desc: 'Step-by-step deployment guide for your install', badge: null, link: '#' },
+                { icon: '🔑', title: 'License Key', desc: 'Your personal Starter license — single domain', badge: null, link: '#' },
+            ],
+            Pro: [
+                { icon: '🖥️', title: 'VeilPiercer Dashboard', desc: 'Full interactive agent observatory with 4 protocol modes', badge: 'included', link: '/veilpiercer-pitch.html' },
+                { icon: '📦', title: 'Full Source + safeLog', desc: 'Complete source with safeLog module + simulation model', badge: null, link: '#' },
+                { icon: '📊', title: 'Buyer Decks', desc: 'All investor/client pitch decks in PDF + PPTX', badge: 'pro', link: '#' },
+                { icon: '🤖', title: 'AI Agent Blueprints', desc: 'n8n + Ollama workflow templates (what you just used)', badge: 'pro', link: '#' },
+                { icon: '🔑', title: 'Pro License Key', desc: 'Multi-domain license — use on up to 3 projects', badge: null, link: '#' },
+                { icon: '💬', title: 'Priority Support', desc: 'Direct access — 12hr response time', badge: 'pro', link: '#' },
+            ],
+            Agency: [
+                { icon: '🖥️', title: 'VeilPiercer Dashboard', desc: 'Full system + all protocols', badge: 'included', link: '/veilpiercer-pitch.html' },
+                { icon: '📦', title: 'White-Label Source', desc: 'Fully rebrandable — your name, your colors, your domain', badge: 'agency', link: '#' },
+                { icon: '📊', title: 'Client Pitch Deck', desc: 'Ready-to-present deck for selling to your clients', badge: 'agency', link: '#' },
+                { icon: '🤖', title: 'AI Workflow Pack', desc: 'Complete n8n + Ollama + Gemini workflow library', badge: 'agency', link: '#' },
+                { icon: '🔑', title: 'Unlimited License', desc: 'Deploy on unlimited client projects', badge: 'agency', link: '#' },
+                { icon: '🎯', title: 'Revenue Share Rights', desc: 'Sell VeilPiercer to clients and keep 100% profit', badge: 'agency', link: '#' },
+                { icon: '☎️', title: 'Onboarding Call', desc: '30-min strategy call with the NEXUS ULTRA team', badge: 'agency', link: '#' },
+            ]
+        };
+
+        async function init() {
+            const params = new URLSearchParams(window.location.search);
+            const token = params.get('token');
+
+            if (!token) { showError('No Access Token', 'No access token found in the URL. Please use the link from your welcome email.'); return; }
+
+            try {
+                const resp = await fetch(`${NEXUS}/access/verify?token=${encodeURIComponent(token)}`);
+                const data = await resp.json();
+                if (!data.ok) { showError('Invalid Token', data.error || 'Your access link is invalid or expired.'); return; }
+                showPortal(data);
+            } catch (e) {
+                showError('Connection Error', 'Could not connect to NEXUS. Please try again in a moment.');
+            }
+        }
+
+        function showError(title, msg) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'flex';
+            document.getElementById('error-title').textContent = title;
+            document.getElementById('error-msg').textContent = msg;
+        }
+
+        async function showPortal(data) {
+            const { email, tier, amount, welcomeEmail } = data;
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('portal').style.display = 'block';
+
+            // Set tier badge
+            const badge = document.getElementById('tier-badge');
+            badge.className = `tier-badge ${tier}`;
+            badge.textContent = `⚡ ${tier}`;
+
+            document.getElementById('welcome-title').textContent = `Welcome to VeilPiercer ${tier}`;
+            document.getElementById('welcome-sub').textContent = `${email} — $${(amount / 100).toFixed(2)} confirmed`;
+            document.getElementById('footer-email').textContent = email;
+            document.getElementById('footer-tier').textContent = `${tier} Access`;
+
+            // Load cards
+            const cards = TIER_CONTENT[tier] || TIER_CONTENT.Starter;
+            document.getElementById('access-cards').innerHTML = cards.map(c => `
+    <a class="card" href="${c.link}" ${c.link === '#' ? '' : 'target="_blank"'}>
+      <div class="card-icon">${c.icon}</div>
+      ${c.badge ? `<span class="badge badge-${c.badge}">${c.badge}</span>` : ''}
+      <h3>${c.title}</h3>
+      <p>${c.desc}</p>
+    </a>
+  `).join('');
+
+            // Show AI welcome email (pre-generated or generate now)
+            if (welcomeEmail) {
+                document.getElementById('welcome-email-text').textContent = welcomeEmail;
+            } else {
+                try {
+                    const r = await fetch(`${NEXUS}/ollama/agent`, {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ task: 'write-welcome-email', data: { email, tier, amount }, model: 'llama3.2:1b' })
+                    });
+                    const d = await r.json();
+                    document.getElementById('welcome-email-text').textContent = d.response || 'Welcome to VeilPiercer!';
+                } catch { document.getElementById('welcome-email-text').textContent = `Welcome to VeilPiercer ${tier}! Your access is now active. Explore everything below.`; }
+            }
+
+            // Generate AI onboarding guide
+            try {
+                const r = await fetch(`${NEXUS}/ollama/agent`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ task: 'write-welcome-email', data: { email, tier, amount }, model: 'llama3.2:1b' })
+                });
+                const guideResp = await fetch(`${NEXUS}/ollama/generate`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: 'llama3.2:1b',
+                        system: 'You are a VeilPiercer onboarding expert. Be specific, actionable, numbered. No fluff.',
+                        prompt: `Write a 5-step onboarding guide for a new VeilPiercer ${tier} buyer. Steps should help them get maximum value in their first 24 hours. Keep each step to 1-2 sentences.`
+                    })
+                });
+                const gd = await guideResp.json();
+                document.getElementById('ai-guide-text').textContent = gd.response || 'Explore the dashboard, run a protocol, and reach out if you need help!';
+            } catch {
+                document.getElementById('ai-guide-text').textContent = '1. Open the VeilPiercer dashboard\n2. Run each protocol mode\n3. Review the source code\n4. Deploy to your domain\n5. Contact support if you need help';
+            }
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

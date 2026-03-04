@@ -1,0 +1,63 @@
+{
+  "386d770395a7b7bb7d700e00a9bdfb2badd94c00cdaaa790b941ea2e32369e83": {
+    "email": "test@veilpiercer.com",
+    "tier": "Pro",
+    "amount": 9700,
+    "sessionId": "cs_test_DEMO",
+    "createdAt": "2026-03-04T02:05:55.628Z",
+    "used": 1,
+    "lastAccessed": "2026-03-04T02:05:55.722Z"
+  },
+  "97602284f5696ab4b090e8db8f162a8e31cccac89838966dda9e0dd700553dff": {
+    "email": "test@veilpiercer.com",
+    "tier": "Pro",
+    "amount": 9700,
+    "sessionId": "manual",
+    "createdAt": "2026-03-04T02:06:15.465Z",
+    "used": 0
+  },
+  "a769a9b93dde122498c03d6b5afbc932486556052d1df58f260933e8d9301898": {
+    "email": "test@veilpiercer.com",
+    "tier": "Pro",
+    "amount": 9700,
+    "sessionId": "manual",
+    "createdAt": "2026-03-04T02:06:22.892Z",
+    "used": 0
+  },
+  "27f36e82b3f187d39af9ee799301d291b65c7fc3736154ece941e2d12d4a4557": {
+    "email": "demo@veilpiercer.com",
+    "tier": "Agency",
+    "amount": 19700,
+    "sessionId": "manual",
+    "createdAt": "2026-03-04T02:09:36.461Z",
+    "used": 1,
+    "lastAccessed": "2026-03-04T02:09:37.714Z"
+  },
+  "6f68d6be6a50f34d47fae8feaffa502ff9eefc6a5d479f1bf296e9fa07b207ff": {
+    "email": "laurenflipo1388@gmail.com",
+    "tier": "Pro",
+    "amount": 9700,
+    "sessionId": "manual",
+    "createdAt": "2026-03-04T02:12:12.468Z",
+    "used": 0,
+    "welcomeEmail": "Here is a concise welcome email:\n\nSubject: Welcome to VeilPiercing!\n\nDear Laurenflipo1388,\n\nA warm welcome to the VeilPiercing family! We're thrilled to have you on board and grateful for your purchase of $97.00. As promised, we'll send you a confirmation email with all details about your order, including access to our website, tutorials, and community forums.\n\nThank you for choosing VeilPiercing. We're excited to help you achieve your piercing goals!\n\nThe NEXUS ULTRA Team"
+  },
+  "a90d9aaa3998f6592b9b40e5503271379f7aba92d9660035656a0879c6cd8af5": {
+    "email": "laurenflipo1388@gmail.com",
+    "tier": "Pro",
+    "amount": 9700,
+    "sessionId": "manual",
+    "createdAt": "2026-03-04T02:13:03.487Z",
+    "used": 0,
+    "welcomeEmail": "Here is a welcome email:\n\nSubject: Welcome to VeilPiercer Pro!\n\nDear Lauren,\n\nA warm welcome to VeilPiercer Pro! We are thrilled to have you on board and grateful for the $97.00 payment we received from your end. As promised, you will receive immediate access to our platform and get started with a 30-day money-back guarantee. If for any reason you're not satisfied with your experience, please don't hesitate to reach out. We look forward to helping you achieve your veil goals!\n\nBest regards,\nThe NEXUS ULTRA Team"
+  },
+  "fdcd3b217f85ade545987b33029b04b96c08c0e36ae2284aee28a57657ce8a63": {
+    "email": "laurenflipo1388@gmail.com",
+    "tier": "Pro",
+    "amount": 9700,
+    "sessionId": "manual",
+    "createdAt": "2026-03-04T02:18:28.364Z",
+    "used": 0,
+    "welcomeEmail": "Subject: Welcome to VeilPiercing!\n\nDear Laurenflipo1388,\n\nWe hope this email finds you well. Thank you for choosing VeilPiercer Pro - your journey with us is just beginning! We're thrilled that you've chosen our service and are excited to help you achieve the veil piercing you desire.\n\nAs a valued customer, we want to assure you of the high quality products and exceptional service you can expect from us. To confirm, your order was placed for $97.00, which will be processed within 3-5 business days.\n\nBest regards,\nThe NEXUS ULTRA Team"
+  }
+}
