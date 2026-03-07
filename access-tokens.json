@@ -30,8 +30,8 @@
     "amount": 19700,
     "sessionId": "manual",
     "createdAt": "2026-03-04T02:09:36.461Z",
-    "used": 2,
-    "lastAccessed": "2026-03-04T04:05:48.856Z"
+    "used": 1,
+    "lastAccessed": "2026-03-04T02:09:37.714Z"
   },
   "6f68d6be6a50f34d47fae8feaffa502ff9eefc6a5d479f1bf296e9fa07b207ff": {
     "email": "laurenflipo1388@gmail.com",
@@ -57,18 +57,7 @@
     "amount": 9700,
     "sessionId": "manual",
     "createdAt": "2026-03-04T02:18:28.364Z",
-    "used": 2,
-    "welcomeEmail": "Subject: Welcome to VeilPiercing!\n\nDear Laurenflipo1388,\n\nWe hope this email finds you well. Thank you for choosing VeilPiercer Pro - your journey with us is just beginning! We're thrilled that you've chosen our service and are excited to help you achieve the veil piercing you desire.\n\nAs a valued customer, we want to assure you of the high quality products and exceptional service you can expect from us. To confirm, your order was placed for $97.00, which will be processed within 3-5 business days.\n\nBest regards,\nThe NEXUS ULTRA Team",
-    "lastAccessed": "2026-03-04T23:19:20.955Z"
-  },
-  "b18eeeeaebac861058e7676e9bc8a2f2c6ee4bfeac71851681cd31350bf763ce": {
-    "email": "testbuyer@example.com",
-    "tier": "Pro",
-    "amount": 9700,
-    "sessionId": "cs_test_12345",
-    "createdAt": "2026-03-05T03:18:18.167Z",
-    "used": 1,
-    "welcomeEmail": "Here is a concise welcome email:\n\nSubject: Welcome to the VeilPiercer Community!\n\nDear TestBuyer,\n\nA warm welcome to the VeilPiercer community! We're thrilled that you've chosen our service and paid for your VeilPiercing procedure. Your payment of $97.00 was processed successfully. To confirm, your total comes out to be $97.00. If you have any questions or concerns in the future, please don't hesitate to reach out. Thank you again for choosing VeilPiercer Pro.\n\nThe NEXUS ULTRA Team",
-    "lastAccessed": "2026-03-05T03:18:24.938Z"
+    "used": 0,
+    "welcomeEmail": "Subject: Welcome to VeilPiercing!\n\nDear Laurenflipo1388,\n\nWe hope this email finds you well. Thank you for choosing VeilPiercer Pro - your journey with us is just beginning! We're thrilled that you've chosen our service and are excited to help you achieve the veil piercing you desire.\n\nAs a valued customer, we want to assure you of the high quality products and exceptional service you can expect from us. To confirm, your order was placed for $97.00, which will be processed within 3-5 business days.\n\nBest regards,\nThe NEXUS ULTRA Team"
   }
 }

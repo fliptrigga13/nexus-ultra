@@ -143,7 +143,7 @@ async def generate_synthetic_examples(agent_role: str, count: int = 10) -> list[
 
     These are self-generated WITHOUT any external API — pure local inference.
     """
-    import httpx
+    import http
 
     role_topics = {
         "researcher": [
