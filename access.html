@@ -484,7 +484,7 @@
             <div class="section animate-in delay-4">
                 <div class="section-label">Support</div>
                 <div
-                    style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:gap:16px;">
+                    style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
                     <div>
                         <h3 style="font-size:0.95rem;font-weight:600;margin-bottom:4px;">Need Help?</h3>
                         <p style="font-size:0.85rem;color:var(--muted);">The NEXUS ULTRA team responds within 24 hours
@@ -503,8 +503,7 @@
     </div>
 
     <script>
-        const NEXUS = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-            ? `http://127.0.0.1:3000` : ``;
+        const NEXUS = window.location.origin; // Points to the server where this is hosted (e.g. port 9100)
 
         const TIER_CONTENT = {
             Starter: [
@@ -542,7 +541,7 @@
                 const resp = await fetch(`${NEXUS}/access/verify?token=${encodeURIComponent(token)}`);
                 const data = await resp.json();
                 if (!data.ok) { showError('Invalid Token', data.error || 'Your access link is invalid or expired.'); return; }
-                showPortal(data);
+                showPortal(data, token);
             } catch (e) {
                 showError('Connection Error', 'Could not connect to NEXUS. Please try again in a moment.');
             }
@@ -555,7 +554,7 @@
             document.getElementById('error-msg').textContent = msg;
         }
 
-        async function showPortal(data) {
+        async function showPortal(data, token) {
             const { email, tier, amount, welcomeEmail } = data;
             document.getElementById('loading').style.display = 'none';
             document.getElementById('portal').style.display = 'block';
@@ -573,7 +572,7 @@
             // Load cards
             const cards = TIER_CONTENT[tier] || TIER_CONTENT.Starter;
             document.getElementById('access-cards').innerHTML = cards.map(c => `
-    <a class="card" href="${c.link}" ${c.link === '#' ? '' : 'target="_blank"'}>
+    <a class="card" href="${c.link === '/veilpiercer-pitch.html' ? `/veilpiercer-pitch?tk=${encodeURIComponent(token)}` : c.link}" ${c.link === '#' ? '' : 'target="_blank"'}>
       <div class="card-icon">${c.icon}</div>
       ${c.badge ? `<span class="badge badge-${c.badge}">${c.badge}</span>` : ''}
       <h3>${c.title}</h3>
