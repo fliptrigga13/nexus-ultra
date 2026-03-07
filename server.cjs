@@ -715,6 +715,44 @@ app.get('/ollama/models', async (req, res) => {
   }
 });
 
+// POST /ollama/chat — STREAMING proxy for /api/chat (used by Bot Mind)
+// Browser hits port 3000 (same origin) → NEXUS pipes to Ollama 11434 → streams NDJSON back
+app.post('/ollama/chat', (req, res) => {
+  const http = require('http');
+  const payload = JSON.stringify(req.body);
+  const payloadBuf = Buffer.from(payload, 'utf8');
+  res.setHeader('Content-Type', 'application/x-ndjson');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('X-Accel-Buffering', 'no');
+  res.setHeader('Content-Encoding', 'identity');
+  const options = {
+    hostname: '127.0.0.1',
+    port: 11434,
+    path: '/api/chat',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': payloadBuf.length
+    }
+  };
+  const ollamaReq = http.request(options, (ollamaRes) => {
+    res.flushHeaders();
+    ollamaRes.pipe(res);
+    ollamaRes.on('error', (e) => { log('OLLAMA CHAT PIPE ERR: ' + e.message); res.end(); });
+  });
+  ollamaReq.on('error', (e) => {
+    log('OLLAMA CHAT CONNECT ERR: ' + e.message);
+    if (!res.headersSent) res.status(502).end(JSON.stringify({ error: e.message }));
+    else res.end();
+  });
+  ollamaReq.setTimeout(300000, () => {
+    log('OLLAMA CHAT TIMEOUT');
+    ollamaReq.destroy();
+  });
+  ollamaReq.write(payloadBuf);
+  ollamaReq.end();
+});
+
 // POST /ollama/generate — proxy a prompt to local Ollama LLM
 // Body: { "prompt": "...", "model": "llama3:latest", "system": "..." }
 app.post('/ollama/generate', async (req, res) => {
@@ -727,7 +765,7 @@ app.post('/ollama/generate', async (req, res) => {
     const payload = JSON.stringify({ model: useModel, prompt, system: system || '', stream: false });
     const data = await new Promise((resolve, reject) => {
       const options = {
-        hostname: 'localhost', port: 11434, path: '/api/generate', method: 'POST',
+        hostname: '127.0.0.1', port: 11434, path: '/api/generate', method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) }
       };
       const r = https.request(options, resp => {

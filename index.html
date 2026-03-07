@@ -741,6 +741,7 @@
       <button class="tab" onclick="switchTab('logs',this)">📋 LOGS</button>
       <button class="tab" onclick="switchTab('schedule',this)">🗓 SCHEDULE</button>
       <button class="tab" onclick="switchTab('dropzone',this)">📁 DROP ZONE</button>
+      <button class="tab" onclick="switchTab('botmind',this)" id="tab-botmind">🧠 BOT MIND</button>
     </div>
 
     <div id="content">
@@ -819,313 +820,601 @@
           <button class="nx-btn" onclick="loadN8N()" style="font-size:11px;padding:6px 14px">↻ CHECK n8n</button>
         </div>
         <div class="out-box" id="n8n-out">Click "CHECK n8n" to probe localhost:5678</div>
-      </div>
 
-      <!-- ══ LOGS ═══════════════════════════ -->
-      <div id="panel-logs" class="panel">
-        <div class="log-ctrl">
-          <div class="sec-hdr" style="margin:0">LIVE LOG STREAM</div>
-          <label><input type="checkbox" id="auto-scroll" checked> Auto-scroll</label>
-          <label><input type="checkbox" id="auto-refresh" checked> Live (3s)</label>
-          <button class="nx-btn" onclick="loadLogs()" style="font-size:11px;padding:6px 12px">↻ REFRESH</button>
-          <span id="log-count" style="font-size:11px;color:#3a5a3a"></span>
+        <!-- VeilPiercer Pillar Scores (/veilpiercer/metrics) -->
+        <div class="sec-hdr" style="margin-top:20px">VEILPIERCER PILLARS</div>
+        <div class="stat-grid" id="vp-grid">
+          <div class="stat-card">
+            <div class="stat-label">VISIBILITY</div>
+            <div class="stat-val" id="vp-vis">—</div>
+            <div class="stat-sub" id="vp-vis-ev" style="font-size:9px;color:#2a4a2a"></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">SAFETY</div>
+            <div class="stat-val" id="vp-saf">—</div>
+            <div class="stat-sub" id="vp-saf-ev" style="font-size:9px;color:#2a4a2a"></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">PRIVACY</div>
+            <div class="stat-val" id="vp-priv">—</div>
+            <div class="stat-sub" id="vp-priv-ev" style="font-size:9px;color:#2a4a2a"></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">TOTAL EVENTS</div>
+            <div class="stat-val" id="vp-evts">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">TOTAL RUNS</div>
+            <div class="stat-val" id="vp-runs">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">UPTIME</div>
+            <div class="stat-val" id="vp-up">—</div>
+            <div class="stat-sub">s</div>
+          </div>
         </div>
-        <div id="log-box"></div>
-      </div>
 
-      <!-- ══ SCHEDULE ════════════════════════ -->
-      <div id="panel-schedule" class="panel">
-        <div class="sec-hdr">ADD SCHEDULED JOB</div>
-        <div style="margin-bottom:10px;font-size:11px;color:#3a5a3a;">PRESETS:</div>
-        <div class="cron-presets">
-          <button class="preset-btn" onclick="setCron('* * * * *','Every Minute')">Every Min</button>
-          <button class="preset-btn" onclick="setCron('0 * * * *','Hourly Scan')">Hourly</button>
-          <button class="preset-btn" onclick="setCron('0 9 * * *','Daily 9AM Scan')">Daily 9AM</button>
-          <button class="preset-btn" onclick="setCron('0 9 * * 1','Weekly Monday')">Weekly Mon</button>
-          <button class="preset-btn" onclick="setCron('0 */6 * * *','Every 6 Hours')">6-Hourly</button>
-          <button class="preset-btn" onclick="setCron('0 0 * * *','Midnight Scan')">Midnight</button>
+        <!-- Ollama + Gemini Status (/ollama/status, /gemini/status, /ollama/models) -->
+        <div class="sec-hdr" style="margin-top:20px">AI BACKENDS</div>
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-label">OLLAMA</div>
+            <div class="stat-val" id="ai-ollama">—</div>
+            <div class="stat-sub" id="ai-ollama-model" style="font-size:9px;color:#2a4a2a"></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">GEMINI</div>
+            <div class="stat-val" id="ai-gemini">—</div>
+            <div class="stat-sub" id="ai-gemini-model" style="font-size:9px;color:#2a4a2a"></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">OLLAMA MODELS</div>
+            <div class="stat-val" id="ai-models">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">ACCESS TOKENS</div>
+            <div class="stat-val" id="ai-tokens">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">CAPTURES</div>
+            <div class="stat-val" id="ai-captures">—</div>
+          </div>
         </div>
-        <div class="sched-form">
-          <div>
-            <label>CRON EXPRESSION</label>
-            <input id="sched-expr" placeholder="0 * * * *" value="0 * * * *">
+
+        <!-- Recent VeilPiercer Events (/veilpiercer/events) -->
+        <div class="sec-hdr" style="margin-top:20px">RECENT AGENT EVENTS
+          <button class="nx-btn" onclick="loadVPEvents()" style="font-size:11px;padding:4px 12px;margin-left:10px">↻
+            REFRESH</button>
+        </div>
+        <div class="out-box" id="vp-events-box" style="max-height:180px;overflow-y:auto;font-size:11px">Loading…</div>
+
+        <!-- ══ LOGS ═══════════════════════════ -->
+        <div id="panel-logs" class="panel">
+          <div class="log-ctrl">
+            <div class="sec-hdr" style="margin:0">LIVE LOG STREAM</div>
+            <label><input type="checkbox" id="auto-scroll" checked> Auto-scroll</label>
+            <label><input type="checkbox" id="auto-refresh" checked> Live (3s)</label>
+            <button class="nx-btn" onclick="loadLogs()" style="font-size:11px;padding:6px 12px">↻ REFRESH</button>
+            <span id="log-count" style="font-size:11px;color:#3a5a3a"></span>
           </div>
-          <div>
-            <label>JOB LABEL</label>
-            <input id="sched-label" placeholder="Hourly Scan">
+          <div id="log-box"></div>
+        </div>
+
+        <!-- ══ SCHEDULE ════════════════════════ -->
+        <div id="panel-schedule" class="panel">
+          <div class="sec-hdr">ADD SCHEDULED JOB</div>
+          <div style="margin-bottom:10px;font-size:11px;color:#3a5a3a;">PRESETS:</div>
+          <div class="cron-presets">
+            <button class="preset-btn" onclick="setCron('* * * * *','Every Minute')">Every Min</button>
+            <button class="preset-btn" onclick="setCron('0 * * * *','Hourly Scan')">Hourly</button>
+            <button class="preset-btn" onclick="setCron('0 9 * * *','Daily 9AM Scan')">Daily 9AM</button>
+            <button class="preset-btn" onclick="setCron('0 9 * * 1','Weekly Monday')">Weekly Mon</button>
+            <button class="preset-btn" onclick="setCron('0 */6 * * *','Every 6 Hours')">6-Hourly</button>
+            <button class="preset-btn" onclick="setCron('0 0 * * *','Midnight Scan')">Midnight</button>
           </div>
-          <div>
-            <label>ACTION</label>
-            <select id="sched-action">
-              <option value="force-stabilize">Force Stabilize</option>
-              <option value="trigger-n8n">Trigger n8n</option>
-              <option value="execute">Execute</option>
-              <option value="capture">Capture</option>
+          <div class="sched-form">
+            <div>
+              <label>CRON EXPRESSION</label>
+              <input id="sched-expr" placeholder="0 * * * *" value="0 * * * *">
+            </div>
+            <div>
+              <label>JOB LABEL</label>
+              <input id="sched-label" placeholder="Hourly Scan">
+            </div>
+            <div>
+              <label>ACTION</label>
+              <select id="sched-action">
+                <option value="force-stabilize">Force Stabilize</option>
+                <option value="trigger-n8n">Trigger n8n</option>
+                <option value="execute">Execute</option>
+                <option value="capture">Capture</option>
+              </select>
+            </div>
+            <button class="nx-btn" onclick="addJob()">+ ADD JOB</button>
+          </div>
+
+          <div class="sec-hdr">ACTIVE JOBS</div>
+          <table class="jobs-table" id="jobs-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>LABEL</th>
+                <th>CRON</th>
+                <th>ACTION</th>
+                <th>CREATED</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="jobs-body">
+              <tr>
+                <td colspan="6" style="color:#3a5a3a;padding:20px">Loading…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ══ DROP ZONE ══════════════════════ -->
+        <div id="panel-dropzone" class="panel">
+          <div class="sec-hdr">FILE DROP ZONE</div>
+          <div id="dropzone-area" onclick="document.getElementById('drop-file-input').click()"
+            ondragover="dzDragOver(event)" ondragleave="dzDragLeave(event)" ondrop="dzDrop(event)">
+            <div class="drop-icon">📁</div>
+            <div style="font-size:14px;margin-bottom:8px;color:var(--g)">DROP FILES HERE</div>
+            <div class="drop-hint">or click to browse · auto-triggers watch-trigger.ps1</div>
+          </div>
+          <input type="file" id="drop-file-input" multiple onchange="dzFilePicked(event)">
+
+          <div class="row" style="margin-bottom:14px">
+            <button class="nx-btn" onclick="loadDropzone()" style="font-size:11px;padding:6px 14px">↻ REFRESH</button>
+            <span id="dz-count" style="font-size:11px;color:#3a5a3a"></span>
+          </div>
+
+          <table class="files-table" id="dz-table">
+            <thead>
+              <tr>
+                <th>FILE</th>
+                <th>SIZE</th>
+                <th>MODIFIED</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="dz-body">
+              <tr>
+                <td colspan="4" style="color:#3a5a3a;padding:20px">Loading…</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="sec-hdr" style="margin-top:24px">RECENT TRIGGERS</div>
+          <div class="out-box" id="dz-log-box" style="max-height:200px">—</div>
+        </div>
+
+        <!-- ══ BOT MIND ════════════════════════ -->
+        <div id="panel-botmind" class="panel">
+          <div class="sec-hdr">🧠 BOT MIND — LOCAL OLLAMA REASONING</div>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+            <button class="nx-btn" style="border-color:#00dfff44;color:#00dfff" onclick="nativeRunBot('security')">🔒
+              Security Audit</button>
+            <button class="nx-btn" style="border-color:#ffaa0044;color:#ffaa00" onclick="nativeRunBot('bugs')">🐛 Hunt
+              Bugs</button>
+            <button class="nx-btn" style="border-color:#00ff8844;color:#00ff88" onclick="nativeRunBot('perf')">⚡ Perf
+              Deep-Dive</button>
+            <button class="nx-btn" style="border-color:#ff990044;color:#ff9900" onclick="nativeRunBot('drift')">📉 Drift
+              Detection</button>
+            <button class="nx-btn" style="border-color:#00dfff44;color:#00dfff" onclick="nativeRunBot('review')">🔍
+              Review</button>
+            <button class="nx-btn" style="border-color:#ff333344;color:#ff3333" onclick="nativeRunBot('lockdown')">🔴
+              LOCKDOWN</button>
+            <button class="nx-btn" style="border-color:#9933ff44;color:#cc44ff" onclick="nativeRunBot('fromcode')">💡
+              From
+              Code</button>
+            <button class="nx-btn danger" onclick="abortBot()">■ STOP</button>
+            <a href="/veilpiercer-bot-mind_1.html" target="_blank" class="nx-btn"
+              style="text-decoration:none;border-color:#2a4a2a;color:#3a8a3a;">↗ OPEN FULL UI</a>
+          </div>
+
+          <div style="display:flex;gap:16px;align-items:center;margin-bottom:8px;">
+            <div id="bot-badge"
+              style="font-size:10px;letter-spacing:2px;padding:3px 10px;border:1px solid #1a3a1a;color:#3a5a3a;">● IDLE
+            </div>
+            <div id="bot-tokens" style="font-size:10px;color:#3a5a3a;">TOKENS —</div>
+            <div id="bot-time" style="font-size:10px;color:#3a5a3a;">TIME —</div>
+            <select id="bot-model"
+              style="background:#060606;border:1px solid #1a2e1a;color:var(--g);font-family:inherit;font-size:11px;padding:4px 8px;">
+              <option value="llama3.2:1b">llama3.2:1b ⚡ FAST</option>
+              <option value="llama3:latest">llama3:latest</option>
+              <option value="gemma3:4b">gemma3:4b</option>
+              <option value="qwen3:8b">qwen3:8b ★ BEST</option>
             </select>
           </div>
-          <button class="nx-btn" onclick="addJob()">+ ADD JOB</button>
+
+          <div id="bot-output"
+            style="background:#020a04;border:1px solid #1a2e1a;padding:16px;height:480px;overflow-y:auto;font-size:12px;line-height:1.8;color:#a0c8a0;white-space:pre-wrap;word-break:break-word;font-family:'JetBrains Mono',monospace;">
+            Select a task above to start local Ollama reasoning…</div>
         </div>
 
-        <div class="sec-hdr">ACTIVE JOBS</div>
-        <table class="jobs-table" id="jobs-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>LABEL</th>
-              <th>CRON</th>
-              <th>ACTION</th>
-              <th>CREATED</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="jobs-body">
-            <tr>
-              <td colspan="6" style="color:#3a5a3a;padding:20px">Loading…</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      </div><!-- /content -->
+    </div><!-- /shell -->
 
-      <!-- ══ DROP ZONE ══════════════════════ -->
-      <div id="panel-dropzone" class="panel">
-        <div class="sec-hdr">FILE DROP ZONE</div>
-        <div id="dropzone-area" onclick="document.getElementById('drop-file-input').click()"
-          ondragover="dzDragOver(event)" ondragleave="dzDragLeave(event)" ondrop="dzDrop(event)">
-          <div class="drop-icon">📁</div>
-          <div style="font-size:14px;margin-bottom:8px;color:var(--g)">DROP FILES HERE</div>
-          <div class="drop-hint">or click to browse · auto-triggers watch-trigger.ps1</div>
-        </div>
-        <input type="file" id="drop-file-input" multiple onchange="dzFilePicked(event)">
-
-        <div class="row" style="margin-bottom:14px">
-          <button class="nx-btn" onclick="loadDropzone()" style="font-size:11px;padding:6px 14px">↻ REFRESH</button>
-          <span id="dz-count" style="font-size:11px;color:#3a5a3a"></span>
-        </div>
-
-        <table class="files-table" id="dz-table">
-          <thead>
-            <tr>
-              <th>FILE</th>
-              <th>SIZE</th>
-              <th>MODIFIED</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="dz-body">
-            <tr>
-              <td colspan="4" style="color:#3a5a3a;padding:20px">Loading…</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div class="sec-hdr" style="margin-top:24px">RECENT TRIGGERS</div>
-        <div class="out-box" id="dz-log-box" style="max-height:200px">—</div>
-      </div>
-
-    </div><!-- /content -->
-  </div><!-- /shell -->
-
-  <script>
-    // ── Auth ─────────────────────────────────
-    const KEY = 'Burton';
-    function hdrs(json = true) {
-      const h = { 'x-api-key': KEY };
-      if (json) h['Content-Type'] = 'application/json';
-      return h;
-    }
-
-    function doLogin() {
-      const code = document.getElementById('lp').value.trim();
-      const err = document.getElementById('login-err');
-      if (!code) { err.textContent = '⚠ Access code required'; return; }
-      if (code !== KEY) { err.textContent = '✗ Invalid access code'; return; }
-      document.getElementById('login-wrap').style.display = 'none';
-      document.getElementById('shell').style.display = 'flex';
-      init();
-    }
-
-    // ── Tab switching ─────────────────────────
-    function switchTab(name, btn) {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById('panel-' + name).classList.add('active');
-      if (name === 'status') loadStatus();
-      if (name === 'logs') loadLogs();
-      if (name === 'schedule') loadJobs();
-      if (name === 'dropzone') loadDropzone();
-    }
-
-    // ── Clock ────────────────────────────────
-    setInterval(() => {
-      document.getElementById('hdr-time').textContent = new Date().toLocaleTimeString();
-    }, 1000);
-
-    // ── Init ─────────────────────────────────
-    function init() {
-      loadStatus();
-      startLogRefresh();
-    }
-
-    // ── Status polling ───────────────────────
-    async function loadStatus() {
-      try {
-        const d = await fetch('/status').then(r => r.json());
-        document.getElementById('hdr-status').textContent = d.status || 'ONLINE';
-        document.getElementById('s-status').textContent = d.ok ? '● ONLINE' : '● ERROR';
-        document.getElementById('s-uptime').textContent = d.uptime;
-        document.getElementById('s-port').textContent = d.port;
-        document.getElementById('s-tabs').textContent = d.tabs_loaded;
-        document.getElementById('s-jobs').textContent = d.scheduled_jobs;
-        document.getElementById('s-drop').textContent = d.drop_zone_files;
-        document.getElementById('s-cap').textContent = d.captures;
-        document.getElementById('s-log').textContent = d.log_size_kb;
-        document.getElementById('srv-dot').style.background = '#00ff41';
-      } catch (e) {
-        document.getElementById('hdr-status').textContent = 'OFFLINE';
-        document.getElementById('srv-dot').style.background = '#ff3333';
+    <script>
+      // ── Auth ─────────────────────────────────
+      const KEY = 'Burton';
+      function hdrs(json = true) {
+        const h = { 'x-api-key': KEY };
+        if (json) h['Content-Type'] = 'application/json';
+        return h;
       }
-    }
-    setInterval(loadStatus, 10000);
 
-    // ── n8n Status ───────────────────────────
-    async function loadN8N() {
-      const box = document.getElementById('n8n-out');
-      const badge = document.getElementById('n8n-badge');
-      box.textContent = 'Probing localhost:5678…';
-      try {
-        const d = await fetch('/n8n/status').then(r => r.json());
-        if (d.online) {
-          badge.className = 'online-badge up';
-          badge.textContent = '● ONLINE';
-          box.textContent = `✅ n8n reachable at ${d.url}\n${d.health || ''}`;
-        } else {
+      function doLogin() {
+        const code = document.getElementById('lp').value.trim();
+        const err = document.getElementById('login-err');
+        if (!code) { err.textContent = '⚠ Access code required'; return; }
+        if (code !== KEY) { err.textContent = '✗ Invalid access code'; return; }
+        document.getElementById('login-wrap').style.display = 'none';
+        document.getElementById('shell').style.display = 'flex';
+        init();
+      }
+
+      // ── Tab switching ─────────────────────────
+      function switchTab(name, btn) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('panel-' + name).classList.add('active');
+        if (name === 'status') { loadStatus(); loadVPMetrics(); loadVPEvents(); loadAIBackends(); }
+        if (name === 'logs') loadLogs();
+        if (name === 'schedule') loadJobs();
+        if (name === 'dropzone') loadDropzone();
+        if (name === 'botmind') {
+          // native streaming panel — no iframe needed
+        }
+      }
+
+      // ── Bot Mind — native streaming (no iframe) ──
+      const BOT_PROMPTS = {
+        security: `You are doing a security audit of safeLog v2.1.0 — the PATCHED version. Five fixes have been applied: (1) event field now has 1-256 char limit and blocks control chars + <>"'\\u0060\\\\, (2) nodeId uses NFC normalization with regex blocking Unicode homoglyphs like ＠ ／ ⁄ ∕ and PUA/Specials Unicode blocks, (3) errorType uses a closed 17-type allowlist with stack-trace detection, (4) outputKeys now rejects empty strings and path chars, (5) chainId enforces strict UUID v4 regex. Your job is to find what's STILL exploitable after these fixes. Does NFC normalization collapse ALL confusable codepoints, or only combining-char sequences? Are there Unicode categories not covered — think Halfwidth/Fullwidth Forms block (FF00-FFEF)? What happens when a library throws DOMException, AggregateError, or a custom 'ValidationError' whose message contains a path? The event validator blocks <>"' but not semicolons, pipes, percent-encoded sequences — do those matter in Datadog/Loki query injection? Reason through each residual attack surface with concrete examples.`,
+        bugs: `Hunt for bugs the 79 tests are NOT catching in safeLog v2.1.0. The NFC normalization: what if normalizeStr() is called on a value already partially normalized — could double-normalization cause edge cases? The outputKeys validator caps at 64 items — what happens when exactly 65 keys are passed; is the cap inclusive or exclusive? The rate limiter window reset: if two calls hit in the same millisecond, does wStart get set correctly both times? The backoff jitter: delay * 0.3 * Math.random() — Math.random() can return 0, giving zero jitter. Does that cause thundering herd? The safeErrorType helper: if e.name is 'ValidationError' but error.message contains a filesystem path, does that path leak into the log via a different field? Walk through concrete scenarios.`,
+        perf: `Do real performance math on the Veilpiercer codebase. kineticNode: 4ms base + jitter 0-8ms + spike 32ms at 8% chance. In 500 chains, with 10 nodes each, how many kineticNode spikes do you expect? Work out the actual p99 math. The backoff formula: BASE=5ms, 5 attempts, delays are 5ms, 10ms, 20ms, 40ms, 80ms — max total wait is 155ms + jitter. Is that right? The new NFC normalization in v2.1.0 adds normalize() per string field — for 500 nodes with 8 string fields each, is the CPU cost measurable? Think about whether the 2x anomaly threshold is correctly calibrated for the 32ms spike scenario.`,
+        drift: `Reason through where Veilpiercer's drift detection is genuinely blind. safeLog only logs outputKeys (key names), not values. If an AI agent starts generating shorter answers, would that appear anywhere in the log schema? If response quality degrades but the set of keys stays the same, what's the earliest detectable signal? The 90-day drift incident: what would the log timeline actually look like over those 90 days? At what point would the anomaly detector have fired, if at all? Be specific about what's missing.`,
+        review: `Review the 5 security fixes in safeLog v2.1.0 critically. event field: blocks <>"'\\u0060\\\\ but not semicolons, pipes, or percent-encoded sequences — is that complete for a Datadog/Loki context? nodeId regex: the PUA range is E000-F8FF but Supplementary Private Use Area A starts at F0000 — is a surrogate pair bypass possible in JS? The errorType allowlist has 17 names — what happens with DOMException (name='NotSupportedError', not in the list) or AggregateError? chainId now uses strict UUID v4 regex with /i — does that accept mixed-case UUIDs, and is that intentional? The safeErrorType helper returns 'Error' for unknown classes — does that mask important failure info from ops teams? Find the real edge cases in the patches themselves.`,
+        lockdown: `Reason through what LOCKDOWN actually mechanically prevents vs what it doesn't. GATE at 100% vs 88% — what is the 12% gap? The $2.4M GDPR incident: the email was passed as nodeId. safeLog v2.1.0 now blocks @ and its Unicode homoglyph ＠ (U+FF20) — but what about punycode-encoded email-like strings like 'user%40domain.com'? The percent sign isn't in the blocklist. The constructor injection: does LOCKDOWN affect prototype pollution prevention, or is that entirely in the hasOwnProperty patch? Think carefully about what node percentages actually do mechanically.`,
+        fromcode: `Ignore all marketing copy. Derive what Veilpiercer actually is purely by reasoning about the code. safeLog v2.1.0's errorType allowlist has exactly 17 error class names — what does the specific choice (ValidationError, RateLimitError, ChainError, NodeError) tell you about the product's architecture? The $2.4M GDPR incident happened because an email ended up in nodeId — v2.1.0 now blocks @ and ＠. What does it mean that this needed a Unicode-aware patch rather than just includes('@')? Build up a picture of the actual product, customers, and their sophistication from the code evidence alone.`
+      };
+      const BOT_SYSTEM = `You are the Veilpiercer bot — an AI reasoning about its own codebase. Think out loud, step by step. Be specific and concrete — use exact field names, code paths, and numbers. When you find something interesting, pursue it. Draw real conclusions. Use flowing analytical prose when reasoning.`;
+
+      let botController = null;
+      let botTimer = null;
+      let botStart = 0;
+      let botRunning = false;
+
+      async function nativeRunBot(task) {
+        // Always abort any previous run and start fresh
+        if (botController) { botController.abort(); }
+        botRunning = false;
+        clearInterval(botTimer);
+        botRunning = true;
+        botController = new AbortController();
+
+        const model = document.getElementById('bot-model').value;
+        const out = document.getElementById('bot-output');
+        const badge = document.getElementById('bot-badge');
+        const tokEl = document.getElementById('bot-tokens');
+        const timeEl = document.getElementById('bot-time');
+
+        const taskNames = { security: '🔒 Security Audit', bugs: '🐛 Hunt Bugs', perf: '⚡ Perf Deep-Dive', drift: '📉 Drift Detection', review: '🔍 Review', lockdown: '🔴 LOCKDOWN', fromcode: '💡 From Code' };
+
+        badge.textContent = '◉ THINKING'; badge.style.color = 'var(--yel)'; badge.style.borderColor = '#3a3a1a';
+        out.textContent = '';
+        tokEl.textContent = 'TOKENS 0';
+        botStart = Date.now();
+        botTimer = setInterval(() => { timeEl.textContent = 'TIME ' + ((Date.now() - botStart) / 1000).toFixed(1) + 's'; }, 200);
+        console.log('BOT MIND: ' + taskNames[task] + ' → ' + model);
+
+        try {
+          const res = await fetch('/ollama/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            signal: botController.signal,
+            body: JSON.stringify({
+              model,
+              stream: true,
+              options: { num_predict: 1800, temperature: 0.7 },
+              messages: [
+                { role: 'system', content: BOT_SYSTEM },
+                { role: 'user', content: BOT_PROMPTS[task] }
+              ]
+            })
+          });
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          badge.textContent = '▶ STREAMING'; badge.style.color = 'var(--g)'; badge.style.borderColor = 'var(--gd)';
+          const reader = res.body.getReader();
+          const dec = new TextDecoder();
+          let buf = '', fullText = '', toks = 0;
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buf += dec.decode(value, { stream: true });
+            const lines = buf.split('\n'); buf = lines.pop();
+            for (const line of lines) {
+              if (!line.trim()) continue;
+              try {
+                const ev = JSON.parse(line);
+                const chunk = ev.message?.content || '';
+                if (chunk) { fullText += chunk; toks += Math.ceil(chunk.length / 4); out.textContent = fullText; out.scrollTop = out.scrollHeight; tokEl.textContent = 'TOKENS ' + toks; }
+                if (ev.done && ev.eval_count) tokEl.textContent = 'TOKENS ' + ev.eval_count;
+              } catch (_) { }
+            }
+          }
+          badge.textContent = '✓ DONE'; badge.style.color = 'var(--g)';
+          console.log('BOT MIND done — ' + toks + ' tokens');
+        } catch (e) {
+          if (e.name !== 'AbortError') { badge.textContent = '✗ ERROR'; badge.style.color = 'var(--red)'; out.textContent += '\n\n[ERROR] ' + e.message; console.log('BOT MIND error: ' + e.message); }
+          else { badge.textContent = '■ STOPPED'; badge.style.color = 'var(--yel)'; }
+        } finally {
+          clearInterval(botTimer); botRunning = false;
+        }
+      }
+
+      function abortBot() {
+        if (botController) botController.abort();
+        clearInterval(botTimer);
+        botRunning = false;
+      }
+
+      // ── Clock ────────────────────────────────
+      setInterval(() => {
+        document.getElementById('hdr-time').textContent = new Date().toLocaleTimeString();
+      }, 1000);
+
+      // ── Init ─────────────────────────────────
+      function init() {
+        loadStatus();
+        startLogRefresh();
+        loadVPMetrics();
+        loadVPEvents();
+        loadAIBackends();
+      }
+
+
+      // ── Status polling ───────────────────────
+      async function loadStatus() {
+        try {
+          const d = await fetch('/status').then(r => r.json());
+          document.getElementById('hdr-status').textContent = d.status || 'ONLINE';
+          document.getElementById('s-status').textContent = d.ok ? '● ONLINE' : '● ERROR';
+          document.getElementById('s-uptime').textContent = d.uptime;
+          document.getElementById('s-port').textContent = d.port;
+          document.getElementById('s-tabs').textContent = d.tabs_loaded;
+          document.getElementById('s-jobs').textContent = d.scheduled_jobs;
+          document.getElementById('s-drop').textContent = d.drop_zone_files;
+          document.getElementById('s-cap').textContent = d.captures;
+          document.getElementById('s-log').textContent = d.log_size_kb;
+          document.getElementById('srv-dot').style.background = '#00ff41';
+        } catch (e) {
+          document.getElementById('hdr-status').textContent = 'OFFLINE';
+          document.getElementById('srv-dot').style.background = '#ff3333';
+        }
+      }
+      setInterval(loadStatus, 10000);
+
+      // ── VeilPiercer Metrics (/veilpiercer/metrics) ────────────────
+      async function loadVPMetrics() {
+        try {
+          const d = await fetch('/veilpiercer/metrics').then(r => r.json());
+          if (!d.ok) return;
+          const col = v => v >= 90 ? 'var(--g)' : v >= 70 ? 'var(--yel)' : 'var(--red)';
+          document.getElementById('vp-vis').textContent = d.vis.score + '%';
+          document.getElementById('vp-vis').style.color = col(d.vis.score);
+          document.getElementById('vp-vis-ev').textContent = d.vis.lastEvent.slice(0, 40);
+          document.getElementById('vp-saf').textContent = d.saf.score + '%';
+          document.getElementById('vp-saf').style.color = col(d.saf.score);
+          document.getElementById('vp-saf-ev').textContent = d.saf.lastEvent.slice(0, 40);
+          document.getElementById('vp-priv').textContent = d.priv.score + '%';
+          document.getElementById('vp-priv').style.color = col(d.priv.score);
+          document.getElementById('vp-priv-ev').textContent = d.priv.lastEvent.slice(0, 40);
+          document.getElementById('vp-evts').textContent = d.totalEvents;
+          document.getElementById('vp-runs').textContent = d.totalRuns;
+          document.getElementById('vp-up').textContent = d.uptime;
+        } catch (_) { }
+      }
+
+      // ── VeilPiercer Events (/veilpiercer/events) ──────────────────
+      async function loadVPEvents() {
+        const box = document.getElementById('vp-events-box');
+        try {
+          const d = await fetch('/veilpiercer/events?n=20').then(r => r.json());
+          if (!d.ok || !d.events.length) { box.textContent = 'No events yet.'; return; }
+          box.innerHTML = d.events.map(ev => {
+            const col = ev.pillar === 'vis' ? 'var(--cya)' : ev.pillar === 'saf' ? 'var(--g)' : 'var(--yel)';
+            const ts = new Date(ev.ts).toLocaleTimeString();
+            return `<pre style="margin:0;color:${col}">[${ts}] [${ev.pillar.toUpperCase()}] ${escHtml(ev.msg)}</pre>`;
+          }).join('');
+        } catch (e) { box.textContent = 'Error: ' + e.message; }
+      }
+
+      // ── AI Backends (/ollama/status, /gemini/status, /ollama/models, /access/list, /captures) ──
+      async function loadAIBackends() {
+        // Ollama status
+        try {
+          const d = await fetch('/ollama/status').then(r => r.json());
+          const el = document.getElementById('ai-ollama');
+          el.textContent = d.ok ? '● ONLINE' : '● OFFLINE';
+          el.style.color = d.ok ? 'var(--g)' : 'var(--red)';
+          document.getElementById('ai-ollama-model').textContent = d.model || '';
+        } catch (_) { document.getElementById('ai-ollama').textContent = '? ERR'; }
+
+        // Gemini status
+        try {
+          const d = await fetch('/gemini/status').then(r => r.json());
+          const el = document.getElementById('ai-gemini');
+          el.textContent = d.ok ? '● CONFIGURED' : '● NO KEY';
+          el.style.color = d.ok ? 'var(--g)' : 'var(--yel)';
+          document.getElementById('ai-gemini-model').textContent = d.model || '';
+        } catch (_) { document.getElementById('ai-gemini').textContent = '? ERR'; }
+
+        // Ollama models count
+        try {
+          const d = await fetch('/ollama/models').then(r => r.json());
+          document.getElementById('ai-models').textContent = (d.models || []).length;
+        } catch (_) { document.getElementById('ai-models').textContent = '—'; }
+
+        // Access tokens (/access/list)
+        try {
+          const d = await fetch('/access/list', { headers: hdrs() }).then(r => r.json());
+          document.getElementById('ai-tokens').textContent = d.count || 0;
+        } catch (_) { document.getElementById('ai-tokens').textContent = '—'; }
+
+        // Captures (/captures)
+        try {
+          const d = await fetch('/captures', { headers: hdrs() }).then(r => r.json());
+          document.getElementById('ai-captures').textContent = (d.files || []).length;
+        } catch (_) { document.getElementById('ai-captures').textContent = '—'; }
+      }
+
+      // Poll all branches every 10s (same cycle as status)
+      setInterval(() => { loadVPMetrics(); loadVPEvents(); loadAIBackends(); }, 10000);
+
+
+
+      // ── n8n Status ───────────────────────────
+      async function loadN8N() {
+        const box = document.getElementById('n8n-out');
+        const badge = document.getElementById('n8n-badge');
+        box.textContent = 'Probing localhost:5678…';
+        try {
+          const d = await fetch('/n8n/status').then(r => r.json());
+          if (d.online) {
+            badge.className = 'online-badge up';
+            badge.textContent = '● ONLINE';
+            box.textContent = `✅ n8n reachable at ${d.url}\n${d.health || ''}`;
+          } else {
+            badge.className = 'online-badge down';
+            badge.textContent = '● OFFLINE';
+            box.textContent = `n8n is NOT running on port 5678.\n\nTo start n8n:\n  npx n8n start\n\nError: ${d.error}`;
+          }
+        } catch (e) {
           badge.className = 'online-badge down';
-          badge.textContent = '● OFFLINE';
-          box.textContent = `n8n is NOT running on port 5678.\n\nTo start n8n:\n  npx n8n start\n\nError: ${d.error}`;
+          badge.textContent = '● ERROR';
+          box.textContent = 'Request failed: ' + e.message;
         }
-      } catch (e) {
-        badge.className = 'online-badge down';
-        badge.textContent = '● ERROR';
-        box.textContent = 'Request failed: ' + e.message;
       }
-    }
 
-    // ── Logs ─────────────────────────────────
-    let logRefreshTimer = null;
-    async function loadLogs() {
-      const box = document.getElementById('log-box');
-      try {
-        const d = await fetch('/logs?lines=120').then(r => r.json());
-        if (!d.ok) return;
-        document.getElementById('log-count').textContent = `${d.total} total lines`;
-        box.innerHTML = d.lines.map(l => {
-          let cls = 'log-line';
-          if (l.includes('RUN') || l.includes('CMD')) cls += ' rn';
-          if (l.includes('ERR') || l.includes('error')) cls += ' err';
-          if (l.includes('SCHED')) cls += ' sch';
-          if (l.includes('DROP')) cls += ' drp';
-          return `<pre class="${cls}">${escHtml(l)}</pre>`;
-        }).join('');
-        if (document.getElementById('auto-scroll').checked)
-          box.scrollTop = box.scrollHeight;
-      } catch (e) {
-        box.innerHTML = `<pre style="color:var(--red)">Could not load logs: ${e.message}</pre>`;
+      // ── Logs ─────────────────────────────────
+      let logRefreshTimer = null;
+      async function loadLogs() {
+        const box = document.getElementById('log-box');
+        try {
+          const d = await fetch('/logs?lines=120').then(r => r.json());
+          if (!d.ok) return;
+          document.getElementById('log-count').textContent = `${d.total} total lines`;
+          box.innerHTML = d.lines.map(l => {
+            let cls = 'log-line';
+            if (l.includes('RUN') || l.includes('CMD')) cls += ' rn';
+            if (l.includes('ERR') || l.includes('error')) cls += ' err';
+            if (l.includes('SCHED')) cls += ' sch';
+            if (l.includes('DROP')) cls += ' drp';
+            return `<pre class="${cls}">${escHtml(l)}</pre>`;
+          }).join('');
+          if (document.getElementById('auto-scroll').checked)
+            box.scrollTop = box.scrollHeight;
+        } catch (e) {
+          box.innerHTML = `<pre style="color:var(--red)">Could not load logs: ${e.message}</pre>`;
+        }
       }
-    }
 
-    function startLogRefresh() {
-      clearInterval(logRefreshTimer);
-      logRefreshTimer = setInterval(() => {
-        if (document.getElementById('auto-refresh').checked &&
-          document.getElementById('panel-logs').classList.contains('active')) {
-          loadLogs();
-        }
-      }, 3000);
-    }
+      function startLogRefresh() {
+        clearInterval(logRefreshTimer);
+        logRefreshTimer = setInterval(() => {
+          if (document.getElementById('auto-refresh').checked &&
+            document.getElementById('panel-logs').classList.contains('active')) {
+            loadLogs();
+          }
+        }, 3000);
+      }
 
-    // ── Script runner ────────────────────────
-    async function runScript(action) {
-      setCtrl(`⏳ Running ${action}…`, false);
-      try {
-        const d = await fetch('/run', { method: 'POST', headers: hdrs(), body: JSON.stringify({ action }) }).then(r => r.json());
-        setCtrl(d.ok ? `✅ ${action} complete` : `❌ ${d.error}`, d.ok, d.ok ? d.output : d.error);
-      } catch (e) { setCtrl('🔴 ' + e.message, false, e.message); }
-    }
+      // ── Script runner ────────────────────────
+      async function runScript(action) {
+        setCtrl(`⏳ Running ${action}…`, false);
+        try {
+          const d = await fetch('/run', { method: 'POST', headers: hdrs(), body: JSON.stringify({ action }) }).then(r => r.json());
+          setCtrl(d.ok ? `✅ ${action} complete` : `❌ ${d.error}`, d.ok, d.ok ? d.output : d.error);
+        } catch (e) { setCtrl('🔴 ' + e.message, false, e.message); }
+      }
 
-    function setCtrl(label, ok, body = '') {
-      const lbl = document.getElementById('ctrl-label');
-      const box = document.getElementById('ctrl-out');
-      lbl.textContent = label;
-      box.textContent = body || label;
-      box.className = 'out-box ' + (ok === true ? 'ok' : ok === false ? 'error' : '');
-    }
+      function setCtrl(label, ok, body = '') {
+        const lbl = document.getElementById('ctrl-label');
+        const box = document.getElementById('ctrl-out');
+        lbl.textContent = label;
+        box.textContent = body || label;
+        box.className = 'out-box ' + (ok === true ? 'ok' : ok === false ? 'error' : '');
+      }
 
-    async function runCmd() {
-      const cmd = document.getElementById('cmdInput').value.trim();
-      if (!cmd) return;
-      setCtrl(`⏳ $ ${cmd}`, null, '');
-      try {
-        const d = await fetch('/cmd', { method: 'POST', headers: hdrs(), body: JSON.stringify({ cmd }) }).then(r => r.json());
-        setCtrl(d.ok ? `✅ $ ${cmd}` : `❌ ${d.error}`, d.ok, d.ok ? d.output : d.error);
-      } catch (e) { setCtrl('🔴 ' + e.message, false, e.message); }
-    }
+      async function runCmd() {
+        const cmd = document.getElementById('cmdInput').value.trim();
+        if (!cmd) return;
+        setCtrl(`⏳ $ ${cmd}`, null, '');
+        try {
+          const d = await fetch('/cmd', { method: 'POST', headers: hdrs(), body: JSON.stringify({ cmd }) }).then(r => r.json());
+          setCtrl(d.ok ? `✅ $ ${cmd}` : `❌ ${d.error}`, d.ok, d.ok ? d.output : d.error);
+        } catch (e) { setCtrl('🔴 ' + e.message, false, e.message); }
+      }
 
-    async function doCapture() {
-      setCtrl('⏳ Capturing clipboard + screenshot…', null);
-      try {
-        const d = await fetch('/capture', { method: 'POST', headers: hdrs() }).then(r => r.json());
-        setCtrl(d.ok ? '✅ Capture saved to /captures/' : '❌ ' + d.error, d.ok, d.ok ? d.output : d.error);
-      } catch (e) { setCtrl('🔴 ' + e.message, false); }
-    }
+      async function doCapture() {
+        setCtrl('⏳ Capturing clipboard + screenshot…', null);
+        try {
+          const d = await fetch('/capture', { method: 'POST', headers: hdrs() }).then(r => r.json());
+          setCtrl(d.ok ? '✅ Capture saved to /captures/' : '❌ ' + d.error, d.ok, d.ok ? d.output : d.error);
+        } catch (e) { setCtrl('🔴 ' + e.message, false); }
+      }
 
-    async function loadTabs() {
-      try {
-        const d = await fetch('/tabs').then(r => r.json());
-        setCtrl(`✅ ${d.edge_all_open_tabs.length} tab(s) stored`, true, JSON.stringify(d.edge_all_open_tabs, null, 2));
-      } catch (e) { setCtrl('🔴 ' + e.message, false); }
-    }
+      async function loadTabs() {
+        try {
+          const d = await fetch('/tabs').then(r => r.json());
+          setCtrl(`✅ ${d.edge_all_open_tabs.length} tab(s) stored`, true, JSON.stringify(d.edge_all_open_tabs, null, 2));
+        } catch (e) { setCtrl('🔴 ' + e.message, false); }
+      }
 
-    async function clearTabs() {
-      try {
-        const d = await fetch('/tabs', { method: 'DELETE', headers: hdrs() }).then(r => r.json());
-        setCtrl(d.ok ? '✅ Tabs cleared' : '❌ ' + d.error, d.ok);
-      } catch (e) { setCtrl('🔴 ' + e.message, false); }
-    }
+      async function clearTabs() {
+        try {
+          const d = await fetch('/tabs', { method: 'DELETE', headers: hdrs() }).then(r => r.json());
+          setCtrl(d.ok ? '✅ Tabs cleared' : '❌ ' + d.error, d.ok);
+        } catch (e) { setCtrl('🔴 ' + e.message, false); }
+      }
 
-    // ── Scheduler ────────────────────────────
-    function setCron(expr, label) {
-      document.getElementById('sched-expr').value = expr;
-      document.getElementById('sched-label').value = label;
-    }
+      // ── Scheduler ────────────────────────────
+      function setCron(expr, label) {
+        document.getElementById('sched-expr').value = expr;
+        document.getElementById('sched-label').value = label;
+      }
 
-    async function addJob() {
-      const expression = document.getElementById('sched-expr').value.trim();
-      const label = document.getElementById('sched-label').value.trim();
-      const action = document.getElementById('sched-action').value;
-      if (!expression || !label) return alert('Cron expression and label required');
-      try {
-        const d = await fetch('/schedule', { method: 'POST', headers: hdrs(), body: JSON.stringify({ expression, label, action }) }).then(r => r.json());
-        if (d.ok) { loadJobs(); loadStatus(); }
-        else alert('Error: ' + d.error);
-      } catch (e) { alert(e.message); }
-    }
+      async function addJob() {
+        const expression = document.getElementById('sched-expr').value.trim();
+        const label = document.getElementById('sched-label').value.trim();
+        const action = document.getElementById('sched-action').value;
+        if (!expression || !label) return alert('Cron expression and label required');
+        try {
+          const d = await fetch('/schedule', { method: 'POST', headers: hdrs(), body: JSON.stringify({ expression, label, action }) }).then(r => r.json());
+          if (d.ok) { loadJobs(); loadStatus(); }
+          else alert('Error: ' + d.error);
+        } catch (e) { alert(e.message); }
+      }
 
-    async function deleteJob(id) {
-      if (!confirm(`Remove job #${id}?`)) return;
-      await fetch(`/schedule/${id}`, { method: 'DELETE', headers: hdrs() });
-      loadJobs();
-    }
+      async function deleteJob(id) {
+        if (!confirm(`Remove job #${id}?`)) return;
+        await fetch(`/schedule/${id}`, { method: 'DELETE', headers: hdrs() });
+        loadJobs();
+      }
 
-    async function loadJobs() {
-      const tbody = document.getElementById('jobs-body');
-      try {
-        const d = await fetch('/schedule', { headers: hdrs() }).then(r => r.json());
-        if (!d.jobs.length) {
-          tbody.innerHTML = '<tr><td colspan="6" style="color:#3a5a3a;padding:20px">No scheduled jobs</td></tr>';
-          return;
-        }
-        tbody.innerHTML = d.jobs.map(j => `
+      async function loadJobs() {
+        const tbody = document.getElementById('jobs-body');
+        try {
+          const d = await fetch('/schedule', { headers: hdrs() }).then(r => r.json());
+          if (!d.jobs.length) {
+            tbody.innerHTML = '<tr><td colspan="6" style="color:#3a5a3a;padding:20px">No scheduled jobs</td></tr>';
+            return;
+          }
+          tbody.innerHTML = d.jobs.map(j => `
       <tr>
         <td><span class="badge">#${j.id}</span></td>
         <td>${escHtml(j.label)}</td>
@@ -1134,132 +1423,132 @@
         <td style="color:#3a5a3a;font-size:11px">${new Date(j.created).toLocaleString()}</td>
         <td><button class="del-link" onclick="deleteJob(${j.id})">✕ remove</button></td>
       </tr>`).join('');
-      } catch (e) {
-        tbody.innerHTML = `<tr><td colspan="6" style="color:var(--red)">${escHtml(e.message)}</td></tr>`;
+        } catch (e) {
+          tbody.innerHTML = `<tr><td colspan="6" style="color:var(--red)">${escHtml(e.message)}</td></tr>`;
+        }
       }
-    }
 
-    // ── Drop Zone ────────────────────────────
-    function dzDragOver(e) { e.preventDefault(); document.getElementById('dropzone-area').classList.add('drag-over'); }
-    function dzDragLeave(e) { document.getElementById('dropzone-area').classList.remove('drag-over'); }
+      // ── Drop Zone ────────────────────────────
+      function dzDragOver(e) { e.preventDefault(); document.getElementById('dropzone-area').classList.add('drag-over'); }
+      function dzDragLeave(e) { document.getElementById('dropzone-area').classList.remove('drag-over'); }
 
-    function dzDrop(e) {
-      e.preventDefault();
-      document.getElementById('dropzone-area').classList.remove('drag-over');
-      const files = [...e.dataTransfer.files];
-      uploadFiles(files);
-    }
+      function dzDrop(e) {
+        e.preventDefault();
+        document.getElementById('dropzone-area').classList.remove('drag-over');
+        const files = [...e.dataTransfer.files];
+        uploadFiles(files);
+      }
 
-    function dzFilePicked(e) { uploadFiles([...e.target.files]); }
+      function dzFilePicked(e) { uploadFiles([...e.target.files]); }
 
-    async function uploadFiles(files) {
-      for (const f of files) {
-        const data = await f.arrayBuffer();
+      async function uploadFiles(files) {
+        for (const f of files) {
+          const data = await f.arrayBuffer();
+          try {
+            const r = await fetch(`/dropzone/upload?name=${encodeURIComponent(f.name)}`, {
+              method: 'POST',
+              headers: { 'x-api-key': KEY, 'Content-Type': 'application/octet-stream' },
+              body: data
+            });
+            const d = await r.json();
+            if (!d.ok) alert('Upload failed: ' + d.error);
+          } catch (e) { alert('Upload error: ' + e.message); }
+        }
+        loadDropzone();
+      }
+
+      async function deleteFile(name) {
+        if (!confirm(`Delete ${name}?`)) return;
+        await fetch(`/dropzone/${encodeURIComponent(name)}`, { method: 'DELETE', headers: hdrs() });
+        loadDropzone();
+      }
+
+      async function loadDropzone() {
+        const tbody = document.getElementById('dz-body');
+        const logBox = document.getElementById('dz-log-box');
         try {
-          const r = await fetch(`/dropzone/upload?name=${encodeURIComponent(f.name)}`, {
-            method: 'POST',
-            headers: { 'x-api-key': KEY, 'Content-Type': 'application/octet-stream' },
-            body: data
-          });
-          const d = await r.json();
-          if (!d.ok) alert('Upload failed: ' + d.error);
-        } catch (e) { alert('Upload error: ' + e.message); }
-      }
-      loadDropzone();
-    }
-
-    async function deleteFile(name) {
-      if (!confirm(`Delete ${name}?`)) return;
-      await fetch(`/dropzone/${encodeURIComponent(name)}`, { method: 'DELETE', headers: hdrs() });
-      loadDropzone();
-    }
-
-    async function loadDropzone() {
-      const tbody = document.getElementById('dz-body');
-      const logBox = document.getElementById('dz-log-box');
-      try {
-        const d = await fetch('/dropzone').then(r => r.json());
-        document.getElementById('dz-count').textContent = `${d.files.length} file(s)`;
-        if (!d.files.length) {
-          tbody.innerHTML = '<tr><td colspan="4" style="color:#3a5a3a;padding:20px">Drop zone is empty</td></tr>';
-        } else {
-          tbody.innerHTML = d.files.map(f => `
+          const d = await fetch('/dropzone').then(r => r.json());
+          document.getElementById('dz-count').textContent = `${d.files.length} file(s)`;
+          if (!d.files.length) {
+            tbody.innerHTML = '<tr><td colspan="4" style="color:#3a5a3a;padding:20px">Drop zone is empty</td></tr>';
+          } else {
+            tbody.innerHTML = d.files.map(f => `
         <tr>
           <td>${escHtml(f.name)}</td>
           <td style="color:#3a5a3a">${fmtBytes(f.size)}</td>
           <td style="color:#3a5a3a;font-size:11px">${new Date(f.modified).toLocaleString()}</td>
           <td><button class="del-link" onclick="deleteFile('${escHtml(f.name)}')">✕</button></td>
         </tr>`).join('');
+          }
+          logBox.textContent = d.recent.length
+            ? d.recent.map(e => `[${e.time}] ${e.file}${e.processed ? ' ✅' : ' ⏳'}\n${e.output || ''}`).join('\n\n')
+            : 'No recent trigger events';
+        } catch (e) {
+          tbody.innerHTML = `<tr><td colspan="4" style="color:var(--red)">${e.message}</td></tr>`;
         }
-        logBox.textContent = d.recent.length
-          ? d.recent.map(e => `[${e.time}] ${e.file}${e.processed ? ' ✅' : ' ⏳'}\n${e.output || ''}`).join('\n\n')
-          : 'No recent trigger events';
-      } catch (e) {
-        tbody.innerHTML = `<tr><td colspan="4" style="color:var(--red)">${e.message}</td></tr>`;
       }
-    }
 
-    // ── Voice Recognition ─────────────────────
-    let recognition = null;
-    let voiceActive = false;
+      // ── Voice Recognition ─────────────────────
+      let recognition = null;
+      let voiceActive = false;
 
-    function toggleVoice() {
-      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-        alert('Voice recognition not supported in this browser.\nTry Chrome or Edge.');
-        return;
+      function toggleVoice() {
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+          alert('Voice recognition not supported in this browser.\nTry Chrome or Edge.');
+          return;
+        }
+        if (voiceActive) { recognition && recognition.stop(); return; }
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SR();
+        recognition.continuous = false;
+        recognition.lang = 'en-US';
+        recognition.interimResults = false;
+
+        recognition.onstart = () => {
+          voiceActive = true;
+          document.getElementById('voice-btn').classList.add('listening');
+          document.getElementById('voice-btn').textContent = '🎙 LISTENING…';
+          document.getElementById('voice-out').textContent = '🎙 Speak now… (say "scan", "status", "capture", "n8n", or "logs")';
+        };
+        recognition.onend = () => {
+          voiceActive = false;
+          document.getElementById('voice-btn').classList.remove('listening');
+          document.getElementById('voice-btn').textContent = '🎙 VOICE';
+        };
+        recognition.onresult = (e) => {
+          const said = e.results[0][0].transcript.toLowerCase().trim();
+          document.getElementById('voice-out').textContent = `🎙 Heard: "${said}"`;
+          if (said.includes('scan')) { switchTab('control', document.querySelectorAll('.tab')[0]); runScript('force-stabilize'); }
+          else if (said.includes('status')) { switchTab('status', document.querySelectorAll('.tab')[1]); loadStatus(); }
+          else if (said.includes('capture')) { doCapture(); }
+          else if (said.includes('n8n')) { switchTab('status', document.querySelectorAll('.tab')[1]); loadN8N(); }
+          else if (said.includes('log')) { switchTab('logs', document.querySelectorAll('.tab')[2]); loadLogs(); }
+          else if (said.includes('trigger')) { runScript('trigger-n8n'); }
+          else { document.getElementById('voice-out').textContent = `🎙 "${said}" — not recognized. Try: scan, status, capture, n8n, logs`; }
+        };
+        recognition.onerror = (e) => {
+          document.getElementById('voice-out').textContent = '🎙 Error: ' + e.error;
+          voiceActive = false;
+          document.getElementById('voice-btn').classList.remove('listening');
+          document.getElementById('voice-btn').textContent = '🎙 VOICE';
+        };
+        recognition.start();
       }
-      if (voiceActive) { recognition && recognition.stop(); return; }
-      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognition = new SR();
-      recognition.continuous = false;
-      recognition.lang = 'en-US';
-      recognition.interimResults = false;
 
-      recognition.onstart = () => {
-        voiceActive = true;
-        document.getElementById('voice-btn').classList.add('listening');
-        document.getElementById('voice-btn').textContent = '🎙 LISTENING…';
-        document.getElementById('voice-out').textContent = '🎙 Speak now… (say "scan", "status", "capture", "n8n", or "logs")';
-      };
-      recognition.onend = () => {
-        voiceActive = false;
-        document.getElementById('voice-btn').classList.remove('listening');
-        document.getElementById('voice-btn').textContent = '🎙 VOICE';
-      };
-      recognition.onresult = (e) => {
-        const said = e.results[0][0].transcript.toLowerCase().trim();
-        document.getElementById('voice-out').textContent = `🎙 Heard: "${said}"`;
-        if (said.includes('scan')) { switchTab('control', document.querySelectorAll('.tab')[0]); runScript('force-stabilize'); }
-        else if (said.includes('status')) { switchTab('status', document.querySelectorAll('.tab')[1]); loadStatus(); }
-        else if (said.includes('capture')) { doCapture(); }
-        else if (said.includes('n8n')) { switchTab('status', document.querySelectorAll('.tab')[1]); loadN8N(); }
-        else if (said.includes('log')) { switchTab('logs', document.querySelectorAll('.tab')[2]); loadLogs(); }
-        else if (said.includes('trigger')) { runScript('trigger-n8n'); }
-        else { document.getElementById('voice-out').textContent = `🎙 "${said}" — not recognized. Try: scan, status, capture, n8n, logs`; }
-      };
-      recognition.onerror = (e) => {
-        document.getElementById('voice-out').textContent = '🎙 Error: ' + e.error;
-        voiceActive = false;
-        document.getElementById('voice-btn').classList.remove('listening');
-        document.getElementById('voice-btn').textContent = '🎙 VOICE';
-      };
-      recognition.start();
-    }
+      // ── Utilities ────────────────────────────
+      function escHtml(s) {
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      }
+      function fmtBytes(b) {
+        if (b < 1024) return b + ' B';
+        if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
+        return (b / 1048576).toFixed(1) + ' MB';
+      }
 
-    // ── Utilities ────────────────────────────
-    function escHtml(s) {
-      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    }
-    function fmtBytes(b) {
-      if (b < 1024) return b + ' B';
-      if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
-      return (b / 1048576).toFixed(1) + ' MB';
-    }
-
-    // Enter key on login
-    document.getElementById('ln').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('lp').focus(); });
-    document.getElementById('lp').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-  </script>
+      // Enter key on login
+      document.getElementById('ln').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('lp').focus(); });
+      document.getElementById('lp').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+    </script>
 </body>
 
 </html>

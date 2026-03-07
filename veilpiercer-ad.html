@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VeilPiercer — Your Agents Fail Silently. Not Anymore.</title>
+  <meta name="description" content="VeilPiercer is a real-time AI Agent Observatory that monitors chain depth, drift, and PII leakage before your agents fail in production. One-time access from $47." />
+  <meta property="og:title" content="YOUR AGENTS FAIL SILENTLY." />
+  <meta property="og:description" content="VeilPiercer monitors AI agent chain depth, semantic drift, and PII leakage in real time. One-time access from $47." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="YOUR AGENTS FAIL SILENTLY. — VeilPiercer" />
+  <meta name="twitter:description" content="Real-time AI agent observatory. Monitor. Detect. Control. From $47 one-time." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cyan: #00f5ff;
+      --pink: #ff2d7a;
+      --purple: #9b5de5;
+      --green: #39ff14;
+      --bg: #030610;
+      --bg2: #060d1a;
+      --text: #e8edf5;
+      --muted: #6b7fa3;
+      --border: rgba(0,245,255,0.15);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ─── CANVAS BACKGROUND ─────────────────────────────── */
+    #bg-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    /* ─── NAV ─────────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2.5rem;
+      background: rgba(3,6,16,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: 'Space Mono', monospace;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--cyan);
+      letter-spacing: 0.15em;
+      text-decoration: none;
+    }
+
+    .nav-status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--green);
+      letter-spacing: 0.1em;
+    }
+
+    .pulse-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.7); }
+    }
+
+    .nav-cta {
+      background: var(--cyan);
+      color: #000;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      padding: 0.5rem 1.2rem;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+      clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    }
+    .nav-cta:hover { background: #fff; transform: translateY(-1px); }
+
+    /* ─── HERO ─────────────────────────────────────────────── */
+    .hero {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 8rem 2rem 4rem;
+    }
+
+    .hero-eyebrow {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      color: var(--cyan);
+      text-transform: uppercase;
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.2s forwards;
+    }
+
+    .hero-headline {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(4rem, 12vw, 10rem);
+      line-height: 0.9;
+      letter-spacing: 0.02em;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.4s forwards;
+    }
+
+    .hero-headline .line1 { color: var(--text); display: block; }
+    .hero-headline .line2 { color: var(--pink); display: block; }
+    .hero-headline .line3 { color: var(--cyan); display: block; }
+
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: var(--muted);
+      max-width: 560px;
+      line-height: 1.7;
+      margin-bottom: 3rem;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.6s forwards;
+    }
+
+    .hero-sub strong { color: var(--text); }
+
+    .hero-ctas {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.8s forwards;
+    }
+
+    .btn-primary {
+      background: var(--cyan);
+      color: #000;
+      font-family: 'Space Mono', monospace;
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+      padding: 1rem 2.5rem;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-primary::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.2);
+      transform: translateX(-100%);
+      transition: transform 0.3s;
+    }
+    .btn-primary:hover::after { transform: translateX(0); }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,245,255,0.4); }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--cyan);
+      font-family: 'Space Mono', monospace;
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+      padding: 1rem 2.5rem;
+      border: 1px solid var(--cyan);
+      cursor: pointer;
+      text-decoration: none;
+      clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover { background: rgba(0,245,255,0.1); transform: translateY(-2px); }
+
+    /* ─── METRICS STRIP ──────────────────────────────────── */
+    .metrics-strip {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: rgba(6,13,26,0.8);
+      backdrop-filter: blur(8px);
+      overflow: hidden;
+    }
+
+    .metric-item {
+      flex: 1;
+      max-width: 200px;
+      padding: 1.5rem 2rem;
+      text-align: center;
+      border-right: 1px solid var(--border);
+      position: relative;
+    }
+    .metric-item:last-child { border-right: none; }
+
+    .metric-value {
+      font-family: 'Space Mono', monospace;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--cyan);
+      display: block;
+    }
+    .metric-value.pink { color: var(--pink); }
+    .metric-value.green { color: var(--green); }
+    .metric-value.purple { color: var(--purple); }
+
+    .metric-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 0.25rem;
+      display: block;
+    }
+
+    /* ─── PROBLEM SECTION ───────────────────────────────── */
+    .section {
+      position: relative;
+      z-index: 1;
+      padding: 6rem 2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-tag {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      color: var(--pink);
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .section-tag::before {
+      content: '';
+      display: block;
+      width: 30px;
+      height: 1px;
+      background: var(--pink);
+    }
+
+    .section-headline {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      line-height: 1;
+      margin-bottom: 1.5rem;
+      color: var(--text);
+    }
+    .section-headline span { color: var(--cyan); }
+
+    /* ─── PROBLEM CARDS ─────────────────────────────────── */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-top: 3rem;
+    }
+
+    .problem-card {
+      background: var(--bg2);
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+    .problem-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--pink);
+      transform: scaleX(0);
+      transition: transform 0.3s;
+    }
+    .problem-card:hover::before { transform: scaleX(1); }
+    .problem-card:hover { background: rgba(255,45,122,0.05); }
+
+    .problem-icon {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    .problem-title {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--pink);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+    .problem-desc {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ─── SOLUTION / FEATURES ─────────────────────────── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+
+    .feature-card {
+      background: rgba(0,245,255,0.03);
+      border: 1px solid var(--border);
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+    .feature-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 0;
+      background: linear-gradient(to top, rgba(0,245,255,0.08), transparent);
+      transition: height 0.3s;
+    }
+    .feature-card:hover::after { height: 100%; }
+    .feature-card:hover { border-color: var(--cyan); transform: translateY(-3px); }
+
+    .feature-num {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--cyan);
+      letter-spacing: 0.2em;
+      margin-bottom: 1rem;
+      opacity: 0.6;
+    }
+    .feature-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.75rem;
+    }
+    .feature-desc {
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* ─── LIVE DEMO STRIP ─────────────────────────────── */
+    .demo-strip {
+      position: relative;
+      z-index: 1;
+      background: linear-gradient(135deg, rgba(0,245,255,0.08) 0%, rgba(155,93,229,0.08) 100%);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 5rem 2rem;
+      text-align: center;
+      overflow: hidden;
+    }
+    .demo-strip::before {
+      content: 'LIVE';
+      position: absolute;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20rem;
+      color: rgba(0,245,255,0.03);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .demo-headline {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2rem, 5vw, 4rem);
+      margin-bottom: 1rem;
+    }
+    .demo-sub {
+      color: var(--muted);
+      font-size: 1rem;
+      max-width: 500px;
+      margin: 0 auto 2rem;
+      line-height: 1.6;
+    }
+
+    /* ─── TERMINAL MOCKUP ─────────────────────────────── */
+    .terminal {
+      max-width: 700px;
+      margin: 3rem auto 0;
+      background: #0a0f1e;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      text-align: left;
+      box-shadow: 0 0 60px rgba(0,245,255,0.1);
+    }
+    .terminal-header {
+      background: #111827;
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .t-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .t-dot.red { background: #ff5f57; }
+    .t-dot.yellow { background: #ffbd2e; }
+    .t-dot.green { background: #28c840; }
+    .terminal-title {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      margin-left: 0.5rem;
+    }
+    .terminal-body {
+      padding: 1.5rem;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.78rem;
+      line-height: 2;
+    }
+    .t-line { display: flex; gap: 0.75rem; }
+    .t-prompt { color: var(--cyan); flex-shrink: 0; }
+    .t-cmd { color: var(--text); }
+    .t-output { color: #6b7fa3; }
+    .t-ok { color: var(--green); }
+    .t-warn { color: var(--pink); }
+    .t-val { color: var(--purple); }
+    .t-cursor {
+      display: inline-block;
+      width: 8px; height: 14px;
+      background: var(--cyan);
+      animation: blink 1s step-end infinite;
+      vertical-align: middle;
+      margin-left: 4px;
+    }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+    /* ─── PRICING ───────────────────────────────────────── */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+
+    .price-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      padding: 2.5rem 2rem;
+      position: relative;
+      transition: all 0.3s;
+    }
+    .price-card.featured {
+      background: linear-gradient(135deg, rgba(0,245,255,0.08), rgba(155,93,229,0.06));
+      border-color: var(--cyan);
+      transform: scale(1.03);
+    }
+    .price-card:hover { transform: translateY(-4px); border-color: var(--cyan); }
+    .price-card.featured:hover { transform: scale(1.03) translateY(-4px); }
+
+    .price-badge {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--cyan);
+      color: #000;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      padding: 0.2rem 0.8rem;
+    }
+
+    .price-tier {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+    .price-amount {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 4rem;
+      color: var(--text);
+      line-height: 1;
+      margin-bottom: 0.25rem;
+    }
+    .price-amount span { color: var(--cyan); font-size: 2rem; }
+    .price-note {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+    .price-features {
+      list-style: none;
+      margin-bottom: 2rem;
+    }
+    .price-features li {
+      font-size: 0.85rem;
+      color: var(--muted);
+      padding: 0.35rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    .price-features li::before {
+      content: '→';
+      color: var(--cyan);
+      flex-shrink: 0;
+    }
+
+    .price-btn {
+      display: block;
+      width: 100%;
+      padding: 0.85rem;
+      text-align: center;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      background: transparent;
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .price-btn.featured-btn {
+      background: var(--cyan);
+      color: #000;
+    }
+    .price-btn:hover { background: var(--cyan); color: #000; transform: translateY(-1px); }
+    .price-btn.featured-btn:hover { background: #fff; }
+
+    /* ─── SOCIAL PROOF ───────────────────────────────────── */
+    .testimonial-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+
+    .testimonial-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      padding: 2rem;
+      position: relative;
+    }
+    .testimonial-card::before {
+      content: '"';
+      position: absolute;
+      top: -0.5rem;
+      left: 1.5rem;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 5rem;
+      color: var(--cyan);
+      opacity: 0.15;
+      line-height: 1;
+    }
+
+    .testimonial-text {
+      font-size: 0.9rem;
+      color: var(--text);
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+      font-style: italic;
+    }
+    .testimonial-author {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--cyan);
+      letter-spacing: 0.1em;
+    }
+    .testimonial-role {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.2rem;
+    }
+
+    /* ─── FINAL CTA ────────────────────────────────────── */
+    .final-cta {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 8rem 2rem;
+      background: linear-gradient(180deg, transparent, rgba(0,245,255,0.04) 50%, transparent);
+    }
+    .final-cta-headline {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 8vw, 7rem);
+      line-height: 0.95;
+      margin-bottom: 1.5rem;
+    }
+    .final-cta-headline .accent { color: var(--cyan); }
+
+    .cta-subtext {
+      font-size: 1rem;
+      color: var(--muted);
+      max-width: 480px;
+      margin: 0 auto 3rem;
+      line-height: 1.7;
+    }
+
+    /* ─── FOOTER ─────────────────────────────────────────── */
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+    }
+
+    /* ─── ANIMATIONS ─────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ─── SCROLLING TICKER ───────────────────────────────── */
+    .ticker-wrap {
+      position: relative;
+      z-index: 1;
+      overflow: hidden;
+      background: rgba(0,245,255,0.06);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 0;
+    }
+    .ticker {
+      display: flex;
+      gap: 4rem;
+      animation: ticker 30s linear infinite;
+      white-space: nowrap;
+      width: max-content;
+    }
+    .ticker-item {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      color: var(--cyan);
+      text-transform: uppercase;
+    }
+    .ticker-item .dot { color: var(--pink); margin: 0 1rem; }
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    /* ─── RESPONSIVE ─────────────────────────────────────── */
+    @media (max-width: 768px) {
+      nav { padding: 1rem; }
+      .metrics-strip { flex-wrap: wrap; }
+      .metric-item { min-width: 50%; border-bottom: 1px solid var(--border); }
+      .price-card.featured { transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ANIMATED BACKGROUND -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="https://aggregatory-unrumored-elidia.ngrok-free.dev/veilpiercer-command.html?ngrok-skip-browser-warning=69420" target="_blank">VEILPIERCER</a>
+  <div class="nav-status">
+    <div class="pulse-dot"></div>
+    NEXUS ONLINE
+  </div>
+  <a class="nav-cta" href="https://aggregatory-unrumored-elidia.ngrok-free.dev/veilpiercer-pitch.html?ngrok-skip-browser-warning=69420" target="_blank">GET ACCESS →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <p class="hero-eyebrow">/// AI AGENT OBSERVATORY — PRODUCTION CONTROL PLANE ///</p>
+  <h1 class="hero-headline">
+    <span class="line1">YOUR AGENTS</span>
+    <span class="line2">FAIL</span>
+    <span class="line3">SILENTLY.</span>
+  </h1>
+  <p class="hero-sub">
+    <strong>VeilPiercer</strong> monitors AI agent chain depth, semantic drift, and PII leakage
+    in real time — before your users find out the hard way.
+  </p>
+  <div class="hero-ctas">
+    <a class="btn-primary" href="https://aggregatory-unrumored-elidia.ngrok-free.dev/veilpiercer-command.html?ngrok-skip-browser-warning=69420" target="_blank">▶ LIVE DEMO — FREE</a>
+    <a class="btn-secondary" href="https://aggregatory-unrumored-elidia.ngrok-free.dev/veilpiercer-pitch.html?ngrok-skip-browser-warning=69420" target="_blank">GET ACCESS FROM $47</a>
+  </div>
+</section>
+
+<!-- METRICS STRIP -->
+<div class="metrics-strip">
+  <div class="metric-item">
+    <span class="metric-value" id="vis-val">72.1%</span>
+    <span class="metric-label">Visibility Score</span>
+  </div>
+  <div class="metric-item">
+    <span class="metric-value pink" id="saf-val">88.4%</span>
+    <span class="metric-label">Safety Score</span>
+  </div>
+  <div class="metric-item">
+    <span class="metric-value green">100%</span>
+    <span class="metric-label">Privacy (PII Clean)</span>
+  </div>
+  <div class="metric-item">
+    <span class="metric-value purple">9</span>
+    <span class="metric-label">Nodes Active</span>
+  </div>
+  <div class="metric-item">
+    <span class="metric-value" id="uptime-val">47,831s</span>
+    <span class="metric-label">System Uptime</span>
+  </div>
+</div>
+
+<!-- SCROLLING TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker">
+    <span class="ticker-item">Chain Depth Monitoring <span class="dot">✦</span></span>
+    <span class="ticker-item">Semantic Drift Detection <span class="dot">✦</span></span>
+    <span class="ticker-item">PII Leakage Alerts <span class="dot">✦</span></span>
+    <span class="ticker-item">Real-Time Intervention <span class="dot">✦</span></span>
+    <span class="ticker-item">Zero-Trust Privacy <span class="dot">✦</span></span>
+    <span class="ticker-item">Production Control Plane <span class="dot">✦</span></span>
+    <span class="ticker-item">9 Active Monitoring Nodes <span class="dot">✦</span></span>
+    <span class="ticker-item">n8n Automation Bridge <span class="dot">✦</span></span>
+    <!-- duplicate for seamless loop -->
+    <span class="ticker-item">Chain Depth Monitoring <span class="dot">✦</span></span>
+    <span class="ticker-item">Semantic Drift Detection <span class="dot">✦</span></span>
+    <span class="ticker-item">PII Leakage Alerts <span class="dot">✦</span></span>
+    <span class="ticker-item">Real-Time Intervention <span class="dot">✦</span></span>
+    <span class="ticker-item">Zero-Trust Privacy <span class="dot">✦</span></span>
+    <span class="ticker-item">Production Control Plane <span class="dot">✦</span></span>
+    <span class="ticker-item">9 Active Monitoring Nodes <span class="dot">✦</span></span>
+    <span class="ticker-item">n8n Automation Bridge <span class="dot">✦</span></span>
+  </div>
+</div>
+
+<!-- THE PROBLEM -->
+<section class="section">
+  <div class="section-tag">The Problem</div>
+  <h2 class="section-headline reveal">AI Agents Are Running<br /><span>Blind in Production.</span></h2>
+  <p style="color: var(--muted); font-size: 1rem; line-height: 1.7; max-width: 600px;" class="reveal">
+    You deployed your LLM agent. It seems to work. But you have no idea what's happening inside. No chain visibility. No drift alerts. No PII watchdog. Just vibes.
+  </p>
+  <div class="problem-grid reveal">
+    <div class="problem-card">
+      <div class="problem-icon">🔗</div>
+      <div class="problem-title">Chain Depth Blindness</div>
+      <p class="problem-desc">You can't see how deep your agent chains are running. Complex multi-step reasoning silently degrades quality and costs you tokens.</p>
+    </div>
+    <div class="problem-card">
+      <div class="problem-icon">📉</div>
+      <div class="problem-title">Silent Semantic Drift</div>
+      <p class="problem-desc">Agents drift from their original instructions over long conversations. By the time you notice, your users already got wrong answers.</p>
+    </div>
+    <div class="problem-card">
+      <div class="problem-icon">🔓</div>
+      <div class="problem-title">PII Leakage Risk</div>
+      <p class="problem-desc">Every API call is a potential data breach. Without real-time monitoring, PII slips into logs, outputs, and downstream systems.</p>
+    </div>
+    <div class="problem-card">
+      <div class="problem-icon">🚫</div>
+      <div class="problem-title">No Intervention Mechanism</div>
+      <p class="problem-desc">When an agent goes rogue, you have no kill switch. No circuit breaker. No manual override. Just a runaway process burning your API budget.</p>
+    </div>
+  </div>
+</section>
+
+<!-- THE SOLUTION -->
+<section class="section" style="padding-top: 2rem;">
+  <div class="section-tag">The Solution</div>
+  <h2 class="section-headline reveal">VeilPiercer Gives You<br /><span>X-Ray Vision.</span></h2>
+  <div class="features-grid">
+    <div class="feature-card reveal">
+      <div class="feature-num">01 — TRACE</div>
+      <div class="feature-title">Real-Time Chain Visualization</div>
+      <p class="feature-desc">Watch every node in your agent graph activate in real time. Trace exact execution paths and spot anomalies before they compound.</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-num">02 — DRIFT</div>
+      <div class="feature-title">Semantic Drift Detection</div>
+      <p class="feature-desc">Proprietary drift scoring engine detects when agent behavior deviates from baseline. Get alerted before your users notice quality degradation.</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-num">03 — SHIELD</div>
+      <div class="feature-title">Zero-Trust PII Guard</div>
+      <p class="feature-desc">Every output is scanned for PII patterns. Instant lockdown mode triggers automatic redaction and alerts when sensitive data is detected.</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-num">04 — GATE</div>
+      <div class="feature-title">Manual Override Control</div>
+      <p class="feature-desc">Real-time LOCK DOWN, AMPLIFY, NOMINAL, and SELECTIVE protocols. You're always in command — even when your agents aren't.</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-num">05 — SIGNAL</div>
+      <div class="feature-title">Anomaly Detection Engine</div>
+      <p class="feature-desc">Pattern recognition across all agent calls. CATCH node intercepts malformed outputs. HEAL node auto-corrects and continues execution.</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-num">06 — NEXUS</div>
+      <div class="feature-title">n8n Automation Bridge</div>
+      <p class="feature-desc">Native integration with n8n workflows. Trigger automated responses, alerts, and remediation pipelines based on any observatory event.</p>
+    </div>
+  </div>
+</section>
+
+<!-- LIVE TERMINAL DEMO -->
+<div class="demo-strip">
+  <p style="font-family: 'Space Mono', monospace; font-size: 0.7rem; letter-spacing: 0.3em; color: var(--cyan); margin-bottom: 1rem;">// LIVE SYSTEM</p>
+  <h2 class="demo-headline">See It In Action.<br /><span style="color: var(--cyan);">Right Now.</span></h2>
+  <p class="demo-sub">The command interface is live. Connect to the NEXUS, run protocols, and watch nodes respond in real time. No signup required.</p>
+  <a class="btn-primary" href="https://aggregatory-unrumored-elidia.ngrok-free.dev/veilpiercer-command.html?ngrok-skip-browser-warning=69420" target="_blank" style="display: inline-block;">▶ OPEN LIVE DEMO</a>
+
+  <div class="terminal">
+    <div class="terminal-header">
+      <div class="t-dot red"></div>
+      <div class="t-dot yellow"></div>
+      <div class="t-dot green"></div>
+      <span class="terminal-title">veilpiercer — nexus-control — 127.0.0.1:3000</span>
+    </div>
+    <div class="terminal-body">
+      <div class="t-line"><span class="t-prompt">nexus$</span><span class="t-cmd">status</span></div>
+      <div class="t-line"><span class="t-output">→ NEXUS ULTRA ONLINE · Uptime: 47,831s · Nodes: 9 active</span></div>
+      <div class="t-line"><span class="t-output">→ VIS: <span class="t-val">72.1%</span>  SAF: <span class="t-ok">88.4%</span>  PRIV: <span class="t-ok">100%</span></span></div>
+      <div class="t-line" style="margin-top: 0.5rem;"><span class="t-prompt">nexus$</span><span class="t-cmd">amplify</span></div>
+      <div class="t-line"><span class="t-ok">✓ AMPLIFY PROTOCOL ACTIVATED</span></div>
+      <div class="t-line"><span class="t-output">→ Visibility amplification: +18.3% projected</span></div>
+      <div class="t-line"><span class="t-output">→ All 9 nodes boosted to HIGH sensitivity</span></div>
+      <div class="t-line" style="margin-top: 0.5rem;"><span class="t-prompt">nexus$</span><span class="t-cmd">scan --pii</span></div>
+      <div class="t-line"><span class="t-ok">✓ PII scan complete — 0 leakage events detected</span></div>
+      <div class="t-line"><span class="t-output">→ REDACT node active · PRIV: <span class="t-ok">100%</span> CLEAN</span></div>
+      <div class="t-line" style="margin-top: 0.5rem;"><span class="t-prompt">nexus$</span><span class="t-cursor"></span></div>
+    </div>
+  </div>
+</div>
+
+<!-- SOCIAL PROOF -->
+<section class="section">
+  <div class="section-tag">Early Community Feedback</div>
+  <h2 class="section-headline reveal">What Builders<br /><span>Are Saying.</span></h2>
+  <div class="testimonial-grid">
+    <div class="testimonial-card reveal">
+      <p class="testimonial-text">"Finally. I've been running LangChain agents in production for 6 months with zero visibility. This is exactly what I needed to stop flying blind."</p>
+      <div class="testimonial-author">AI_Engineer_Dev</div>
+      <div class="testimonial-role">r/LangChain · Backend Engineer</div>
+    </div>
+    <div class="testimonial-card reveal">
+      <p class="testimonial-text">"The AMPLIFY protocol visualization is genuinely impressive. Watching the node graph respond to commands in real time — I was not expecting it to be this polished."</p>
+      <div class="testimonial-author">ML_Builder_42</div>
+      <div class="testimonial-role">Discord — AI Tools Channel</div>
+    </div>
+    <div class="testimonial-card reveal">
+      <p class="testimonial-text">"We had a PII leak in our customer support agent that we only caught 3 days later in a log audit. With VeilPiercer, that gets caught in milliseconds. No brainer at $97."</p>
+      <div class="testimonial-author">FinTech_CTO</div>
+      <div class="testimonial-role">Financial Services · 50-person team</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section" style="padding-top: 2rem;">
+  <div class="section-tag">Simple Pricing</div>
+  <h2 class="section-headline reveal">One-Time Access.<br /><span>No Monthly Traps.</span></h2>
+  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.7; margin-top: 1rem;" class="reveal">
+    No subscriptions. No per-agent fees. No $400/mo SaaS bill for a dashboard you built.
+  </p>
+  <div class="pricing-grid">
+    <div class="price-card reveal">
+      <div class="price-tier">Starter</div>
+      <div class="price-amount"><span>$</span>47</div>
+      <div class="price-note">One-time · Lifetime access</div>
+      <ul class="price-features">
+        <li>Full VeilPiercer dashboard</li>
+        <li>All 4 protocol modes</li>
+        <li>9 tunable live nodes</li>
+        <li>Natural language command interface</li>
+        <li>Source code included</li>
+      </ul>
+      <a class="price-btn" href="https://aggregatory-unrumored-elidia.ngrok-free.dev/veilpiercer-pitch.html#pricing&ngrok-skip-browser-warning=69420" target="_blank">GET STARTER</a>
+    </div>
+    <div class="price-card featured reveal">
+      <div class="price-badge">MOST POPULAR</div>
+      <div class="price-tier">Pro</div>
+      <div class="price-amount"><span>$</span>97</div>
+      <div class="price-note">One-time · Lifetime access</div>
+      <ul class="price-features">
+        <li>Everything in Starter</li>
+        <li>SafetyAI module (production-ready, 79 tests)</li>
+        <li>Simulation model + 8-phase stress tests</li>
+        <li>React Flow node editor component</li>
+        <li>Pino + OpenTelemetry integration guide</li>
+        <li>Prototype pollution patch (fully documented)</li>
+        <li>Use case decks for all 4 buyer types</li>
+      </ul>
+      <a class="price-btn featured-btn" href="https://aggregatory-unrumored-elidia.ngrok-free.dev/veilpiercer-pitch.html#pricing&ngrok-skip-browser-warning=69420" target="_blank">GET PRO — BEST VALUE</a>
+    </div>
+    <div class="price-card reveal">
+      <div class="price-tier">Agency</div>
+      <div class="price-amount"><span>$</span>197</div>
+      <div class="price-note">One-time · White-label rights</div>
+      <ul class="price-features">
+        <li>Everything in Pro</li>
+        <li>White-label + full rebrand rights</li>
+        <li>Client-facing pitch deck + use cases</li>
+        <li>Resell or bundle with your services</li>
+        <li>Priority support channel</li>
+        <li>Future updates included</li>
+      </ul>
+      <a class="price-btn" href="https://aggregatory-unrumored-elidia.ngrok-free.dev/veilpiercer-pitch.html#pricing&ngrok-skip-browser-warning=69420" target="_blank">GET AGENCY</a>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <h2 class="final-cta-headline reveal">
+    STOP FLYING<br />
+    <span class="accent">BLIND.</span>
+  </h2>
+  <p class="cta-subtext reveal">Your agents are running right now. The question is: do you know what they're doing?</p>
+  <div class="hero-ctas reveal">
+    <a class="btn-primary" href="https://aggregatory-unrumored-elidia.ngrok-free.dev/veilpiercer-command.html?ngrok-skip-browser-warning=69420" target="_blank">▶ TRY THE LIVE DEMO</a>
+    <a class="btn-secondary" href="https://aggregatory-unrumored-elidia.ngrok-free.dev/veilpiercer-pitch.html?ngrok-skip-browser-warning=69420" target="_blank">GET ACCESS FROM $47</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>VEILPIERCER · AI AGENT OBSERVATORY · PRODUCTION CONTROL PLANE</p>
+  <p style="margin-top: 0.5rem; opacity: 0.5;">Monitor. Detect. Control. Built for AI engineers.</p>
+</footer>
+
+<script>
+// ─── CANVAS PARTICLE NETWORK ───────────────────────────────────────────────
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [], animFrame;
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+class Particle {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * W;
+    this.y = Math.random() * H;
+    this.vx = (Math.random() - 0.5) * 0.4;
+    this.vy = (Math.random() - 0.5) * 0.4;
+    this.r = Math.random() * 2 + 1;
+    this.color = ['#00f5ff','#9b5de5','#39ff14','#ff2d7a'][Math.floor(Math.random()*4)];
+    this.alpha = Math.random() * 0.6 + 0.2;
+  }
+  update() {
+    this.x += this.vx; this.y += this.vy;
+    if (this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset();
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fillStyle = this.color;
+    ctx.globalAlpha = this.alpha;
+    ctx.fill();
+  }
+}
+
+for (let i = 0; i < 120; i++) particles.push(new Particle());
+
+function drawConnections() {
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 120) {
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.strokeStyle = '#00f5ff';
+        ctx.globalAlpha = (1 - dist/120) * 0.12;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    }
+  }
+}
+
+function animate() {
+  ctx.clearRect(0, 0, W, H);
+  drawConnections();
+  particles.forEach(p => { p.update(); p.draw(); });
+  ctx.globalAlpha = 1;
+  animFrame = requestAnimationFrame(animate);
+}
+animate();
+
+// ─── SCROLL REVEAL ──────────────────────────────────────────────────────────
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ─── LIVE METRICS ANIMATION ─────────────────────────────────────────────────
+function animateMetric(el, start, end, suffix, interval) {
+  let val = start;
+  const step = (end - start) / 50;
+  const timer = setInterval(() => {
+    val += step;
+    if ((step > 0 && val >= end) || (step < 0 && val <= end)) {
+      val = end;
+      clearInterval(timer);
+    }
+    el.textContent = val.toFixed(1) + suffix;
+  }, 30);
+}
+
+// Simulate live metrics drift
+setInterval(() => {
+  const visEl = document.getElementById('vis-val');
+  const safEl = document.getElementById('saf-val');
+  const vis = 65 + Math.random() * 20;
+  const saf = 80 + Math.random() * 15;
+  animateMetric(visEl, parseFloat(visEl.textContent), vis, '%', 30);
+  animateMetric(safEl, parseFloat(safEl.textContent), saf, '%', 30);
+}, 5000);
+
+// Live uptime counter
+const startUptime = 47831;
+let currentUptime = startUptime;
+const uptimeEl = document.getElementById('uptime-val');
+setInterval(() => {
+  currentUptime++;
+  uptimeEl.textContent = currentUptime.toLocaleString() + 's';
+}, 1000);
+</script>
+</body>
+</html>

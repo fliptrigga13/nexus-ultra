@@ -4,3 +4,6 @@ nexus.log
 captures/
 drop-zone/
 *.ps1
+
+# Local Netlify folder
+.netlify
