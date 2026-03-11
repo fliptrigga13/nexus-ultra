@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NEXUS ULTRA — PSO Swarm Brain</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+<style>
+/* ── RESET & TOKENS ─────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-void:   #03050a;
+  --bg-panel:  #080d17;
+  --bg-card:   #0d1320;
+  --border:    #1a2540;
+  --cyan:      #00f5e4;
+  --cyan-dim:  #00a89a;
+  --amber:     #ffb300;
+  --amber-dim: #c47d00;
+  --green:     #00e87c;
+  --red:       #ff3b5c;
+  --purple:    #bf5fff;
+  --text-hi:   #e8f0ff;
+  --text-mid:  #7a8aab;
+  --text-lo:   #3a4563;
+  --glow-c:    0 0 18px #00f5e455;
+  --glow-a:    0 0 18px #ffb30055;
+  --glow-g:    0 0 16px #00e87c55;
+  --radius:    12px;
+  font-size: 14px;
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg-void);
+  color: var(--text-hi);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* animated grid background */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(0,245,228,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,245,228,.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* scanlines effect */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,.08) 2px,
+    rgba(0,0,0,.08) 4px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── LAYOUT ─────────────────────────────────────────────── */
+#app {
+  position: relative; z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 20px 60px;
+  display: grid;
+  gap: 20px;
+  grid-template-rows: auto auto 1fr;
+}
+
+/* ── HEADER ─────────────────────────────────────────────── */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 18px 24px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.logo-icon {
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #00f5e420, #bf5fff20);
+  border: 1px solid var(--cyan-dim);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  animation: pulse-icon 3s ease-in-out infinite;
+}
+@keyframes pulse-icon {
+  0%, 100% { box-shadow: var(--glow-c); }
+  50%       { box-shadow: 0 0 30px #00f5e488; }
+}
+
+.logo-text h1 { font-size: 1.2rem; font-weight: 900; letter-spacing: 2px; color: var(--cyan); }
+.logo-text p  { font-size: .72rem; color: var(--text-mid); letter-spacing: 1px; text-transform: uppercase; }
+
+.status-bar {
+  display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+}
+
+.badge {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .72rem;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: all .3s;
+}
+.badge-offline  { color: var(--text-mid);  border-color: var(--text-lo);  background: #ffffff06; }
+.badge-online   { color: var(--cyan);      border-color: var(--cyan-dim); background: #00f5e410; box-shadow: var(--glow-c); }
+.badge-training { color: var(--amber);     border-color: var(--amber-dim);background: #ffb30010; box-shadow: var(--glow-a);
+  animation: blink-badge 1s step-end infinite; }
+.badge-converged{ color: var(--green);     border-color: #00e87c80;        background: #00e87c10; box-shadow: var(--glow-g); }
+@keyframes blink-badge { 50% { opacity: .4; } }
+
+.badge-gpu { color: var(--purple); border-color: #bf5fff60; background: #bf5fff0c; }
+
+/* ── CONTROL PANEL ──────────────────────────────────────── */
+.controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  padding: 20px 24px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.ctrl-btn {
+  position: relative;
+  padding: 16px 28px;
+  border: none; border-radius: 10px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 1rem; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+  cursor: pointer;
+  transition: all .25s cubic-bezier(.4,0,.2,1);
+  overflow: hidden;
+}
+
+.ctrl-btn::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, #ffffff18, transparent);
+  opacity: 0; transition: opacity .2s;
+}
+.ctrl-btn:hover:not(:disabled)::before { opacity: 1; }
+
+/* TRAIN button */
+#trainBtn {
+  background: linear-gradient(135deg, #006060, #00a89a);
+  color: #000;
+  box-shadow: 0 4px 20px #00f5e430;
+}
+#trainBtn:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px #00f5e460, var(--glow-c);
+}
+#trainBtn:disabled {
+  background: #0f2422;
+  color: #1e4e4a;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* STOP button */
+#stopBtn {
+  background: linear-gradient(135deg, #600020, #c0003c);
+  color: #fff;
+  box-shadow: 0 4px 20px #ff3b5c30;
+}
+#stopBtn:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px #ff3b5c60;
+}
+#stopBtn:disabled {
+  background: #200612;
+  color: #502030;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.ctrl-hint {
+  grid-column: 1 / -1;
+  font-size: .72rem;
+  color: var(--text-lo);
+  text-align: center;
+  letter-spacing: 1px;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+/* ── METRICS GRID ───────────────────────────────────────── */
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+.metric-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color .3s;
+}
+
+.metric-label {
+  font-size: .68rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-mid);
+}
+
+.metric-value {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--cyan);
+  line-height: 1;
+  transition: color .3s;
+}
+
+.metric-sub {
+  font-size: .7rem;
+  color: var(--text-lo);
+}
+
+/* ── SPARKLINE CANVAS ───────────────────────────────────── */
+.spark-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+
+.spark-card h3 {
+  font-size: .72rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-mid);
+}
+
+#sparkCanvas {
+  width: 100%;
+  height: 90px;
+  border-radius: 6px;
+  background: #040810;
+}
+
+/* ── G_BEST HEATMAP ─────────────────────────────────────── */
+.gbest-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  display: flex; flex-direction: column; gap: 10px;
+  grid-column: 1 / -1;
+}
+
+.gbest-card h3 {
+  font-size: .72rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-mid);
+}
+
+.gbest-bars {
+  display: flex; gap: 6px; align-items: flex-end;
+  height: 60px;
+}
+
+.dim-bar-wrap {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+}
+
+.dim-bar {
+  width: 100%;
+  border-radius: 4px 4px 0 0;
+  transition: height .4s ease, background .4s;
+  min-height: 4px;
+}
+
+.dim-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .58rem;
+  color: var(--text-lo);
+}
+
+/* ── LOG CONSOLE ─────────────────────────────────────────── */
+.log-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+
+.log-card h3 {
+  font-size: .72rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-mid);
+}
+
+#logConsole {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .72rem;
+  color: var(--cyan-dim);
+  height: 120px;
+  overflow-y: auto;
+  background: #020508;
+  border: 1px solid #0d1a28;
+  border-radius: 6px;
+  padding: 10px 12px;
+  display: flex; flex-direction: column-reverse;
+  gap: 3px;
+  scrollbar-width: thin;
+}
+
+.log-entry { line-height: 1.5; }
+.log-entry.warn  { color: var(--amber); }
+.log-entry.good  { color: var(--green); }
+.log-entry.error { color: var(--red); }
+
+/* ── BOTTOM SECTION ─────────────────────────────────────── */
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 14px;
+}
+@media (max-width: 720px) {
+  .bottom-grid { grid-template-columns: 1fr; }
+  .controls    { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ── HEADER ─────────────────────────────────────────────── -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">🧠</div>
+    <div class="logo-text">
+      <h1>NEXUS ULTRA</h1>
+      <p>PSO Swarm Brain · Julia / CUDA</p>
+    </div>
+  </div>
+  <div class="status-bar">
+    <span class="badge badge-offline" id="connBadge">⚡ OFFLINE</span>
+    <span class="badge badge-offline" id="modeBadge">IDLE</span>
+    <span class="badge badge-gpu"     id="gpuBadge" style="display:none">GPU</span>
+  </div>
+</header>
+
+<!-- ── CONTROLS ───────────────────────────────────────────── -->
+<div class="controls">
+  <button class="ctrl-btn" id="trainBtn" disabled title="Connect to Julia server first">
+    🚀 TRAIN SWARM
+  </button>
+  <button class="ctrl-btn" id="stopBtn"  disabled>
+    🛑 STOP
+  </button>
+  <p class="ctrl-hint" id="ctrlHint">Connecting to Julia server on port 7700…</p>
+</div>
+
+<!-- ── METRICS ────────────────────────────────────────────── -->
+<div class="metrics">
+  <div class="metric-card">
+    <span class="metric-label">Iteration</span>
+    <span class="metric-value" id="mIter">—</span>
+    <span class="metric-sub">of 1 000 max</span>
+  </div>
+  <div class="metric-card">
+    <span class="metric-label">Best Fitness</span>
+    <span class="metric-value" id="mFit">—</span>
+    <span class="metric-sub">Rosenbrock(g_best) · lower = better</span>
+  </div>
+  <div class="metric-card">
+    <span class="metric-label">Particles</span>
+    <span class="metric-value" style="color:var(--purple)">128</span>
+    <span class="metric-sub">10 dimensions</span>
+  </div>
+  <div class="metric-card">
+    <span class="metric-label">Convergence</span>
+    <span class="metric-value" id="mConv" style="font-size:1.2rem">PENDING</span>
+    <span class="metric-sub">threshold &lt; 1e-4</span>
+  </div>
+</div>
+
+<!-- ── BOTTOM GRID ────────────────────────────────────────── -->
+<div class="bottom-grid">
+  <!-- Sparkline -->
+  <div class="spark-card">
+    <h3>📉 Fitness History</h3>
+    <canvas id="sparkCanvas"></canvas>
+  </div>
+
+  <!-- g_best heatmap -->
+  <div class="gbest-card" style="grid-column: unset;">
+    <h3>📍 Global Best Position (g_best)</h3>
+    <div class="gbest-bars" id="gbestBars">
+      <!-- Bars injected by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ── LOG CONSOLE ────────────────────────────────────────── -->
+<div class="log-card">
+  <h3>🖥 Swarm Log</h3>
+  <div id="logConsole"></div>
+</div>
+
+</div><!-- #app -->
+
+<script>
+// ── CONFIG ───────────────────────────────────────────────
+const WS_URL      = 'ws://localhost:7700/ws';
+const API_URL     = 'http://localhost:7700/api/control';
+const MAX_HISTORY = 200;   // sparkline points
+
+// ── STATE ────────────────────────────────────────────────
+let ws            = null;
+let connected     = false;
+let training      = false;
+let fitHistory    = [];
+
+// ── DOM REFS ─────────────────────────────────────────────
+const trainBtn  = document.getElementById('trainBtn');
+const stopBtn   = document.getElementById('stopBtn');
+const connBadge = document.getElementById('connBadge');
+const modeBadge = document.getElementById('modeBadge');
+const gpuBadge  = document.getElementById('gpuBadge');
+const ctrlHint  = document.getElementById('ctrlHint');
+const mIter     = document.getElementById('mIter');
+const mFit      = document.getElementById('mFit');
+const mConv     = document.getElementById('mConv');
+const logBox    = document.getElementById('logConsole');
+const spark     = document.getElementById('sparkCanvas');
+const sparkCtx  = spark.getContext('2d');
+const gbestWrap = document.getElementById('gbestBars');
+
+// ── LOGGING ──────────────────────────────────────────────
+function log(msg, cls = '') {
+  const el = document.createElement('div');
+  el.className = 'log-entry ' + cls;
+  const ts = new Date().toLocaleTimeString('en','{ hour12:false }');
+  el.textContent = `[${ts}] ${msg}`;
+  logBox.prepend(el);
+  while (logBox.children.length > 80) logBox.lastChild.remove();
+}
+
+// ── BUTTON LOCK CONTRACT ─────────────────────────────────
+// CRITICAL: Train and Stop are ALWAYS mutex.
+function setUIState(state) {
+  // state: 'offline' | 'idle' | 'training' | 'converged'
+  switch (state) {
+    case 'offline':
+      trainBtn.disabled = true;
+      stopBtn.disabled  = true;
+      connBadge.className = 'badge badge-offline';
+      connBadge.textContent = '⚡ OFFLINE';
+      modeBadge.className = 'badge badge-offline';
+      modeBadge.textContent = 'DISCONNECTED';
+      ctrlHint.textContent = 'Julia server not reachable. Start pso_swarm.jl first.';
+      break;
+
+    case 'idle':
+      trainBtn.disabled = false;   // ← only Train active
+      stopBtn.disabled  = true;
+      connBadge.className = 'badge badge-online';
+      connBadge.textContent = '🟢 ONLINE';
+      modeBadge.className = 'badge badge-online';
+      modeBadge.textContent = 'IDLE';
+      ctrlHint.textContent = 'Click TRAIN SWARM to begin GPU optimization.';
+      break;
+
+    case 'training':
+      trainBtn.disabled = true;    // ← only Stop active
+      stopBtn.disabled  = false;
+      connBadge.className = 'badge badge-online';
+      connBadge.textContent = '🟢 ONLINE';
+      modeBadge.className = 'badge badge-training';
+      modeBadge.textContent = '⚡ TRAINING';
+      ctrlHint.textContent = 'Training active — only STOP is available.';
+      break;
+
+    case 'converged':
+      trainBtn.disabled = false;   // ← allow restart
+      stopBtn.disabled  = true;
+      modeBadge.className = 'badge badge-converged';
+      modeBadge.textContent = '✅ CONVERGED';
+      ctrlHint.textContent = 'Swarm converged! Click TRAIN SWARM to retrain.';
+      break;
+  }
+}
+
+// ── WEBSOCKET ────────────────────────────────────────────
+function connectWS() {
+  log('Connecting to Julia server…');
+  try {
+    ws = new WebSocket(WS_URL);
+  } catch(e) {
+    setUIState('offline');
+    setTimeout(connectWS, 4000);
+    return;
+  }
+
+  ws.onopen = () => {
+    connected = true;
+    log('Connected to PSO Swarm Brain ✅', 'good');
+    setUIState('idle');
+  };
+
+  ws.onmessage = (evt) => {
+    let data;
+    try { data = JSON.parse(evt.data); } catch { return; }
+    handleFrame(data);
+  };
+
+  ws.onclose = () => {
+    connected = false;
+    training  = false;
+    log('Connection lost — retrying in 4s…', 'warn');
+    setUIState('offline');
+    setTimeout(connectWS, 4000);
+  };
+
+  ws.onerror = () => {
+    // onclose will fire next
+  };
+}
+
+// ── FRAME HANDLER ────────────────────────────────────────
+function handleFrame(d) {
+  // GPU badge
+  if (d.gpu !== undefined) {
+    gpuBadge.style.display = '';
+    gpuBadge.textContent   = d.gpu ? `🔥 ${d.device || 'GPU'}` : '⚙️ CPU';
+  }
+
+  // Status badge & button state
+  if (d.status === 'ready') {
+    setUIState('idle');
+    return;
+  }
+
+  const isRunning   = d.running;
+  const isConverged = d.converged;
+
+  if (isConverged) {
+    setUIState('converged');
+    log(`Converged at iter ${d.iter} — fitness: ${fmtFit(d.g_fit)}`, 'good');
+  } else if (isRunning) {
+    setUIState('training');
+  } else {
+    setUIState('idle');
+    if (training) log('Training stopped.', 'warn');
+  }
+  training = !!isRunning;
+
+  // Metrics
+  if (d.iter !== undefined)  mIter.textContent = d.iter;
+  if (d.g_fit !== undefined) {
+    mFit.textContent = fmtFit(d.g_fit);
+    fitHistory.push(d.g_fit);
+    if (fitHistory.length > MAX_HISTORY) fitHistory.shift();
+    drawSparkline();
+  }
+  if (d.converged !== undefined) {
+    mConv.textContent = d.converged ? '✅ YES' : 'NO';
+    mConv.style.color = d.converged ? 'var(--green)' : 'var(--text-mid)';
+  }
+
+  // g_best bars
+  if (d.g_best && Array.isArray(d.g_best)) {
+    renderGBest(d.g_best);
+  }
+}
+
+function fmtFit(v) {
+  if (v === undefined || v === null) return '—';
+  if (v < 0.001) return v.toExponential(3);
+  return v.toFixed(4);
+}
+
+// ── SPARKLINE ────────────────────────────────────────────
+function drawSparkline() {
+  const W = spark.offsetWidth;
+  const H = spark.offsetHeight;
+  spark.width  = W;
+  spark.height = H;
+
+  if (fitHistory.length < 2) return;
+
+  const ctx = sparkCtx;
+  ctx.clearRect(0, 0, W, H);
+
+  // Log scale: map [max, min] → [0.05*H, 0.95*H]
+  const logVals = fitHistory.map(v => Math.log10(Math.max(v, 1e-10)));
+  const minL    = Math.min(...logVals);
+  const maxL    = Math.max(...logVals);
+  const rangeL  = maxL - minL || 1;
+
+  const pts = logVals.map((lv, i) => ({
+    x: (i / (logVals.length - 1)) * W,
+    y: H * 0.9 - ((lv - minL) / rangeL) * H * 0.8
+  }));
+
+  // Gradient fill
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, '#00f5e430');
+  grad.addColorStop(1, '#00f5e400');
+
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, H);
+  ctx.lineTo(pts[0].x, pts[0].y);
+  pts.slice(1).forEach(p => ctx.lineTo(p.x, p.y));
+  ctx.lineTo(pts[pts.length-1].x, H);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Line
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
+  pts.slice(1).forEach(p => ctx.lineTo(p.x, p.y));
+  ctx.strokeStyle = '#00f5e4';
+  ctx.lineWidth   = 2;
+  ctx.stroke();
+}
+
+// ── G_BEST BARS ──────────────────────────────────────────
+function renderGBest(vec) {
+  // Normalise [-5,5] → bar height 0–100%
+  if (!gbestWrap.children.length) {
+    // Build bar elements once
+    gbestWrap.innerHTML = '';
+    vec.forEach((_, i) => {
+      gbestWrap.innerHTML += `
+        <div class="dim-bar-wrap">
+          <div class="dim-bar" id="bar${i}" style="height:4px"></div>
+          <span class="dim-label">x${i+1}</span>
+        </div>`;
+    });
+  }
+  vec.forEach((v, i) => {
+    const bar = document.getElementById(`bar${i}`);
+    if (!bar) return;
+    const pct    = ((v + 5) / 10) * 100;  // map [-5,5] → [0,100]%
+    const hue    = 180 + (v / 5) * 60;    // cyan → purple hue shift
+    bar.style.height     = Math.max(4, pct * 0.55) + 'px';
+    bar.style.background = `hsl(${hue}, 90%, 55%)`;
+  });
+}
+
+// ── TRAIN BUTTON ─────────────────────────────────────────
+trainBtn.addEventListener('click', async () => {
+  if (!connected) return;
+  setUIState('training');   // lock immediately — don't wait for server
+  fitHistory = [];
+  log('Sending START to Julia engine…');
+  try {
+    const r = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'start' })
+    });
+    const j = await r.json();
+    log(`Server: ${JSON.stringify(j)}`, 'good');
+  } catch(e) {
+    log(`Failed to start: ${e}`, 'error');
+    setUIState('idle');
+  }
+});
+
+// ── STOP BUTTON ──────────────────────────────────────────
+stopBtn.addEventListener('click', async () => {
+  setUIState('idle');    // lock immediately
+  log('Sending STOP to Julia engine…', 'warn');
+  try {
+    const r = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'stop' })
+    });
+    const j = await r.json();
+    log(`Server: ${JSON.stringify(j)}`);
+  } catch(e) {
+    log(`Failed to stop: ${e}`, 'error');
+  }
+});
+
+// ── BOOT ─────────────────────────────────────────────────
+setUIState('offline');
+connectWS();
+log('NEXUS ULTRA PSO Swarm Brain initialised.', 'good');
+log('Awaiting connection to Julia/CUDA engine on port 7700…');
+</script>
+</body>
+</html>

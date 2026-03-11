@@ -869,6 +869,8 @@
             sentinel: clear fault</button>
           <button class="qc-btn" style="border-color:#ffaa00;color:#ffaa00" onclick="sentinelCmd('reset')">↺ sentinel:
             reset swarm</button>
+          <button class="qc-btn" style="border-color:#00f5e4;color:#00f5e4;margin-top:6px;font-weight:700" onclick="psoCmd('start')">🚀 pso: train swarm</button>
+          <button class="qc-btn" style="border-color:#ff3b5c;color:#ff3b5c" onclick="psoCmd('stop')">🛑 pso: stop training</button>
         </div>
       </div>
 
@@ -1841,8 +1843,133 @@ Run an AI call or trigger a payment to watch nodes respond in real-time.`, 'syst
       }
     }
 
+    // ══════════════════════════════════════════════════════════
+    //  PSO SWARM BRAIN BRIDGE  — port 7700 (Julia/CUDA engine)
+    //  Maps live PSO telemetry → ECHO / FLUX / SWARM nodes
+    // ══════════════════════════════════════════════════════════
+    let psoWS = null;
+    let psoConnected = false;
+    let psoBestHistory = [];  // track fitness history for entropy calc
+
+    function connectPSO() {
+      try {
+        psoWS = new WebSocket('ws://localhost:7700/ws');
+      } catch (e) {
+        setTimeout(connectPSO, 5000);
+        return;
+      }
+
+      psoWS.onopen = () => {
+        psoConnected = true;
+        // Update bottombar sentinel dot to also reflect PSO
+        const dot = document.getElementById('cb-sentinel-dot');
+        const txt = document.getElementById('cb-sentinel');
+        if (dot) { dot.style.background = '#00ff99'; }
+        if (txt)  { txt.textContent = 'SENTINEL + PSO ONLINE'; txt.style.color = '#00ff99'; }
+        addAI('PSO·BRAIN', '🧠 <strong>PSO SWARM BRAIN CONNECTED</strong><br>Julia/CUDA engine on port 7700.<br>ECHO · FLUX · SWARM nodes now driven by live GPU optimization.', 'system');
+      };
+
+      psoWS.onmessage = (evt) => {
+        let d;
+        try { d = JSON.parse(evt.data); } catch { return; }
+
+        const sw1 = NODES.find(n => n.id === 'sw1'); // ECHO
+        const sw2 = NODES.find(n => n.id === 'sw2'); // FLUX
+        const sw3 = NODES.find(n => n.id === 'sw3'); // SWARM
+        if (!sw1 || !sw2 || !sw3) return;
+
+        if (d.status === 'ready') {
+          // Engine idle — gently pulse nodes at baseline
+          sw1.targetPower = 0.5;
+          sw2.targetPower = 0.1;
+          sw3.targetPower = 0.5;
+          document.getElementById('tb-swarm').textContent = 'PSO·IDLE';
+          return;
+        }
+
+        if (d.g_fit !== undefined) {
+          psoBestHistory.push(d.g_fit);
+          if (psoBestHistory.length > 60) psoBestHistory.shift();
+
+          // ECHO = convergence health (how close to solved?)
+          // Map fitness log10 from [8, -4] range → [0, 1]
+          const logFit   = Math.log10(Math.max(d.g_fit, 1e-10));
+          const echo     = Math.max(0, Math.min(1, (8 - logFit) / 12));
+
+          // FLUX = movement entropy = stddev of recent fitness log history
+          let flux = 0.2;
+          if (psoBestHistory.length > 3) {
+            const logs  = psoBestHistory.map(v => Math.log10(Math.max(v, 1e-10)));
+            const mean  = logs.reduce((a, b) => a + b, 0) / logs.length;
+            const std   = Math.sqrt(logs.reduce((a, v) => a + (v - mean) ** 2, 0) / logs.length);
+            flux = Math.max(0, Math.min(1, std / 4));
+          }
+
+          // SWARM = EchoFlux composite (mirrors Julia engine formula)
+          const efs = (echo * 0.6 + (1.0 - flux) * 0.4) / 1.2;
+
+          sw1.targetPower = echo;
+          sw2.targetPower = flux;
+          sw3.targetPower = Math.min(1, efs);
+
+          // Fire particles on improving iterations
+          if (d.running && Math.random() < echo * 0.3) {
+            for (let i = 0; i < 2; i++) spawnP(sw3);
+          }
+
+          // Update topbar SWARM stat
+          const swarmPct = (efs * 100).toFixed(1);
+          const fitFmt   = d.g_fit < 0.001 ? d.g_fit.toExponential(2) : d.g_fit.toFixed(4);
+          document.getElementById('tb-swarm').textContent =
+            d.running ? `${swarmPct}% · iter ${d.iter}` :
+            d.converged ? `✅ ${swarmPct}%` : `${swarmPct}%`;
+
+          // Convergence event
+          if (d.converged) {
+            emitEvent(`pso_converged: iter=${d.iter} fitness=${fitFmt}`, 'saf');
+            addAI('PSO·BRAIN', `✅ <strong>SWARM CONVERGED</strong> at iteration ${d.iter}<br>Best fitness: <strong>${fitFmt}</strong><br>EchoFlux: ${swarmPct}%<br>Click "🚀 pso: train swarm" to retrain.`, 'system');
+          }
+        }
+      };
+
+      psoWS.onclose = () => {
+        psoConnected = false;
+        const dot = document.getElementById('cb-sentinel-dot');
+        const txt = document.getElementById('cb-sentinel');
+        if (dot && !txt?.textContent?.includes('SENTINEL ONLINE')) {
+          dot.style.background = '#333';
+        }
+        document.getElementById('tb-swarm').textContent = 'PSO·OFF';
+        setTimeout(connectPSO, 5000);
+      };
+
+      psoWS.onerror = () => {};
+    }
+
+    // ── PSO quick commands (wired to existing qc-btn buttons) ────
+    function psoCmd(action) {
+      fetch('http://localhost:7700/api/control', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action })
+      })
+      .then(r => r.json())
+      .then(j => {
+        const msg = action === 'start'
+          ? '🚀 <strong>PSO TRAINING STARTED</strong><br>128 particles × 10 dims launching on GPU.<br>ECHO · FLUX · SWARM nodes now live.'
+          : '🛑 <strong>PSO TRAINING STOPPED</strong><br>Swarm halted. Nodes returning to idle state.';
+        addAI('PSO·BRAIN', msg, 'system');
+        if (action === 'start') psoBestHistory = [];
+      })
+      .catch(() => {
+        addAI('PSO·BRAIN', '⚠ PSO engine offline — run <strong>START_PSO_BRAIN.bat</strong> first.', 'system');
+      });
+    }
+
     // Connect to Sentinel on load
     connectSentinel();
+    // Connect to PSO Brain on load (auto-reconnects if Julia is still compiling)
+    connectPSO();
   </script>
 </body>
 

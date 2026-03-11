@@ -1,0 +1,15 @@
+name = "PSOSwarmBrain"
+uuid = "a4f3c2d1-e5b6-7890-abcd-ef1234567890"
+authors = ["Nexus Ultra"]
+version = "1.0.0"
+
+[deps]
+CUDA  = "052768ef-5323-5732-b1bb-66c8b64840ba"
+HTTP  = "cd3eb016-35fb-5094-929b-558a96fad6f3"
+JSON3 = "0f8b85d8-7e73-4b43-9b55-0be95d3a7716"
+
+[compat]
+julia = "1.9"
+CUDA  = "5"
+HTTP  = "1"
+JSON3 = "1"
