@@ -19,7 +19,7 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: #000; display: flex; justify-content: center; align-items: center;
          min-height: 100vh; font-family: 'Courier New', monospace; overflow: hidden; }
-  #game-container { position: relative; }
+  #game-container { position: relative; width: 900px; max-width: 100vw; }
   #ui-overlay { position: absolute; top: 0; left: 0; width: 100%; padding: 12px 20px;
                  display: flex; justify-content: space-between; align-items: center;
                  pointer-events: none; z-index: 10; }
@@ -200,8 +200,17 @@ class NexusScene extends Phaser.Scene {
   }
 }
 
-new Phaser.Game({ type:Phaser.AUTO, width:W, height:H,
-  canvas:document.getElementById('c'), backgroundColor:'#000005', scene:NexusScene });
+new Phaser.Game({
+  type: Phaser.AUTO,
+  width: W, height: H,
+  canvas: document.getElementById('c'),
+  backgroundColor: '#000005',
+  scale: {
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH
+  },
+  scene: NexusScene
+});
 </script>
 </body>
 </html>
