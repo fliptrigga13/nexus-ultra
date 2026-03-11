@@ -287,9 +287,32 @@ function handle_ws(ws)
     end
 end
 
+
+# Path to the PSO trainer HTML (sits one level up from this script)
+const TRAINER_HTML = joinpath(@__DIR__, "..", "pso-trainer.html")
+
 function router(req::HTTP.Request)
     path   = req.target
     method = req.method
+
+    # ── CORS preflight ─────────────────────────────────────────
+    if method == "OPTIONS"
+        return HTTP.Response(204, [
+            "Access-Control-Allow-Origin"  => "*",
+            "Access-Control-Allow-Methods" => "GET, POST, OPTIONS",
+            "Access-Control-Allow-Headers" => "Content-Type"
+        ])
+    end
+
+    # ── SERVE DASHBOARD at GET / or GET /trainer ───────────────
+    if (path == "/" || path == "/trainer") && method == "GET"
+        if isfile(TRAINER_HTML)
+            html = read(TRAINER_HTML, String)
+            return HTTP.Response(200, ["Content-Type" => "text/html; charset=utf-8"], html)
+        else
+            return HTTP.Response(404, "pso-trainer.html not found next to local-scripts/")
+        end
+    end
 
     if path == "/health"
         return HTTP.Response(200, ["Content-Type" => "application/json"],
