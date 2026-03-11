@@ -1,216 +1,508 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UNIVERS ULTRA PONG — NEXUS Level ∞ | FlipTrigga13</title>
-<meta name="description" content="Play UNIVERS ULTRA PONG — an infinite-level cosmic Pong game powered by Phaser 3. Built with neon AI aesthetics, an evolving AI opponent, and particle effects. Free to play in your browser.">
-<meta name="keywords" content="nexus pong, infinite pong game, phaser game, browser game, cosmic pong, AI pong, fliptrigga13, nexus-ultra game">
-<meta name="author" content="FlipTrigga13">
-<meta property="og:title" content="UNIVERS ULTRA PONG — NEXUS Level ∞">
-<meta property="og:description" content="Infinite-level cosmic Pong. AI opponent gets smarter every level. Neon particle effects. FREE — play now in your browser.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://fliptrigga13.github.io/nexus-ultra/nexus-pong.html">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="UNIVERS ULTRA PONG — NEXUS Level ∞">
-<meta name="twitter:description" content="Infinite-level cosmic Pong. Play free in your browser.">
-<link rel="canonical" href="https://fliptrigga13.github.io/nexus-ultra/nexus-pong.html">
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: #000; display: flex; justify-content: center; align-items: center;
-         min-height: 100vh; font-family: 'Courier New', monospace; overflow: hidden; }
-  #game-container { position: relative; width: 900px; max-width: 100vw; }
-  #ui-overlay { position: absolute; top: 0; left: 0; width: 100%; padding: 12px 20px;
-                 display: flex; justify-content: space-between; align-items: center;
-                 pointer-events: none; z-index: 10; }
-  .ui-block { text-align: center; }
-  .ui-label { font-size: 9px; letter-spacing: 3px; color: #333; text-transform: uppercase; }
-  .ui-value { font-size: 28px; font-weight: bold; letter-spacing: 2px; }
-  #score-player .ui-value { color: #00ff41; text-shadow: 0 0 20px #00ff41; }
-  #score-ai .ui-value    { color: #ff0080; text-shadow: 0 0 20px #ff0080; }
-  #level-display .ui-value { color: #00cfff; text-shadow: 0 0 20px #00cfff; font-size: 20px; }
-  #title-bar h1 { font-size: 11px; letter-spacing: 4px; color: #444;
-                  text-transform: uppercase; font-weight: normal; }
-  #msg { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
-          text-align: center; pointer-events: none; z-index: 20; }
-  #msg h2 { font-size: 36px; letter-spacing: 6px; color: #fff;
-             text-shadow: 0 0 30px #00cfff, 0 0 60px #00cfff; animation: pulse 1s infinite; }
-  #msg p  { font-size: 12px; letter-spacing: 3px; color: #888; margin-top: 8px; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.6} }
-  #level-announce { position: absolute; left: 50%; top: 38%; transform: translate(-50%,-50%);
-                     text-align: center; pointer-events: none; z-index: 20; opacity: 0;
-                     transition: opacity .4s; }
-  #level-announce h3 { font-size: 48px; letter-spacing: 8px; color: #00cfff;
-                        text-shadow: 0 0 40px #00cfff; }
-  #level-announce.show { opacity: 1; }
-  #back-link { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
-                font-size: 10px; letter-spacing: 3px; color: #333; z-index: 30; pointer-events: all; }
-  #back-link a { color: #444; text-decoration: none; }
-  #back-link a:hover { color: #00cfff; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UNIVERS ULTRA PONG NEXUS LEVEL INFINITE</title>
+  <meta name="description" content="Play UNIVERS ULTRA PONG — an infinite-level Pong game with cosmic neon visuals, evolving AI, and particle effects. Free, no download.">
+  <meta name="keywords" content="pong game, neon pong, cosmic pong, nexus pong, browser game, free game">
+  <meta name="author" content="NEXUS ULTRA">
+  <meta property="og:title" content="UNIVERS ULTRA PONG NEXUS LEVEL INFINITE">
+  <meta property="og:description" content="Infinite-level cosmic Pong with evolving AI. Free, no download required.">
+  <meta property="og:url" content="https://fliptrigga13.github.io/nexus-ultra/nexus-pong.html">
+  <link rel="canonical" href="https://fliptrigga13.github.io/nexus-ultra/nexus-pong.html">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    html,body{width:100%;height:100%;background:#000;overflow:hidden;font-family:'Courier New',monospace}
+    #c{display:block;background:#000}
+    #ui{position:fixed;top:0;left:0;width:100%;padding:10px 24px;display:flex;justify-content:space-between;align-items:center;pointer-events:none;z-index:10}
+    .score{text-align:center}
+    .score .label{font-size:9px;letter-spacing:3px;color:#333}
+    .score .num{font-size:28px;font-weight:bold}
+    #p-score .num{color:#00ff41;text-shadow:0 0 18px #00ff41}
+    #ai-score .num{color:#ff0080;text-shadow:0 0 18px #ff0080}
+    #lv-box{text-align:center}
+    #lv-box .lbl{font-size:8px;letter-spacing:3px;color:#333}
+    #lv-box .lv{font-size:13px;color:#00e5ff;text-shadow:0 0 10px #00e5ff}
+    #msg{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;z-index:20;pointer-events:none}
+    #msg h1{font-size:clamp(24px,5vw,48px);letter-spacing:8px;color:#fff;text-shadow:0 0 28px #00e5ff;animation:pulse 1.1s infinite}
+    #msg p{font-size:10px;letter-spacing:3px;color:#444;margin-top:12px}
+    #lvann{position:fixed;left:50%;top:30%;transform:translate(-50%,-50%);text-align:center;z-index:20;pointer-events:none;opacity:0;transition:opacity .3s;font-size:clamp(32px,6vw,60px);letter-spacing:10px;color:#00e5ff;text-shadow:0 0 36px #00e5ff;font-weight:bold}
+    #back{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);font-size:9px;letter-spacing:3px;color:#333;text-decoration:none;z-index:10;transition:color .2s}
+    #back:hover{color:#00e5ff}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+  </style>
 </head>
 <body>
-<div id="game-container">
-  <div id="ui-overlay">
-    <div class="ui-block" id="score-player">
-      <div class="ui-label">YOU</div>
-      <div class="ui-value" id="p-score">0</div>
-    </div>
-    <div class="ui-block" id="level-display">
-      <div class="ui-label">◈ NEXUS</div>
-      <div class="ui-value" id="lv-display">LV 1</div>
-      <div id="title-bar"><h1>UNIVERS ULTRA PONG</h1></div>
-    </div>
-    <div class="ui-block" id="score-ai">
-      <div class="ui-label">AI NEXUS</div>
-      <div class="ui-value" id="ai-score">0</div>
-    </div>
+
+<!-- UI overlay -->
+<div id="ui">
+  <div class="score" id="p-score">
+    <div class="label">YOU</div>
+    <div class="num" id="ps">0</div>
   </div>
-  <div id="level-announce"><h3 id="la-text">LEVEL 1</h3></div>
-  <div id="msg">
-    <h2>NEXUS PONG</h2>
-    <p>SPACE / CLICK TO BEGIN · ARROWS OR MOUSE TO MOVE</p>
+  <div id="lv-box">
+    <div class="lbl">NEXUS LEVEL ∞</div>
+    <div class="lv" id="lvtxt">LV 1</div>
   </div>
-  <div id="back-link"><a href="index.html">← NEXUS ULTRA</a></div>
-  <canvas id="c"></canvas>
+  <div class="score" id="ai-score">
+    <div class="label">AI NEXUS</div>
+    <div class="num" id="as">0</div>
+  </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.min.js"></script>
+<div id="msg">
+  <h1>NEXUS PONG</h1>
+  <p>SPACE · CLICK · ARROW KEYS or MOUSE</p>
+</div>
+<div id="lvann"></div>
+
+<canvas id="c"></canvas>
+<a href="index.html" id="back">← NEXUS ULTRA</a>
+
 <script>
-const W = 900, H = 600;
-const PAD_W = 14, PAD_H = 90, PAD_SPEED = 8;
-const BALL_R = 9;
-const COLORS = { player: 0x00ff41, ai: 0xff0080, ball: 0x00cfff };
+// ═══════════════════════════════════════════════
+// UNIVERS ULTRA PONG — Pure Vanilla JS, Zero CDN
+// ═══════════════════════════════════════════════
+const canvas = document.getElementById('c');
+const ctx    = canvas.getContext('2d');
 
-let gameStarted = false;
-let playerScore = 0, aiScore = 0, level = 1;
-let ballSpeedBase = 5;
+// ── Resize ──
+function resize(){
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
 
-class NexusScene extends Phaser.Scene {
-  constructor() { super('NexusScene'); }
-  create() {
-    this.gfx = this.add.graphics();
-    this.particles = [];
-    this.stars = Array.from({length:200}, () => ({
-      x: Math.random()*W, y: Math.random()*H,
-      r: Math.random()*1.5, a: Math.random(), speed: Math.random()*0.3+0.1
-    }));
-    this.playerPad = { x: 30, y: H/2 };
-    this.aiPad     = { x: W-30, y: H/2 };
-    this.resetBall();
-    this.cursors = this.input.keyboard.createCursorKeys();
-    this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-    this.input.on('pointerdown', () => { if(!gameStarted) this.startGame(); });
-    this.input.on('pointermove', (p) => {
-      if(gameStarted) this.playerPad.y = Phaser.Math.Clamp(p.y, PAD_H/2, H-PAD_H/2);
+// ── State ──
+let W, H;
+let started = false;
+let pScore = 0, aiScore = 0, lv = 1;
+
+// ── Paddle ──
+const PW = 14, BASE_PH = 90;
+let ph = BASE_PH;
+const player = { y: 0 };
+const ai     = { y: 0 };
+
+// ── Ball ──
+const BR = 9;
+let ball  = { x:0, y:0, vx:0, vy:0 };
+let trail = [];
+
+// ── Particles ──
+let particles = [];
+
+// ── Stars ──
+let stars = [];
+function mkStars(){
+  stars = Array.from({length:180}, ()=>({
+    x: Math.random()*2000,
+    y: Math.random()*1200,
+    r: Math.random()*1.4,
+    a: Math.random(),
+    sp: Math.random()*.003+.001
+  }));
+}
+mkStars();
+
+// ── Input ──
+let mouseY = 0;
+let keyUp = false, keyDown = false;
+window.addEventListener('mousemove', e => { mouseY = e.clientY; });
+window.addEventListener('keydown', e => {
+  if(['ArrowUp','ArrowDown',' '].includes(e.key)) e.preventDefault();
+  if(e.key==='ArrowUp')   keyUp=true;
+  if(e.key==='ArrowDown') keyDown=true;
+  if(e.key===' ' && !started) startGame();
+});
+window.addEventListener('keyup', e => {
+  if(e.key==='ArrowUp')   keyUp=false;
+  if(e.key==='ArrowDown') keyDown=false;
+});
+canvas.addEventListener('click', ()=>{ if(!started) startGame(); });
+canvas.addEventListener('mousemove', e=>{ mouseY = e.clientY; });
+// Touch support
+canvas.addEventListener('touchmove', e=>{ e.preventDefault(); mouseY=e.touches[0].clientY; }, {passive:false});
+canvas.addEventListener('touchstart', e=>{ e.preventDefault(); if(!started) startGame(); mouseY=e.touches[0].clientY; }, {passive:false});
+
+// ── Speed helpers ──
+function ballSpeed(){ return 5 + (lv-1)*0.42; }
+function aiSpeed(){   return Math.min(3.2 + (lv-1)*0.48, 14); }
+
+// ── Init / Reset ──
+function initPositions(){
+  W = canvas.width; H = canvas.height;
+  player.y = H/2;
+  ai.y     = H/2;
+}
+function resetBall(toRight){
+  const spd = ballSpeed();
+  const ang = (Math.random()*30-15) * Math.PI/180;
+  const dir = toRight ? 1 : -1;
+  ball.x  = W/2; ball.y = H/2;
+  ball.vx = dir * spd * Math.cos(ang);
+  ball.vy = spd * Math.sin(ang);
+  trail   = [];
+}
+function startGame(){
+  started = true;
+  document.getElementById('msg').style.display = 'none';
+  W = canvas.width; H = canvas.height;
+  player.y = H/2; ai.y = H/2;
+  resetBall(Math.random()>.5);
+  showLevel();
+}
+function showLevel(){
+  const el = document.getElementById('lvann');
+  document.getElementById('lvtxt').textContent = 'LV '+lv;
+  el.textContent = 'LEVEL  '+lv;
+  el.style.opacity = '1';
+  setTimeout(()=>el.style.opacity='0', 1400);
+}
+
+// ── Particles ──
+function burst(x, y, col, n=12){
+  for(let i=0;i<n;i++){
+    const ang = Math.random()*Math.PI*2;
+    const spd = Math.random()*5+2;
+    particles.push({
+      x, y,
+      vx: Math.cos(ang)*spd,
+      vy: Math.sin(ang)*spd,
+      r:  Math.random()*4+2,
+      col,
+      life: 1
     });
-    this.spaceKey.on('down', () => { if(!gameStarted) this.startGame(); });
-    this.trail = [];
-  }
-
-  resetBall(towardPlayer = Math.random()>.5) {
-    const spd = ballSpeedBase + (level-1)*0.4;
-    const angle = (Math.random()*40-20) * Math.PI/180;
-    this.ball = { x: W/2, y: H/2,
-      vx: (towardPlayer?-1:1)*spd*Math.cos(angle),
-      vy: spd*Math.sin(angle) };
-    this.trail = [];
-  }
-
-  startGame() {
-    gameStarted = true;
-    document.getElementById('msg').style.display = 'none';
-    this.showLevelAnnounce();
-  }
-
-  showLevelAnnounce() {
-    const el = document.getElementById('level-announce');
-    document.getElementById('la-text').textContent = `LEVEL  ${level}`;
-    el.classList.add('show');
-    setTimeout(()=>el.classList.remove('show'), 1500);
-    document.getElementById('lv-display').textContent = `LV ${level}`;
-  }
-
-  update() {
-    const g = this.gfx; g.clear();
-    this.stars.forEach(s => {
-      s.a += s.speed*0.02; if(s.a>1) s.a=0;
-      g.fillStyle(0xffffff, Math.sin(s.a*Math.PI)*0.6);
-      g.fillCircle(s.x, s.y, s.r);
-    });
-    for(let y=0;y<H;y+=24){ g.fillStyle(0x222222,1); g.fillRect(W/2-1,y,2,12); }
-    if(!gameStarted){ this.drawPad(g,this.playerPad,COLORS.player); this.drawPad(g,this.aiPad,COLORS.ai); return; }
-    if(this.cursors.up.isDown)   this.playerPad.y=Math.max(PAD_H/2,this.playerPad.y-PAD_SPEED);
-    if(this.cursors.down.isDown) this.playerPad.y=Math.min(H-PAD_H/2,this.playerPad.y+PAD_SPEED);
-    const aiSpd=Math.min(3+level*0.5,12);
-    if(this.aiPad.y<this.ball.y-8) this.aiPad.y=Math.min(H-PAD_H/2,this.aiPad.y+aiSpd);
-    if(this.aiPad.y>this.ball.y+8) this.aiPad.y=Math.max(PAD_H/2,this.aiPad.y-aiSpd);
-    this.ball.x+=this.ball.vx; this.ball.y+=this.ball.vy;
-    this.trail.push({x:this.ball.x,y:this.ball.y});
-    if(this.trail.length>18) this.trail.shift();
-    if(this.ball.y-BALL_R<0){this.ball.y=BALL_R;this.ball.vy*=-1;this.burst(this.ball.x,0,0x00cfff);}
-    if(this.ball.y+BALL_R>H){this.ball.y=H-BALL_R;this.ball.vy*=-1;this.burst(this.ball.x,H,0x00cfff);}
-    if(this.ball.vx<0&&this.ball.x-BALL_R<this.playerPad.x+PAD_W/2&&this.ball.x+BALL_R>this.playerPad.x-PAD_W/2&&Math.abs(this.ball.y-this.playerPad.y)<PAD_H/2){
-      this.ball.vx=Math.abs(this.ball.vx)*1.04;
-      this.ball.vy=((this.ball.y-this.playerPad.y)/(PAD_H/2))*(ballSpeedBase+level*0.5)*1.2;
-      this.ball.x=this.playerPad.x+PAD_W/2+BALL_R;
-      this.burst(this.ball.x,this.ball.y,COLORS.player); this.cameras.main.shake(80,.003);
-    }
-    if(this.ball.vx>0&&this.ball.x+BALL_R>this.aiPad.x-PAD_W/2&&this.ball.x-BALL_R<this.aiPad.x+PAD_W/2&&Math.abs(this.ball.y-this.aiPad.y)<PAD_H/2){
-      this.ball.vx=-Math.abs(this.ball.vx)*1.04;
-      this.ball.vy=((this.ball.y-this.aiPad.y)/(PAD_H/2))*(ballSpeedBase+level*0.5)*1.2;
-      this.ball.x=this.aiPad.x-PAD_W/2-BALL_R;
-      this.burst(this.ball.x,this.ball.y,COLORS.ai); this.cameras.main.shake(80,.003);
-    }
-    if(this.ball.x>W+20){
-      playerScore++; document.getElementById('p-score').textContent=playerScore;
-      this.burst(W,H/2,COLORS.player,30);
-      if(playerScore%3===0){level++;this.showLevelAnnounce();this.cameras.main.flash(300,0,100,80);}
-      this.resetBall(false);
-    }
-    if(this.ball.x<-20){
-      aiScore++; document.getElementById('ai-score').textContent=aiScore;
-      this.burst(0,H/2,COLORS.ai,30); this.resetBall(true);
-    }
-    this.trail.forEach((p,i)=>{
-      g.fillStyle(COLORS.ball,(i/this.trail.length)*0.5);
-      g.fillCircle(p.x,p.y,BALL_R*(i/this.trail.length));
-    });
-    g.fillStyle(COLORS.ball,1); g.fillCircle(this.ball.x,this.ball.y,BALL_R);
-    g.fillStyle(0xffffff,.8); g.fillCircle(this.ball.x-3,this.ball.y-3,3);
-    this.drawPad(g,this.playerPad,COLORS.player); this.drawPad(g,this.aiPad,COLORS.ai);
-    this.particles=this.particles.filter(p=>p.life>0);
-    this.particles.forEach(p=>{
-      p.x+=p.vx;p.y+=p.vy;p.life-=2;
-      g.fillStyle(p.color,p.life/100);g.fillCircle(p.x,p.y,p.r*(p.life/100)+1);
-    });
-  }
-
-  drawPad(g,pad,color){
-    g.fillStyle(color,.15);g.fillRoundedRect(pad.x-PAD_W/2-4,pad.y-PAD_H/2-4,PAD_W+8,PAD_H+8,8);
-    g.fillStyle(color,1);g.fillRoundedRect(pad.x-PAD_W/2,pad.y-PAD_H/2,PAD_W,PAD_H,5);
-    g.fillStyle(0xffffff,.3);g.fillRoundedRect(pad.x-PAD_W/2+2,pad.y-PAD_H/2+4,3,PAD_H-8,3);
-  }
-
-  burst(x,y,color,n=12){
-    for(let i=0;i<n;i++){
-      const a=Math.random()*Math.PI*2,s=Math.random()*5+2;
-      this.particles.push({x,y,color,vx:Math.cos(a)*s,vy:Math.sin(a)*s,r:Math.random()*4+2,life:80+Math.random()*40});
-    }
   }
 }
 
-new Phaser.Game({
-  type: Phaser.AUTO,
-  width: W, height: H,
-  canvas: document.getElementById('c'),
-  backgroundColor: '#000005',
-  scale: {
-    mode: Phaser.Scale.FIT,
-    autoCenter: Phaser.Scale.CENTER_BOTH
-  },
-  scene: NexusScene
-});
+// ── Draw helpers ──
+function drawPaddle(x, y, col){
+  const h = ph;
+  ctx.shadowColor = col;
+  ctx.shadowBlur  = 20;
+  ctx.fillStyle   = col;
+  ctx.beginPath();
+  ctx.roundRect(x-PW/2, y-h/2, PW, h, 5);
+  ctx.fill();
+  // shine
+  ctx.fillStyle = 'rgba(255,255,255,.22)';
+  ctx.fillRect(x-PW/2+2, y-h/2+4, 3, h-8);
+  ctx.shadowBlur = 0;
+}
+
+function glowCircle(x, y, r, col, alpha=1){
+  ctx.shadowColor = col;
+  ctx.shadowBlur  = 24;
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle   = col;
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI*2);
+  ctx.fill();
+  ctx.globalAlpha = 1;
+  ctx.shadowBlur  = 0;
+}
+
+// ── Main loop ──
+function loop(){
+  requestAnimationFrame(loop);
+  W = canvas.width; H = canvas.height;
+
+  // Background
+  ctx.fillStyle = 'rgba(0,0,0,.18)';
+  ctx.fillRect(0,0,W,H);
+
+  // Stars
+  stars.forEach(s=>{
+    s.a += s.sp;
+    const alpha = Math.abs(Math.sin(s.a))*.6;
+    ctx.fillStyle = `rgba(255,255,255,${alpha.toFixed(2)})`;
+    ctx.beginPath();
+    ctx.arc((s.x%W), (s.y%H), s.r, 0, Math.PI*2);
+    ctx.fill();
+  });
+
+  // Center dashes
+  for(let y=0; y<H; y+=22){
+    ctx.fillStyle = 'rgba(255,255,255,.07)';
+    ctx.fillRect(W/2-1, y, 2, 12);
+  }
+
+  if(!started){
+    drawPaddle(PW+6, player.y||H/2, '#00ff41');
+    drawPaddle(W-PW-6, ai.y||H/2,  '#ff0080');
+    return;
+  }
+
+  // ── Move player paddle ──
+  const PSPD = 9;
+  if(keyUp)   player.y = Math.max(ph/2, player.y-PSPD);
+  if(keyDown) player.y = Math.min(H-ph/2, player.y+PSPD);
+  // Mouse/touch (only if actually moved — threshold so it doesn't always snap)
+  if(!keyUp && !keyDown){
+    const diff = mouseY - player.y;
+    if(Math.abs(diff)>2) player.y += diff*0.16;
+    player.y = Math.max(ph/2, Math.min(H-ph/2, player.y));
+  }
+
+  // ── Move AI paddle ──
+  const as = aiSpeed();
+  const aiDiff = ball.y - ai.y;
+  if(Math.abs(aiDiff) > 4) ai.y += Math.sign(aiDiff)*Math.min(Math.abs(aiDiff)*0.1+as*.7, as);
+  ai.y = Math.max(ph/2, Math.min(H-ph/2, ai.y));
+
+  // ── Move ball ──
+  ball.x += ball.vx;
+  ball.y += ball.vy;
+
+  trail.push({x:ball.x, y:ball.y});
+  if(trail.length > 18) trail.shift();
+
+  // Wall bounce (top/bottom)
+  if(ball.y - BR < 0){
+    ball.y = BR; ball.vy = Math.abs(ball.vy);
+    burst(ball.x, 0, '#00cfff', 6);
+  }
+  if(ball.y + BR > H){
+    ball.y = H-BR; ball.vy = -Math.abs(ball.vy);
+    burst(ball.x, H, '#00cfff', 6);
+  }
+
+  // ── Player paddle collision ──
+  const px = PW+6;
+  if(ball.vx < 0 && ball.x-BR < px+PW/2 && ball.x+BR > px-PW/2
+     && ball.y > player.y-ph/2 && ball.y < player.y+ph/2){
+    ball.vx  = Math.abs(ball.vx)*1.05;
+    ball.vy += (ball.y-player.y)/(ph/2) * 3.5;
+    ball.x   = px+PW/2+BR;
+    // cap speed
+    const spd=Math.hypot(ball.vx,ball.vy), cap=ballSpeed()*2.2;
+    if(spd>cap){ball.vx=ball.vx/spd*cap;ball.vy=ball.vy/spd*cap;}
+    burst(ball.x, ball.y, '#00ff41');
+    screenShake(8);
+  }
+
+  // ── AI paddle collision ──
+  const ax = W-PW-6;
+  if(ball.vx > 0 && ball.x+BR > ax-PW/2 && ball.x-BR < ax+PW/2
+     && ball.y > ai.y-ph/2 && ball.y < ai.y+ph/2){
+    ball.vx  = -Math.abs(ball.vx)*1.05;
+    ball.vy += (ball.y-ai.y)/(ph/2) * 3.5;
+    ball.x   = ax-PW/2-BR;
+    const spd=Math.hypot(ball.vx,ball.vy), cap=ballSpeed()*2.2;
+    if(spd>cap){ball.vx=ball.vx/spd*cap;ball.vy=ball.vy/spd*cap;}
+    burst(ball.x, ball.y, '#ff0080');
+    screenShake(8);
+  }
+
+  // ── Score ──
+  if(ball.x > W+20){
+    pScore++;
+    document.getElementById('ps').textContent = pScore;
+    burst(W, H/2, '#00ff41', 24);
+    if(pScore % 3 === 0){ lv++; ph=Math.max(52,BASE_PH-(lv-1)*3); showLevel(); flashScreen('#00e5ff'); }
+    resetBall(false);
+  }
+  if(ball.x < -20){
+    aiScore++;
+    document.getElementById('as').textContent = aiScore;
+    burst(0, H/2, '#ff0080', 24);
+    resetBall(true);
+  }
+
+  // ── Draw trail ──
+  trail.forEach((p,i)=>{
+    const a = (i/trail.length)*.55;
+    glowCircle(p.x, p.y, BR*(i/trail.length), '#00cfff', a);
+  });
+
+  // ── Draw ball ──
+  glowCircle(ball.x, ball.y, BR, '#00cfff');
+  // Specular highlight
+  ctx.fillStyle='rgba(255,255,255,.75)';
+  ctx.beginPath(); ctx.arc(ball.x-2, ball.y-2, 3, 0, Math.PI*2); ctx.fill();
+
+  // ── Draw paddles ──
+  drawPaddle(px,  player.y, '#00ff41');
+  drawPaddle(ax,  ai.y,     '#ff0080');
+
+  // ── Particles ──
+  particles = particles.filter(p=>p.life>0);
+  particles.forEach(p=>{
+    p.x+=p.vx; p.y+=p.vy;
+    p.vy+=0.12; // gravity
+    p.life-=0.028;
+    glowCircle(p.x, p.y, p.r*p.life, p.col, p.life*.8);
+  });
+
+  // ── Screen shake apply ──
+  if(shakeT > 0){
+    const dx = (Math.random()-.5)*shakeT;
+    const dy = (Math.random()-.5)*shakeT;
+    ctx.translate(dx, dy);
+    shakeT = Math.max(0, shakeT-1.2);
+  }
+}
+
+// ── Screen shake ──
+let shakeT = 0;
+function screenShake(amt){ shakeT = Math.max(shakeT, amt); }
+// Reset transform each frame
+const origLoop = loop;
+
+// ── Flash ──
+let flashAlpha = 0, flashCol = '#fff';
+function flashScreen(col){ flashAlpha=0.35; flashCol=col; }
+
+// Override loop with full version
+function frame(){
+  requestAnimationFrame(frame);
+  W = canvas.width; H = canvas.height;
+
+  // Screen shake offset
+  let sx=0, sy=0;
+  if(shakeT > 0){
+    sx=(Math.random()-.5)*shakeT*2;
+    sy=(Math.random()-.5)*shakeT*2;
+    shakeT=Math.max(0, shakeT-1.8);
+  }
+  ctx.setTransform(1,0,0,1,sx,sy);
+
+  // Background fade
+  ctx.fillStyle = 'rgba(0,0,0,.2)';
+  ctx.fillRect(-sx,-sy,W,H);
+
+  // Stars
+  stars.forEach(s=>{
+    s.a+=s.sp;
+    const alpha=Math.abs(Math.sin(s.a))*.55;
+    ctx.fillStyle=`rgba(255,255,255,${alpha.toFixed(2)})`;
+    ctx.beginPath(); ctx.arc(s.x%W, s.y%H, s.r, 0, Math.PI*2); ctx.fill();
+  });
+
+  // Center dashes
+  for(let y=0;y<H;y+=22){
+    ctx.fillStyle='rgba(255,255,255,.07)';
+    ctx.fillRect(W/2-1,y,2,12);
+  }
+
+  if(!started){
+    drawPaddle(PW+6, H/2, '#00ff41');
+    drawPaddle(W-PW-6, H/2, '#ff0080');
+    ctx.setTransform(1,0,0,1,0,0);
+    return;
+  }
+
+  // Player move
+  const PS=9;
+  if(keyUp)   player.y=Math.max(ph/2, player.y-PS);
+  if(keyDown) player.y=Math.min(H-ph/2, player.y+PS);
+  if(!keyUp&&!keyDown){
+    const d=mouseY-player.y;
+    if(Math.abs(d)>2) player.y+=d*.16;
+    player.y=Math.max(ph/2,Math.min(H-ph/2,player.y));
+  }
+
+  // AI move
+  const as=aiSpeed();
+  const ad=ball.y-ai.y;
+  if(Math.abs(ad)>3) ai.y+=Math.sign(ad)*Math.min(Math.abs(ad)*.1+as*.65,as);
+  ai.y=Math.max(ph/2,Math.min(H-ph/2,ai.y));
+
+  // Ball move
+  ball.x+=ball.vx; ball.y+=ball.vy;
+  trail.push({x:ball.x,y:ball.y});
+  if(trail.length>18) trail.shift();
+
+  // Wall bounce
+  if(ball.y-BR<0){ball.y=BR;ball.vy=Math.abs(ball.vy);burst(ball.x,0,'#00cfff',6);}
+  if(ball.y+BR>H){ball.y=H-BR;ball.vy=-Math.abs(ball.vy);burst(ball.x,H,'#00cfff',6);}
+
+  // Player hit
+  const pxv=PW+6;
+  if(ball.vx<0&&ball.x-BR<pxv+PW/2&&ball.x+BR>pxv-PW/2&&Math.abs(ball.y-player.y)<ph/2){
+    ball.vx=Math.abs(ball.vx)*1.05;
+    ball.vy+=(ball.y-player.y)/(ph/2)*3.5;
+    ball.x=pxv+PW/2+BR;
+    const spd=Math.hypot(ball.vx,ball.vy),cap=ballSpeed()*2.2;
+    if(spd>cap){ball.vx=ball.vx/spd*cap;ball.vy=ball.vy/spd*cap;}
+    burst(ball.x,ball.y,'#00ff41'); shakeT=8;
+  }
+
+  // AI hit
+  const axv=W-PW-6;
+  if(ball.vx>0&&ball.x+BR>axv-PW/2&&ball.x-BR<axv+PW/2&&Math.abs(ball.y-ai.y)<ph/2){
+    ball.vx=-Math.abs(ball.vx)*1.05;
+    ball.vy+=(ball.y-ai.y)/(ph/2)*3.5;
+    ball.x=axv-PW/2-BR;
+    const spd=Math.hypot(ball.vx,ball.vy),cap=ballSpeed()*2.2;
+    if(spd>cap){ball.vx=ball.vx/spd*cap;ball.vy=ball.vy/spd*cap;}
+    burst(ball.x,ball.y,'#ff0080'); shakeT=8;
+  }
+
+  // Score
+  if(ball.x>W+20){
+    pScore++; document.getElementById('ps').textContent=pScore;
+    burst(W,H/2,'#00ff41',28);
+    if(pScore%3===0){lv++;ph=Math.max(52,BASE_PH-(lv-1)*3);showLevel();flashAlpha=.35;flashCol='#00e5ff';}
+    resetBall(false);
+  }
+  if(ball.x<-20){
+    aiScore++; document.getElementById('as').textContent=aiScore;
+    burst(0,H/2,'#ff0080',28);
+    resetBall(true);
+  }
+
+  // Trail
+  trail.forEach((p,i)=>{
+    const a=(i/trail.length)*.52;
+    ctx.shadowColor='#00cfff'; ctx.shadowBlur=14;
+    ctx.globalAlpha=a;
+    ctx.fillStyle='#00cfff';
+    ctx.beginPath(); ctx.arc(p.x,p.y,BR*(0.3+i/trail.length*.7),0,Math.PI*2); ctx.fill();
+    ctx.globalAlpha=1; ctx.shadowBlur=0;
+  });
+
+  // Ball
+  ctx.shadowColor='#00cfff'; ctx.shadowBlur=28;
+  ctx.fillStyle='#00cfff';
+  ctx.beginPath(); ctx.arc(ball.x,ball.y,BR,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,.8)';
+  ctx.beginPath(); ctx.arc(ball.x-2,ball.y-2,3,0,Math.PI*2); ctx.fill();
+  ctx.shadowBlur=0;
+
+  // Paddles
+  drawPaddle(pxv,player.y,'#00ff41');
+  drawPaddle(axv,ai.y,'#ff0080');
+
+  // Particles
+  particles=particles.filter(p=>p.life>0);
+  particles.forEach(p=>{
+    p.x+=p.vx; p.y+=p.vy; p.vy+=.12; p.life-=.028;
+    ctx.shadowColor=p.col; ctx.shadowBlur=10;
+    ctx.globalAlpha=p.life*.85;
+    ctx.fillStyle=p.col;
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.r*p.life+.5,0,Math.PI*2); ctx.fill();
+    ctx.globalAlpha=1; ctx.shadowBlur=0;
+  });
+
+  // Flash overlay
+  if(flashAlpha>0){
+    ctx.globalAlpha=flashAlpha;
+    ctx.fillStyle=flashCol;
+    ctx.fillRect(-sx,-sy,W,H);
+    ctx.globalAlpha=1;
+    flashAlpha=Math.max(0,flashAlpha-.018);
+  }
+
+  ctx.setTransform(1,0,0,1,0,0);
+}
+
+// ── Boot ──
+initPositions();
+frame();
 </script>
 </body>
 </html>
