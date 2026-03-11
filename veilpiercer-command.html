@@ -708,6 +708,7 @@
       <div class="tb-s">VIS <strong id="tb-vis">—</strong></div>
       <div class="tb-s">SAF <strong id="tb-saf">—</strong></div>
       <div class="tb-s">PRIV <strong id="tb-priv">—</strong></div>
+      <div class="tb-s" style="color:#00ff99">SWARM <strong id="tb-swarm" style="color:#00ff99">—</strong></div>
       <div class="tb-s">RUNS <strong id="tb-runs">0</strong></div>
       <div class="tb-s">EVENTS <strong id="tb-evs">0</strong></div>
     </div>
@@ -860,6 +861,14 @@
           <button class="qc-btn" onclick="quickCmd('what can this be used for?')">💡 what can this be used for?</button>
           <button class="qc-btn" onclick="quickCmd('show me real world impact')">📊 show real world impact</button>
           <button class="qc-btn" onclick="quickCmd('reset to nominal')">↺ reset to nominal</button>
+          <button class="qc-btn" style="border-color:#00ff99;color:#00ff99" onclick="sentinelCmd('spawn_rogues')">🧫
+            sentinel: spawn rogues</button>
+          <button class="qc-btn" style="border-color:#ff3355;color:#ff3355" onclick="sentinelCmd('inject_fault')">⚡
+            sentinel: inject fault</button>
+          <button class="qc-btn" style="border-color:#00eeff;color:#00eeff" onclick="sentinelCmd('clear_fault')">✕
+            sentinel: clear fault</button>
+          <button class="qc-btn" style="border-color:#ffaa00;color:#ffaa00" onclick="sentinelCmd('reset')">↺ sentinel:
+            reset swarm</button>
         </div>
       </div>
 
@@ -877,6 +886,11 @@
     <div class="cb-item"><span id="cb-nodes">9 nodes active</span></div>
     <span class="cb-sep">·</span>
     <div class="cb-item"><span id="cb-use-case">AI Customer Support</span></div>
+    <span class="cb-sep">·</span>
+    <div class="cb-item">
+      <div class="cb-dot" id="cb-sentinel-dot" style="background:#333"></div><span id="cb-sentinel"
+        style="color:#333">SENTINEL OFFLINE</span>
+    </div>
     <div class="cb-hint">DRAG NODES · TAP BOOST · TYPE COMMANDS</div>
   </div>
 
@@ -956,6 +970,23 @@
       { f: 'p1', t: 'p2' }, { f: 'v2', t: 's2' }, { f: 's2', t: 'p3' },
     ];
 
+    // ── SENTINEL NODES (swarm pillar) ──────────────────────────────
+    const SENTINEL_NODES = [
+      { id: 'sw1', pillar: 'sentinel', color: '#00ff99', icon: '🧬', label: 'ECHO', role: 'Swarm consensus score', power: 0.80, default: 0.80 },
+      { id: 'sw2', pillar: 'sentinel', color: '#cc44ff', icon: '🌊', label: 'FLUX', role: 'Movement entropy', power: 0.20, default: 0.20 },
+      { id: 'sw3', pillar: 'sentinel', color: '#00eeff', icon: '🧫', label: 'SWARM', role: 'EchoFlux composite', power: 0.75, default: 0.75 },
+    ];
+    NODES.push(...SENTINEL_NODES);
+
+    const SENTINEL_EDGES = [
+      { f: 'sw1', t: 's1' },  // Echo feeds Safety catch
+      { f: 'sw2', t: 's3' },  // Flux feeds Anomaly detection
+      { f: 'sw3', t: 'v1' },  // Swarm feeds Visibility trace
+      { f: 'sw1', t: 'sw3' }, // Echo → Swarm composite
+      { f: 'sw2', t: 'sw3' }, // Flux → Swarm composite
+    ];
+    EDGES.push(...SENTINEL_EDGES);
+
     function initPositions() {
       const cw = W(), ch = H();
       const CL = {
@@ -973,6 +1004,20 @@
         nd.orbitSpeed = (0.00014 + Math.random() * 0.00018) * (Math.random() > .5 ? 1 : -1);
         nd.x = cl.cx + Math.cos(angle) * r;
         nd.y = cl.cy + Math.sin(angle) * r;
+        nd.R = 28; nd.fireT = 0; nd.pulseT = 0; nd.dragging = false;
+        nd.targetPower = nd.power;
+      });
+      // Position sentinel nodes at bottom center
+      const sentinelNodes = NODES.filter(n => n.pillar === 'sentinel');
+      const sentCx = W() * 0.50, sentCy = H() * 0.78;
+      sentinelNodes.forEach((nd, idx) => {
+        const angle = (idx / 3) * Math.PI * 2 - Math.PI / 2;
+        const r = Math.min(W(), H()) * 0.10;
+        nd.cx = sentCx; nd.cy = sentCy; nd.orbitR = r;
+        nd.orbitAngle = angle;
+        nd.orbitSpeed = (0.0002 + Math.random() * 0.0002) * (Math.random() > .5 ? 1 : -1);
+        nd.x = sentCx + Math.cos(angle) * r;
+        nd.y = sentCy + Math.sin(angle) * r;
         nd.R = 28; nd.fireT = 0; nd.pulseT = 0; nd.dragging = false;
         nd.targetPower = nd.power;
       });
@@ -1057,6 +1102,12 @@
       document.getElementById('tb-priv').textContent = f(SIM.priv.score);
       document.getElementById('tb-runs').textContent = SIM.total;
       document.getElementById('tb-evs').textContent = SIM.events;
+      // Sentinel swarm score
+      const swn = NODES.filter(n => n.pillar === 'sentinel');
+      if (swn.length) {
+        const swarmScore = (swn[0].power * 0.4 + (1 - swn[1].power) * 0.3 + swn[2].power * 0.3) * 100;
+        document.getElementById('tb-swarm').textContent = swarmScore.toFixed(1) + '%';
+      }
     }
 
     function emitEvent(msg, pillar) {
@@ -1707,6 +1758,91 @@ Run an AI call or trigger a payment to watch nodes respond in real-time.`, 'syst
         edge_all_open_tabs: [{ url: window.location.href, title: document.title, active: true }]
       });
     });
+
+    // ═══════════════════════════════════════════════════════════════
+    //  SLIME FLOW SENTINEL — WebSocket Bridge
+    //  Connects GPU engine (ws://127.0.0.1:8080) to VeilPiercer
+    // ═══════════════════════════════════════════════════════════════
+    let sentinelWS = null;
+    let sentinelConnected = false;
+
+    function connectSentinel() {
+      try {
+        sentinelWS = new WebSocket('ws://127.0.0.1:8080');
+        sentinelWS.onopen = () => {
+          sentinelConnected = true;
+          document.getElementById('cb-sentinel').textContent = 'SENTINEL LIVE';
+          document.getElementById('cb-sentinel').style.color = '#00ff99';
+          document.getElementById('cb-sentinel-dot').style.background = '#00ff99';
+          addAI('SENTINEL', '🧫 <strong>Slime Flow Sentinel GPU Engine connected</strong><br>WebSocket bridge active at ws://127.0.0.1:8080<br>EchoFlux data now feeding VeilPiercer nodes in real-time.', 'system');
+        };
+        sentinelWS.onclose = () => {
+          sentinelConnected = false;
+          document.getElementById('cb-sentinel').textContent = 'SENTINEL OFFLINE';
+          document.getElementById('cb-sentinel').style.color = '#333';
+          document.getElementById('cb-sentinel-dot').style.background = '#333';
+          setTimeout(connectSentinel, 5000); // Auto-reconnect
+        };
+        sentinelWS.onmessage = (evt) => {
+          try {
+            const frame = JSON.parse(evt.data);
+            // Update Sentinel swarm nodes with live data
+            const sw1 = NODES.find(n => n.id === 'sw1'); // ECHO
+            const sw2 = NODES.find(n => n.id === 'sw2'); // FLUX
+            const sw3 = NODES.find(n => n.id === 'sw3'); // SWARM
+            if (sw1 && sw2 && sw3) {
+              // Calculate echo/flux from agent data
+              let totalEcho = 0, totalFlux = 0, count = 0;
+              if (frame.agents) {
+                for (const ag of frame.agents) {
+                  if (ag.q === 0) {
+                    totalFlux += ag.a;
+                    totalEcho += (1.0 - ag.a);
+                    count++;
+                  }
+                }
+              }
+              if (count > 0) {
+                const echo = totalEcho / count;
+                const flux = totalFlux / count;
+                const efs = (echo * 0.6 + (1.0 - flux) * 0.4) / 1.2;
+                sw1.targetPower = echo;
+                sw2.targetPower = flux;
+                sw3.targetPower = efs;
+              }
+              // Feed swarm harmony into Safety pillar
+              sw1.fireT = performance.now();
+              if (frame.rogue_count > 0) {
+                const safNode = NODES.find(n => n.id === 's3'); // ANOMALY node
+                if (safNode) safNode.targetPower = Math.max(0.3, safNode.power - 0.05);
+                if (frame.rogue_count > 5) {
+                  emitEvent('sentinel: ' + frame.rogue_count + ' rogues detected — quarantine engaged', 'saf');
+                }
+              }
+            }
+          } catch (e) { /* ignore parse errors */ }
+        };
+      } catch (e) {
+        setTimeout(connectSentinel, 5000);
+      }
+    }
+
+    function sentinelCmd(action) {
+      if (sentinelWS && sentinelWS.readyState === WebSocket.OPEN) {
+        const payload = { action };
+        if (action === 'inject_fault') {
+          payload.x = 0.3 + Math.random() * 0.4;
+          payload.y = 0.3 + Math.random() * 0.4;
+        }
+        sentinelWS.send(JSON.stringify(payload));
+        addAI('SENTINEL', '⚡ Command sent: <strong>' + action + '</strong>', 'system');
+      } else {
+        addAI('SENTINEL', '⚠ Sentinel engine offline — start with: <code>julia sentinel_engine.jl</code>', 'system');
+      }
+    }
+
+    // Connect to Sentinel on load
+    connectSentinel();
   </script>
 </body>
 

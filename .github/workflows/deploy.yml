@@ -1,0 +1,40 @@
+name: 🚀 Auto Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:  # allow manual trigger
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./
+          publish_branch: gh-pages
+          exclude_assets: |
+            .github
+            node_modules
+            *.log
+            .env
+            access-tokens.json
+            *.bak
+            server.cjs
+            server.cjs.*
+            package*.json
+            test-*.js
+            nexus_memory.json
+            nexus.log
+            startup.log
+          commit_message: "🤖 nexus-prime: auto-deploy ${{ github.sha }}"

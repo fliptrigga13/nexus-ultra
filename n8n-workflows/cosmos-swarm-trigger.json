@@ -1,0 +1,123 @@
+{
+    "name": "COSMOS — Swarm Task Trigger",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "cosmos-trigger",
+                "responseMode": "lastNode",
+                "options": {}
+            },
+            "id": "d4e5f6a7-0004-0004-0004-000000000001",
+            "name": "COSMOS Webhook",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                200,
+                300
+            ],
+            "webhookId": "cosmos-trigger"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "http://127.0.0.1:9100/task",
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={{ JSON.stringify({ task: $json.task || 'analyze system status', pipeline: $json.pipeline || 'research_synthesis', source: 'n8n', context: $json.context || '' }) }}",
+                "options": {
+                    "timeout": 10000
+                }
+            },
+            "id": "d4e5f6a7-0004-0004-0004-000000000002",
+            "name": "Dispatch to COSMOS Swarm",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4,
+            "position": [
+                440,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "method": "GET",
+                "url": "=http://127.0.0.1:9100/result/{{ $json.task_id }}",
+                "options": {
+                    "timeout": 120000,
+                    "retry": {
+                        "maxRetries": 30,
+                        "retryInterval": 4000,
+                        "retryOnStatus": "202"
+                    }
+                }
+            },
+            "id": "d4e5f6a7-0004-0004-0004-000000000003",
+            "name": "Poll Swarm Result",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4,
+            "position": [
+                680,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "const result = $input.first().json;\nreturn [{\n  json: {\n    status: result.status || 'unknown',\n    result: result.result || 'No output',\n    agents: result.agents || [],\n    reward: result.reward || 0,\n    source: 'n8n-cosmos-trigger',\n    timestamp: new Date().toISOString()\n  }\n}];"
+            },
+            "id": "d4e5f6a7-0004-0004-0004-000000000004",
+            "name": "Format Output",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                920,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "COSMOS Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "Dispatch to COSMOS Swarm",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Dispatch to COSMOS Swarm": {
+            "main": [
+                [
+                    {
+                        "node": "Poll Swarm Result",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Poll Swarm Result": {
+            "main": [
+                [
+                    {
+                        "node": "Format Output",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "tags": [
+        {
+            "name": "COSMOS"
+        },
+        {
+            "name": "Swarm"
+        }
+    ]
+}
