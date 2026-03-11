@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNIVERS ULTRA PONG — NEXUS Level ∞ | FlipTrigga13</title>
+<meta name="description" content="Play UNIVERS ULTRA PONG — an infinite-level cosmic Pong game powered by Phaser 3. Built with neon AI aesthetics, an evolving AI opponent, and particle effects. Free to play in your browser.">
+<meta name="keywords" content="nexus pong, infinite pong game, phaser game, browser game, cosmic pong, AI pong, fliptrigga13, nexus-ultra game">
+<meta name="author" content="FlipTrigga13">
+<meta property="og:title" content="UNIVERS ULTRA PONG — NEXUS Level ∞">
+<meta property="og:description" content="Infinite-level cosmic Pong. AI opponent gets smarter every level. Neon particle effects. FREE — play now in your browser.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://fliptrigga13.github.io/nexus-ultra/nexus-pong.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="UNIVERS ULTRA PONG — NEXUS Level ∞">
+<meta name="twitter:description" content="Infinite-level cosmic Pong. Play free in your browser.">
+<link rel="canonical" href="https://fliptrigga13.github.io/nexus-ultra/nexus-pong.html">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #000; display: flex; justify-content: center; align-items: center;
+         min-height: 100vh; font-family: 'Courier New', monospace; overflow: hidden; }
+  #game-container { position: relative; }
+  #ui-overlay { position: absolute; top: 0; left: 0; width: 100%; padding: 12px 20px;
+                 display: flex; justify-content: space-between; align-items: center;
+                 pointer-events: none; z-index: 10; }
+  .ui-block { text-align: center; }
+  .ui-label { font-size: 9px; letter-spacing: 3px; color: #333; text-transform: uppercase; }
+  .ui-value { font-size: 28px; font-weight: bold; letter-spacing: 2px; }
+  #score-player .ui-value { color: #00ff41; text-shadow: 0 0 20px #00ff41; }
+  #score-ai .ui-value    { color: #ff0080; text-shadow: 0 0 20px #ff0080; }
+  #level-display .ui-value { color: #00cfff; text-shadow: 0 0 20px #00cfff; font-size: 20px; }
+  #title-bar h1 { font-size: 11px; letter-spacing: 4px; color: #444;
+                  text-transform: uppercase; font-weight: normal; }
+  #msg { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+          text-align: center; pointer-events: none; z-index: 20; }
+  #msg h2 { font-size: 36px; letter-spacing: 6px; color: #fff;
+             text-shadow: 0 0 30px #00cfff, 0 0 60px #00cfff; animation: pulse 1s infinite; }
+  #msg p  { font-size: 12px; letter-spacing: 3px; color: #888; margin-top: 8px; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.6} }
+  #level-announce { position: absolute; left: 50%; top: 38%; transform: translate(-50%,-50%);
+                     text-align: center; pointer-events: none; z-index: 20; opacity: 0;
+                     transition: opacity .4s; }
+  #level-announce h3 { font-size: 48px; letter-spacing: 8px; color: #00cfff;
+                        text-shadow: 0 0 40px #00cfff; }
+  #level-announce.show { opacity: 1; }
+  #back-link { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
+                font-size: 10px; letter-spacing: 3px; color: #333; z-index: 30; pointer-events: all; }
+  #back-link a { color: #444; text-decoration: none; }
+  #back-link a:hover { color: #00cfff; }
+</style>
+</head>
+<body>
+<div id="game-container">
+  <div id="ui-overlay">
+    <div class="ui-block" id="score-player">
+      <div class="ui-label">YOU</div>
+      <div class="ui-value" id="p-score">0</div>
+    </div>
+    <div class="ui-block" id="level-display">
+      <div class="ui-label">◈ NEXUS</div>
+      <div class="ui-value" id="lv-display">LV 1</div>
+      <div id="title-bar"><h1>UNIVERS ULTRA PONG</h1></div>
+    </div>
+    <div class="ui-block" id="score-ai">
+      <div class="ui-label">AI NEXUS</div>
+      <div class="ui-value" id="ai-score">0</div>
+    </div>
+  </div>
+  <div id="level-announce"><h3 id="la-text">LEVEL 1</h3></div>
+  <div id="msg">
+    <h2>NEXUS PONG</h2>
+    <p>SPACE / CLICK TO BEGIN · ARROWS OR MOUSE TO MOVE</p>
+  </div>
+  <div id="back-link"><a href="index.html">← NEXUS ULTRA</a></div>
+  <canvas id="c"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.min.js"></script>
+<script>
+const W = 900, H = 600;
+const PAD_W = 14, PAD_H = 90, PAD_SPEED = 8;
+const BALL_R = 9;
+const COLORS = { player: 0x00ff41, ai: 0xff0080, ball: 0x00cfff };
+
+let gameStarted = false;
+let playerScore = 0, aiScore = 0, level = 1;
+let ballSpeedBase = 5;
+
+class NexusScene extends Phaser.Scene {
+  constructor() { super('NexusScene'); }
+  create() {
+    this.gfx = this.add.graphics();
+    this.particles = [];
+    this.stars = Array.from({length:200}, () => ({
+      x: Math.random()*W, y: Math.random()*H,
+      r: Math.random()*1.5, a: Math.random(), speed: Math.random()*0.3+0.1
+    }));
+    this.playerPad = { x: 30, y: H/2 };
+    this.aiPad     = { x: W-30, y: H/2 };
+    this.resetBall();
+    this.cursors = this.input.keyboard.createCursorKeys();
+    this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    this.input.on('pointerdown', () => { if(!gameStarted) this.startGame(); });
+    this.input.on('pointermove', (p) => {
+      if(gameStarted) this.playerPad.y = Phaser.Math.Clamp(p.y, PAD_H/2, H-PAD_H/2);
+    });
+    this.spaceKey.on('down', () => { if(!gameStarted) this.startGame(); });
+    this.trail = [];
+  }
+
+  resetBall(towardPlayer = Math.random()>.5) {
+    const spd = ballSpeedBase + (level-1)*0.4;
+    const angle = (Math.random()*40-20) * Math.PI/180;
+    this.ball = { x: W/2, y: H/2,
+      vx: (towardPlayer?-1:1)*spd*Math.cos(angle),
+      vy: spd*Math.sin(angle) };
+    this.trail = [];
+  }
+
+  startGame() {
+    gameStarted = true;
+    document.getElementById('msg').style.display = 'none';
+    this.showLevelAnnounce();
+  }
+
+  showLevelAnnounce() {
+    const el = document.getElementById('level-announce');
+    document.getElementById('la-text').textContent = `LEVEL  ${level}`;
+    el.classList.add('show');
+    setTimeout(()=>el.classList.remove('show'), 1500);
+    document.getElementById('lv-display').textContent = `LV ${level}`;
+  }
+
+  update() {
+    const g = this.gfx; g.clear();
+    this.stars.forEach(s => {
+      s.a += s.speed*0.02; if(s.a>1) s.a=0;
+      g.fillStyle(0xffffff, Math.sin(s.a*Math.PI)*0.6);
+      g.fillCircle(s.x, s.y, s.r);
+    });
+    for(let y=0;y<H;y+=24){ g.fillStyle(0x222222,1); g.fillRect(W/2-1,y,2,12); }
+    if(!gameStarted){ this.drawPad(g,this.playerPad,COLORS.player); this.drawPad(g,this.aiPad,COLORS.ai); return; }
+    if(this.cursors.up.isDown)   this.playerPad.y=Math.max(PAD_H/2,this.playerPad.y-PAD_SPEED);
+    if(this.cursors.down.isDown) this.playerPad.y=Math.min(H-PAD_H/2,this.playerPad.y+PAD_SPEED);
+    const aiSpd=Math.min(3+level*0.5,12);
+    if(this.aiPad.y<this.ball.y-8) this.aiPad.y=Math.min(H-PAD_H/2,this.aiPad.y+aiSpd);
+    if(this.aiPad.y>this.ball.y+8) this.aiPad.y=Math.max(PAD_H/2,this.aiPad.y-aiSpd);
+    this.ball.x+=this.ball.vx; this.ball.y+=this.ball.vy;
+    this.trail.push({x:this.ball.x,y:this.ball.y});
+    if(this.trail.length>18) this.trail.shift();
+    if(this.ball.y-BALL_R<0){this.ball.y=BALL_R;this.ball.vy*=-1;this.burst(this.ball.x,0,0x00cfff);}
+    if(this.ball.y+BALL_R>H){this.ball.y=H-BALL_R;this.ball.vy*=-1;this.burst(this.ball.x,H,0x00cfff);}
+    if(this.ball.vx<0&&this.ball.x-BALL_R<this.playerPad.x+PAD_W/2&&this.ball.x+BALL_R>this.playerPad.x-PAD_W/2&&Math.abs(this.ball.y-this.playerPad.y)<PAD_H/2){
+      this.ball.vx=Math.abs(this.ball.vx)*1.04;
+      this.ball.vy=((this.ball.y-this.playerPad.y)/(PAD_H/2))*(ballSpeedBase+level*0.5)*1.2;
+      this.ball.x=this.playerPad.x+PAD_W/2+BALL_R;
+      this.burst(this.ball.x,this.ball.y,COLORS.player); this.cameras.main.shake(80,.003);
+    }
+    if(this.ball.vx>0&&this.ball.x+BALL_R>this.aiPad.x-PAD_W/2&&this.ball.x-BALL_R<this.aiPad.x+PAD_W/2&&Math.abs(this.ball.y-this.aiPad.y)<PAD_H/2){
+      this.ball.vx=-Math.abs(this.ball.vx)*1.04;
+      this.ball.vy=((this.ball.y-this.aiPad.y)/(PAD_H/2))*(ballSpeedBase+level*0.5)*1.2;
+      this.ball.x=this.aiPad.x-PAD_W/2-BALL_R;
+      this.burst(this.ball.x,this.ball.y,COLORS.ai); this.cameras.main.shake(80,.003);
+    }
+    if(this.ball.x>W+20){
+      playerScore++; document.getElementById('p-score').textContent=playerScore;
+      this.burst(W,H/2,COLORS.player,30);
+      if(playerScore%3===0){level++;this.showLevelAnnounce();this.cameras.main.flash(300,0,100,80);}
+      this.resetBall(false);
+    }
+    if(this.ball.x<-20){
+      aiScore++; document.getElementById('ai-score').textContent=aiScore;
+      this.burst(0,H/2,COLORS.ai,30); this.resetBall(true);
+    }
+    this.trail.forEach((p,i)=>{
+      g.fillStyle(COLORS.ball,(i/this.trail.length)*0.5);
+      g.fillCircle(p.x,p.y,BALL_R*(i/this.trail.length));
+    });
+    g.fillStyle(COLORS.ball,1); g.fillCircle(this.ball.x,this.ball.y,BALL_R);
+    g.fillStyle(0xffffff,.8); g.fillCircle(this.ball.x-3,this.ball.y-3,3);
+    this.drawPad(g,this.playerPad,COLORS.player); this.drawPad(g,this.aiPad,COLORS.ai);
+    this.particles=this.particles.filter(p=>p.life>0);
+    this.particles.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;p.life-=2;
+      g.fillStyle(p.color,p.life/100);g.fillCircle(p.x,p.y,p.r*(p.life/100)+1);
+    });
+  }
+
+  drawPad(g,pad,color){
+    g.fillStyle(color,.15);g.fillRoundedRect(pad.x-PAD_W/2-4,pad.y-PAD_H/2-4,PAD_W+8,PAD_H+8,8);
+    g.fillStyle(color,1);g.fillRoundedRect(pad.x-PAD_W/2,pad.y-PAD_H/2,PAD_W,PAD_H,5);
+    g.fillStyle(0xffffff,.3);g.fillRoundedRect(pad.x-PAD_W/2+2,pad.y-PAD_H/2+4,3,PAD_H-8,3);
+  }
+
+  burst(x,y,color,n=12){
+    for(let i=0;i<n;i++){
+      const a=Math.random()*Math.PI*2,s=Math.random()*5+2;
+      this.particles.push({x,y,color,vx:Math.cos(a)*s,vy:Math.sin(a)*s,r:Math.random()*4+2,life:80+Math.random()*40});
+    }
+  }
+}
+
+new Phaser.Game({ type:Phaser.AUTO, width:W, height:H,
+  canvas:document.getElementById('c'), backgroundColor:'#000005', scene:NexusScene });
+</script>
+</body>
+</html>
