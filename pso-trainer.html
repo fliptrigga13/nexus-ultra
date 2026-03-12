@@ -391,6 +391,13 @@ header {
   <p class="ctrl-hint" id="ctrlHint">Connecting to Julia server on port 7700…</p>
 </div>
 
+<!-- ── PARTICLE VIEW ──────────────────────────────────────── -->
+<div class="spark-card" style="padding:18px 20px">
+  <h3>⚡ PARTICLE SWARM — Live View (dim x₁ vs x₂)</h3>
+  <canvas id="particleCanvas" style="width:100%;height:260px;border-radius:6px;background:#020810;display:block"></canvas>
+  <p style="font-size:.65rem;color:var(--text-lo);letter-spacing:1px;margin-top:6px">🟢 low fitness &nbsp;|&nbsp; 🔴 high fitness &nbsp;|&nbsp; ★ global best &nbsp;|&nbsp; bounds [−5, 5]</p>
+</div>
+
 <!-- ── METRICS ────────────────────────────────────────────── -->
 <div class="metrics">
   <div class="metric-card">
@@ -493,8 +500,8 @@ function setUIState(state) {
       break;
 
     case 'idle':
-      trainBtn.disabled = false;   // ← only Train active
-      stopBtn.disabled  = true;
+      trainBtn.disabled = false;
+      stopBtn.disabled  = !connected;  // STOP stays on if server reachable
       connBadge.className = 'badge badge-online';
       connBadge.textContent = '🟢 ONLINE';
       modeBadge.className = 'badge badge-online';
@@ -547,9 +554,13 @@ function connectWS() {
 
   ws.onclose = () => {
     connected = false;
-    training  = false;
     log('Connection lost — retrying in 4s…', 'warn');
     setUIState('offline');
+    // Keep STOP enabled if we know training was running
+    if (training) {
+      stopBtn.disabled = false;
+      ctrlHint.textContent = 'WS dropped but engine may be running — STOP to halt.';
+    }
     setTimeout(connectWS, 4000);
   };
 
@@ -603,12 +614,75 @@ function handleFrame(d) {
   if (d.g_best && Array.isArray(d.g_best)) {
     renderGBest(d.g_best);
   }
+
+  // Particle canvas
+  if (d.px && d.py && d.pfit) {
+    drawParticles(d.px, d.py, d.pfit, d.g_best);
+  }
 }
 
 function fmtFit(v) {
   if (v === undefined || v === null) return '—';
   if (v < 0.001) return v.toExponential(3);
   return v.toFixed(4);
+}
+
+// ── PARTICLE CANVAS ──────────────────────────────────────
+const pCanvas = document.getElementById('particleCanvas');
+const pCtx    = pCanvas.getContext('2d');
+
+function drawParticles(px, py, pfit, gbest) {
+  const W = pCanvas.offsetWidth;
+  const H = pCanvas.offsetHeight;
+  pCanvas.width  = W;
+  pCanvas.height = H;
+  pCtx.clearRect(0, 0, W, H);
+
+  // Draw grid
+  pCtx.strokeStyle = '#0d1a28';
+  pCtx.lineWidth = 1;
+  for (let i = 0; i <= 10; i++) {
+    const x = (i / 10) * W;
+    const y = (i / 10) * H;
+    pCtx.beginPath(); pCtx.moveTo(x, 0); pCtx.lineTo(x, H); pCtx.stroke();
+    pCtx.beginPath(); pCtx.moveTo(0, y); pCtx.lineTo(W, y); pCtx.stroke();
+  }
+
+  // Draw axis labels
+  pCtx.fillStyle = '#3a4563';
+  pCtx.font = '9px Share Tech Mono, monospace';
+  pCtx.fillText('-5', 2, H - 2);
+  pCtx.fillText('+5', W - 16, H - 2);
+  pCtx.fillText('+5', 2, 10);
+  pCtx.fillText('-5', 2, H / 2 + 4);
+
+  const fitArr = Array.from(pfit);
+  const minFit = Math.min(...fitArr);
+  const maxFit = Math.max(...fitArr) || 1;
+
+  // Map [-5,5] → canvas coords
+  const toX = v => ((v + 5) / 10) * W;
+  const toY = v => H - ((v + 5) / 10) * H;
+
+  // Draw particles
+  for (let i = 0; i < px.length; i++) {
+    const t   = Math.min((fitArr[i] - minFit) / (maxFit - minFit), 1);
+    const r   = Math.round(t * 255);
+    const g   = Math.round((1 - t) * 200);
+    pCtx.beginPath();
+    pCtx.arc(toX(px[i]), toY(py[i]), 3.5, 0, Math.PI * 2);
+    pCtx.fillStyle = `rgba(${r},${g},60,0.85)`;
+    pCtx.fill();
+  }
+
+  // Draw global best star
+  if (gbest && gbest.length >= 2) {
+    const gx = toX(gbest[0]);
+    const gy = toY(gbest[1]);
+    pCtx.font = '16px serif';
+    pCtx.fillStyle = '#00f5e4';
+    pCtx.fillText('★', gx - 8, gy + 6);
+  }
 }
 
 // ── SPARKLINE ────────────────────────────────────────────

@@ -15,10 +15,15 @@ import requests
 from pathlib import Path
 from datetime import datetime
 
+# Force UTF-8 output on Windows to avoid cp1252 crashes
+if sys.stdout.encoding != 'utf-8':
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+
 # ── Config ────────────────────────────────────────────────────────────────────
 REPO_ROOT   = Path(__file__).parent
 OLLAMA_URL  = "http://127.0.0.1:11434/api/chat"
-MODEL       = "nexus-prime:latest"          # local, free, always on
+MODEL       = "llama3.2:1b"                  # fast, free, always on — swap to nexus-prime for deeper analysis
+# MODEL     = "nexus-prime:latest"           # deeper but slower (5.4GB)
 # MODEL     = "claude-opus-4-5"             # upgrade: set ANTHROPIC_API_KEY env var
 ANTHROPIC_KEY = os.environ.get("ANTHROPIC_API_KEY")
 
@@ -58,7 +63,7 @@ def ask_nexus(prompt: str) -> str:
         "model": MODEL,
         "stream": False,
         "messages": [{"role": "user", "content": prompt}]
-    }, timeout=120)
+    }, timeout=300)
     return r.json()["message"]["content"]
 
 def ask_claude(prompt: str) -> str:
@@ -164,7 +169,7 @@ def analyze_file(html_path: Path, auto_fix: bool = False) -> dict:
 
     if auto_fix:
         changed = patch_html(html_path, analysis)
-        print(f"  Patched:     {'✓ changes applied' if changed else 'no changes needed'}")
+        print(f"  Patched:     {'[OK] changes applied' if changed else 'no changes needed'}")
 
     return analysis
 
@@ -185,7 +190,7 @@ def main():
 
     target_files = args if args else HTML_FILES
 
-    print("🔍 NEXUS SEO AGENT")
+    print("[SEO] NEXUS SEO AGENT")
     print(f"   Model: {'Claude API' if ANTHROPIC_KEY else 'nexus-prime (local, free)'}")
     print(f"   Mode:  {'AUTO-FIX' if auto_fix else 'ANALYZE ONLY'}")
     print(f"   Files: {len(target_files)}")
@@ -201,12 +206,12 @@ def main():
     if auto_fix:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
         git_commit_push(f"🤖 nexus-prime SEO auto-fix — {timestamp}")
-        print(f"\n✅ Live at: https://fliptrigga13.github.io/nexus-ultra/")
+        print(f"\n[DONE] Live at: https://fliptrigga13.github.io/nexus-ultra/")
 
     # Save report
     report_path = REPO_ROOT / "seo_report.json"
     report_path.write_text(json.dumps(results, indent=2), encoding="utf-8")
-    print(f"\n📄 Full report saved: seo_report.json")
+    print(f"\n[REPORT] Full report saved: seo_report.json")
 
 if __name__ == "__main__":
     main()

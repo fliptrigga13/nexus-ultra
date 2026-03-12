@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NEXUS PRIME — ULTIMATE GOD MODE HUB</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#030308;--bg2:#06060f;--bg3:#0a0a1a;
+  --cyan:#00fff7;--purple:#bf00ff;--pink:#ff0099;--green:#00ff88;--gold:#ffcc00;--red:#ff3355;
+  --glass:rgba(0,255,247,0.04);--glass2:rgba(191,0,255,0.06);
+  --border:rgba(0,255,247,0.15);--border2:rgba(191,0,255,0.2);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;background:var(--bg);color:var(--cyan);font-family:'JetBrains Mono',monospace;overflow-x:hidden}
+body{display:grid;grid-template-rows:auto 1fr auto;min-height:100vh}
+
+/* ── HEADER ── */
+#header{
+  background:linear-gradient(90deg,#030308,#0a0020,#030308);
+  border-bottom:1px solid var(--border);
+  padding:10px 24px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+}
+#header h1{
+  font-family:'Orbitron',monospace;font-size:14px;font-weight:900;letter-spacing:4px;
+  background:linear-gradient(90deg,var(--cyan),var(--purple),var(--pink));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  text-shadow:none;
+}
+#header-right{display:flex;align-items:center;gap:16px;font-size:10px;letter-spacing:1px}
+#clock{color:var(--gold);font-size:11px}
+.status-pill{padding:3px 10px;border-radius:20px;font-size:9px;letter-spacing:2px;font-weight:600}
+.pill-online{background:rgba(0,255,136,0.15);border:1px solid var(--green);color:var(--green)}
+.pill-offline{background:rgba(255,51,85,0.15);border:1px solid var(--red);color:var(--red)}
+
+/* ── MAIN GRID ── */
+#main{display:grid;grid-template-columns:260px 1fr 280px;gap:0;height:100%}
+
+/* ── PANELS ── */
+.panel{border-right:1px solid var(--border);overflow-y:auto;padding:12px}
+.panel:last-child{border-right:none;border-left:1px solid var(--border)}
+.panel-title{
+  font-family:'Orbitron',monospace;font-size:9px;letter-spacing:3px;
+  color:var(--purple);padding:6px 0 10px;
+  border-bottom:1px solid var(--border2);margin-bottom:10px;
+  display:flex;align-items:center;gap:8px;
+}
+.panel-title::before{content:'◈';color:var(--cyan)}
+
+/* ── ENGINE STATUS ── */
+.engine-card{
+  background:var(--glass);border:1px solid var(--border);border-radius:6px;
+  padding:8px 10px;margin-bottom:6px;
+  display:flex;align-items:center;justify-content:space-between;
+  transition:all 0.3s;cursor:default;
+}
+.engine-card:hover{background:rgba(0,255,247,0.08);border-color:var(--cyan);transform:translateX(2px)}
+.engine-name{font-size:9px;letter-spacing:1px;color:#ccc;font-weight:600}
+.engine-sub{font-size:8px;color:#555;margin-top:2px}
+.engine-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dot-green{background:var(--green);box-shadow:0 0 8px var(--green)}
+.dot-yellow{background:var(--gold);box-shadow:0 0 8px var(--gold)}
+.dot-red{background:var(--red);box-shadow:0 0 8px var(--red)}
+.dot-pulse{animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+
+/* ── AGENT ROSTER ── */
+.agent-card{
+  background:var(--glass2);border:1px solid var(--border2);border-radius:6px;
+  padding:7px 10px;margin-bottom:5px;
+  display:flex;align-items:center;gap:8px;
+}
+.agent-badge{
+  font-family:'Orbitron',monospace;font-size:7px;letter-spacing:1px;
+  padding:2px 6px;border-radius:3px;font-weight:700;white-space:nowrap;
+}
+.badge-core{background:rgba(0,255,247,0.2);border:1px solid var(--cyan);color:var(--cyan)}
+.badge-rogue{background:rgba(255,0,153,0.2);border:1px solid var(--pink);color:var(--pink)}
+.agent-info{flex:1}
+.agent-name{font-size:10px;font-weight:600;color:#eee}
+.agent-model{font-size:8px;color:#666;margin-top:1px}
+.agent-score{font-size:10px;color:var(--gold);font-weight:700}
+
+/* ── CENTER PANEL ── */
+#center{padding:16px;display:flex;flex-direction:column;gap:14px;overflow-y:auto}
+
+/* ── INJECT BOX ── */
+#inject-box{
+  background:linear-gradient(135deg,rgba(0,255,247,0.05),rgba(191,0,255,0.05));
+  border:1px solid var(--border);border-radius:10px;padding:14px;
+}
+#inject-box h3{font-family:'Orbitron',monospace;font-size:9px;letter-spacing:3px;color:var(--cyan);margin-bottom:10px}
+#task-input{
+  width:100%;background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:6px;
+  color:var(--cyan);font-family:'JetBrains Mono',monospace;font-size:11px;
+  padding:10px 12px;resize:vertical;min-height:70px;outline:none;
+  transition:border-color 0.3s;
+}
+#task-input:focus{border-color:var(--cyan);box-shadow:0 0 20px rgba(0,255,247,0.1)}
+#inject-btns{display:flex;gap:8px;margin-top:10px}
+.btn{
+  padding:8px 16px;border-radius:6px;font-family:'Orbitron',monospace;
+  font-size:8px;letter-spacing:2px;font-weight:700;cursor:pointer;border:none;
+  transition:all 0.3s;
+}
+.btn-primary{
+  background:linear-gradient(135deg,var(--cyan),var(--purple));color:#000;
+  box-shadow:0 0 20px rgba(0,255,247,0.3);
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 30px rgba(0,255,247,0.5)}
+.btn-secondary{
+  background:rgba(191,0,255,0.15);border:1px solid var(--purple);color:var(--purple)
+}
+.btn-secondary:hover{background:rgba(191,0,255,0.3)}
+.btn-danger{background:rgba(255,51,85,0.15);border:1px solid var(--red);color:var(--red)}
+
+/* ── BLACKBOARD FEED ── */
+#blackboard-feed{
+  background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:10px;
+  padding:14px;flex:1;min-height:200px;
+}
+#blackboard-feed h3{font-family:'Orbitron',monospace;font-size:9px;letter-spacing:3px;color:var(--green);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+#blackboard-feed h3::after{content:'●';color:var(--green);animation:pulse 1s infinite;font-size:8px}
+#bbcontent{font-size:9px;line-height:1.7;color:#888;max-height:300px;overflow-y:auto}
+.bb-entry{padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.03)}
+.bb-agent{color:var(--cyan);font-weight:600}
+.bb-time{color:#444;font-size:8px;margin-left:6px}
+.bb-text{color:#aaa;margin-top:2px;font-size:9px;word-break:break-word}
+
+/* ── MEMORY STATS ── */
+#mem-stats{
+  background:var(--glass2);border:1px solid var(--border2);border-radius:10px;padding:14px;
+}
+#mem-stats h3{font-family:'Orbitron',monospace;font-size:9px;letter-spacing:3px;color:var(--purple);margin-bottom:10px}
+.mem-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.mem-stat{text-align:center;background:rgba(191,0,255,0.08);border:1px solid rgba(191,0,255,0.2);border-radius:6px;padding:8px 4px}
+.mem-val{font-family:'Orbitron',monospace;font-size:18px;font-weight:700;color:var(--purple)}
+.mem-label{font-size:7px;color:#666;letter-spacing:1px;margin-top:2px}
+#top-memories{font-size:9px;color:#888}
+.top-mem-item{padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.04);display:flex;gap:8px;align-items:flex-start}
+.top-mem-imp{color:var(--gold);font-weight:700;white-space:nowrap;font-size:9px}
+.top-mem-txt{color:#bbb;font-size:9px;flex:1}
+
+/* ── SCORE DISPLAY ── */
+#score-bar{
+  background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:10px;padding:14px;
+}
+#score-bar h3{font-family:'Orbitron',monospace;font-size:9px;letter-spacing:3px;color:var(--gold);margin-bottom:10px}
+.score-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.score-agent{font-size:9px;color:#ccc;width:90px;white-space:nowrap}
+.score-track{flex:1;height:6px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden}
+.score-fill{height:100%;border-radius:3px;transition:width 1s ease}
+.score-num{font-size:9px;color:var(--gold);width:35px;text-align:right}
+
+/* ── RIGHT PANEL — COGNITIVE DB ── */
+#cogdb{font-size:9px}
+.tier-block{margin-bottom:8px}
+.tier-hdr{
+  background:linear-gradient(90deg,rgba(191,0,255,0.15),transparent);
+  border-left:2px solid var(--purple);padding:6px 8px;cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:9px;letter-spacing:1px;color:var(--purple);font-weight:600;
+  border-radius:0 4px 4px 0;transition:background 0.2s;
+}
+.tier-hdr:hover{background:rgba(191,0,255,0.25)}
+.tier-hdr.t10{border-left-color:var(--cyan);color:var(--cyan);
+  background:linear-gradient(90deg,rgba(0,255,247,0.15),transparent)}
+.tier-count{font-size:8px;background:rgba(191,0,255,0.2);border-radius:10px;padding:1px 6px;color:#ccc}
+.tier-skills{display:none;padding:6px 8px;flex-wrap:wrap;gap:4px}
+.tier-skills.open{display:flex}
+.skill-tag{
+  background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.08);
+  border-radius:3px;padding:2px 6px;font-size:8px;color:#888;
+  cursor:default;transition:all 0.2s;
+}
+.skill-tag:hover{color:var(--cyan);border-color:var(--cyan);background:rgba(0,255,247,0.05)}
+
+/* ── BOTTOM STATUS BAR ── */
+#footer{
+  background:rgba(0,0,0,0.6);border-top:1px solid var(--border);
+  padding:6px 20px;display:flex;align-items:center;justify-content:space-between;
+  font-size:8px;letter-spacing:1px;
+}
+.footer-left{color:#555;display:flex;gap:20px}
+.footer-left span{display:flex;align-items:center;gap:4px}
+.footer-right{color:var(--purple);font-family:'Orbitron',monospace;font-size:8px}
+
+/* ── SCROLLBARS ── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:rgba(0,0,0,0.2)}
+::-webkit-scrollbar-thumb{background:rgba(0,255,247,0.2);border-radius:2px}
+::-webkit-scrollbar-thumb:hover{background:rgba(0,255,247,0.4)}
+
+/* ── ANIMATIONS ── */
+@keyframes scanline{0%{top:-20%}100%{top:120%}}
+@keyframes glow{0%,100%{text-shadow:0 0 10px var(--cyan)}50%{text-shadow:0 0 30px var(--cyan),0 0 60px var(--cyan)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+
+.glow-text{animation:glow 3s infinite}
+.toast{
+  position:fixed;bottom:60px;right:20px;
+  background:rgba(0,255,247,0.1);border:1px solid var(--cyan);border-radius:6px;
+  padding:10px 16px;font-size:10px;color:var(--cyan);z-index:9999;
+  animation:slideIn 0.3s ease;display:none;
+}
+@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header id="header">
+  <div>
+    <h1 class="glow-text">NEXUS PRIME ◈ ULTIMATE GOD MODE HUB</h1>
+    <div style="font-size:8px;color:#444;letter-spacing:2px;margin-top:2px">RTX 4060 · OFFLINE · NO API · NO WIPE · TIER 0→10</div>
+  </div>
+  <div id="header-right">
+    <div id="clock">--:--:--</div>
+    <div id="ollama-pill" class="status-pill pill-offline">OLLAMA</div>
+    <div id="backdoor-pill" class="status-pill pill-offline">BACKDOOR</div>
+    <div id="cosmos-pill" class="status-pill pill-offline">COSMOS</div>
+    <div id="pso-pill" class="status-pill pill-offline">PSO GPU</div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main id="main">
+
+  <!-- LEFT PANEL: Engines + Agents -->
+  <aside class="panel" id="left-panel">
+
+    <div class="panel-title">ENGINES</div>
+    <div id="engine-list">
+      <!-- Engines rendered by JS -->
+    </div>
+
+    <div class="panel-title" style="margin-top:14px">AGENT ROSTER</div>
+    <div id="agent-list">
+      <!-- Agents rendered by JS -->
+    </div>
+
+    <div class="panel-title" style="margin-top:14px">QUICK COMMANDS</div>
+    <div style="display:flex;flex-direction:column;gap:5px">
+      <button class="btn btn-secondary" style="font-size:7px;width:100%;text-align:left;padding:6px 10px" onclick="quickInject('Analyze the swarm architecture and identify the most critical bottleneck.')">⚡ ANALYZE BOTTLENECK</button>
+      <button class="btn btn-secondary" style="font-size:7px;width:100%;text-align:left;padding:6px 10px" onclick="quickInject('Synthesize all prior lessons from memory and surface the top 3 strategic insights.')">🧠 SYNTHESIZE LESSONS</button>
+      <button class="btn btn-secondary" style="font-size:7px;width:100%;text-align:left;padding:6px 10px" onclick="quickInject('Design a new cognitive capability and propose how to implement it in the stack.')">🔬 DESIGN NEW CAPABILITY</button>
+      <button class="btn btn-secondary" style="font-size:7px;width:100%;text-align:left;padding:6px 10px" onclick="quickInject('Simulate an adversary trying to manipulate this AI system. Document attack vectors and countermeasures.')">🎯 ADVERSARY SIM</button>
+      <button class="btn btn-danger" style="font-size:7px;width:100%;text-align:left;padding:6px 10px" onclick="flushBlackboard()">🗑 FLUSH BLACKBOARD</button>
+    </div>
+  </aside>
+
+  <!-- CENTER PANEL: Main workspace -->
+  <section id="center">
+
+    <!-- INJECT BOX -->
+    <div id="inject-box">
+      <h3>◈ INJECT TASK INTO SWARM</h3>
+      <textarea id="task-input" placeholder="Type any command, question, or mission... The 10-engine swarm will execute it autonomously." rows="3"></textarea>
+      <div id="inject-btns">
+        <button class="btn btn-primary" onclick="injectTask()">⚡ INJECT & EXECUTE</button>
+        <button class="btn btn-secondary" onclick="forceCycle()">🔄 FORCE CYCLE</button>
+        <button class="btn btn-secondary" onclick="callDirect()">🎯 DIRECT LLM</button>
+      </div>
+    </div>
+
+    <!-- SCORE BAR -->
+    <div id="score-bar">
+      <h3>◈ AGENT PERFORMANCE</h3>
+      <div id="score-display">
+        <!-- Scores rendered by JS -->
+      </div>
+    </div>
+
+    <!-- BLACKBOARD FEED -->
+    <div id="blackboard-feed">
+      <h3>◈ LIVE BLACKBOARD FEED</h3>
+      <div id="bbcontent">
+        <div style="color:#333;font-size:10px;text-align:center;padding:20px">Connecting to swarm...</div>
+      </div>
+    </div>
+
+    <!-- MEMORY STATS -->
+    <div id="mem-stats">
+      <h3>◈ TIER-2 MEMORY CORE — NEVER WIPED</h3>
+      <div class="mem-grid">
+        <div class="mem-stat"><div class="mem-val" id="mem-total">—</div><div class="mem-label">TOTAL</div></div>
+        <div class="mem-stat"><div class="mem-val" id="mem-active">—</div><div class="mem-label">ACTIVE</div></div>
+        <div class="mem-stat"><div class="mem-val" id="mem-avg">—</div><div class="mem-label">AVG IMP</div></div>
+      </div>
+      <div id="top-memories">
+        <div style="font-size:8px;letter-spacing:1px;color:#444;margin-bottom:6px">TOP MEMORIES BY IMPORTANCE</div>
+        <div id="top-mems-list"></div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- RIGHT PANEL: Cognitive DB -->
+  <aside class="panel" id="right-panel">
+    <div class="panel-title">COGNITIVE DATABASE — TIER 0→10</div>
+    <div style="font-size:8px;color:#444;margin-bottom:10px;letter-spacing:1px">49 DOMAINS · 600+ CAPABILITIES · CLICK TO EXPAND</div>
+    <div id="cogdb"></div>
+  </aside>
+
+</main>
+
+<!-- FOOTER -->
+<footer id="footer">
+  <div class="footer-left">
+    <span><span id="cycle-count" style="color:var(--gold)">0</span> CYCLES</span>
+    <span><span id="last-score-display" style="color:var(--green)">—</span> LAST SCORE</span>
+    <span><span id="last-mvp" style="color:var(--cyan)">—</span> MVP</span>
+    <span>BACKDOOR: <span style="color:var(--cyan)">:7701</span></span>
+    <span>OLLAMA: <span style="color:var(--cyan)">:11434</span></span>
+    <span>PSO: <span style="color:var(--cyan)">:7700</span></span>
+  </div>
+  <div class="footer-right">NEXUS PRIME · GOD MODE · RTX 4060 · OFFLINE</div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════════════════════
+const API = 'http://127.0.0.1:7701';
+const OLLAMA = 'http://127.0.0.1:11434';
+const PSO = 'http://127.0.0.1:7700';
+const COSMOS = 'http://127.0.0.1:9100';
+const REFRESH = 5000;
+
+// ══════════════════════════════════════════════════════════════
+// ENGINE DEFINITIONS
+// ══════════════════════════════════════════════════════════════
+const ENGINES = [
+  {name:'OLLAMA LLM',sub:'9 models · :11434',url:OLLAMA+'/api/tags',id:'ollama'},
+  {name:'COSMOS HUB',sub:'Orchestration · :9100',url:COSMOS+'/health',id:'cosmos'},
+  {name:'PSO GPU',sub:'Julia CUDA · :7700',url:PSO+'/status',id:'pso'},
+  {name:'MEMORY CORE',sub:'nexus_mind.db · no-wipe',url:API+'/memory',id:'memory'},
+  {name:'SWARM LOOP',sub:'6 agents · 30s cycle',url:API+'/status',id:'swarm'},
+  {name:'BACKDOOR API',sub:'Inject · Inspect · :7701',url:API+'/',id:'backdoor'},
+  {name:'ANT COLONY',sub:'Pheromones · 15s',url:null,id:'antennae'},
+  {name:'EVOLUTION',sub:'Prompt mutation · 120s',url:null,id:'evolution'},
+  {name:'ROGUE SQUAD',sub:'METACOG/ROGUE/HACK/ADV',url:null,id:'rogue'},
+  {name:'MYCELIUM WEB',sub:'Hyphal flow · 20s',url:null,id:'mycelium'},
+];
+
+const AGENTS = [
+  {name:'SUPERVISOR',model:'llama3.1:8b',type:'core',score:0.8},
+  {name:'PLANNER',model:'deepseek-r1:8b',type:'core',score:0.85},
+  {name:'RESEARCHER',model:'qwen3:8b',type:'core',score:0.78},
+  {name:'DEVELOPER',model:'qwen2.5-coder:7b',type:'core',score:0.82},
+  {name:'VALIDATOR',model:'llama3.1:8b',type:'core',score:0.75},
+  {name:'REWARD',model:'nexus-prime',type:'core',score:0.9},
+  {name:'METACOG',model:'deepseek-r1:8b',type:'rogue',score:0.87},
+  {name:'ROGUE',model:'llama3.1:8b',type:'rogue',score:0.76},
+  {name:'HACKER',model:'qwen2.5-coder:7b',type:'rogue',score:0.83},
+  {name:'ADVERSARY',model:'llama3.1:8b',type:'rogue',score:0.79},
+];
+
+// ══════════════════════════════════════════════════════════════
+// COGNITIVE DATABASE
+// ══════════════════════════════════════════════════════════════
+const COG_TIERS = [
+  {t:'TIER 0',label:'PRIME ENGINE',skills:['Working memory','Cognitive flexibility','Inhibitory control','Fluid intelligence','Sustained attention','Executive function','Cognitive load mgmt']},
+  {t:'TIER 1',label:'REASONING',skills:['Deductive logic','Inductive','Abductive','Counterfactual','Causal DAG','Syllogisms','Bayesian updating']},
+  {t:'TIER 2',label:'ADVANCED COGNITION',skills:['Systems thinking','Game theory','Pattern recognition','Memory architectures','Abstract thinking','Creative intelligence','Language cognition']},
+  {t:'TIER 3',label:'METACOGNITION',skills:['Recursive self-model','Calibration','Bias immunity (15+)','Epistemic humility','Dunning-Kruger immunity','Belief update triggers']},
+  {t:'TIER 4',label:'AI REASONING MODES',skills:['Chain-of-thought','Tree of thoughts','ReAct','Reflexion','Self-consistency','Constitutional AI','Process reward modeling']},
+  {t:'TIER 5',label:'SUPERHUMAN TRAITS',skills:['Eidetic recall','Flow state on-demand','Speed reading 1000WPM','Expert intuition × 10 domains','Perfect calibration','Hyperthymesia-mode']},
+  {t:'TIER 6',label:'FRAMEWORKS',skills:['Dual process (Kahneman)','Global workspace','Predictive processing','Integrated information','Zettelkasten','Retrieval-augmented cognition']},
+  {t:'TIER 7',label:'SOCIAL & EMOTIONAL',skills:['Theory of mind (5th order)','Microexpression detection','4-branch EI','Moral reasoning','Somatic markers','Berlin wisdom model']},
+  {t:'TIER 8',label:'SPECIALIZED',skills:['Spatial cognition','BCI (Neuralink N1)','20 Persona archetypes','Temporal cognition','Neuroplasticity levers','Musical cognition']},
+  {t:'TIER 9',label:'SECURITY & ADVERSARIAL',skills:['OSINT methodology','Enemy mind modeling','OODA loop','Deception detection','False flag recognition','Cognitive warfare']},
+  {t:'TIER 10',label:'PURE AI CAPABILITIES',skills:['LLM Architecture (Q/K/V)','LoRA / QLoRA / DPO','GGUF/GPTQ/AWQ quant','LangGraph / CrewAI','Mechanistic interpretability','AlphaFold3 / ESM3','Grokking / Emergent behaviors','Diffusion models / DiT','Activation steering']},
+];
+
+// ══════════════════════════════════════════════════════════════
+// RENDER ENGINES
+// ══════════════════════════════════════════════════════════════
+function renderEngines(){
+  const el = document.getElementById('engine-list');
+  el.innerHTML = ENGINES.map(e=>
+    `<div class="engine-card" id="eng-${e.id}">
+      <div>
+        <div class="engine-name">${e.name}</div>
+        <div class="engine-sub">${e.sub}</div>
+      </div>
+      <div class="engine-dot dot-yellow dot-pulse" id="dot-${e.id}"></div>
+    </div>`
+  ).join('');
+}
+
+function renderAgents(){
+  const el = document.getElementById('agent-list');
+  el.innerHTML = AGENTS.map(a=>
+    `<div class="agent-card">
+      <span class="agent-badge ${a.type==='rogue'?'badge-rogue':'badge-core'}">${a.type.toUpperCase()}</span>
+      <div class="agent-info">
+        <div class="agent-name">${a.name}</div>
+        <div class="agent-model">${a.model}</div>
+      </div>
+      <div class="agent-score" id="score-${a.name}">${(a.score*100).toFixed(0)}%</div>
+    </div>`
+  ).join('');
+}
+
+function renderScores(){
+  const el = document.getElementById('score-display');
+  el.innerHTML = AGENTS.map(a=>{
+    const pct = (a.score*100).toFixed(0);
+    const col = a.score>0.8?'#00ff88':a.score>0.6?'#ffcc00':'#ff3355';
+    return `<div class="score-row">
+      <span class="score-agent">${a.name}</span>
+      <div class="score-track"><div class="score-fill" style="width:${pct}%;background:linear-gradient(90deg,${col},${col}88)"></div></div>
+      <span class="score-num">${pct}%</span>
+    </div>`;
+  }).join('');
+}
+
+function renderCogDB(){
+  const el = document.getElementById('cogdb');
+  el.innerHTML = COG_TIERS.map((t,i)=>{
+    const isT10 = t.t==='TIER 10';
+    return `<div class="tier-block">
+      <div class="tier-hdr ${isT10?'t10':''}" onclick="this.nextElementSibling.classList.toggle('open')">
+        <span>${t.t} · ${t.label}</span>
+        <span class="tier-count">${t.skills.length}</span>
+      </div>
+      <div class="tier-skills">
+        ${t.skills.map(s=>`<span class="skill-tag">${s}</span>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
+// API CALLS
+// ══════════════════════════════════════════════════════════════
+async function checkService(url,dotId,pillId){
+  const dot = document.getElementById('dot-'+dotId);
+  const pill = document.getElementById(pillId+'-pill');
+  try{
+    const r = await fetch(url,{signal:AbortSignal.timeout(2000)});
+    if(r.ok||r.status<500){
+      if(dot){dot.className='engine-dot dot-green';dot.classList.remove('dot-pulse')}
+      if(pill){pill.className='status-pill pill-online'}
+      return true;
+    }
+  }catch(e){}
+  if(dot){dot.className='engine-dot dot-red';dot.classList.remove('dot-pulse')}
+  if(pill){pill.className='status-pill pill-offline'}
+  return false;
+}
+
+async function pollStatus(){
+  // Check key services
+  const ollamaOk = await checkService(OLLAMA+'/api/tags','ollama','ollama');
+  const backdoorOk = await checkService(API+'/status','backdoor','backdoor');
+  await checkService(COSMOS+'/health','cosmos','cosmos');
+  await checkService(PSO+'/status','pso','pso');
+
+  // Memory, swarm, etc - infer from backdoor
+  ['memory','swarm','antennae','evolution','rogue','mycelium'].forEach(id=>{
+    const dot = document.getElementById('dot-'+id);
+    if(dot){
+      if(backdoorOk){dot.className='engine-dot dot-green';dot.classList.remove('dot-pulse')}
+      else{dot.className='engine-dot dot-yellow dot-pulse'}
+    }
+  });
+
+  if(backdoorOk){
+    // Fetch blackboard
+    try{
+      const r = await fetch(API+'/status',{signal:AbortSignal.timeout(3000)});
+      const data = await r.json();
+      renderBlackboard(data);
+      updateFooter(data);
+    }catch(e){}
+
+    // Fetch memories
+    try{
+      const r = await fetch(API+'/memory',{signal:AbortSignal.timeout(3000)});
+      const data = await r.json();
+      renderMemory(data);
+    }catch(e){}
+  }
+}
+
+function renderBlackboard(data){
+  const el = document.getElementById('bbcontent');
+  const outputs = data.outputs||[];
+  if(!outputs.length){el.innerHTML='<div style="color:#333;text-align:center;padding:10px">Swarm idle — inject a task to activate</div>';return}
+  el.innerHTML = outputs.slice(-20).reverse().map(o=>
+    `<div class="bb-entry">
+      <span class="bb-agent">[${o.agent||'?'}]</span><span class="bb-time">${(o.ts||'').slice(11,19)}</span>
+      <div class="bb-text">${(o.text||'').slice(0,220)}${(o.text||'').length>220?'…':''}</div>
+    </div>`
+  ).join('');
+}
+
+function renderMemory(data){
+  const memories = Array.isArray(data)?data:[];
+  const active = memories.filter(m=>!m.archived);
+  const avgImp = active.length? (active.reduce((s,m)=>s+(m.importance||0),0)/active.length).toFixed(1) : '—';
+  document.getElementById('mem-total').textContent = memories.length;
+  document.getElementById('mem-active').textContent = active.length;
+  document.getElementById('mem-avg').textContent = avgImp;
+
+  const top = [...active].sort((a,b)=>(b.importance||0)-(a.importance||0)).slice(0,5);
+  document.getElementById('top-mems-list').innerHTML = top.map(m=>
+    `<div class="top-mem-item">
+      <span class="top-mem-imp">[${(m.importance||0).toFixed(1)}]</span>
+      <span class="top-mem-txt">${(m.content||'').slice(0,80)}${(m.content||'').length>80?'…':''}</span>
+    </div>`
+  ).join('') || '<div style="color:#333">No memories yet</div>';
+}
+
+function updateFooter(data){
+  const score = data.last_score;
+  const mvp = data.last_mvp;
+  if(score!=null) document.getElementById('last-score-display').textContent = (score*100).toFixed(0)+'%';
+  if(mvp) document.getElementById('last-mvp').textContent = mvp;
+
+  // Update agent scores from blackboard weights
+  AGENTS.forEach(a=>{
+    const el = document.getElementById('score-'+a.name);
+    if(el&&score!=null){
+      const adj = score*(a.name===mvp?1.1:0.9);
+      a.score = Math.min(1,Math.max(0.3,adj));
+      el.textContent = (a.score*100).toFixed(0)+'%';
+    }
+  });
+  renderScores();
+}
+
+// ══════════════════════════════════════════════════════════════
+// ACTIONS
+// ══════════════════════════════════════════════════════════════
+async function injectTask(){
+  const task = document.getElementById('task-input').value.trim();
+  if(!task){toast('⚠️ Enter a task first');return}
+  try{
+    const r = await fetch(API+'/inject',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({task}),signal:AbortSignal.timeout(5000)
+    });
+    if(r.ok){
+      toast('⚡ Task injected into swarm');
+      document.getElementById('task-input').value='';
+      const n = parseInt(document.getElementById('cycle-count').textContent||'0')+1;
+      document.getElementById('cycle-count').textContent = n;
+    } else toast('❌ Backdoor API offline — start the stack first');
+  }catch(e){toast('❌ Cannot reach backdoor API — is the stack running?')}
+}
+
+async function forceCycle(){
+  try{
+    const r = await fetch(API+'/cycle',{method:'POST',signal:AbortSignal.timeout(5000)});
+    if(r.ok) toast('🔄 Forced swarm cycle');
+    else toast('❌ Backdoor offline');
+  }catch(e){toast('❌ Backdoor unreachable')}
+}
+
+async function flushBlackboard(){
+  if(!confirm('Flush the blackboard? Memory core (nexus_mind.db) will NOT be wiped — only the session blackboard.')) return;
+  try{
+    const r = await fetch(API+'/flush',{method:'POST',signal:AbortSignal.timeout(5000)});
+    if(r.ok) toast('🗑 Blackboard flushed — memories preserved');
+    else toast('❌ Backdoor offline');
+  }catch(e){toast('❌ Backdoor unreachable')}
+}
+
+async function callDirect(){
+  const task = document.getElementById('task-input').value.trim();
+  if(!task){toast('⚠️ Enter a prompt first');return}
+  try{
+    const r = await fetch(API+'/direct',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'llama3.1:8b',prompt:task}),
+      signal:AbortSignal.timeout(60000)
+    });
+    if(r.ok){const d=await r.json();toast('✅ Direct response received');console.log(d)}
+    else toast('❌ Backdoor offline');
+  }catch(e){toast('❌ Error: '+e.message)}
+}
+
+function quickInject(task){
+  document.getElementById('task-input').value = task;
+  injectTask();
+}
+
+// ══════════════════════════════════════════════════════════════
+// KEYBOARD SHORTCUT
+// ══════════════════════════════════════════════════════════════
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==='Enter') injectTask();
+});
+
+// ══════════════════════════════════════════════════════════════
+// CLOCK
+// ══════════════════════════════════════════════════════════════
+function updateClock(){
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    now.toLocaleTimeString('en-US',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+
+// ══════════════════════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════════════════════
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;t.style.display='block';
+  clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',3000);
+}
+
+// ══════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════
+renderEngines();
+renderAgents();
+renderScores();
+renderCogDB();
+updateClock();
+setInterval(updateClock,1000);
+pollStatus();
+setInterval(pollStatus,REFRESH);
+
+// Open TIER 10 by default
+setTimeout(()=>{
+  const lastTier = document.querySelectorAll('.tier-skills');
+  if(lastTier.length) lastTier[lastTier.length-1].classList.add('open');
+},200);
+</script>
+</body>
+</html>

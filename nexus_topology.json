@@ -1,0 +1,25 @@
+{
+  "nodes": [
+    "supervisor",
+    "planner",
+    "developer",
+    "validator",
+    "reward"
+  ],
+  "edges": [
+    [
+      "developer",
+      "validator"
+    ],
+    [
+      "validator",
+      "reward"
+    ],
+    [
+      "planner",
+      "developer"
+    ]
+  ],
+  "entry": "supervisor",
+  "terminal": "reward"
+}

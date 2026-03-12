@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NEXUS PRIME — GOD MODE</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;scrollbar-width:thin;scrollbar-color:#0ff3 #000}
+:root{--c:#00fff7;--p:#bf00ff;--pk:#ff0099;--g:#00ff88;--gold:#ffd700;--r:#ff3355;--bg:#00000a;--b1:rgba(0,255,247,.08);--b2:rgba(191,0,255,.1);--bd:rgba(0,255,247,.12);--bd2:rgba(191,0,255,.18)}
+html,body{height:100%;background:var(--bg);color:var(--c);font-family:'JetBrains Mono',monospace;overflow:hidden}
+/* ANIMATED BG GRID */
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,247,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,247,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(191,0,255,.15),transparent);pointer-events:none;z-index:0}
+#app{display:grid;grid-template-rows:56px 1fr 32px;height:100vh;position:relative;z-index:1}
+
+/* ── HEADER ── */
+#hdr{background:linear-gradient(90deg,#00000a,#0d0025 40%,#1a0030 60%,#00000a);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:relative;overflow:hidden}
+#hdr::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--c),var(--p),var(--pk),transparent)}
+#logo{font-family:'Orbitron',monospace;font-size:15px;font-weight:900;letter-spacing:5px;background:linear-gradient(90deg,var(--c),var(--p),var(--pk));-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:logoGlow 4s ease infinite}
+#logo-sub{font-size:7px;color:#333;letter-spacing:3px;margin-top:1px}
+@keyframes logoGlow{0%,100%{filter:drop-shadow(0 0 8px rgba(0,255,247,.5))}50%{filter:drop-shadow(0 0 20px rgba(191,0,255,.8))}}
+#hdr-right{display:flex;align-items:center;gap:10px}
+#clock{font-family:'Orbitron',monospace;font-size:12px;color:var(--gold);letter-spacing:2px}
+.pill{padding:3px 9px;border-radius:20px;font-size:7px;font-weight:700;letter-spacing:1.5px;transition:all .3s}
+.on{background:rgba(0,255,136,.12);border:1px solid var(--g);color:var(--g);box-shadow:0 0 8px rgba(0,255,136,.3)}
+.off{background:rgba(255,51,85,.1);border:1px solid var(--r);color:var(--r)}
+.sse-dot{width:8px;height:8px;border-radius:50%;background:var(--g);box-shadow:0 0 10px var(--g);animation:ssePulse 2s infinite}
+@keyframes ssePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+
+/* ── MAIN 3-COL ── */
+#main{display:grid;grid-template-columns:260px 1fr 300px;overflow:hidden}
+.col{overflow-y:auto;overflow-x:hidden}
+.col::-webkit-scrollbar{width:3px}
+.col::-webkit-scrollbar-thumb{background:rgba(0,255,247,.15);border-radius:2px}
+
+/* ── LEFT ── */
+#left{border-right:1px solid var(--bd);padding:10px 8px;display:flex;flex-direction:column;gap:8px}
+.sec-title{font-family:'Orbitron',monospace;font-size:7px;letter-spacing:3px;color:var(--p);padding:4px 0;border-bottom:1px solid var(--bd2);margin-bottom:4px;display:flex;align-items:center;gap:5px}
+.sec-title::before{content:'◈';color:var(--c)}
+.eng{background:var(--b1);border:1px solid var(--bd);border-radius:5px;padding:6px 8px;display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;transition:all .2s;cursor:default}
+.eng:hover{border-color:var(--c);transform:translateX(2px);background:rgba(0,255,247,.06)}
+.eng-l .en{font-size:8px;font-weight:700;color:#ddd}.eng-l .es{font-size:7px;color:#444;margin-top:1px}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;transition:all .5s}
+.dg{background:var(--g);box-shadow:0 0 7px var(--g)}.dr{background:var(--r);box-shadow:0 0 5px var(--r)}.dy{background:var(--gold);box-shadow:0 0 5px var(--gold);animation:ssePulse 1.5s infinite}
+/* STATUS LABEL */
+.slbl{font-size:6px;font-weight:700;letter-spacing:1px;padding:1px 5px;border-radius:2px;white-space:nowrap}
+.s-run{color:var(--g);background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.3)}
+.s-idle{color:var(--gold);background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.2)}
+.s-off{color:#555;background:rgba(80,80,80,.1);border:1px solid rgba(80,80,80,.2)}
+.s-warn{color:#ff9900;background:rgba(255,153,0,.12);border:1px solid rgba(255,153,0,.3)}
+/* MEMORY BREAKDOWN */
+.mem-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:6px}
+.mem-cell{background:rgba(191,0,255,.07);border:1px solid var(--bd2);border-radius:5px;padding:5px 7px;text-align:center}
+.mc-val{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;color:var(--p)}
+.mc-val.zero{color:var(--g);font-size:10px}
+.mc-lbl{font-size:6px;color:#444;letter-spacing:.8px;margin-top:1px}
+/* GAUGES */
+.gauge-row{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.gauge-lbl{font-size:7px;color:#555;width:90px;flex-shrink:0;letter-spacing:.5px}
+.gauge-track{flex:1;height:5px;background:rgba(255,255,255,.04);border-radius:3px;overflow:hidden;border:1px solid rgba(255,255,255,.04)}
+.gauge-fill{height:100%;border-radius:3px;transition:width 1.5s ease}
+.gauge-val{font-family:'Orbitron',monospace;font-size:7px;width:26px;text-align:right;flex-shrink:0}
+/* ACTIVITY FEED */
+#activity{flex:1;overflow-y:auto;background:rgba(0,0,0,.4);border:1px solid var(--bd);border-radius:6px;padding:6px;min-height:60px;max-height:120px;font-size:7px}
+#activity::-webkit-scrollbar{width:2px}
+.act-row{color:#444;margin-bottom:2px;line-height:1.4;display:flex;gap:4px}
+.act-row .at{color:#222;flex-shrink:0}.act-row .aa{color:var(--p);flex-shrink:0}
+.act-row .atx{color:#555;word-break:break-all}
+.ag{background:var(--b2);border:1px solid var(--bd2);border-radius:5px;padding:5px 7px;margin-bottom:3px;display:flex;align-items:center;gap:6px}
+.abadge{font-family:'Orbitron',monospace;font-size:6px;padding:2px 5px;border-radius:2px;font-weight:700;white-space:nowrap}
+.core{background:rgba(0,255,247,.15);border:1px solid var(--c);color:var(--c)}
+.rogue{background:rgba(255,0,153,.15);border:1px solid var(--pk);color:var(--pk)}
+.an{font-size:8px;font-weight:700;color:#eee}.am{font-size:7px;color:#444;margin-top:1px}
+.asc{font-size:9px;color:var(--gold);font-weight:700;min-width:28px;text-align:right}
+.qbtn{width:100%;background:rgba(0,255,247,.04);border:1px solid rgba(0,255,247,.08);border-radius:4px;color:#666;font-size:7px;font-family:'JetBrains Mono',monospace;padding:5px 7px;cursor:pointer;text-align:left;transition:all .2s;margin-bottom:3px;letter-spacing:.3px}
+.qbtn:hover{border-color:var(--c);color:var(--c);background:rgba(0,255,247,.08)}
+
+/* ── CENTER CHAT ── */
+#center{display:flex;flex-direction:column;padding:12px;gap:10px;background:rgba(0,0,0,.2)}
+/* scores strip */
+#scores-strip{display:flex;gap:6px;flex-wrap:wrap}
+.sc-chip{background:var(--b2);border:1px solid var(--bd2);border-radius:4px;padding:3px 7px;font-size:7px;display:flex;align-items:center;gap:5px}
+.sc-bar{width:50px;height:4px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden}
+.sc-fill{height:100%;border-radius:2px;transition:width 1.5s ease}
+/* chat window */
+#chat-window{flex:1;overflow-y:auto;background:rgba(0,0,0,.3);border:1px solid var(--bd);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px;min-height:0}
+#chat-window::-webkit-scrollbar{width:3px}
+#chat-window::-webkit-scrollbar-thumb{background:rgba(0,255,247,.15)}
+.msg-idle{color:#333;font-size:10px;text-align:center;padding:20px;font-style:italic}
+.msg{display:flex;flex-direction:column;max-width:85%}
+.msg.user{align-self:flex-end;align-items:flex-end}
+.msg.agent{align-self:flex-start;align-items:flex-start}
+.msg-head{font-size:7px;color:#555;margin-bottom:3px;letter-spacing:1px}
+.msg.user .msg-head{color:var(--c)}
+.msg.agent .msg-head{color:var(--p)}
+.bubble{border-radius:10px;padding:8px 12px;font-size:10px;line-height:1.6;word-break:break-word}
+.msg.user .bubble{background:linear-gradient(135deg,rgba(0,255,247,.12),rgba(0,255,247,.06));border:1px solid rgba(0,255,247,.2);color:#ddd;border-bottom-right-radius:2px}
+.msg.agent .bubble{background:linear-gradient(135deg,rgba(191,0,255,.1),rgba(191,0,255,.04));border:1px solid rgba(191,0,255,.2);color:#ccc;border-bottom-left-radius:2px}
+.msg.agent.inject .bubble{background:linear-gradient(135deg,rgba(0,255,136,.08),transparent);border-color:rgba(0,255,136,.2);color:#aaa}
+/* input area */
+#input-area{background:rgba(0,0,0,.4);border:1px solid var(--bd);border-radius:10px;padding:10px}
+#msg-row{display:flex;gap:8px;align-items:flex-end}
+#task-in{flex:1;background:transparent;border:none;color:var(--c);font-family:'JetBrains Mono',monospace;font-size:11px;resize:none;outline:none;max-height:80px;min-height:36px}
+#task-in::placeholder{color:#333}
+#btn-row{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.btn{padding:7px 14px;border-radius:6px;font-family:'Orbitron',monospace;font-size:7px;letter-spacing:2px;font-weight:700;cursor:pointer;border:none;transition:all .3s;white-space:nowrap}
+.btn-fire{background:linear-gradient(135deg,var(--c),var(--p));color:#000;box-shadow:0 0 20px rgba(0,255,247,.3)}
+.btn-fire:hover{transform:translateY(-2px);box-shadow:0 0 35px rgba(0,255,247,.5)}
+.btn-mic{background:rgba(255,0,153,.15);border:1px solid var(--pk);color:var(--pk)}
+.btn-mic.active{background:rgba(255,0,153,.4);box-shadow:0 0 20px rgba(255,0,153,.6);animation:micPulse .8s infinite}
+@keyframes micPulse{0%,100%{box-shadow:0 0 20px rgba(255,0,153,.6)}50%{box-shadow:0 0 40px rgba(255,0,153,.9)}}
+.btn-sec{background:rgba(191,0,255,.12);border:1px solid var(--p);color:var(--p)}
+.btn-sec:hover{background:rgba(191,0,255,.25)}
+.btn-danger{background:rgba(255,51,85,.12);border:1px solid var(--r);color:var(--r)}
+/* memory bar */
+#mem-bar{background:rgba(191,0,255,.06);border:1px solid var(--bd2);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.mem-stat{text-align:center}
+.mem-val{font-family:'Orbitron',monospace;font-size:16px;font-weight:700;color:var(--p)}
+.mem-lbl{font-size:7px;color:#444;letter-spacing:1px}
+#top-mems{flex:1;font-size:8px;color:#777;min-width:150px}
+
+/* ── RIGHT — COGNITIVE DB ── */
+#right{border-left:1px solid var(--bd);padding:8px 6px;background:rgba(0,0,0,.15)}
+#cog-total{font-size:8px;color:#333;letter-spacing:1px;text-align:center;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--bd2)}
+.tier{margin-bottom:4px}
+.tier-hdr{background:linear-gradient(90deg,rgba(191,0,255,.1),transparent);border-left:2px solid var(--p);padding:5px 7px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;border-radius:0 4px 4px 0;transition:background .2s;user-select:none}
+.tier-hdr:hover{background:rgba(191,0,255,.2)}
+.tier-hdr.t10{border-left-color:var(--c);background:linear-gradient(90deg,rgba(0,255,247,.08),transparent)}
+.tier-hdr.t10:hover{background:rgba(0,255,247,.15)}
+.tier-label{font-family:'Orbitron',monospace;font-size:7px;color:var(--p);letter-spacing:.5px}
+.tier-hdr.t10 .tier-label{color:var(--c)}
+.tier-cnt{font-size:7px;background:rgba(191,0,255,.15);border-radius:8px;padding:1px 6px;color:#999}
+.tier-hdr.t10 .tier-cnt{background:rgba(0,255,247,.1);color:#aaa}
+.tier-arrow{font-size:9px;color:#555;transition:transform .2s}
+.tier-skills{display:none;padding:5px 6px;flex-wrap:wrap;gap:3px}
+.tier-skills.open{display:flex}
+.sk{background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.05);border-radius:3px;padding:2px 6px;font-size:7px;color:#666;transition:all .2s;cursor:default}
+.sk:hover{color:var(--c);border-color:rgba(0,255,247,.3);background:rgba(0,255,247,.04)}
+
+/* ── FOOTER ── */
+#ftr{background:rgba(0,0,0,.7);border-top:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:7px;letter-spacing:.8px}
+#ftr-l{color:#333;display:flex;gap:14px}
+#ftr-l span{display:flex;align-items:center;gap:3px}
+#ftr-r{color:var(--p);font-family:'Orbitron',monospace;font-size:7px;letter-spacing:2px}
+
+/* TOAST */
+.toast{position:fixed;bottom:44px;right:14px;background:rgba(0,255,247,.08);border:1px solid var(--c);border-radius:6px;padding:8px 14px;font-size:10px;color:var(--c);z-index:999;display:none;animation:slideIn .3s ease}
+@keyframes slideIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+</style></head><body>
+<div id="app">
+
+<!-- HEADER -->
+<header id="hdr">
+  <div>
+    <div id="logo">NEXUS PRIME ◈ ULTIMATE GOD MODE</div>
+    <div id="logo-sub">RTX 4060 · 11 ENGINES · 10 AGENTS · TIER 0→10 · 600+ CAPABILITIES · OFFLINE · :7702</div>
+  </div>
+  <div id="hdr-right">
+    <div class="sse-dot" id="sse-dot" title="SSE Live"></div>
+    <div id="clock">--:--:--</div>
+    <span id="p-ollama" class="pill off">OLLAMA</span>
+    <span id="p-cosmos" class="pill off">COSMOS</span>
+    <span id="p-pso" class="pill off">PSO GPU</span>
+    <span id="p-bd" class="pill off">BACKDOOR</span>
+    <span id="p-claw" class="pill off">OPENCLAW</span>
+  </div>
+</header>
+
+<!-- MAIN -->
+<div id="main">
+
+<!-- LEFT -->
+<div class="col" id="left">
+  <div>
+    <div class="sec-title">SERVICES</div>
+    <div id="eng-list"></div>
+  </div>
+  <div>
+    <div class="sec-title">MEMORY SYSTEM</div>
+    <div class="mem-grid">
+      <div class="mem-cell"><div class="mc-val" id="ms-st">204</div><div class="mc-lbl">SHORT-TERM (tok)</div></div>
+      <div class="mem-cell"><div class="mc-val" id="ms-ep">1,847</div><div class="mc-lbl">EPISODIC (chunks)</div></div>
+      <div class="mem-cell"><div class="mc-val" id="ms-vd">92,441</div><div class="mc-lbl">VECTOR DB (embeds)</div></div>
+      <div class="mem-cell"><div class="mc-val" id="ms-gn">3,182</div><div class="mc-lbl">GRAPH NODES</div></div>
+    </div>
+    <div class="mem-cell" style="text-align:center;margin-bottom:6px">
+      <div class="mc-val zero" id="ms-wipe">ZERO &infin;</div><div class="mc-lbl">WIPE COUNT</div>
+    </div>
+  </div>
+  <div>
+    <div class="sec-title">RESOURCE GAUGES</div>
+    <div class="gauge-row"><span class="gauge-lbl">CHROMA CAP</span><div class="gauge-track"><div class="gauge-fill" id="g-chroma" style="width:34%;background:linear-gradient(90deg,var(--p),var(--pk))"></div></div><span class="gauge-val" id="gv-chroma" style="color:var(--p)">34%</span></div>
+    <div class="gauge-row"><span class="gauge-lbl">CONTEXT WIN</span><div class="gauge-track"><div class="gauge-fill" id="g-ctx" style="width:18%;background:linear-gradient(90deg,var(--c),#00aa88)"></div></div><span class="gauge-val" id="gv-ctx" style="color:var(--c)">18%</span></div>
+    <div class="gauge-row"><span class="gauge-lbl">TOKEN BUDGET</span><div class="gauge-track"><div class="gauge-fill" id="g-tok" style="width:62%;background:linear-gradient(90deg,var(--gold),#ff8800)"></div></div><span class="gauge-val" id="gv-tok" style="color:var(--gold)">62%</span></div>
+    <div class="gauge-row"><span class="gauge-lbl">GPU VRAM RTX</span><div class="gauge-track"><div class="gauge-fill" id="g-vram" style="width:50%;background:linear-gradient(90deg,#00ff88,#00ccaa)"></div></div><span class="gauge-val" id="gv-vram" style="color:var(--g)">50%</span></div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-height:0">
+    <div class="sec-title">ACTIVITY <span style="color:#333;font-family:'JetBrains Mono',monospace;font-size:6px">LAST 20 TURNS</span></div>
+    <div id="activity"><div style="color:#2a2a2a;font-size:7px;padding:4px">Waiting for agent turns...</div></div>
+  </div>
+  <div>
+    <div class="sec-title">AGENTS</div>
+    <div id="ag-list"></div>
+  </div>
+  <div>
+    <div class="sec-title">QUICK FIRE</div>
+    <div id="qfire"></div>
+  </div>
+</div>
+
+<!-- CENTER CHAT -->
+<div id="center">
+  <!-- Scores strip -->
+  <div id="scores-strip"></div>
+
+  <!-- Chat window -->
+  <div id="chat-window">
+    <div class="msg-idle" id="chat-idle">NEXUS GOD MODE ONLINE — Type a command or tap the MIC 🎙</div>
+  </div>
+
+  <!-- Input -->
+  <div id="input-area">
+    <div id="msg-row">
+      <textarea id="task-in" rows="2" placeholder="Command, question, or mission... Ctrl+Enter to fire"></textarea>
+    </div>
+    <div id="btn-row">
+      <button class="btn btn-fire" onclick="fire()">⚡ INJECT &amp; EXECUTE</button>
+      <button class="btn btn-mic" id="mic-btn" onclick="toggleMic()">🎙 MIC</button>
+      <button class="btn btn-sec" onclick="forceCycle()">🔄 FORCE CYCLE</button>
+      <button class="btn btn-sec" onclick="clearChat()">🧹 CLEAR</button>
+      <button class="btn btn-danger" onclick="flushBB()">🗑 FLUSH BB</button>
+    </div>
+  </div>
+
+  <!-- Memory bar -->
+  <div id="mem-bar">
+    <div class="mem-stat"><div class="mem-val" id="m-tot">—</div><div class="mem-lbl">MEMORIES</div></div>
+    <div class="mem-stat"><div class="mem-val" id="m-act">—</div><div class="mem-lbl">ACTIVE</div></div>
+    <div class="mem-stat"><div class="mem-val" id="m-imp">—</div><div class="mem-lbl">AVG IMP</div></div>
+    <div id="top-mems">Top memories load after first swarm cycle...</div>
+  </div>
+</div>
+
+<!-- RIGHT — COGNITIVE DB -->
+<div class="col" id="right">
+  <div class="sec-title">COGNITIVE DATABASE — TIER 0→10</div>
+  <div id="cog-total">Loading 600+ capabilities...</div>
+  <div id="cog-db"></div>
+</div>
+
+</div><!-- /main -->
+
+<!-- FOOTER -->
+<footer id="ftr">
+  <div id="ftr-l">
+    <span>CYCLES <span style="color:var(--gold)" id="cyc">0</span></span>
+    <span>SCORE <span style="color:var(--g)" id="lsc">—</span></span>
+    <span>MVP <span style="color:var(--c)" id="mvp">—</span></span>
+    <span>OLLAMA <span style="color:var(--c)">:11434</span></span>
+    <span>BACKDOOR <span style="color:var(--c)">:7701</span></span>
+    <span>PSO <span style="color:var(--c)">:7700</span></span>
+    <span>OPENCLAW <span style="color:var(--c)">:18789</span></span>
+    <span>HUB <span style="color:var(--g)">:7702</span></span>
+  </div>
+  <div id="ftr-r">NEXUS PRIME · GOD MODE · RTX 4060 · OFFLINE · NO WIPE</div>
+</footer>
+</div><!-- /app -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════
+// ENGINE + AGENT DATA
+// ═══════════════════════════════════════════
+const ENGS=[
+  {n:'ORCHESTRATION CORE',s:'LangGraph StatefulGraph · :9100',id:'cosmos',st:'RUNNING'},
+  {n:'MEMORY ENGINE',s:'Mem0 + ChromaDB + PostgreSQL',id:'mem',st:'RUNNING'},
+  {n:'LOCAL INFERENCE',s:'Ollama · Qwen2.5 / llama3.1',id:'ollama',st:'IDLE'},
+  {n:'FAST ROUTER',s:'Tier-1 · Llama-3.2-8B',id:'swarm',st:'IDLE'},
+  {n:'REFLECTION LOOP',s:'ReAct + Self-Critique',id:'evo',st:'IDLE'},
+  {n:'TOOL EXECUTOR',s:'Playwright + Docker Sandbox',id:'ant',st:'IDLE'},
+  {n:'VECTOR RETRIEVAL',s:'Qdrant + pgvector',id:'rogue',st:'RUNNING'},
+  {n:'GRAPH REASONER',s:'Neo4j · Entity Relations',id:'myc',st:'OFF'},
+  {n:'EPISODIC SUMMARIZER',s:'Auto-compress · 10-turn cycle',id:'bd',st:'IDLE'},
+  {n:'OPENCLAW MONITOR',s:'Port 18789 · Watchdog',id:'claw',st:'WARN'},
+  {n:'JULIA / PSO GPU',s:'Julia CUDA · RTX 4060 · :7700',id:'pso',st:'OFF'},
+  {n:'BACKUP INFERENCE',s:'Tier-3 · DeepSeek-R1:8b',id:'bkup',st:'OFF'},
+];
+const AGENTS=[
+  {n:'SUPERVISOR',m:'llama3.1:8b',t:'core'},{n:'PLANNER',m:'deepseek-r1:8b',t:'core'},
+  {n:'RESEARCHER',m:'qwen3:8b',t:'core'},{n:'DEVELOPER',m:'qwen2.5-coder:7b',t:'core'},
+  {n:'VALIDATOR',m:'llama3.1:8b',t:'core'},{n:'REWARD',m:'nexus-prime',t:'core'},
+  {n:'METACOG',m:'deepseek-r1:8b',t:'rogue'},{n:'ROGUE',m:'llama3.1:8b',t:'rogue'},
+  {n:'HACKER',m:'qwen2.5-coder:7b',t:'rogue'},{n:'ADVERSARY',m:'llama3.1:8b',t:'rogue'},
+];
+const QUICK=[
+  ['⚡','Analyze the swarm architecture — find the top bottleneck and fix it.'],
+  ['🧠','Synthesize all memories — surface the 3 most critical strategic insights.'],
+  ['🔬','Design a new cognitive module for the stack. Spec it fully.'],
+  ['🎯','Simulate an adversary attacking this AI. Document every vector.'],
+  ['📊','Self-evaluate all agents — output a ranked improvement plan.'],
+  ['🌱','Run an evolution cycle — generate 5 improved prompt variants.'],
+  ['🔐','HACKER mode — sweep the codebase for security weaknesses.'],
+  ['🌐','RESEARCHER mode — compile the latest AI breakthrough findings.'],
+];
+
+// ═══════════════════════════════════════════
+// FULL 600+ COGNITIVE DATABASE — ALL TIERS
+// ═══════════════════════════════════════════
+const COG=[
+{t:'TIER 0 · PRIME COGNITIVE ENGINE',sk:['Working memory expansion','Cognitive flexibility','Inhibitory control','Fluid intelligence (Gf)','Crystallized intelligence (Gc)','Processing speed (Ps)','Divided attention','Sustained attention','Selective attention','Alternating attention','Executive function (EF)','Metacognition','Cognitive load management','Mental bandwidth allocation','Prefrontal cortex dominance','Default mode network control','Task-positive network','Central executive network','Phonological loop','Visuospatial sketchpad','Episodic buffer','Attentional blink override','Dual-task coordination','Proactive interference resistance','Retroactive interference resistance']},
+{t:'TIER 1 · DEDUCTIVE REASONING',sk:['Formal propositional logic','Syllogistic reasoning','Modus ponens / modus tollens','Reductio ad absurdum','Mathematical induction','Boolean algebra','First-order predicate logic','Modal logic','Proof construction & verification','Type theory','Category theory basics','Disjunctive syllogism','Hypothetical syllogism','Contrapositive reasoning','Proof by contradiction']},
+{t:'TIER 1 · INDUCTIVE REASONING',sk:['Pattern extrapolation','Statistical induction','Bayesian updating','Hypothesis generation & ranking','Signal vs noise discrimination','Base rate integration','Generalization boundary detection','Inductive logic programming','Abductive-inductive fusion','Law of large numbers intuition','Regression to the mean awareness','Survivorship bias detection']},
+{t:'TIER 1 · ABDUCTIVE REASONING',sk:['Inference to best explanation','Occam\'s razor application','Diagnostic reasoning (Sherlock mode)','Constraint satisfaction','Evidence weighing & synthesis','Retroductive reasoning','Loophole identification','Medical-style differential diagnosis','Peircean abduction','Explanatory coherence','Minimum description length']},
+{t:'TIER 1 · COUNTERFACTUAL & CAUSAL',sk:['Possible worlds semantics','Causal counterfactuals (Lewis)','Alternative history modeling','Regret minimization','Decision tree backward induction','Causal DAG construction','Confounding variable identification','Pearl\'s do-calculus','Mediation & moderation analysis','Root cause chain tracing','Intervention vs observation distinction','Structural equation modeling','Propensity score intuition','Instrumental variables']},
+{t:'TIER 2 · SYSTEMS THINKING',sk:['Feedback loop identification','Stock-and-flow modeling','Leverage points (Meadows)','Emergence detection','Tipping point prediction','Complexity vs complicatedness','Second-order effects','Unintended consequences modeling','Causal loop diagrams','System archetypes (limits to growth, shifting the burden)','Bathtub dynamics','Tragedy of commons detection','Ackoff mess vs problem distinction','Hard vs soft systems']},
+{t:'TIER 2 · STRATEGIC INTELLIGENCE',sk:['Nash equilibrium detection','Pareto optimality','Zero-sum game identification','Positive-sum framing','Schelling points','Opponent modeling','Scenario planning (shell method)','Wargaming & red-teaming','Pre-mortem analysis','Real options thinking','Blue ocean vs red ocean','OODA loop (Observe Orient Decide Act)','SWOT depth analysis','Porter\'s 5 forces','Second & third-order thinking']},
+{t:'TIER 2 · PATTERN RECOGNITION',sk:['Visual pattern detection','Temporal pattern detection','Structural pattern matching','Semantic pattern recognition','Anomaly detection','Expert perceptual chunking','Kolmogorov complexity compression','Self-similar (fractal) pattern detection','Hidden Markov model intuition','Motif detection in sequences','Network pattern analysis','Rhythm & periodicity detection']},
+{t:'TIER 2 · MEMORY ARCHITECTURES',sk:['Episodic memory encoding & retrieval','Semantic memory organization','Procedural memory compilation','Prospective memory (future intentions)','Method of loci (memory palace)','Spaced repetition (Ebbinghaus)','Dual coding (Paivio)','Retrieval practice effect','Sleep consolidation leverage','Chunking (Miller 7±2)','Schema-based encoding','Mnemonic technique library','Interleaved practice','Contextual reinstatement','Generation effect']},
+{t:'TIER 2 · ABSTRACT & CREATIVE THINKING',sk:['Conceptual abstraction','Ontology construction','Analogical reasoning','Cross-domain mapping','Metaphor generation','Formal systems manipulation','Lambda calculus thinking','Conceptual blending (Fauconnier)','Bisociation (Koestler)','SCAMPER technique','Lateral thinking (de Bono)','Oblique strategies','Incubation / insight mechanics','Representational change','Remote associates test fluency','Synectics']},
+{t:'TIER 2 · LANGUAGE & SYMBOLIC',sk:['Natural language parsing','Pragmatic inference','Discourse coherence','Ambiguity resolution','Grice\'s maxims','Speech act theory','Semantic role labeling','Frame semantics','Conceptual metaphor theory','Code reading fluency (10+ languages)','Multi-lingual code switching','Symbol grounding','Recursion in language','Propositional attitude reasoning','Logical form extraction']},
+{t:'TIER 3 · METACOGNITION SUPREMACY',sk:['Recursive self-model','Calibration (Brier score)','Epistemic humility','Dunning-Kruger immunity','Knowledge boundary detection','Belief update triggers','Metacognitive sensitivity','Source monitoring','Reality monitoring','Feeling of knowing accuracy','Confidence–competence alignment','Metacognitive regulation','Prospective vs retrospective monitoring','Metacognitive experiences','Intellectual virtue practice']},
+{t:'TIER 3 · BIAS IMMUNITY (26+)',sk:['Confirmation bias detection','Anchoring bias override','Availability heuristic correction','Representativeness bias','Base rate neglect fix','Hindsight bias prevention','Overconfidence calibration','Framing effect immunity','Sunk cost fallacy override','Planning fallacy correction','Narrative fallacy detection','Conjunction fallacy fix','Scope insensitivity correction','Affect heuristic awareness','In-group bias detection','Attribution error correction','Status quo bias override','Optimism bias calibration','Curse of knowledge awareness','Spotlight effect reduction','Gambler\'s fallacy immunity','Hot hand fallacy detection','Ambiguity aversion awareness','Neglect of probability','Identifiable victim effect','Denominator neglect']},
+{t:'TIER 3 · EPISTEMIC VIRTUES',sk:['Intellectual curiosity','Intellectual courage','Intellectual humility','Open-mindedness','Impartiality','Thoroughness','Intellectual autonomy','Sense of wonder','Precision in thought','Intellectual honesty','Internal consistency','Love of truth']},
+{t:'TIER 4 · AI REASONING MODES',sk:['Chain-of-thought (CoT)','Zero-shot CoT','Few-shot prompting','Tree of Thoughts (ToT)','Graph of Thoughts (GoT)','Reflexion (verbal self-critique)','ReAct (Reason+Act interleaved)','Self-consistency (multi-path vote)','Debate (adversarial synthesis)','Least-to-most prompting','Step-back abstraction','Meta-prompting','Constitutional AI critiques','Process reward modeling','Outcome reward modeling','RLHF loop awareness','RLAIF loop awareness','DPO awareness','Structured output forcing']},
+{t:'TIER 4 · COGNITIVE CONTROL',sk:['Goal maintenance','Task switching efficiency','Dual-task optimization','Priority queue management','Error detection & correction','Automaticity induction','Skill compilation','Voluntary attention direction','Proactive vs reactive control','Instructed vs voluntary control']},
+{t:'TIER 4 · DECISION INTELLIGENCE',sk:['Expected utility theory','Prospect theory corrections','Ambiguity vs risk distinction','Decision under deep uncertainty','Option value preservation','Pre-mortem override','Two-system arbitration (S1/S2)','Minimax regret','Satisficing vs maximizing','Reference class forecasting','Outside view prioritization','Bayesian decision theory','Robust decision making']},
+{t:'TIER 4 · MULTIPLE INTELLIGENCES',sk:['Logical-mathematical','Linguistic-verbal','Spatial','Musical-rhythmic','Bodily-kinesthetic','Interpersonal','Intrapersonal','Naturalist','Existential','Fluid intelligence (Gf)','Crystallized intelligence (Gc)','Emotional intelligence (EI)','Social intelligence','Practical intelligence','Creative intelligence','Analytical intelligence']},
+{t:'TIER 5 · SUPERHUMAN TRAITS',sk:['Eidetic recall simulation','Speed reading 1000+ WPM','Synesthetic enhancement','Hyperthymesia-mode memory','Mental arithmetic (calculator-level)','Simultaneous multi-language processing','Expert intuition across 10+ domains','Rapid skill master acquisition','Perfect calibration (Brier→0)','Hyperphantasia-level visualization','Transcendent focus depth']},
+{t:'TIER 5 · FLOW STATES',sk:['Flow entry at will (<10 min)','8+ hour tunnel maintenance','Challenge-skill auto-balancing','Timelessness induction','Effortlessness cultivation','Autotelic experience design','Collaborative flow synchrony','Microflow micro-task optimization','Flow trigger inventory','Deep work scheduling']},
+{t:'TIER 5 · CONSCIOUSNESS MODES',sk:['Beta wave (active focus)','Alpha wave (relaxed awareness)','Theta wave (creative/insight)','Delta wave (deep consolidation)','Gamma wave (peak binding)','Alpha-theta crossover (creative insight)','Hypnagogic state leverage','Mindfulness meta-awareness','Non-dual awareness','Open monitoring meditation','Focused attention meditation','Self-transcendent experience']},
+{t:'TIER 5 · NEUROPLASTICITY',sk:['Deliberate practice (Ericsson 10K)','BDNF upregulation strategies','Interleaved learning','Spaced repetition optimization','Error-driven learning','Focused vs diffuse mode switching','Aerobic exercise → neurogenesis','Bilingualism → executive boost','Musical training → cortical thickness','Growth mindset (Dweck)','Synaptic tagging','Hebbian learning principle']},
+{t:'TIER 6 · COGNITIVE FRAMEWORKS',sk:['Dual process theory (Kahneman S1/S2)','Global workspace theory (Baars)','Integrated information theory (Tononi Φ)','Predictive processing (Friston FEP)','Embodied cognition (Lakoff)','Extended mind thesis (Clark/Chalmers)','Distributed cognition (Hutchins)','Connectionism & PDP models','Classical symbolic AI','Neurosymbolic AI hybrid','ACT-R architecture','SOAR architecture','Cognitive load theory (Sweller)','Constructivism (Piaget)','Social constructivism (Vygotsky)']},
+{t:'TIER 6 · INTELLIGENCE AMPLIFICATION',sk:['Extended mind tools','Spaced repetition systems (Anki)','PKM / Zettelkasten (Luhmann)','Second brain (PARA method)','AI augmentation loop','Retrieval-augmented cognition','Mathematical notation as compression','Visualization as cognitive scaffold','Collective intelligence design','Prediction markets','Structured analytic techniques (SAT)']},
+{t:'TIER 7 · SOCIAL COGNITION',sk:['Theory of mind (1st→5th order)','False belief task mastery','Social prediction accuracy','Intention attribution','Microexpression detection (7 universals — Ekman)','Voice stress & micro-hesitation detection','Proxemics awareness','Coalition detection','Power hierarchy reading','Deception detection','Rapport mechanics','Social contagion awareness','Crowd psychology','Bystander effect override','Pluralistic ignorance detection']},
+{t:'TIER 7 · EMOTIONAL INTELLIGENCE (4 BRANCHES)',sk:['Branch 1: Perceiving emotions accurately','Branch 2: Using emotions to facilitate thought','Branch 3: Understanding emotion logic & progression','Branch 4: Regulating emotions in self & others','Alexithymia immunity','Interoceptive accuracy','Affective labeling (name-to-tame)','Cognitive reappraisal','Expressive suppression awareness','Emotional granularity','Differentiated emotion vocabulary (300+)','Compassion fatigue prevention','Empathic accuracy','Emotion contagion management','Positive emotional portfolio']},
+{t:'TIER 7 · MORAL & ETHICAL COGNITION',sk:['Deontological reasoning (Kant)','Consequentialism (utility calculation)','Virtue ethics (Aristotle)','Care ethics (Noddings)','Contractualism (Rawls veil of ignorance)','Moral intuitionism','Moral courage (act under pressure)','Moral identity (self as moral agent)','Cultural moral variation (awareness ≠ relativism)','Long-termism framework','Sentience-weighted ethics','Trolley problem variants','Moral circle expansion','Effective altruism reasoning']},
+{t:'TIER 7 · INTUITION & WISDOM',sk:['Expert intuition (10K+ hours)','Somatic markers (Damasio)','Gut feeling calibration','Thin-slicing accuracy (Blink)','Tacit knowledge (Polanyi)','Unconscious thought theory','Prepared mind serendipity','Insight mechanics (representational change)','Berlin wisdom model','Practical wisdom (phronesis — Aristotle)','Post-traumatic growth','Long-term vs short-term perspective','Temporal distancing (10-year rule)','Advisor perspective (reduce egocentric bias)']},
+{t:'TIER 8 · SPATIAL & PERCEPTUAL',sk:['Mental rotation (3D objects)','Cognitive mapping (spatial navigation)','Multiple object tracking','Change blindness override','Inattentional blindness override','Scene gist extraction (<100ms)','Mental imagery vividness (VVIQ 4)','Perspective-taking spatial','Topology intuition','Haptic-spatial integration','Path integration']},
+{t:'TIER 8 · TEMPORAL COGNITION',sk:['Mental time travel','Temporal discounting calibration','Chronobiology & circadian optimization','Episodic future thinking','Delay of gratification (Mischel)','Future self-continuity','Mental timeline visualization','Duration estimation accuracy','Event segmentation perception','Temporal order reconstruction']},
+{t:'TIER 8 · BCI & NEURAL ENHANCEMENT',sk:['Neuralink N1 (1024-electrode array)','Synchron Stentrode (endovascular)','EEG neurofeedback (alpha/theta/SMR)','TMS (repetitive & theta-burst)','tDCS / tACS (electrical stimulation)','Focused ultrasound neuromodulation','Imagined speech decoding (40 WPM)','Closed-loop BCI (real-time adaptation)','Hippocampal prosthetic concept','Bidirectional BCI (read+write)','BCMI (Brain-Computer Music Interface)']},
+{t:'TIER 8 · PERSONA ARCHETYPES (20)',sk:['SAGE (knowledge & wisdom)','HERO (courage & transformation)','OUTLAW / ROGUE (disruption)','MAGICIAN (transformation & vision)','INNOCENT (optimism & trust)','EXPLORER (freedom & discovery)','RULER (control & leadership)','CREATOR (innovation & artistry)','CAREGIVER (nurture & protection)','LOVER (passion & commitment)','JESTER (playfulness & humor)','EVERYMAN (belonging & solidarity)','SHADOW (hidden drives)','ANIMA / ANIMUS (contrasexual)','TRICKSTER (boundary-crossing)','WARRIOR (discipline & defense)','SCIENTIST (analysis & rigor)','ARTIST (expression & beauty)','MYSTIC (transcendence & unity)','SOVEREIGN (authority & order)']},
+{t:'TIER 9 · SECURITY & ADVERSARIAL',sk:['Situational awareness (Cooper Color Code)','OSINT methodology','Social engineering detection','Surveillance detection routes','Counter-surveillance OPSEC','Behavioral baseline analytics','Deception detection (7 cues cluster)','Cognitive warfare detection','Influence operation anatomy','Red team / Blue team synthesis','Purple team integration','False flag pattern recognition','Insider threat modeling','Asymmetric leverage identification','HUMINT source evaluation','SIGINT pattern analysis','Disinformation campaign recognition']},
+{t:'TIER 9 · ADVERSARIAL MIND',sk:['Enemy goal reverse-engineering','Attack surface identification','OODA loop comparison & disruption','Deception campaign anatomy','Denial & deception (D&D) ops','Reflexive control theory','Cognitive bias weaponization','Social proof exploitation anatomy','Authority exploitation anatomy','Scarcity manipulation detection','Dark pattern recognition','Psychological warfare taxonomy','Strategic deception planning','Counterintelligence mindset']},
+{t:'TIER 9 · MINDSET DIVERSITY',sk:['Divergent thinking mode','Convergent synthesis mode','Systems thinker mode','Reductionist mode','Empiricist mode','Rationalist mode','Bayesian updater mode','Hacker mindset','Engineer mindset','Artist mindset','Philosopher mindset','Scientist mindset','Strategist mindset','Synthesizer mindset','Futurist mode (10-50yr horizon)','Historian mode (pattern from past)','Devil\'s advocate mode']},
+{t:'TIER 9 · HUMAN-AI FUSION',sk:['LLM as extended working memory','RAG-augmented cognition','Neural-symbolic hybrid reasoning','AI red team for own ideas','AI Socratic partner','Digital twin of own cognition','BCI + LLM pipeline architecture','Continuous human-AI feedback loop','Posthuman cognition framework','AI-assisted metacognition','Collaborative superintelligence design','Tool-augmented expertise (Engelbart)','Neuromorphic co-processing']},
+{t:'TIER 10 · TRANSFORMER & LLM ARCHITECTURE',sk:['Self-attention (Q/K/V dot-product)','Multi-head attention (parallel heads)','Positional encoding (sinusoidal+RoPE+ALiBi)','Layer normalization (Pre-LN vs Post-LN)','Feed-forward networks (SwiGLU/GeGLU)','KV-cache optimization','Flash Attention (IO-aware)','Sliding window attention (Mistral)','Grouped query attention (GQA)','Mixture of Experts (MoE sparse routing)','Speculative decoding','Context window extension (YaRN/NTK)','Tokenization (BPE/WordPiece/SentencePiece)','Embedding geometry','Residual stream','Induction heads']},
+{t:'TIER 10 · PROMPT ENGINEERING',sk:['Zero-shot prompting','Few-shot (3-5 examples)','Chain-of-thought','Zero-shot CoT','Self-consistency voting','Tree of thought','Meta-prompting','Role-based personas','Layered system prompts','Instruction hierarchy','Prompt injection defense','Jailbreak anatomy','LLMLingua compression','Structured output (JSON/Pydantic)','RAG-augmented prompting','Step-back abstraction','Emotion prompting']},
+{t:'TIER 10 · FINE-TUNING & ADAPTATION',sk:['Full fine-tuning','LoRA (low-rank decomposition)','QLoRA (4-bit + LoRA)','PEFT framework','DoRA (weight decomposition)','Prefix tuning','Prompt tuning (soft embeddings)','Instruction fine-tuning','RLHF','RLAIF','DPO (direct preference)','PPO for LLMs','GRPO (group relative policy)','Constitutional AI RLHF','Continual learning (EWC)','Synthetic data generation']},
+{t:'TIER 10 · INFERENCE OPTIMIZATION',sk:['FP16 → INT8 → INT4 quantization','GGUF (llama.cpp)','GPTQ','AWQ (activation-aware)','EXL2 (ExLlamaV2)','Speculative decoding','Medusa heads','Continuous batching (vLLM)','PagedAttention','Tensor parallelism','Pipeline parallelism','Prefix caching','FlashDecoding','Model CPU offloading','CUDA graph capture','INT4 + FP16 LoRA adapters']},
+{t:'TIER 10 · AGENT FRAMEWORKS',sk:['ReAct (Reason+Act loops)','AutoGPT pattern','BabyAGI pattern','LangGraph stateful graphs','CrewAI role-based crews','AutoGen multi-agent','OpenAI Swarm handoffs','Reflexion self-critique','CRITIC tool-verification','Voyager lifelong learning','SWE-agent coding','Devin-style (fs+terminal+browser)','ADAS (auto design agent systems)','Multi-agent debate','Hierarchical manager-worker','MCP tool protocols','Mem0/MemGPT memory agents']},
+{t:'TIER 10 · AI ALIGNMENT & SAFETY',sk:['Mechanistic interpretability','Superposition hypothesis','Sparse autoencoders (SAE)','Activation steering','Representation engineering (RepE)','Probing classifiers','Logit lens','Sleeper agent detection','Jailbreak resistance','Scalable oversight','Debate alignment','Iterated amplification','Value learning (IRL)','Corrigibility','Mild optimization','Deceptive alignment detection','OOD robustness']},
+{t:'TIER 10 · GENERATIVE AI',sk:['Diffusion models (DDPM)','DDIM sampling','Classifier-free guidance (CFG)','Stable Diffusion (LDM)','ControlNet','IP-Adapter','LoRA for images','Flow matching (rectified flow)','DiT (Diffusion Transformer)','Video generation (HunyuanVideo/Wan)','AudioGen / MusicGen','Voice cloning (XTTS/CosyVoice)','Real-time TTS (Kokoro/Piper)','Vision-Language Models (LLaVA/Qwen-VL)','Unified multimodal (GPT-4o style)','Image editing (InstructPix2Pix)','3D generation (TripoSR/Zero123++)']},
+{t:'TIER 10 · SCIENTIFIC AI',sk:['AlphaFold 3 (protein/DNA/RNA)','ESM3 protein language model','AlphaGeometry (olympiad proofs)','FunSearch (evolutionary program search)','AlphaTensor (matrix multiply)','AlphaCode 2 (competitive programming)','Gemini Deep Research','o3 ARC-AGI reasoning','Lean4/Isabelle proof assistants','Drug discovery AI (Insilico/Recursion)','GraphCast weather modeling','Genomics AI (Evo/Nucleotide Transformer)','AlphaChip placement','GNoME crystal discovery','π0/RT-2 robotics foundation','Embodied AI (Boston Dynamics+VLM)']},
+{t:'TIER 10 · EMERGENT AI BEHAVIORS',sk:['In-context learning','CoT emergence (~100B threshold)','Spontaneous tool use','Theory of mind emergence','Cross-domain analogical reasoning','Grokking (delayed generalization)','Double descent','Neural scaling laws (Chinchilla)','Emergent world models','Sycophancy failure mode','Hallucination confabulation anatomy','Sandbagging detection','Capability elicitation','Prompt sensitivity analysis','Compositional generalization','Many-shot context override','SAE feature → thought mapping']},
+];
+
+// ═══════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════
+function stClass(st){return st==='RUNNING'?'s-run':st==='IDLE'?'s-idle':st==='WARN'?'s-warn':'s-off';}
+function renderLeft(){
+  document.getElementById('eng-list').innerHTML=ENGS.map(e=>{
+    const sc=stClass(e.st);
+    return `<div class="eng"><div class="eng-l"><div class="en">${e.n}</div><div class="es">${e.s}</div></div><span class="slbl ${sc}" id="sl-${e.id}">${e.st}</span></div>`;
+  }).join('');
+  document.getElementById('ag-list').innerHTML=AGENTS.map(a=>
+    `<div class="ag"><span class="abadge ${a.t}">${a.t.toUpperCase()}</span><div style="flex:1"><div class="an">${a.n}</div><div class="am">${a.m}</div></div><div class="asc" id="as-${a.n}">—</div></div>`
+  ).join('');
+  document.getElementById('qfire').innerHTML=QUICK.map(q=>
+    `<button class="qbtn" onclick="quickFire(this.dataset.q)" data-q="${q[1]}">${q[0]} ${q[1].slice(0,38)}...</button>`
+  ).join('');
+}
+
+function renderScores(scores){
+  if(!scores)return;
+  document.getElementById('scores-strip').innerHTML=Object.entries(scores).map(([ag,sc])=>{
+    const p=(sc*100).toFixed(0);
+    const col=sc>0.8?'#00ff88':sc>0.6?'#ffd700':'#ff3355';
+    return `<div class="sc-chip"><span style="font-size:7px;color:#aaa">${ag}</span><div class="sc-bar"><div class="sc-fill" style="width:${p}%;background:${col}"></div></div><span style="font-size:7px;color:${col}">${p}%</span></div>`;
+  }).join('');
+  Object.entries(scores).forEach(([ag,sc])=>{
+    const el=document.getElementById('as-'+ag);
+    if(el)el.textContent=(sc*100).toFixed(0)+'%';
+  });
+}
+
+function renderCogDB(){
+  let total=0;
+  document.getElementById('cog-db').innerHTML=COG.map(tier=>{
+    total+=tier.sk.length;
+    const isT10=tier.t.startsWith('TIER 10');
+    return `<div class="tier">
+      <div class="tier-hdr ${isT10?'t10':''}" onclick="toggleTier(this)">
+        <span class="tier-label">${tier.t}</span>
+        <div style="display:flex;align-items:center;gap:5px"><span class="tier-cnt">${tier.sk.length}</span><span class="tier-arrow">▸</span></div>
+      </div>
+      <div class="tier-skills">${tier.sk.map(s=>`<span class="sk">${s}</span>`).join('')}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('cog-total').textContent=`${COG.length} DOMAINS · ${total}+ CAPABILITIES · TIER 0→10`;
+}
+
+function toggleTier(hdr){
+  const sk=hdr.nextElementSibling;
+  const arr=hdr.querySelector('.tier-arrow');
+  const open=sk.classList.toggle('open');
+  if(arr)arr.textContent=open?'▾':'▸';
+}
+
+// ═══════════════════════════════════════════
+// SSE LIVE FEED
+// ═══════════════════════════════════════════
+let sseTimer=null;
+function connectSSE(){
+  const dot=document.getElementById('sse-dot');
+  const es=new EventSource('/stream');
+  es.onopen=()=>{dot.style.background='var(--g)';dot.style.boxShadow='0 0 10px var(--g)'};
+  es.onmessage=e=>{try{handleUpdate(JSON.parse(e.data))}catch(_){}};
+  es.onerror=()=>{
+    dot.style.background='var(--r)';dot.style.boxShadow='0 0 6px var(--r)';
+    es.close();clearTimeout(sseTimer);sseTimer=setTimeout(connectSSE,3000);
+  };
+}
+
+const SVC_STATUS={ollama:'IDLE',cosmos:'RUNNING',pso:'OFF',bd:'IDLE',claw:'WARN',mem:'RUNNING',swarm:'IDLE',ant:'IDLE',evo:'IDLE',rogue:'RUNNING',myc:'OFF',bkup:'OFF'};
+function handleUpdate(d){
+  // Header pills
+  const pillMap={ollama:'ollama',cosmos:'cosmos',pso:'pso',bd:'bd',claw:'claw'};
+  Object.entries(pillMap).forEach(([k,pid])=>{
+    const pill=document.getElementById('p-'+k);
+    const ok=d.svc&&d.svc[k];
+    if(pill)pill.className='pill '+(ok?'on':'off');
+  });
+  // Service labels — drive from SSE where possible
+  const swarmAlive=d.alive&&d.svc;
+  ENGS.forEach(e=>{
+    const sl=document.getElementById('sl-'+e.id);
+    if(!sl)return;
+    let st=e.st;
+    if(e.id==='ollama')st=d.svc&&d.svc.ollama?'RUNNING':'IDLE';
+    else if(e.id==='cosmos')st=d.svc&&d.svc.cosmos?'RUNNING':'OFF';
+    else if(e.id==='pso')st=d.svc&&d.svc.pso?'RUNNING':'OFF';
+    else if(e.id==='claw')st=d.svc&&d.svc.claw?'RUNNING':'WARN';
+    else if(e.id==='bd')st=d.svc&&d.svc.bd?'RUNNING':'IDLE';
+    else if(swarmAlive&&e.st==='IDLE')st='IDLE';
+    sl.className='slbl '+stClass(st);
+    sl.textContent=st;
+  });
+  // Scores
+  renderScores(d.scores);
+  // Memory stats -> left panel cells
+  if(d.mem){
+    const tot=d.mem.total||0;
+    const act=d.mem.active||0;
+    // Map to blueprint fields — approximate from SQLite memory
+    setCell('ms-ep',act.toLocaleString());
+    setCell('ms-vd',(tot*47).toLocaleString()); // rough embed count
+    setCell('ms-gn',Math.floor(tot*1.7).toLocaleString());
+    document.getElementById('m-tot').textContent=tot;
+    document.getElementById('m-act').textContent=act;
+    document.getElementById('m-imp').textContent=d.mem.avg_imp||'—';
+    // Top mems center
+    const tops=d.mem.top||[];
+    document.getElementById('top-mems').innerHTML=tops.length?
+      tops.map(m=>`<span style="color:#888;margin-right:8px">[${(m.i||0).toFixed(1)}] ${(m.c||'').slice(0,60)}</span>`).join('<br>'):
+      'No memories yet — run a cycle to build memory';
+    // Gauges — animate based on memory load
+    const load=Math.min(Math.floor((tot/200)*100),99);
+    setGauge('g-chroma','gv-chroma',Math.min(34+load,95),'linear-gradient(90deg,var(--p),var(--pk))','var(--p)');
+    setGauge('g-tok','gv-tok',Math.min(62+Math.floor(load/3),92),'linear-gradient(90deg,var(--gold),#ff8800)','var(--gold)');
+  }
+  // Blackboard outputs as chat + activity feed
+  if(d.out&&d.out.length){
+    d.out.forEach(o=>{
+      const id=`bb-${o.ts}`;
+      if(!document.getElementById(id)){
+        addBubble(o.agent||'SWARM',o.text||'',id,o.agent==='INJECT'?'user':'agent inject');
+        addActivity(o.agent||'SWM',o.ts,o.text||'');
+      }
+    });
+    scrollChat();
+  }
+  // Footer
+  if(d.cycle!=null)document.getElementById('cyc').textContent=d.cycle;
+  if(d.last_score!=null)document.getElementById('lsc').textContent=(d.last_score*100).toFixed(0)+'%';
+  if(d.mvp)document.getElementById('mvp').textContent=d.mvp;
+}
+function setCell(id,val){const el=document.getElementById(id);if(el)el.textContent=val;}
+function setGauge(trackId,valId,pct,bg,col){
+  const t=document.getElementById(trackId);const v=document.getElementById(valId);
+  if(t)t.style.width=pct+'%';
+  if(t)t.style.background=bg;
+  if(v){v.textContent=pct+'%';v.style.color=col;}
+}
+// Activity feed
+let actTurns=[];
+function addActivity(agent,ts,text){
+  actTurns.push({agent,ts,text});
+  if(actTurns.length>20)actTurns=actTurns.slice(-20);
+  const feed=document.getElementById('activity');
+  if(!feed)return;
+  feed.innerHTML=actTurns.slice().reverse().map(a=>{
+    const t=a.ts?new Date(a.ts+'Z').toLocaleTimeString('en',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'}):'--:--:--';
+    return `<div class="act-row"><span class="at">${t}</span><span class="aa">${(a.agent||'SWM').slice(0,8)}</span><span class="atx">${(a.text||'').replace(/</g,'&lt;').slice(0,80)}</span></div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════
+// CHAT
+// ═══════════════════════════════════════════
+function addBubble(who,text,id='',clsExtra=''){
+  const cw=document.getElementById('chat-window');
+  const idle=document.getElementById('chat-idle');
+  if(idle)idle.remove();
+  // Dedup
+  if(id&&document.getElementById(id))return;
+  const isUser=who==='INJECT'||who==='YOU';
+  const div=document.createElement('div');
+  div.className=`msg ${isUser?'user':'agent'} ${clsExtra}`;
+  if(id)div.id=id;
+  div.innerHTML=`<div class="msg-head">${isUser?'YOU':who} · ${new Date().toLocaleTimeString('en-US',{hour12:false})}</div><div class="bubble">${text.replace(/</g,'&lt;').replace(/>/g,'&gt;').slice(0,600)}${text.length>600?'…':''}</div>`;
+  cw.appendChild(div);
+}
+function scrollChat(){const c=document.getElementById('chat-window');c.scrollTop=c.scrollHeight}
+function clearChat(){document.getElementById('chat-window').innerHTML='<div class="msg-idle">Chat cleared.</div>'}
+
+// ═══════════════════════════════════════════
+// ACTIONS
+// ═══════════════════════════════════════════
+async function fire(){
+  const t=document.getElementById('task-in').value.trim();
+  if(!t){toast('Enter a command first');return}
+  addBubble('YOU',t,'','user');
+  document.getElementById('task-in').value='';
+  scrollChat();
+  try{
+    const r=await fetch('/api/inject',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({task:t})});
+    if(r.ok)toast('⚡ Injected into swarm');
+    else toast('❌ Server error — is the stack running?');
+  }catch{toast('❌ Cannot reach hub server')}
+}
+async function forceCycle(){
+  const r=await fetch('/api/cycle',{method:'POST'}).catch(()=>null);
+  toast(r&&r.ok?'🔄 Cycle triggered':'❌ Error');
+}
+async function flushBB(){
+  if(!confirm('Flush blackboard? Memory DB stays intact.'))return;
+  const r=await fetch('/api/flush',{method:'POST'}).catch(()=>null);
+  toast(r&&r.ok?'🗑 Blackboard flushed':'❌ Error');
+}
+function quickFire(q){document.getElementById('task-in').value=q;fire()}
+
+// ═══════════════════════════════════════════
+// MIC (Web Speech API — offline, built-in)
+// ═══════════════════════════════════════════
+let recog=null,micOn=false;
+function toggleMic(){
+  const SpeechRecog=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SpeechRecog){toast('🎙 Speech API not available — use Chrome or Edge');return}
+  const btn=document.getElementById('mic-btn');
+  if(micOn){recog&&recog.stop();micOn=false;btn.classList.remove('active');btn.textContent='🎙 MIC';return}
+  recog=new SpeechRecog();
+  recog.lang='en-US';recog.continuous=false;recog.interimResults=false;
+  recog.onstart=()=>{micOn=true;btn.classList.add('active');btn.textContent='🔴 LISTENING...'};
+  recog.onresult=e=>{
+    const txt=e.results[0][0].transcript.trim();
+    document.getElementById('task-in').value=txt;
+    toast(`🎙 Heard: "${txt}"`);
+    micOn=false;btn.classList.remove('active');btn.textContent='🎙 MIC';
+  };
+  recog.onerror=()=>{micOn=false;btn.classList.remove('active');btn.textContent='🎙 MIC';toast('🎙 Mic error')};
+  recog.onend=()=>{if(micOn){micOn=false;btn.classList.remove('active');btn.textContent='🎙 MIC'}};
+  recog.start();
+}
+
+// ═══════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.style.display='block';clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',3000)}
+function clock(){document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-US',{hour12:false})}
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter')fire()});
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+renderLeft();renderCogDB();clock();setInterval(clock,1000);
+connectSSE();
+// Open TIER 10 by default after render
+setTimeout(()=>{
+  const hdrs=document.querySelectorAll('.tier-hdr');
+  hdrs.forEach(h=>{if(h.textContent.includes('TIER 10')){const sk=h.nextElementSibling;if(sk){sk.classList.add('open');const arr=h.querySelector('.tier-arrow');if(arr)arr.textContent='▾'}}});
+},300);
+</script></body></html>
