@@ -1,4 +1,4 @@
-"""
+﻿"""
 ╔══════════════════════════════════════════════════════════════════════════╗
 ║  NEXUS MEMORY CORE — TIER 2 NO-WIPE PERSISTENT MEMORY                  ║
 ║                                                                          ║
@@ -13,7 +13,7 @@
 ║                                                                          ║
 ║  INTEGRATION:                                                            ║
 ║  · nexus_swarm_loop.py    reads GOD_MODE_PROMPT + top memories          ║
-║  · nexus_backdoor.py      exposes /memory + /memorize + /recall         ║
+║  · nexus_eh.py            exposes /memory + /memorize + /recall         ║
 ║  · nexus_evolution.py     bias from high-importance memories            ║
 ║  · nexus_mycelium.py      nutrient = importance score                   ║
 ║                                                                          ║
@@ -327,7 +327,7 @@ class MemoryCore:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# SINGLETON INSTANCE (import this in swarm_loop + backdoor)
+# SINGLETON INSTANCE (import this in swarm_loop + EH API)
 # ══════════════════════════════════════════════════════════════════════════════
 _core: Optional[MemoryCore] = None
 
@@ -387,3 +387,4 @@ if __name__ == "__main__":
     print("  core.parse_output(agent_output, agent_name)")
     print()
     core.close()
+

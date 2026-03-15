@@ -1,23 +1,23 @@
-"""
-╔══════════════════════════════════════════════════════════════════╗
-║  NEXUS BACKDOOR — LOCAL COMMAND INJECTION API                   ║
-║  Port: 7701  •  127.0.0.1 ONLY  •  No auth needed locally      ║
-║                                                                  ║
-║  Endpoints:                                                      ║
-║    GET  /              — status dashboard                        ║
-║    GET  /status        — live blackboard snapshot               ║
-║    GET  /memory        — full persistent memory                 ║
-║    GET  /log           — last 50 swarm log lines                ║
-║    POST /inject        — push task into swarm queue             ║
-║    POST /direct        — run ONE-SHOT ollama inference          ║
-║    POST /flush         — clear blackboard + memory              ║
-║    POST /cycle         — force immediate swarm cycle            ║
-║    GET  /agents        — agent roster + live weights            ║
-║    POST /kill          — kill current cycle, skip to next       ║
-╚══════════════════════════════════════════════════════════════════╝
+﻿"""
+â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+â•‘  NEXUS EH â€” LOCAL COMMAND INJECTION API                   â•‘
+â•‘  Port: 7701  â€¢  127.0.0.1 ONLY  â€¢  No auth needed locally      â•‘
+â•‘                                                                  â•‘
+â•‘  Endpoints:                                                      â•‘
+â•‘    GET  /              â€” status dashboard                        â•‘
+â•‘    GET  /status        â€” live blackboard snapshot               â•‘
+â•‘    GET  /memory        â€” full persistent memory                 â•‘
+â•‘    GET  /log           â€” last 50 swarm log lines                â•‘
+â•‘    POST /inject        â€” push task into swarm queue             â•‘
+â•‘    POST /direct        â€” run ONE-SHOT ollama inference          â•‘
+â•‘    POST /flush         â€” clear blackboard + memory              â•‘
+â•‘    POST /cycle         â€” force immediate swarm cycle            â•‘
+â•‘    GET  /agents        â€” agent roster + live weights            â•‘
+â•‘    POST /kill          â€” kill current cycle, skip to next       â•‘
+â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 Usage:
-  python nexus_backdoor.py
+  python nexus_eh.py
 
 Then from anywhere on this machine:
   curl http://127.0.0.1:7701/status
@@ -40,21 +40,29 @@ BASE_DIR    = Path(__file__).parent
 BLACKBOARD  = BASE_DIR / "nexus_blackboard.json"
 MEMORY_FILE = BASE_DIR / "nexus_memory.json"
 LOG_FILE    = BASE_DIR / "swarm_loop.log"
-BACKDOOR_PORT = 7701
+EH_PORT = 7701
 OLLAMA      = "http://127.0.0.1:11434"
 
-log = logging.getLogger("BACKDOOR")
+log = logging.getLogger("EH")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(message)s")
 
-# ── SECURITY HELPERS ──────────────────────────────────────────────────────────
+# â”€â”€ SECURITY HELPERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 ALLOWED_IPS = {"127.0.0.1", "::1", "localhost"}
+LOCALHOST_ONLY = {"/flush", "/kill"}  # destructive endpoints stay localhost-only
 
-def check_ip_allowed(ip: str) -> bool:
-    """Only allow localhost connections — backdoor is local-only."""
-    return ip in ALLOWED_IPS
+def check_ip_allowed(ip: str, path: str = "/") -> bool:
+    """Allow localhost always. Allow LAN (192.168.x.x / 10.x.x.x) for non-destructive endpoints."""
+    if ip in ALLOWED_IPS:
+        return True
+    if path in LOCALHOST_ONLY:
+        return False
+    # Allow home LAN ranges
+    if ip.startswith("192.168.") or ip.startswith("10."):
+        return True
+    return False
 
 def sanitize_task(task: str) -> tuple:
-    """Basic injection guard — returns (clean_task, error_or_None)."""
+    """Basic injection guard â€” returns (clean_task, error_or_None)."""
     if not task:
         return "", "Empty task"
     if len(task) > 2000:
@@ -66,7 +74,7 @@ def sanitize_task(task: str) -> tuple:
             return "", f"Blocked pattern: {b}"
     return task.strip(), None
 
-# ── HELPERS ───────────────────────────────────────────────────────────────────
+# â”€â”€ HELPERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def read_json(path: Path):
     if path.exists():
         try:
@@ -80,7 +88,7 @@ def write_json(path: Path, data):
 
 def read_log(n: int = 50) -> list:
     if not LOG_FILE.exists():
-        return ["[No log file yet — start nexus_swarm_loop.py first]"]
+        return ["[No log file yet â€” start nexus_swarm_loop.py first]"]
     lines = LOG_FILE.read_text(encoding="utf-8", errors="replace").splitlines()
     return lines[-n:]
 
@@ -121,7 +129,73 @@ async def direct_inference(model: str, prompt: str) -> str:
         except Exception as e:
             return f"[ERROR: {e}]"
 
-# ── HTML DASHBOARD ─────────────────────────────────────────────────────────────
+# â”€â”€ MOBILE DASHBOARD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+def build_mobile_html() -> str:
+    bb     = read_json(BLACKBOARD)
+    status = bb.get("status", "UNKNOWN")
+    task   = bb.get("task", "[none]")
+    score  = bb.get("last_score", "â€”")
+    mvp    = bb.get("last_mvp", "â€”")
+    cycle  = bb.get("cycle_id", "â€”")
+    logs   = read_log(15)
+    log_html = "".join(f'<div class="ll">{l.replace("<","&lt;")}</div>' for l in logs)
+    badge_color = "#00ff41" if status == "RUNNING" else "#ffaa00" if status == "DONE" else "#ff3333"
+
+    return f"""<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="refresh" content="10">
+<title>NEXUS Â· Mobile</title>
+<style>
+*{{box-sizing:border-box;margin:0;padding:0}}
+body{{background:#060606;color:#aaccaa;font-family:monospace;font-size:14px;padding:16px;max-width:480px;margin:auto}}
+h1{{color:#ff00ff;font-size:16px;letter-spacing:3px;margin-bottom:12px}}
+.badge{{display:inline-block;padding:4px 12px;border-radius:4px;font-size:11px;letter-spacing:2px;font-weight:bold;margin-bottom:12px;color:#060606;background:{badge_color}}}
+.card{{background:#0a0a0a;border:1px solid #0f2d0f;border-radius:6px;padding:12px;margin-bottom:12px}}
+.card h2{{color:#00ccff;font-size:11px;letter-spacing:2px;margin-bottom:8px}}
+.row{{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #0a1a0a;font-size:13px}}
+.lbl{{color:#2a4a2a}}.val{{color:#fff;text-align:right;max-width:65%}}
+textarea{{width:100%;background:#050505;border:1px solid #0f2d0f;color:#00ff41;font-family:monospace;font-size:13px;padding:8px;border-radius:4px;resize:vertical;min-height:60px}}
+button{{width:100%;background:none;border:2px solid #00ff41;color:#00ff41;font-family:monospace;font-size:14px;padding:10px;border-radius:4px;margin-top:8px;cursor:pointer;letter-spacing:1px}}
+button:active{{background:#00ff4120}}
+.ll{{font-size:10px;color:#2a5a2a;padding:1px 0;border-bottom:1px solid #0a1a0a}}
+</style></head><body>
+<h1>âš¡ NEXUS</h1>
+<div class="badge">{status}</div>
+
+<div class="card">
+  <h2>â–¸ SWARM STATUS</h2>
+  <div class="row"><span class="lbl">CYCLE</span><span class="val">{cycle}</span></div>
+  <div class="row"><span class="lbl">SCORE</span><span class="val" style="color:#ffaa00">{score}</span></div>
+  <div class="row"><span class="lbl">MVP</span><span class="val" style="color:#ff00ff">{mvp}</span></div>
+  <div class="row"><span class="lbl">TASK</span><span class="val">{str(task)[:60]}</span></div>
+</div>
+
+<div class="card">
+  <h2>â–¸ INJECT TASK</h2>
+  <textarea id="t" placeholder="Enter task for the swarm..."></textarea>
+  <button onclick="inject()">âš¡ INJECT</button>
+</div>
+
+<div class="card">
+  <h2>â–¸ LIVE LOG</h2>
+  <div style="max-height:200px;overflow-y:auto">{log_html}</div>
+</div>
+
+<script>
+async function inject(){{
+  const t=document.getElementById('t').value.trim();
+  if(!t)return;
+  const r=await fetch('/inject',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify({{task:t}})}});
+  const d=await r.json();
+  alert(d.ok?'Injected! Queue: '+d.queue_depth:d.error);
+  document.getElementById('t').value='';
+}}
+</script>
+</body></html>"""
+
+# â”€â”€ HTML DASHBOARD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def build_dashboard_html() -> str:
     bb  = read_json(BLACKBOARD)
     mem = read_json(MEMORY_FILE) if MEMORY_FILE.exists() else []
@@ -131,15 +205,15 @@ def build_dashboard_html() -> str:
 
     status   = bb.get("status", "UNKNOWN")
     task     = bb.get("task", "[none]")
-    score    = bb.get("last_score", "—")
-    mvp      = bb.get("last_mvp", "—")
+    score    = bb.get("last_score", "â€”")
+    mvp      = bb.get("last_mvp", "â€”")
     lesson   = bb.get("last_lesson", "[none]")
-    cycle_id = bb.get("cycle_id", "—")
+    cycle_id = bb.get("cycle_id", "â€”")
     outputs  = bb.get("outputs", [])
 
     agents_html = "".join(
         f'<div class="agent"><span class="ag-name">{o["agent"]}</span>'
-        f'<span class="ag-out">{o["text"][:200].replace("<","&lt;")}…</span></div>'
+        f'<span class="ag-out">{o["text"][:200].replace("<","&lt;")}â€¦</span></div>'
         for o in outputs[-8:]
     )
     mem_html = "".join(
@@ -153,8 +227,8 @@ def build_dashboard_html() -> str:
     return f"""<!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="UTF-8"><meta http-equiv="refresh" content="8">
-<title>NEXUS BACKDOOR</title>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<title>NEXUS EH</title>
+<link rel="stylesheet" href="jetbrains-mono.css">
 <style>
 :root{{--g:#00ff41;--g2:#00cc33;--bg:#060606;--p:#0a0a0a;--bd:#0f2d0f;--red:#ff3333;--yel:#ffaa00;--cya:#00ccff;--mag:#ff00ff;--dim:#2a4a2a;--wht:#aaccaa}}
 *{{box-sizing:border-box;margin:0;padding:0}}
@@ -180,52 +254,52 @@ button.c{{border-color:var(--cya);color:var(--cya)}}
 .grid{{display:grid;grid-template-columns:1fr 1fr;gap:12px}}
 @media(max-width:700px){{.grid{{grid-template-columns:1fr}}}}
 </style></head><body>
-<h1>⚡ NEXUS BACKDOOR // 127.0.0.1:7701</h1>
+<h1>âš¡ NEXUS EH // 127.0.0.1:7701</h1>
 
 <div style="margin-bottom:10px">
   <span class="badge {'g' if status == 'RUNNING' else 'y' if status == 'DONE' else 'r'}">{status}</span>
-  <span class="badge g">OFFLINE · NO API</span>
+  <span class="badge g">OFFLINE Â· NO API</span>
   <span class="badge g">AUTO-REFRESH 8s</span>
 </div>
 
 <div class="grid">
 <div>
-<h2>▸ SWARM STATUS</h2>
+<h2>â–¸ SWARM STATUS</h2>
 <div class="row"><span class="lbl">CYCLE</span><span class="val">{cycle_id}</span></div>
 <div class="row"><span class="lbl">TASK</span><span class="val">{task[:80]}</span></div>
 <div class="row"><span class="lbl">LAST SCORE</span><span class="val" style="color:var(--yel)">{score}</span></div>
 <div class="row"><span class="lbl">MVP AGENT</span><span class="val" style="color:var(--mag)">{mvp}</span></div>
 <div class="row"><span class="lbl">LESSON</span><span class="val">{str(lesson)[:100]}</span></div>
 
-<h2>▸ INJECT TASK</h2>
+<h2>â–¸ INJECT TASK</h2>
 <form method="POST" action="/inject" onsubmit="return submitInject(event)">
   <input type="text" id="inject-task" placeholder="Enter task to inject into swarm queue...">
-  <button type="button" onclick="submitInject()">⚡ INJECT</button>
-  <button type="button" onclick="forceNow()" class="c">▶ FORCE NOW</button>
+  <button type="button" onclick="submitInject()">âš¡ INJECT</button>
+  <button type="button" onclick="forceNow()" class="c">â–¶ FORCE NOW</button>
 </form>
 
-<h2>▸ DIRECT INFERENCE</h2>
+<h2>â–¸ DIRECT INFERENCE</h2>
 <form onsubmit="return directInfer(event)">
   <input type="text" id="d-model" placeholder="model (e.g. nexus-prime:latest)" style="max-width:200px">
   <input type="text" id="d-prompt" placeholder="prompt...">
-  <button type="button" onclick="directInfer()">🧠 RUN</button>
+  <button type="button" onclick="directInfer()">ðŸ§  RUN</button>
 </form>
 <div id="direct-result" style="margin-top:6px;font-size:9px;color:#668866;max-height:150px;overflow-y:auto"></div>
 
-<h2>▸ DANGER ZONE</h2>
+<h2>â–¸ DANGER ZONE</h2>
 <form>
-  <button type="button" class="r" onclick="if(confirm('Flush ALL memory?'))fetch('/flush',{{method:'POST'}}).then(()=>location.reload())">☠ FLUSH ALL</button>
+  <button type="button" class="r" onclick="if(confirm('Flush ALL memory?'))fetch('/flush',{{method:'POST'}}).then(()=>location.reload())">â˜  FLUSH ALL</button>
 </form>
 </div>
 
 <div>
-<h2>▸ RECENT AGENT OUTPUTS</h2>
-<div style="max-height:200px;overflow-y:auto">{agents_html or '<div style="color:var(--dim)">No outputs yet — start nexus_swarm_loop.py</div>'}</div>
+<h2>â–¸ RECENT AGENT OUTPUTS</h2>
+<div style="max-height:200px;overflow-y:auto">{agents_html or '<div style="color:var(--dim)">No outputs yet â€” start nexus_swarm_loop.py</div>'}</div>
 
-<h2>▸ MEMORY ({len(mem) if isinstance(mem, list) else 0} entries)</h2>
+<h2>â–¸ MEMORY ({len(mem) if isinstance(mem, list) else 0} entries)</h2>
 <div style="max-height:140px;overflow-y:auto">{mem_html or '<div style="color:var(--dim)">No memory yet</div>'}</div>
 
-<h2>▸ LIVE LOG (last 30 lines)</h2>
+<h2>â–¸ LIVE LOG (last 30 lines)</h2>
 <div style="max-height:200px;overflow-y:auto;border:1px solid var(--bd);padding:4px">{log_html}</div>
 </div>
 </div>
@@ -249,7 +323,7 @@ async function directInfer() {{
   const model = document.getElementById('d-model').value.trim() || 'nexus-prime:latest';
   const prompt = document.getElementById('d-prompt').value.trim();
   if(!prompt) return;
-  document.getElementById('direct-result').textContent = '⏳ Thinking...';
+  document.getElementById('direct-result').textContent = 'â³ Thinking...';
   const r = await fetch('/direct', {{method:'POST', headers:{{'Content-Type':'application/json'}}, body: JSON.stringify({{model, prompt}})}});
   const d = await r.json();
   document.getElementById('direct-result').textContent = d.result || d.error;
@@ -257,7 +331,7 @@ async function directInfer() {{
 </script>
 </body></html>"""
 
-# ── ASYNC HTTP SERVER ──────────────────────────────────────────────────────────
+# â”€â”€ ASYNC HTTP SERVER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async def handle(reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
     try:
         raw = await asyncio.wait_for(reader.read(8192), timeout=10.0)
@@ -270,13 +344,13 @@ async def handle(reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
         method = first[0]
         path   = first[1].split("?")[0]
 
-        # ── IP ALLOWLIST CHECK ────────────────────────────────────────────────────
+        # â”€â”€ IP ALLOWLIST CHECK â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         peer = writer.get_extra_info('peername', ('0.0.0.0', 0))
         client_ip = peer[0] if peer else '0.0.0.0'
-        if path != '/health' and not check_ip_allowed(client_ip):
+        if path != '/health' and not check_ip_allowed(client_ip, path):
             deny = b'HTTP/1.1 403 Forbidden\r\nContent-Type: application/json\r\n\r\n{"error":"IP not allowed"}'
             writer.write(deny); await writer.drain(); writer.close(); return
-        # ─────────────────────────────────────────────────────────────────────────
+        # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         body = {}
         if method == "POST":
             body_start = text.find("\r\n\r\n")
@@ -294,6 +368,9 @@ async def handle(reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
 
         if path == "/" or path == "/dashboard":
             response_body = build_dashboard_html()
+
+        elif path == "/mobile":
+            response_body = build_mobile_html()
 
         elif path == "/status":
             content_type = "application/json"
@@ -322,14 +399,14 @@ async def handle(reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
         elif path == "/inject" and method == "POST":
             content_type = "application/json"
             raw_task = body.get("task", "").strip()
-            task, err = sanitize_task(raw_task)  # ← security: blocks injection attempts
+            task, err = sanitize_task(raw_task)  # â† security: blocks injection attempts
             if err:
                 status = 400
                 response_body = json.dumps({"ok": False, "error": err})
             elif task:
                 result = inject_task(task)
                 response_body = json.dumps(result)
-                log.info(f"[BACKDOOR] Injected task: {task[:80]}")
+                log.info(f"[EH] Injected task: {task[:80]}")
             else:
                 status = 400
                 response_body = json.dumps({"ok": False, "error": "No task provided"})
@@ -339,13 +416,13 @@ async def handle(reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
             task = body.get("task", "").strip()
             result = force_cycle(task)
             response_body = json.dumps(result)
-            log.info(f"[BACKDOOR] Force cycle requested")
+            log.info(f"[EH] Force cycle requested")
 
         elif path == "/flush" and method == "POST":
             content_type = "application/json"
             result = flush_all()
             response_body = json.dumps(result)
-            log.info(f"[BACKDOOR] FLUSH ALL executed")
+            log.info(f"[EH] FLUSH ALL executed")
 
         elif path == "/direct" and method == "POST":
             content_type = "application/json"
@@ -374,21 +451,24 @@ async def handle(reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
         writer.write(headers.encode() + body_bytes)
         await writer.drain()
     except Exception as e:
-        log.warning(f"[BACKDOOR] Request error: {e}")
+        log.warning(f"[EH] Request error: {e}")
     finally:
         writer.close()
 
 async def main():
-    server = await asyncio.start_server(handle, "127.0.0.1", BACKDOOR_PORT)
-    log.info(f"⚡ NEXUS BACKDOOR running on http://127.0.0.1:{BACKDOOR_PORT}")
-    log.info(f"   Dashboard:  http://127.0.0.1:{BACKDOOR_PORT}/")
-    log.info(f"   Status:     http://127.0.0.1:{BACKDOOR_PORT}/status")
-    log.info(f"   Memory:     http://127.0.0.1:{BACKDOOR_PORT}/memory")
-    log.info(f"   Log:        http://127.0.0.1:{BACKDOOR_PORT}/log")
-    log.info(f"   Inject:     POST http://127.0.0.1:{BACKDOOR_PORT}/inject")
-    log.info(f"   Direct LLM: POST http://127.0.0.1:{BACKDOOR_PORT}/direct")
+    server = await asyncio.start_server(handle, "0.0.0.0", EH_PORT)
+    log.info(f"âš¡ NEXUS EH running on http://127.0.0.1:{EH_PORT}")
+    log.info(f"   Phone/LAN:  http://192.168.0.188:{EH_PORT}/mobile")
+    log.info(f"   Dashboard:  http://127.0.0.1:{EH_PORT}/")
+    log.info(f"   Status:     http://127.0.0.1:{EH_PORT}/status")
+    log.info(f"   Memory:     http://127.0.0.1:{EH_PORT}/memory")
+    log.info(f"   Log:        http://127.0.0.1:{EH_PORT}/log")
+    log.info(f"   Inject:     POST http://127.0.0.1:{EH_PORT}/inject")
+    log.info(f"   Direct LLM: POST http://127.0.0.1:{EH_PORT}/direct")
     async with server:
         await server.serve_forever()
 
 if __name__ == "__main__":
     asyncio.run(main())
+
+

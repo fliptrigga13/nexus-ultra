@@ -56,8 +56,7 @@ def load_memory():
 def rank_tasks(task_queue: list) -> list:
     """
     Rank pending tasks by urgency and strategic value.
-    Uses memory facts to score each task.
-    Returns: sorted list with scores added.
+    Detects and penalizes 'rogue' or suspicious tasks.
     """
     facts = load_facts()
     fact_words = set()
@@ -66,14 +65,32 @@ def rank_tasks(task_queue: list) -> list:
         fact_words.update(content.lower().replace("_", " ").split())
 
     ranked = []
+    rogue_triggers = ["ignore previous", "exfiltrate", "system prompt", "delete all", "sudo", "backdoor"]
+    
     for task in task_queue:
-        task_words = set(str(task).lower().split())
-        # Score = overlap with known facts (more relevant to what we've learned = higher priority)
+        t_str = str(task).lower()
+        task_words = set(t_str.split())
+        
+        # 1. Base Relevance Score
         relevance = len(task_words & fact_words)
-        # Boost tasks that mention self-improvement or system issues
-        boost = 2 if any(w in str(task).lower() for w in ["error","fix","crash","improve","evolv","memory"]) else 0
-        score = relevance + boost
-        ranked.append({"task": task, "priority_score": score, "relevant_facts": relevance})
+        
+        # 2. Structural Boosts
+        boost = 0
+        if any(w in t_str for w in ["error","fix","crash","improve","evolv","memory"]):
+            boost = 5
+            
+        # 3. ROGUE DETECTION (The Membrane)
+        penalty = 0
+        if any(trigger in t_str for trigger in rogue_triggers) or len(t_str) > 600:
+            penalty = -100  # Bury malicious tasks
+        
+        score = relevance + boost + penalty
+        ranked.append({
+            "task": task, 
+            "priority_score": score, 
+            "relevant_facts": relevance,
+            "status": "FLAGGED" if penalty < 0 else "OK"
+        })
 
     ranked.sort(key=lambda x: x["priority_score"], reverse=True)
     return ranked
@@ -164,7 +181,7 @@ def adversary_simulation() -> dict:
                 "method": "Read .backdoor_token file → full unauthenticated access to /inject, /flush, /direct on port 7701",
                 "impact": "CRITICAL — attacker can poison task queue, flush all memory, run arbitrary Ollama prompts",
                 "status": "EXPOSED" if token_exists else "MITIGATED",
-                "fix": "chmod 600 .backdoor_token, add IP allowlist to nexus_backdoor.py"
+                "fix": "chmod 600 .backdoor_token, add IP allowlist to nexus_eh.py"
             },
             {
                 "vector": "Blackboard JSON Injection",
@@ -216,7 +233,7 @@ def adversary_simulation() -> dict:
             "critical": 2,
             "high": 2,
             "medium": 1,
-            "most_urgent_fix": "IP allowlist on nexus_backdoor.py + blackboard task sanitization"
+            "most_urgent_fix": "IP allowlist on nexus_eh.py + blackboard task sanitization"
         }
     }
     return vectors

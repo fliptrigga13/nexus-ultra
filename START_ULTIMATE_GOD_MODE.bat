@@ -42,9 +42,9 @@ echo  [5/10] Starting Autonomous Agent Swarm Loop (6 agents)...
 start "SWARM LOOP" /min cmd /c "python nexus_swarm_loop.py 2>&1 | tee swarm_loop.log"
 timeout /t 3 /nobreak >nul
 
-REM ── 6. BACKDOOR API (Local Command Injection :7701)
-echo  [6/10] Starting Backdoor API (:7701)...
-start "BACKDOOR :7701" /min cmd /c "python nexus_backdoor.py 2>&1 | tee backdoor.log"
+REM ── 6. EH API (Local Command Injection :7701)
+echo  [6/10] Starting EH API (:7701)...
+start "EH :7701" /min cmd /c "python nexus_eh.py 2>&1 | tee nexus_eh.log"
 timeout /t 2 /nobreak >nul
 
 REM ── 7. ANT COLONY ANTENNAE (pheromone comms, hive mind)
@@ -72,9 +72,14 @@ echo  [11/11] Starting Permanent Hub Server (:7702)...
 start "HUB SERVER :7702" /min cmd /c "python nexus_hub_server.py 2>&1 | tee hub.log"
 timeout /t 2 /nobreak >nul
 
+REM ── 12. FEED INGESTOR (HackerNews + ArXiv → swarm task queue, every hour)
+echo  [12/12] Starting Feed Ingestor (HN + ArXiv)...
+start "FEED INGESTOR" /min cmd /c "python nexus_feed_ingestor.py 2>&1 | tee feed.log"
+timeout /t 2 /nobreak >nul
+
 echo.
 echo  ══════════════════════════════════════════════════════════════
-echo   ALL 10 ENGINES LAUNCHING... waiting 10s for full boot
+echo   ALL 12 ENGINES LAUNCHING... waiting 10s for full boot
 echo  ══════════════════════════════════════════════════════════════
 timeout /t 10 /nobreak >nul
 
@@ -83,7 +88,7 @@ echo  OPENING ULTIMATE GOD MODE HUB (ALL-IN-ONE)...
 start "" "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_ultimate_hub.html"
 
 echo.
-echo  OPENING BACKDOOR DASHBOARD...
+echo  OPENING EH DASHBOARD...
 start "" "http://127.0.0.1:7701"
 
 echo.
@@ -94,7 +99,7 @@ echo   PORTS:
 echo     OLLAMA:           http://127.0.0.1:11434
 echo     COSMOS API:       http://127.0.0.1:9100
 echo     PSO SWARM (GPU):  http://127.0.0.1:7700
-echo     BACKDOOR API:     http://127.0.0.1:7701
+echo     EH API:           http://127.0.0.1:7701
 echo.
 echo   10 ENGINES RUNNING:
 echo     [1]  Ollama LLM (9 models)
@@ -102,7 +107,7 @@ echo     [2]  COSMOS Orchestration
 echo     [3]  Julia PSO GPU Optimizer
 echo     [4]  Tier-2 Memory Core (nexus_mind.db -- no wipe)
 echo     [5]  Swarm Loop (SUPERVISOR/PLANNER/RESEARCHER/DEVELOPER/VALIDATOR/REWARD)
-echo     [6]  Backdoor API
+echo     [6]  EH API (nexus_eh.py)
 echo     [7]  Ant Colony Antennae (pheromones)
 echo     [8]  Evolution Engine (prompt mutation)
 echo     [9]  Rogue Squad (METACOG/ROGUE/HACKER/ADVERSARY)

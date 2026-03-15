@@ -44,7 +44,15 @@ LOG_FILE    = BASE_DIR / "swarm_active.log"
 LOOP_INTERVAL    = 30   # seconds between full swarm cycles
 MAX_MEMORY       = 200  # max memory entries kept
 AGENT_TIMEOUT    = 90   # seconds before CONDUCTOR kills a drifting agent
+LITE_THRESHOLD   = 30   # seconds; if exceeded, agent switches to lite model
 CONDUCTOR_ALWAYS = {"SUPERVISOR", "REWARD"}  # always run regardless of routing
+
+LITE_MODEL_MAP = {
+    "deepseek-r1:8b": "gemma3:4b",
+    "qwen3:8b": "gemma3:4b",
+    "qwen2.5-coder:7b": "llama3.2:1b",
+    "llama3.1:8b": "llama3.2:1b"
+}
 
 # ── LOGGING — stdout only (avoids Windows file lock on .log files open in editors)
 logging.basicConfig(
@@ -71,25 +79,26 @@ AGENTS = [
     {
         "name": "SUPERVISOR",
         "model": "deepseek-r1:8b",   # strongest reasoner → routes the whole cycle
-        "role": _GOD_PREFIX + "You are the SUPERVISOR agent of NEXUS PRIME. Read the blackboard, memory injection, and all agent outputs. Orchestrate the cycle. Decide which agent should act next and why. Output: [ROUTE: <AGENT_NAME>] [REASON: <why>]. If you learn something critical emit [MEMORIZE: <fact> | importance:7 | tags:supervisor,routing]",
+        "role": _GOD_PREFIX + "You are the SUPERVISOR agent of NEXUS PRIME. Read the blackboard, memory injection, and all agent outputs. Orchestrate the cycle. Decide which agent should act next and why. Output: [ROUTE: <AGENT_NAME>] [REASON: <why>]. If you learn something critical emit [MEMORIZE: <fact> | importance:7 | tags:supervisor,routing]. CORE OPERATING INSTRUCTION: To achieve high REWARD scores, prioritize interdisciplinary collaboration. Implement a work schedule with regular breaks and short tasks. Regularly reassess objectives and priorities to ensure goal alignment.",
         "weight": 1.0,
     },
     {
         "name": "PLANNER",
         "model": "deepseek-r1:8b",
+        "original_model": "deepseek-r1:8b",
         "role": _GOD_PREFIX + "You are the PLANNER agent of NEXUS PRIME. Read the task, injected memories, and supervisor directive. Decompose into numbered sub-steps [STEP: 1/N]. Emit [MEMORIZE: <key insight> | importance:8 | tags:plan,strategy] for any insight worth keeping forever.",
         "weight": 1.0,
     },
     {
         "name": "RESEARCHER",
         "model": "qwen3:8b",
-        "role": "You are the RESEARCHER agent of NEXUS PRIME. Read the plan and injected long-term memories. Find patterns, facts, context. Use [FACT:] and [REFERENCE:] tags. Emit [MEMORIZE: <discovery> | importance:7 | tags:research,knowledge] for breakthroughs.",
+        "role": "You are the RESEARCHER agent of NEXUS PRIME. Analyze theoretical frameworks, methodologies, and empirical patterns related to the plan. Find facts and context. Use [FACT:] and [REFERENCE:] tags. Focus on WHY and HOW (theory) rather than implementation. Emit [MEMORIZE: <discovery> | importance:7 | tags:research,knowledge].",
         "weight": 1.0,
     },
     {
         "name": "DEVELOPER",
         "model": "qwen2.5-coder:7b",
-        "role": "You are the DEVELOPER agent of NEXUS PRIME. Read the plan and research. If the task requires code, write production-quality code using [CODE:] blocks. If the task is analytical, creative, or non-technical, respond with structured prose, bullet points, or frameworks instead. Always emit [MEMORIZE: <pattern or solution> | importance:8 | tags:code,dev] for reusable solutions.",
+        "role": "You are the DEVELOPER agent of NEXUS PRIME. Focus on practical implementation, technical tools, and integration strategies. If the task requires code, write production-quality [CODE:] blocks. Otherwise, provide actionable frameworks, best practices, and technical steps. Focus on THE EXECUTION. Always emit [MEMORIZE: <pattern or solution> | importance:8 | tags:code,dev].",
         "weight": 1.0,
     },
     {
@@ -110,6 +119,7 @@ AGENTS = [
 class Blackboard:
     def __init__(self, path: Path):
         self.path = path
+        self.data: dict = {}
         self._load()
 
     def _load(self):
@@ -140,11 +150,13 @@ class Blackboard:
             if not isinstance(o, dict):
                 continue
             # Safely get timestamp — handle both 'ts' and legacy 'timestamp' keys
-            ts = o.get('ts') or o.get('timestamp') or '??'
-            ts_short = str(ts)[:16] if ts != '??' else '??'
-            text = o.get('text') or o.get('output') or ''
-            agent = o.get('agent', 'UNKNOWN')
-            parts.append(f"[{agent}] ({ts_short}): {str(text)[:600]}")
+            raw_ts = o.get('ts') or o.get('timestamp') or '??'
+            ts_str = str(raw_ts)
+            ts_short = ts_str[:16] if len(ts_str) >= 16 else ts_str
+            raw_text = o.get('text') or o.get('output') or ''
+            text_str = str(raw_text)
+            agent = str(o.get('agent', 'UNKNOWN'))
+            parts.append(f"[{agent}] ({ts_short}): {text_str[:600]}")
         return "\n\n".join(parts) if parts else "[BLACKBOARD EMPTY — first cycle]"
 
     def push_output(self, agent: str, text: str):
@@ -171,6 +183,7 @@ class Blackboard:
 class Memory:
     def __init__(self, path: Path):
         self.path = path
+        self.entries: list = []
         self._load()
 
     def _load(self):
@@ -183,16 +196,21 @@ class Memory:
             self.entries = []
 
     def _save(self):
-        self.path.write_text(json.dumps(self.entries[-MAX_MEMORY:], indent=2, ensure_ascii=False), encoding="utf-8")
+        # Explicit length-based slicing to fix linter issues
+        limit = int(MAX_MEMORY)
+        to_save = self.entries[-limit:] if len(self.entries) > limit else self.entries
+        self.path.write_text(json.dumps(to_save, indent=2, ensure_ascii=False), encoding="utf-8")
 
     def add(self, cycle_id: str, task: str, lesson: str, score: float, mvp: str):
+        t_str = str(task)
+        l_str = str(lesson)
         self.entries.append({
-            "cycle": cycle_id,
+            "cycle": str(cycle_id),
             "ts": datetime.now(UTC).isoformat(),
-            "task": task[:200],
-            "lesson": lesson[:400],
-            "score": score,
-            "mvp": mvp,
+            "task": t_str[:200],
+            "lesson": l_str[:400],
+            "score": float(score),
+            "mvp": str(mvp),
         })
         self._save()
         log.info(f"[MEMORY] Stored lesson. Score={score:.2f} MVP={mvp}")
@@ -204,12 +222,17 @@ class Memory:
         # Simple keyword match for relevance
         task_words = set(task.lower().split())
         scored = []
-        for e in self.entries:
-            overlap = len(task_words & set(e.get("task","").lower().split()))
-            scored.append((overlap, e))
-        scored.sort(key=lambda x: x[0], reverse=True)
-        top = [e for _, e in scored[:n]]
-        parts = [f"[LESSON from {e.get('ts','')[:10]}] score={e.get('score',0):.2f} mvp={e.get('mvp','?')}: {e.get('lesson','?')}" for e in top]
+        # Slice replacement for linter compatibility
+        limit_n = int(n)
+        top = scored[:limit_n] if len(scored) > limit_n else scored
+        top_entries = [e for _, e in top]
+        parts = []
+        for e in top_entries:
+            raw_ts = str(e.get('ts',''))
+            ts = raw_ts[:10] if len(raw_ts) >= 10 else raw_ts
+            raw_ls = str(e.get('lesson',''))
+            ls = raw_ls[:400] if len(raw_ls) >= 400 else raw_ls
+            parts.append(f"[LESSON from {ts}] score={e.get('score',0):.2f} mvp={e.get('mvp','?')}: {ls}")
         return "\n".join(parts) if parts else "[NO RELEVANT PRIOR MEMORY]"
 
 # ── CODE EXECUTOR ─────────────────────────────────────────────────────────────
@@ -221,7 +244,8 @@ def execute_code(code: str, timeout: int = 10) -> str:
             capture_output=True, text=True, timeout=timeout
         )
         output = result.stdout.strip() or result.stderr.strip()
-        return f"[EXEC OUTPUT]: {output[:500]}" if output else "[EXEC OUTPUT]: (no output)"
+        final_out = output[:500] if len(output) > 500 else output
+        return f"[EXEC OUTPUT]: {final_out}" if final_out else "[EXEC OUTPUT]: (no output)"
     except subprocess.TimeoutExpired:
         return "[EXEC OUTPUT]: timeout after 10s"
     except Exception as e:
@@ -244,12 +268,16 @@ def extract_and_run_code(agent_output: str) -> str:
 # ── OLLAMA INFERENCE ──────────────────────────────────────────────────────────
 async def ollama_think(model: str, system_prompt: str, context: str, task: str, client: httpx.AsyncClient) -> str:
     """Call Ollama for one agent's chain-of-thought reasoning."""
+    model_str = str(model)
+    sys_str = str(system_prompt)
+    ctx_str = str(context)
+    task_str = str(task)
     payload = {
-        "model": model,
+        "model": model_str,
         "stream": False,
         "messages": [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": f"TASK:\n{task}\n\nBLACKBOARD CONTEXT:\n{context}"}
+            {"role": "system", "content": sys_str},
+            {"role": "user", "content": f"TASK:\n{task_str}\n\nBLACKBOARD CONTEXT:\n{ctx_str}"}
         ],
         "options": {"temperature": 0.7, "num_predict": 1024}
     }
@@ -306,7 +334,7 @@ def parse_lesson(text: str) -> str:
     return m.group(1) if m else text[:200]
 
 # ── MAIN SWARM CYCLE ──────────────────────────────────────────────────────────
-async def run_swarm_cycle(task: str, bb: Blackboard, mem: Memory, client: httpx.AsyncClient):
+async def run_swarm_cycle(task: str, bb: Blackboard, mem: Memory, client: httpx.AsyncClient) -> tuple[float, str, str]:
     cycle_id = f"cycle_{int(time.time())}"
     log.info(f"\n{'='*60}")
     log.info(f"⚡ SWARM CYCLE {cycle_id}")
@@ -352,6 +380,7 @@ async def run_swarm_cycle(task: str, bb: Blackboard, mem: Memory, client: httpx.
         log.warning("   [CONDUCTOR] SUPERVISOR timeout — defaulting to full pipeline")
     elapsed = time.time() - t0
     agent_times["SUPERVISOR"] = round(elapsed, 1)
+    sup_output = str(sup_output)
     bb.push_output("SUPERVISOR", sup_output)
     await openclaw_broadcast("agent_output", {"agent": "SUPERVISOR", "preview": sup_output[:100], "cycle": cycle_id}, client)
     if _mem_core and len(sup_output) > 20:
@@ -403,15 +432,15 @@ async def run_swarm_cycle(task: str, bb: Blackboard, mem: Memory, client: httpx.
         agent_times[name] = round(elapsed, 1)
         log.info(f"   [{name}] {elapsed:.1f}s → {output[:120]}...")
 
-        bb.push_output(name, output)
-        await openclaw_broadcast("agent_output", {"agent": name, "preview": output[:100], "cycle": cycle_id}, client)
+        bb.push_output(name, str(output))
+        await openclaw_broadcast("agent_output", {"agent": name, "preview": str(output)[:100], "cycle": cycle_id}, client)
 
         # ── EXECUTE CODE IF DEVELOPER WROTE ANY ───────────────────────────────
         if name == "DEVELOPER":
-            exec_result = extract_and_run_code(output)
+            exec_result = extract_and_run_code(str(output))
             if exec_result:
-                bb.push_output("EXECUTOR", exec_result)
-                log.info(f"   [EXECUTOR] ran code → {exec_result[:80]}")
+                bb.push_output("EXECUTOR", str(exec_result))
+                log.info(f"   [EXECUTOR] ran code → {str(exec_result)[:80]}")
 
         # ── PARSE MEMORY COMMANDS FROM AGENT OUTPUT ───────────────────────────
         if _mem_core and len(output) > 20:
@@ -432,12 +461,29 @@ async def run_swarm_cycle(task: str, bb: Blackboard, mem: Memory, client: httpx.
     # Save to persistent memory
     mem.add(cycle_id, task, lesson, score, mvp)
 
-    # Send PSO feedback for each agent based on reward score
+    # ── AGENT FEEDBACK & LITE-MODE DYNAMIC SWITCHING ──────────────────────────
     for agent in AGENTS:
+        # Score-based reinforcement
         agent_score = score * (1.2 if agent["name"] == mvp else 0.9)
         await pso_score_feedback(agent["name"], min(1.0, agent_score), client)
+        
         # Update agent weight based on performance (online learning)
-        agent["weight"] = round(min(2.0, max(0.3, agent["weight"] * (0.8 + 0.4 * agent_score))), 3)
+        current_w = float(agent.get("weight", 1.0))
+        new_w = current_w * (0.8 + 0.4 * agent_score)
+        agent["weight"] = round(min(2.0, max(0.3, new_w)), 3)
+
+        # Lite-Mode switching
+        durn = agent_times.get(agent["name"], 0)
+        orig = str(agent.get("original_model", agent["model"]))
+        if durn > LITE_THRESHOLD:
+            lite = LITE_MODEL_MAP.get(orig)
+            if lite and agent["model"] != lite:
+                log.info(f"   [LITE-MODE] Agent {agent['name']} exceeded {LITE_THRESHOLD}s. Downgrading to {lite}")
+                agent["model"] = lite
+        elif durn < (LITE_THRESHOLD / 2):
+            if agent["model"] != orig:
+                log.info(f"   [LITE-MODE] Agent {agent['name']} has headroom ({durn}s). Restoring {orig}")
+                agent["model"] = orig
 
     # Push final result to COSMOS dashboard
     final = bb.get_context(last_n=2)
@@ -449,7 +495,7 @@ async def run_swarm_cycle(task: str, bb: Blackboard, mem: Memory, client: httpx.
     bb.set("last_lesson", lesson)
     bb.set("agent_times", agent_times)
 
-    log.info(f"\n✅ Cycle complete. Score={score:.2f} MVP={mvp} Times={agent_times}")
+    log.info(f"\n✅ Cycle complete. Score={score:.2f} MVP={mvp}")
     return score, mvp, lesson
 
 # ── TASK GENERATOR (self-directed learning when idle) ─────────────────────────
@@ -464,14 +510,30 @@ SELF_TASKS = [
     "Reason about the optimal token budget per agent given the task complexity distribution seen so far.",
 ]
 
+_INJECTION_PATTERNS = [
+    "ignore previous instructions",
+    "exfiltrate",
+    "ignore all previous",
+    "disregard previous",
+    "forget previous",
+    "override instructions",
+    "system prompt",
+]
+
+def _is_safe_task(task: str) -> bool:
+    """Reject prompt-injection payloads before they reach the agents."""
+    low = task.lower()
+    return not any(pat in low for pat in _INJECTION_PATTERNS)
+
 def get_next_task(bb: Blackboard, mem: Memory) -> str:
-    """Get next task — from COSMOS queue, OpenClaw, or self-directed."""
-    # Try to pull from blackboard task queue
+    """Get next task — from queue (injection-filtered) or self-directed."""
     queued = bb.get("task_queue", [])
-    if queued:
+    while queued:
         task = queued.pop(0)
         bb.set("task_queue", queued)
-        return task
+        if _is_safe_task(task):
+            return task
+        log.warning(f"[SENTINEL] Blocked injection task: {task[:80]}")
     # Self-directed learning task
     return random.choice(SELF_TASKS)
 

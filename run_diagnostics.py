@@ -1,4 +1,4 @@
-import json, time
+﻿import json, time
 from pathlib import Path
 
 base = Path(r'C:\Users\fyou1\Desktop\New folder\nexus-ultra')
@@ -88,10 +88,10 @@ else:
     print('[evolution_log.json]  MISSING')
 
 # 6. token
-tok = base / '.backdoor_token'
+tok = base / '.EH API_token'
 tok_exists = tok.exists()
 tok_size = tok.stat().st_size if tok_exists else 0
-print(f'[.backdoor_token]  {"EXISTS" if tok_exists else "MISSING"}  {tok_size} bytes')
+print(f'[.EH API_token]  {"EXISTS" if tok_exists else "MISSING"}  {tok_size} bytes')
 
 # 7. modelfile hash
 mfsig = base / '.modelfile_sha256'
@@ -119,7 +119,7 @@ print('=== VERDICT ===')
 issues = []
 if not mf.exists(): issues.append('nexus_memory.json MISSING')
 if not sf.exists(): issues.append('session_facts.json MISSING')
-if not tok_exists: issues.append('.backdoor_token MISSING')
+if not tok_exists: issues.append('.EH API_token MISSING')
 if not chats.exists(): issues.append('chats/ dir MISSING')
 
 if issues:
@@ -129,3 +129,4 @@ else:
     print('  ALL MEMORY SYSTEMS: HEALTHY')
     print('  DATA LOSS RISK: NONE')
     print('  CHAT PERSISTENCE: ACTIVE')
+

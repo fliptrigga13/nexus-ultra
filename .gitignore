@@ -1,9 +1,53 @@
-node_modules/
-.env
-nexus.log
+# ── Runtime state (generated, not for sharing) ───────────────────────────────
+nexus_mind.db
+nexus_mind.db-shm
+nexus_mind.db-wal
+nexus_blackboard.json
+nexus_memory.json
+nexus_session_facts.json
+.eh_token
+.backdoor_token
+*.log
+swarm_active.log
+evolution_log.json
+evolution_run.log
 captures/
 drop-zone/
-*.ps1
+chats/
+backup/backup_status.json
+backup/memory_sync_status.json
 
-# Local Netlify folder
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# ── Node / local-scripts ──────────────────────────────────────────────────────
+node_modules/
+local-scripts/node_modules/
+npm-debug.log*
+
+# ── Julia ────────────────────────────────────────────────────────────────────
+*.jl.cov
+*.jl.mem
+local-scripts/Manifest.toml
+
+# ── OS junk ──────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Secrets / tokens ─────────────────────────────────────────────────────────
+.env
+*.token
+secrets.json
+
+# ── Installer build output ────────────────────────────────────────────────────
+installer/Output/
+
+# ── Netlify ──────────────────────────────────────────────────────────────────
 .netlify

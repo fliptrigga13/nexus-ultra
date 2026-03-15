@@ -1,0 +1,47 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Ollama LLM Engine",
+      "runtimeExecutable": "ollama",
+      "runtimeArgs": ["serve"],
+      "port": 11434
+    },
+    {
+      "name": "COSMOS Orchestration API",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["cosmos_server.py"],
+      "port": 9100
+    },
+    {
+      "name": "Execution Hub (EH)",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["nexus_eh.py"],
+      "port": 7701
+    },
+    {
+      "name": "Hub Server",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["nexus_hub_server.py"],
+      "port": 7702
+    },
+    {
+      "name": "Swarm Loop",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["nexus_swarm_loop.py"],
+      "port": 0
+    },
+    {
+      "name": "Cognitive Engine",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["nexus_cognitive_engine.py"],
+      "port": 0
+    },
+    {
+      "name": "PSO Swarm Brain (Julia GPU)",
+      "runtimeExecutable": "julia",
+      "runtimeArgs": ["local-scripts/pso_swarm.jl"],
+      "port": 7700
+    }
+  ]
+}

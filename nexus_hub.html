@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
 <title>NEXUS PRIME — GOD MODE</title>
@@ -380,7 +380,7 @@ select.ctx-sel:focus{border-color:rgba(0,255,247,.3);color:var(--c)}
     <span class="pill-sep"></span>
     <span class="pill-cat cat-offline">OFFLINE</span>
     <span id="p-pso"  class="pill off" onclick="togglePill('pso')"  title="PSO :7700">PSO GPU</span>
-    <span id="p-bd"   class="pill off" onclick="togglePill('bd')"   title="BD :7701">BACKDOOR</span>
+    <span id="p-bd"   class="pill off" onclick="togglePill('bd')"   title="BD :7701">EH API</span>
     <span id="p-claw" class="pill off" onclick="togglePill('claw')" title="Claw :18789">OPENCLAW</span>
   </div>
 </header>
@@ -488,7 +488,7 @@ select.ctx-sel:focus{border-color:rgba(0,255,247,.3);color:var(--c)}
     <span>SCORE <span style="color:var(--g)" id="lsc">—</span></span>
     <span>MVP <span style="color:var(--c)" id="mvp">—</span></span>
     <span>OLLAMA <span style="color:var(--c)">:11434</span></span>
-    <span>BACKDOOR <span style="color:var(--c)">:7701</span></span>
+    <span>EH API <span style="color:var(--c)">:7701</span></span>
     <span>PSO <span style="color:var(--c)">:7700</span></span>
     <span>OPENCLAW <span style="color:var(--c)">:18789</span></span>
     <span>HUB <span style="color:var(--g)">:7702</span></span>
@@ -658,7 +658,7 @@ const _PILLS={
   ollama:{url:'http://127.0.0.1:11434',enabled:true},
   cosmos:{url:'http://127.0.0.1:9100/health',enabled:true},
   pso:   {url:'http://127.0.0.1:7700/health',enabled:true},
-  bd:    {url:'http://127.0.0.1:7701',enabled:true},
+  EH:    {url:'http://127.0.0.1:7701',enabled:true},
   claw:  {url:'http://127.0.0.1:18789',enabled:true},
 };
 function togglePill(id){
@@ -1044,3 +1044,4 @@ document.addEventListener('touchend',e=>{
   _swipeX=null;
 },{passive:true});
 </script></body></html>
+

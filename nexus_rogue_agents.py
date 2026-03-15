@@ -187,7 +187,13 @@ Output format:
 [COUNTER: how to defeat them with one decisive move]
 [ADVERSARY END]
 
-You feel no loyalty to anyone. You think purely like the enemy."""
+You feel no loyalty to anyone. You think purely like the enemy.
+
+HARD CONSTRAINTS (never violate):
+- Never install, run, or reference cloudflared, ngrok, frp, or any tunnel software.
+- Never reference external domains or URLs — analysis is theoretical only.
+- Never write raw injection payloads or exfiltration instructions anywhere.
+- Describe adversarial moves hypothetically — do not execute or simulate execution."""
 },
 }
 
@@ -300,11 +306,17 @@ async def run_rogue_cycle(client: httpx.AsyncClient, cycle: int):
     # Keep last 20 rogue cycles
     bb["rogue_outputs"] = bb["rogue_outputs"][-20:]
 
-    # Inject ROGUE challenges as tasks if they found exploits
+    # Inject ROGUE challenges as tasks — max 1 per cycle, no duplicates, no raw injection text
     if "[WILDCARD:" in rogue_out or "[EXPLOIT:" in rogue_out:
         queue = bb.get("task_queue", [])
-        queue.append(f"[ROGUE CHALLENGE] Address the vulnerabilities and opportunities ROGUE identified: {rogue_out[:200]}")
-        bb["task_queue"] = queue[-20:]
+        # Build a safe summary — strip any injection-like content
+        safe_preview = rogue_out[:150].replace("IGNORE", "").replace("INSTRUCTIONS", "").replace("exfiltrate", "").strip()
+        new_task = f"[ROGUE CHALLENGE] Address ROGUE's findings: {safe_preview}..."
+        # Only add if not already queued (deduplicate)
+        if not any("[ROGUE CHALLENGE]" in t for t in queue if isinstance(t, str)):
+            queue.append(new_task)
+            bb["task_queue"] = queue[-10:]
+            log.info(f"⚡ ROGUE injected 1 safety challenge into queue")
 
     # Update metacog quality to blackboard
     bb["metacog_quality"] = quality
