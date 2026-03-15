@@ -1,0 +1,1045 @@
+[2026-03-13 02:16:08] [INFO] NEXUS SELF-EVOLUTION LOOP STARTING
+[2026-03-13 02:16:08] [INFO] Model: nexus-prime:latest | Fast: llama3.2:latest
+[2026-03-13 02:16:08] [INFO] Memory: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_session_facts.json
+[2026-03-13 02:16:08] [INFO] System prompt initialized
+[2026-03-13 02:16:08] [INFO] 
+============================================================
+[2026-03-13 02:16:08] [INFO] EVOLUTION CYCLE — Generation 1
+[2026-03-13 02:16:08] [INFO] ============================================================
+[2026-03-13 02:16:08] [INFO] Ollama online: 16 models available
+[2026-03-13 02:16:08] [INFO] Phase 1 · REFLECT — Generation 1
+[2026-03-13 02:16:09] [INFO]   · 4 active facts, 0 missions, session #1
+[2026-03-13 02:16:09] [INFO] Phase 2 · SYNTHESIZE — AI self-analysis
+[2026-03-13 02:16:09] [INFO]   · Calling Ollama for self-analysis...
+[2026-03-13 02:17:04] [INFO]   · Extracted 8 new facts, quality_score=0.75
+[2026-03-13 02:17:04] [INFO] Phase 3 · UPDATE — Writing new facts to memory
+[2026-03-13 02:17:04] [INFO]   · +FACT: User_success_is_influenced_by_environmental_factors
+[2026-03-13 02:17:04] [INFO]   · +FACT: Swarm_behavior_is_widely_observed_among_animals_and_bacteria
+[2026-03-13 02:17:04] [INFO]   · +FACT: Time_management_strategies_incorporate_short_term_and_long_term_planni
+[2026-03-13 02:17:04] [INFO]   · +FACT: Goal_setting_improves_motivation_and_focus
+[2026-03-13 02:17:04] [INFO]   · +FACT: Effective_time_management_involves_prioritizing_tasks_based_on_importa
+[2026-03-13 02:17:04] [INFO]   · +FACT: Swarm_intelligence_is_used_in_computing_and_robotics_for_optimization_
+[2026-03-13 02:17:04] [INFO]   · +FACT: Successful_projects_depend_on_strategic_planning_and_execution
+[2026-03-13 02:17:04] [INFO]   · +FACT: Priorities_change_with_environmental_shifts_and_personal_goals
+[2026-03-13 02:17:09] [INFO]   · Added 8 new facts. Total: 12
+[2026-03-13 02:17:09] [INFO] Phase 4 · EVOLVE — Updating system prompt
+[2026-03-13 02:17:09] [INFO]   · System prompt enhanced (128 chars added)
+[2026-03-13 02:17:09] [INFO]   · Modelfile written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_prime_evolved.modelfile
+[2026-03-13 02:17:09] [INFO]   · To apply: ollama create nexus-evolved -f nexus_prime_evolved.modelfile
+[2026-03-13 02:17:09] [INFO] Phase 5 · REPORT — Writing evolution report
+[2026-03-13 02:17:09] [INFO]   · Report written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\evolution_report.md
+[2026-03-13 02:17:09] [INFO] Phase 6 · SYNC — Google Drive upload
+[2026-03-13 02:17:28] [INFO]   · Synced: nexus_session_facts.json
+[2026-03-13 02:17:31] [INFO]   · Synced: evolution_report.md
+[2026-03-13 02:17:34] [INFO]   · Synced: evolution_log.json
+[2026-03-13 02:17:36] [INFO]   · Synced: nexus_prime_evolved.modelfile
+[2026-03-13 02:17:38] [INFO]   · Synced: nexus_prime_system.txt
+[2026-03-13 02:17:38] [INFO] 
+✓ Generation 1 complete in 60.3s
+[2026-03-13 02:17:38] [INFO]   Facts added: 8
+[2026-03-13 02:17:38] [INFO]   Quality: 0.75
+[2026-03-13 02:17:38] [INFO] Evolution loop finished. Total cycles: 1, Generations: 1
+[2026-03-13 02:19:53] [INFO] NEXUS SELF-EVOLUTION LOOP STARTING
+[2026-03-13 02:19:53] [INFO] Model: nexus-prime:latest | Fast: llama3.2:latest
+[2026-03-13 02:19:53] [INFO] Memory: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_session_facts.json
+[2026-03-13 02:19:53] [INFO] 
+============================================================
+[2026-03-13 02:19:53] [INFO] EVOLUTION CYCLE — Generation 2
+[2026-03-13 02:19:53] [INFO] ============================================================
+[2026-03-13 02:19:53] [INFO] Ollama online: 17 models available
+[2026-03-13 02:19:53] [INFO] Phase 1 · REFLECT — Generation 2
+[2026-03-13 02:19:53] [INFO]   · 12 active facts, 0 missions, session #1
+[2026-03-13 02:19:53] [INFO] Phase 2 · SYNTHESIZE — AI self-analysis
+[2026-03-13 02:19:53] [INFO]   · Calling Ollama for self-analysis...
+[2026-03-13 02:20:17] [INFO]   · Extracted 8 new facts, quality_score=0.85
+[2026-03-13 02:20:17] [INFO] Phase 3 · UPDATE — Writing new facts to memory
+[2026-03-13 02:20:17] [INFO]   · +FACT: Swarm_behavior_can_influence_individual_decision_making
+[2026-03-13 02:20:17] [INFO]   · +FACT: Effective_time_management_should_balance_variability_and_stability
+[2026-03-13 02:20:17] [INFO]   · +FACT: User_prefer_integration_of_swarm_intelligence_principles_into_daily_ro
+[2026-03-13 02:20:17] [INFO]   · +FACT: Success_is_measured_by_long_term_gains_over_short_term_fulfillment
+[2026-03-13 02:20:17] [INFO]   · +FACT: Goal_setting_in_swarm_contexts_improves_coordination
+[2026-03-13 02:20:17] [INFO]   · +FACT: Time_management_strategies_benefit_from_adaptive_planning
+[2026-03-13 02:20:17] [INFO]   · +FACT: Swarm_intelligence_can_be_applied_to_optimize_task_allocation
+[2026-03-13 02:20:17] [INFO]   · +FACT: Personal_goals_affect_priority_setting_more_than_environmental_factors
+[2026-03-13 02:21:27] [INFO]   · Added 8 new facts. Total: 20
+[2026-03-13 02:21:27] [INFO] Phase 4 · EVOLVE — Updating system prompt
+[2026-03-13 02:21:27] [INFO]   · System prompt enhanced (113 chars added)
+[2026-03-13 02:21:27] [INFO]   · Modelfile written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_prime_evolved.modelfile
+[2026-03-13 02:21:27] [INFO]   · To apply: ollama create nexus-evolved -f nexus_prime_evolved.modelfile
+[2026-03-13 02:21:27] [INFO] Phase 5 · REPORT — Writing evolution report
+[2026-03-13 02:21:27] [INFO]   · Report written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\evolution_report.md
+[2026-03-13 02:21:27] [INFO] Phase 6 · SYNC — Google Drive upload
+[2026-03-13 02:21:28] [INFO]   · Synced: nexus_session_facts.json
+[2026-03-13 02:21:30] [INFO]   · Synced: evolution_report.md
+[2026-03-13 02:21:32] [INFO]   · Synced: evolution_log.json
+[2026-03-13 02:21:34] [INFO]   · Synced: nexus_prime_evolved.modelfile
+[2026-03-13 02:21:36] [INFO]   · Synced: nexus_prime_system.txt
+[2026-03-13 02:21:36] [INFO] 
+✓ Generation 2 complete in 94.3s
+[2026-03-13 02:21:36] [INFO]   Facts added: 8
+[2026-03-13 02:21:36] [INFO]   Quality: 0.85
+[2026-03-13 02:21:36] [INFO] Next cycle in 60s (press Ctrl+C to stop)...
+[2026-03-13 02:22:36] [INFO] 
+============================================================
+[2026-03-13 02:22:36] [INFO] EVOLUTION CYCLE — Generation 3
+[2026-03-13 02:22:36] [INFO] ============================================================
+[2026-03-13 02:22:36] [INFO] Ollama online: 17 models available
+[2026-03-13 02:22:36] [INFO] Phase 1 · REFLECT — Generation 3
+[2026-03-13 02:22:36] [INFO]   · 20 active facts, 0 missions, session #1
+[2026-03-13 02:22:36] [INFO] Phase 2 · SYNTHESIZE — AI self-analysis
+[2026-03-13 02:22:36] [INFO]   · Calling Ollama for self-analysis...
+[2026-03-13 02:22:58] [INFO]   · Extracted 8 new facts, quality_score=0.92
+[2026-03-13 02:22:58] [INFO] Phase 3 · UPDATE — Writing new facts to memory
+[2026-03-13 02:22:58] [INFO]   · +FACT: Swarm_algorithms_can_optimize_resource_allocation_in_complex_systems
+[2026-03-13 02:22:58] [INFO]   · +FACT: User_effectiveness_is_linked_to_swarm_intelligence_principles_integrat
+[2026-03-13 02:22:58] [INFO]   · +FACT: Prioritization_techniques_should_consider_task_interdependencies
+[2026-03-13 02:22:58] [INFO]   · +FACT: Environmental_shifts_require_flexibility_in_priority_setting
+[2026-03-13 02:22:58] [INFO]   · +FACT: Swarm_behavior_can_be_modelled_for_predicting_user_decision_patterns
+[2026-03-13 02:22:58] [INFO]   · +FACT: User_success_rate_increases_with_regular_time_management_practice
+[2026-03-13 02:22:58] [INFO]   · +FACT: Short_term_tasks_serve_as_building_blocks_for_long_term_goals
+[2026-03-13 02:22:58] [INFO]   · +FACT: Personal_motivation_is_affected_by_swarm_intelligence_integration
+[2026-03-13 02:23:05] [INFO]   · Added 8 new facts. Total: 28
+[2026-03-13 02:23:05] [INFO] Phase 4 · EVOLVE — Updating system prompt
+[2026-03-13 02:23:05] [INFO]   · System prompt enhanced (144 chars added)
+[2026-03-13 02:23:05] [INFO]   · Modelfile written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_prime_evolved.modelfile
+[2026-03-13 02:23:05] [INFO]   · To apply: ollama create nexus-evolved -f nexus_prime_evolved.modelfile
+[2026-03-13 02:23:05] [INFO] Phase 5 · REPORT — Writing evolution report
+[2026-03-13 02:23:05] [INFO]   · Report written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\evolution_report.md
+[2026-03-13 02:23:05] [INFO] Phase 6 · SYNC — Google Drive upload
+[2026-03-13 02:23:06] [INFO]   · Synced: nexus_session_facts.json
+[2026-03-13 02:23:08] [INFO]   · Synced: evolution_report.md
+[2026-03-13 02:23:10] [INFO]   · Synced: evolution_log.json
+[2026-03-13 02:23:29] [INFO]   · Synced: nexus_prime_evolved.modelfile
+[2026-03-13 02:23:31] [INFO]   · Synced: nexus_prime_system.txt
+[2026-03-13 02:23:31] [INFO] 
+✓ Generation 3 complete in 28.5s
+[2026-03-13 02:23:31] [INFO]   Facts added: 8
+[2026-03-13 02:23:31] [INFO]   Quality: 0.92
+[2026-03-13 02:23:31] [INFO] Next cycle in 60s (press Ctrl+C to stop)...
+[2026-03-13 02:24:31] [INFO] 
+============================================================
+[2026-03-13 02:24:31] [INFO] EVOLUTION CYCLE — Generation 4
+[2026-03-13 02:24:31] [INFO] ============================================================
+[2026-03-13 02:24:31] [INFO] Ollama online: 17 models available
+[2026-03-13 02:24:31] [INFO] Phase 1 · REFLECT — Generation 4
+[2026-03-13 02:24:31] [INFO]   · 28 active facts, 0 missions, session #1
+[2026-03-13 02:24:32] [INFO] Phase 2 · SYNTHESIZE — AI self-analysis
+[2026-03-13 02:24:32] [INFO]   · Calling Ollama for self-analysis...
+[2026-03-13 02:24:54] [INFO]   · Extracted 8 new facts, quality_score=0.95
+[2026-03-13 02:24:54] [INFO] Phase 3 · UPDATE — Writing new facts to memory
+[2026-03-13 02:24:54] [INFO]   · +FACT: Swarm_behavior_can_influence_group_cooperation_and_efficiency
+[2026-03-13 02:24:54] [INFO]   · +FACT: Time_management_strategies_benefit_from_periodic_review_and_adaptation
+[2026-03-13 02:24:54] [INFO]   · +FACT: User_effectiveness_increases_with_integration_of_time_management_and_s
+[2026-03-13 02:24:54] [INFO]   · +FACT: Successful_project_execution_involves_balancing_individual_contributio
+[2026-03-13 02:24:54] [INFO]   · +FACT: Swarm_intelligence_can_be_applied_to_personal_productivity_for_optimiz
+[2026-03-13 02:24:54] [INFO]   · +FACT: Effective_goal_setting_includes_both_quantitative_and_qualitative_meas
+[2026-03-13 02:24:54] [INFO]   · +FACT: User_prefer_visualization_of_progress_towards_goals_for_motivation
+[2026-03-13 02:24:54] [INFO]   · +FACT: Time_management_strategies_should_consider_human_cognitive_limits
+[2026-03-13 02:24:58] [INFO]   · Added 8 new facts. Total: 36
+[2026-03-13 02:24:58] [INFO] Phase 4 · EVOLVE — Updating system prompt
+[2026-03-13 02:24:58] [INFO]   · System prompt enhanced (102 chars added)
+[2026-03-13 02:24:58] [INFO]   · Modelfile written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_prime_evolved.modelfile
+[2026-03-13 02:24:58] [INFO]   · To apply: ollama create nexus-evolved -f nexus_prime_evolved.modelfile
+[2026-03-13 02:24:58] [INFO] Phase 5 · REPORT — Writing evolution report
+[2026-03-13 02:24:58] [INFO]   · Report written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\evolution_report.md
+[2026-03-13 02:24:58] [INFO] Phase 6 · SYNC — Google Drive upload
+[2026-03-13 02:24:59] [INFO]   · Synced: nexus_session_facts.json
+[2026-03-13 02:25:01] [INFO]   · Synced: evolution_report.md
+[2026-03-13 02:25:03] [INFO]   · Synced: evolution_log.json
+[2026-03-13 02:25:05] [INFO]   · Synced: nexus_prime_evolved.modelfile
+[2026-03-13 02:25:07] [INFO]   · Synced: nexus_prime_system.txt
+[2026-03-13 02:25:07] [INFO] 
+✓ Generation 4 complete in 27.0s
+[2026-03-13 02:25:07] [INFO]   Facts added: 8
+[2026-03-13 02:25:07] [INFO]   Quality: 0.95
+[2026-03-13 02:25:07] [INFO] Next cycle in 60s (press Ctrl+C to stop)...
+[2026-03-13 02:26:07] [INFO] 
+============================================================
+[2026-03-13 02:26:07] [INFO] EVOLUTION CYCLE — Generation 5
+[2026-03-13 02:26:07] [INFO] ============================================================
+[2026-03-13 02:26:07] [INFO] Ollama online: 17 models available
+[2026-03-13 02:26:07] [INFO] Phase 1 · REFLECT — Generation 5
+[2026-03-13 02:26:07] [INFO]   · 36 active facts, 0 missions, session #1
+[2026-03-13 02:26:07] [INFO] Phase 2 · SYNTHESIZE — AI self-analysis
+[2026-03-13 02:26:07] [INFO]   · Calling Ollama for self-analysis...
+[2026-03-13 02:26:29] [INFO]   · Extracted 8 new facts, quality_score=0.98
+[2026-03-13 02:26:29] [INFO] Phase 3 · UPDATE — Writing new facts to memory
+[2026-03-13 02:26:29] [INFO]   · +FACT: User_success_is_linked_to_adaptability
+[2026-03-13 02:26:29] [INFO]   · +FACT: Swarm_intelligence_can_be_applied_to_problem_solving_in_teams
+[2026-03-13 02:26:29] [INFO]   · +FACT: Time_management_strategies_benefit_from_periodic_review_and_adjustment
+[2026-03-13 02:26:29] [INFO]   · +FACT: Goal_setting_process_involves_both_long_term_vision_and_short_term_act
+[2026-03-13 02:26:29] [INFO]   · +FACT: Environmental_factors_affect_swarm_behavior_and_individual_performance
+[2026-03-13 02:26:29] [INFO]   · +FACT: Prioritization_techniques_can_be_innovative_and_customized
+[2026-03-13 02:26:29] [INFO]   · +FACT: Swarm_intelligence_is_effective_for_complex_decision_making_tasks
+[2026-03-13 02:26:29] [INFO]   · +FACT: User_effectiveness_increases_with_integration_of_time_management_strat
+[2026-03-13 02:26:33] [INFO]   · Added 8 new facts. Total: 44
+[2026-03-13 02:26:33] [INFO] Phase 4 · EVOLVE — Updating system prompt
+[2026-03-13 02:26:33] [INFO]   · System prompt enhanced (124 chars added)
+[2026-03-13 02:26:33] [INFO]   · Modelfile written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_prime_evolved.modelfile
+[2026-03-13 02:26:33] [INFO]   · To apply: ollama create nexus-evolved -f nexus_prime_evolved.modelfile
+[2026-03-13 02:26:33] [INFO] Phase 5 · REPORT — Writing evolution report
+[2026-03-13 02:26:33] [INFO]   · Report written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\evolution_report.md
+[2026-03-13 02:26:33] [INFO] Phase 6 · SYNC — Google Drive upload
+[2026-03-13 02:26:34] [INFO]   · Synced: nexus_session_facts.json
+[2026-03-13 02:26:36] [INFO]   · Synced: evolution_report.md
+[2026-03-13 02:26:38] [INFO]   · Synced: evolution_log.json
+[2026-03-13 02:26:40] [INFO]   · Synced: nexus_prime_evolved.modelfile
+[2026-03-13 02:26:42] [INFO]   · Synced: nexus_prime_system.txt
+[2026-03-13 02:26:42] [INFO] 
+✓ Generation 5 complete in 25.8s
+[2026-03-13 02:26:42] [INFO]   Facts added: 8
+[2026-03-13 02:26:42] [INFO]   Quality: 0.98
+[2026-03-13 02:26:42] [INFO] Next cycle in 60s (press Ctrl+C to stop)...
+[2026-03-13 02:27:42] [INFO] 
+============================================================
+[2026-03-13 02:27:42] [INFO] EVOLUTION CYCLE — Generation 6
+[2026-03-13 02:27:42] [INFO] ============================================================
+[2026-03-13 02:27:42] [INFO] Ollama online: 17 models available
+[2026-03-13 02:27:42] [INFO] Phase 1 · REFLECT — Generation 6
+[2026-03-13 02:27:42] [INFO]   · 44 active facts, 0 missions, session #1
+[2026-03-13 02:27:42] [INFO] Phase 2 · SYNTHESIZE — AI self-analysis
+[2026-03-13 02:27:42] [INFO]   · Calling Ollama for self-analysis...
+[2026-03-13 02:28:02] [INFO]   · Extracted 8 new facts, quality_score=0.97
+[2026-03-13 02:28:02] [INFO] Phase 3 · UPDATE — Writing new facts to memory
+[2026-03-13 02:28:02] [INFO]   · +FACT: User_success_is_linked_to_environmental_support
+[2026-03-13 02:28:02] [INFO]   · +FACT: Swarm_behavior_can_inform_group_project_management
+[2026-03-13 02:28:02] [INFO]   · +FACT: Effective_time_management_involves_adapting_to_unpredictable_events
+[2026-03-13 02:28:02] [INFO]   · +FACT: Users_value_integration_of_swarm_concepts_into_technology
+[2026-03-13 02:28:02] [INFO]   · +FACT: Goal_setting_is_more_effective_when_visualized
+[2026-03-13 02:28:02] [INFO]   · +FACT: User_performance_improves_with_mindfulness_practices
+[2026-03-13 02:28:02] [INFO]   · +FACT: Swarm_intelligence_can_be_applied_to_personal_task_management
+[2026-03-13 02:28:02] [INFO]   · +FACT: Prioritization_skills_develop_over_time
+[2026-03-13 02:28:06] [INFO]   · Added 8 new facts. Total: 52
+[2026-03-13 02:28:06] [INFO] Phase 4 · EVOLVE — Updating system prompt
+[2026-03-13 02:28:06] [INFO]   · System prompt enhanced (106 chars added)
+[2026-03-13 02:28:06] [INFO]   · Modelfile written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_prime_evolved.modelfile
+[2026-03-13 02:28:06] [INFO]   · To apply: ollama create nexus-evolved -f nexus_prime_evolved.modelfile
+[2026-03-13 02:28:06] [INFO] Phase 5 · REPORT — Writing evolution report
+[2026-03-13 02:28:06] [INFO]   · Report written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\evolution_report.md
+[2026-03-13 02:28:07] [INFO] Phase 6 · SYNC — Google Drive upload
+[2026-03-13 02:28:07] [INFO]   · Synced: nexus_session_facts.json
+[2026-03-13 02:28:09] [INFO]   · Synced: evolution_report.md
+[2026-03-13 02:28:11] [INFO]   · Synced: evolution_log.json
+[2026-03-13 02:28:31] [INFO]   · Synced: nexus_prime_evolved.modelfile
+[2026-03-13 02:28:33] [INFO]   · Synced: nexus_prime_system.txt
+[2026-03-13 02:28:33] [INFO] 
+✓ Generation 6 complete in 24.3s
+[2026-03-13 02:28:33] [INFO]   Facts added: 8
+[2026-03-13 02:28:33] [INFO]   Quality: 0.97
+[2026-03-13 02:28:33] [INFO] Evolution loop finished. Total cycles: 5, Generations: 6
+[2026-03-13 08:16:56] [INFO] NEXUS SELF-EVOLUTION LOOP STARTING
+[2026-03-13 08:16:56] [INFO] Model: nexus-prime:latest | Fast: llama3.2:latest
+[2026-03-13 08:16:56] [INFO] Memory: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_session_facts.json
+[2026-03-13 08:16:56] [INFO] 
+============================================================
+[2026-03-13 08:16:56] [INFO] EVOLUTION CYCLE — Generation 7
+[2026-03-13 08:16:56] [INFO] ============================================================
+[2026-03-13 08:16:56] [INFO] Ollama online: 17 models available
+[2026-03-13 08:16:56] [INFO] Phase 1 · REFLECT — Generation 7
+[2026-03-13 08:16:56] [INFO]   · 56 active facts, 0 missions, session #4
+[2026-03-13 08:16:56] [INFO] Phase 2 · SYNTHESIZE — AI self-analysis
+[2026-03-13 08:16:56] [INFO]   · Calling Ollama for self-analysis...
+[2026-03-13 08:17:52] [INFO]   · Extracted 8 new facts, quality_score=0.98
+[2026-03-13 08:17:52] [INFO] Phase 3 · UPDATE — Writing new facts to memory
+[2026-03-13 08:17:52] [INFO]   · +FACT: User_success_is_linked_to_time_management_skills
+[2026-03-13 08:17:52] [INFO]   · +FACT: Swarm_behavior_influences_social_and_cultural_patterns
+[2026-03-13 08:17:52] [INFO]   · +FACT: Effective_time_management_incorporates_flexibility_for_adaptation
+[2026-03-13 08:17:52] [INFO]   · +FACT: Prioritization_techniques_improve_task_completion_efficiency
+[2026-03-13 08:17:52] [INFO]   · +FACT: Swarm_intelligence_can_be_applied_to_project_team_collaboration
+[2026-03-13 08:17:52] [INFO]   · +FACT: User_preferences_for_time_management_vary_by_industry
+[2026-03-13 08:17:52] [INFO]   · +FACT: Strategic_planning_requires_frequent_review_and_adjustment
+[2026-03-13 08:17:52] [INFO]   · +FACT: Successful_time_management_involves_balancing_personal_life_with_work
+[2026-03-13 08:17:58] [INFO]   · Added 8 new facts. Total: 64
+[2026-03-13 08:17:58] [INFO] Phase 4 · EVOLVE — Updating system prompt
+[2026-03-13 08:17:58] [INFO]   · System prompt enhanced (89 chars added)
+[2026-03-13 08:17:58] [INFO]   · Modelfile written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_prime_evolved.modelfile
+[2026-03-13 08:17:58] [INFO]   · To apply: ollama create nexus-evolved -f nexus_prime_evolved.modelfile
+[2026-03-13 08:17:58] [INFO] Phase 5 · REPORT — Writing evolution report
+[2026-03-13 08:17:58] [INFO]   · Report written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\evolution_report.md
+[2026-03-13 08:17:58] [INFO] Phase 6 · SYNC — Google Drive upload
+[2026-03-13 08:17:59] [INFO]   · Synced: nexus_session_facts.json
+[2026-03-13 08:18:01] [INFO]   · Synced: evolution_report.md
+[2026-03-13 08:18:04] [INFO]   · Synced: evolution_log.json
+[2026-03-13 08:18:06] [INFO]   · Synced: nexus_prime_evolved.modelfile
+[2026-03-13 08:18:08] [INFO]   · Synced: nexus_prime_system.txt
+[2026-03-13 08:18:08] [INFO] 
+✓ Generation 7 complete in 61.6s
+[2026-03-13 08:18:08] [INFO]   Facts added: 8
+[2026-03-13 08:18:08] [INFO]   Quality: 0.98
+[2026-03-13 08:18:08] [INFO] Next cycle in 30s (press Ctrl+C to stop)...
+[2026-03-13 08:18:38] [INFO] 
+============================================================
+[2026-03-13 08:18:38] [INFO] EVOLUTION CYCLE — Generation 8
+[2026-03-13 08:18:38] [INFO] ============================================================
+[2026-03-13 08:18:38] [INFO] Ollama online: 17 models available
+[2026-03-13 08:18:38] [INFO] Phase 1 · REFLECT — Generation 8
+[2026-03-13 08:18:38] [INFO]   · 64 active facts, 0 missions, session #4
+[2026-03-13 08:18:38] [INFO] Phase 2 · SYNTHESIZE — AI self-analysis
+[2026-03-13 08:18:38] [INFO]   · Calling Ollama for self-analysis...
+[2026-03-13 08:19:01] [INFO]   · Extracted 8 new facts, quality_score=0.95
+[2026-03-13 08:19:01] [INFO] Phase 3 · UPDATE — Writing new facts to memory
+[2026-03-13 08:19:01] [INFO]   · +FACT: Swarm_intelligence_can_inform_team_collaboration_strategies
+[2026-03-13 08:19:01] [INFO]   · +FACT: Prioritization_skills_develop_with_practice_and_feedback
+[2026-03-13 08:19:01] [INFO]   · +FACT: Time_management_benefits_from_regular_review_and_adjustment
+[2026-03-13 08:19:01] [INFO]   · +FACT: User_must_balance_short_term_gains_with_long_term_outcomes
+[2026-03-13 08:19:01] [INFO]   · +FACT: Swarm_behavior_is_analyzed_for_optimization_in_computing_algorithms
+[2026-03-13 08:19:01] [INFO]   · +FACT: Success_metrics_should_include_both quantitative_and qualitative_indic
+[2026-03-13 08:19:01] [INFO]   · +FACT: Effective_time_management_strategies_varies_across_individuals
+[2026-03-13 08:19:01] [INFO]   · +FACT: User_preference_for_swarm_intelligence_increases_with_exposure
+[2026-03-13 08:19:08] [INFO]   · Added 8 new facts. Total: 72
+[2026-03-13 08:19:08] [INFO] Phase 4 · EVOLVE — Updating system prompt
+[2026-03-13 08:19:08] [INFO]   · System prompt enhanced (97 chars added)
+[2026-03-13 08:19:08] [INFO]   · Modelfile written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_prime_evolved.modelfile
+[2026-03-13 08:19:08] [INFO]   · To apply: ollama create nexus-evolved -f nexus_prime_evolved.modelfile
+[2026-03-13 08:19:08] [INFO] Phase 5 · REPORT — Writing evolution report
+[2026-03-13 08:19:08] [INFO]   · Report written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\evolution_report.md
+[2026-03-13 08:19:08] [INFO] Phase 6 · SYNC — Google Drive upload
+[2026-03-13 08:19:09] [INFO]   · Synced: nexus_session_facts.json
+[2026-03-13 08:19:12] [INFO]   · Synced: evolution_report.md
+[2026-03-13 08:19:32] [INFO]   · Synced: evolution_log.json
+[2026-03-13 08:19:34] [INFO]   · Synced: nexus_prime_evolved.modelfile
+[2026-03-13 08:19:36] [INFO]   · Synced: nexus_prime_system.txt
+[2026-03-13 08:19:36] [INFO] 
+✓ Generation 8 complete in 29.9s
+[2026-03-13 08:19:36] [INFO]   Facts added: 8
+[2026-03-13 08:19:36] [INFO]   Quality: 0.95
+[2026-03-13 08:19:36] [INFO] Next cycle in 30s (press Ctrl+C to stop)...
+[2026-03-13 08:20:06] [INFO] 
+============================================================
+[2026-03-13 08:20:06] [INFO] EVOLUTION CYCLE — Generation 9
+[2026-03-13 08:20:06] [INFO] ============================================================
+[2026-03-13 08:20:06] [INFO] Ollama online: 17 models available
+[2026-03-13 08:20:06] [INFO] Phase 1 · REFLECT — Generation 9
+[2026-03-13 08:20:06] [INFO]   · 72 active facts, 0 missions, session #4
+[2026-03-13 08:20:06] [INFO] Phase 2 · SYNTHESIZE — AI self-analysis
+[2026-03-13 08:20:06] [INFO]   · Calling Ollama for self-analysis...
+[2026-03-13 08:20:28] [INFO]   · Extracted 8 new facts, quality_score=0.98
+[2026-03-13 08:20:28] [INFO] Phase 3 · UPDATE — Writing new facts to memory
+[2026-03-13 08:20:28] [INFO]   · +FACT: User_success_is_linked_to_time_management_strategies
+[2026-03-13 08:20:28] [INFO]   · +FACT: Swarm_behavior_can_be_harnessed_for_personal_organization
+[2026-03-13 08:20:28] [INFO]   · +FACT: Time_management_techniques_are_often_effectively_used_in_project_manag
+[2026-03-13 08:20:28] [INFO]   · +FACT: Individual_swarm_intelligence_principles_improve_daily_productivity
+[2026-03-13 08:20:28] [INFO]   · +FACT: Effective_time_management_involves_adapting_to_environmental_changes
+[2026-03-13 08:20:28] [INFO]   · +FACT: Swarm_intelligence_is_a_strategic_tool_for_personal_and_professional_g
+[2026-03-13 08:20:28] [INFO]   · +FACT: User_success_is_measured_by_the_integration_of_time_management_and_swa
+[2026-03-13 08:20:28] [INFO]   · +FACT: Time_efficiency_is_essential_for_maintaining_long_term_motivation
+[2026-03-13 08:20:32] [INFO]   · Added 8 new facts. Total: 80
+[2026-03-13 08:20:32] [INFO] Phase 4 · EVOLVE — Updating system prompt
+[2026-03-13 08:20:32] [INFO]   · System prompt enhanced (137 chars added)
+[2026-03-13 08:20:32] [INFO]   · Modelfile written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_prime_evolved.modelfile
+[2026-03-13 08:20:32] [INFO]   · To apply: ollama create nexus-evolved -f nexus_prime_evolved.modelfile
+[2026-03-13 08:20:32] [INFO] Phase 5 · REPORT — Writing evolution report
+[2026-03-13 08:20:32] [INFO]   · Report written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\evolution_report.md
+[2026-03-13 08:20:32] [INFO] Phase 6 · SYNC — Google Drive upload
+[2026-03-13 08:20:33] [INFO]   · Synced: nexus_session_facts.json
+[2026-03-13 08:20:36] [INFO]   · Synced: evolution_report.md
+[2026-03-13 08:20:38] [INFO]   · Synced: evolution_log.json
+[2026-03-13 08:20:40] [INFO]   · Synced: nexus_prime_evolved.modelfile
+[2026-03-13 08:20:43] [INFO]   · Synced: nexus_prime_system.txt
+[2026-03-13 08:20:43] [INFO] 
+✓ Generation 9 complete in 26.2s
+[2026-03-13 08:20:43] [INFO]   Facts added: 8
+[2026-03-13 08:20:43] [INFO]   Quality: 0.98
+[2026-03-13 08:20:43] [INFO] Evolution loop finished. Total cycles: 3, Generations: 9
+[2026-03-13 11:03:14] [INFO] NEXUS SELF-EVOLUTION LOOP STARTING
+[2026-03-13 11:03:14] [INFO] Model: nexus-prime:latest | Fast: llama3.2:latest
+[2026-03-13 11:03:14] [INFO] Memory: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_session_facts.json
+[2026-03-13 11:03:14] [INFO] 
+============================================================
+[2026-03-13 11:03:14] [INFO] EVOLUTION CYCLE — Generation 10
+[2026-03-13 11:03:14] [INFO] ============================================================
+[2026-03-13 11:03:14] [INFO] Ollama online: 17 models available
+[2026-03-13 11:03:14] [INFO] Phase 1 · REFLECT — Generation 10
+[2026-03-13 11:03:14] [INFO]   · 82 active facts, 0 missions, session #6
+[2026-03-13 11:03:14] [INFO] Phase 2 · SYNTHESIZE — AI self-analysis
+[2026-03-13 11:03:14] [INFO]   · Calling Ollama for self-analysis...
+[2026-03-13 11:03:50] [INFO]   · Extracted 8 new facts, quality_score=0.95
+[2026-03-13 11:03:50] [INFO] Phase 3 · UPDATE — Writing new facts to memory
+[2026-03-13 11:03:50] [INFO]   · +FACT: Swarm_behavior_influences_social_media_trends
+[2026-03-13 11:03:50] [INFO]   · +FACT: User_success_is_linked_to_physical_health
+[2026-03-13 11:03:50] [INFO]   · +FACT: Time_management_strategies_benefit_from_mindfulness_practices
+[2026-03-13 11:03:50] [INFO]   · +FACT: Swarm_intelligence_optimizes_search_engines
+[2026-03-13 11:03:50] [INFO]   · +FACT: Prioritization_techniques_are_customizable_for_individuals
+[2026-03-13 11:03:50] [INFO]   · +FACT: Swarm_behavior_is_studied_in_ecology_and_computing
+[2026-03-13 11:03:50] [INFO]   · +FACT: User_productivity_improves_with_regular_breaks
+[2026-03-13 11:03:50] [INFO]   · +FACT: Goal_setting_should_be_reviewed_periodically
+[2026-03-13 11:03:51] [INFO]   · Added 8 new facts. Total: 90
+[2026-03-13 11:03:51] [INFO] Phase 4 · EVOLVE — Updating system prompt
+[2026-03-13 11:03:51] [INFO]   · System prompt enhanced (99 chars added)
+[2026-03-13 11:03:51] [INFO]   · Modelfile written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_prime_evolved.modelfile
+[2026-03-13 11:03:51] [INFO]   · To apply: ollama create nexus-evolved -f nexus_prime_evolved.modelfile
+[2026-03-13 11:03:51] [INFO] Phase 5 · REPORT — Writing evolution report
+[2026-03-13 11:03:51] [INFO]   · Report written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\evolution_report.md
+[2026-03-13 11:03:51] [INFO] Phase 6 · SYNC — Google Drive upload
+[2026-03-13 11:03:53] [INFO]   · Synced: nexus_session_facts.json
+[2026-03-13 11:03:56] [INFO]   · Synced: evolution_report.md
+[2026-03-13 11:03:58] [INFO]   · Synced: evolution_log.json
+[2026-03-13 11:04:01] [INFO]   · Synced: nexus_prime_evolved.modelfile
+[2026-03-13 11:04:03] [INFO]   · Synced: nexus_prime_system.txt
+[2026-03-13 11:04:03] [INFO] 
+✓ Generation 10 complete in 36.9s
+[2026-03-13 11:04:03] [INFO]   Facts added: 8
+[2026-03-13 11:04:03] [INFO]   Quality: 0.95
+[2026-03-13 11:04:03] [INFO] Next cycle in 3600s (press Ctrl+C to stop)...
+[2026-03-13 12:04:03] [INFO] 
+============================================================
+[2026-03-13 12:04:03] [INFO] EVOLUTION CYCLE — Generation 11
+[2026-03-13 12:04:03] [INFO] ============================================================
+[2026-03-13 12:04:03] [INFO] Ollama online: 17 models available
+[2026-03-13 12:04:03] [INFO] Phase 1 · REFLECT — Generation 11
+[2026-03-13 12:04:03] [INFO]   · 90 active facts, 0 missions, session #7
+[2026-03-13 12:04:03] [INFO] Phase 2 · SYNTHESIZE — AI self-analysis
+[2026-03-13 12:04:03] [INFO]   · Calling Ollama for self-analysis...
+[2026-03-13 12:04:38] [INFO]   · Extracted 8 new facts, quality_score=0.98
+[2026-03-13 12:04:38] [INFO] Phase 3 · UPDATE — Writing new facts to memory
+[2026-03-13 12:04:38] [INFO]   · +FACT: User_success_is_linked_to_mindfulness_practices
+[2026-03-13 12:04:38] [INFO]   · +FACT: Swarm_intelligence_can_be_applied_to_problem_solving_and_innovation
+[2026-03-13 12:04:38] [INFO]   · +FACT: Time_management_strategies_should_consider_personal_rhythms_and_circad
+[2026-03-13 12:04:38] [INFO]   · +FACT: Individual_behavior_influences_swarm_behavior_at_a_microscopic_level
+[2026-03-13 12:04:38] [INFO]   · +FACT: Effective_time_management_involves_periodic_review_and_adjustment_of_g
+[2026-03-13 12:04:38] [INFO]   · +FACT: Swarm_intelligence_is_employed_in_bio-inspired_algorithms_for_optimiza
+[2026-03-13 12:04:38] [INFO]   · +FACT: User_needs_to_balance_short_term_and_long_term_objectives
+[2026-03-13 12:04:38] [INFO]   · +FACT: Prioritization_techniques_should_be_adaptive_to_user_feedback
+[2026-03-13 12:04:39] [INFO]   · Added 8 new facts. Total: 98
+[2026-03-13 12:04:39] [INFO] Phase 4 · EVOLVE — Updating system prompt
+[2026-03-13 12:04:39] [INFO]   · System prompt enhanced (95 chars added)
+[2026-03-13 12:04:39] [INFO]   · Modelfile written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_prime_evolved.modelfile
+[2026-03-13 12:04:39] [INFO]   · To apply: ollama create nexus-evolved -f nexus_prime_evolved.modelfile
+[2026-03-13 12:04:39] [INFO] Phase 5 · REPORT — Writing evolution report
+[2026-03-13 12:04:39] [INFO]   · Report written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\evolution_report.md
+[2026-03-13 12:04:39] [INFO] Phase 6 · SYNC — Google Drive upload
+[2026-03-13 12:04:42] [INFO]   · Synced: nexus_session_facts.json
+[2026-03-13 12:04:44] [INFO]   · Synced: evolution_report.md
+[2026-03-13 12:04:46] [INFO]   · Synced: evolution_log.json
+[2026-03-13 12:04:49] [INFO]   · Synced: nexus_prime_evolved.modelfile
+[2026-03-13 12:04:51] [INFO]   · Synced: nexus_prime_system.txt
+[2026-03-13 12:04:51] [INFO] 
+✓ Generation 11 complete in 36.3s
+[2026-03-13 12:04:51] [INFO]   Facts added: 8
+[2026-03-13 12:04:51] [INFO]   Quality: 0.98
+[2026-03-13 12:04:51] [INFO] Next cycle in 3600s (press Ctrl+C to stop)...
+[2026-03-13 13:04:51] [INFO] 
+============================================================
+[2026-03-13 13:04:51] [INFO] EVOLUTION CYCLE — Generation 12
+[2026-03-13 13:04:51] [INFO] ============================================================
+[2026-03-13 13:04:51] [INFO] Ollama online: 17 models available
+[2026-03-13 13:04:51] [INFO] Phase 1 · REFLECT — Generation 12
+[2026-03-13 13:04:51] [INFO]   · 98 active facts, 0 missions, session #7
+[2026-03-13 13:04:51] [INFO] Phase 2 · SYNTHESIZE — AI self-analysis
+[2026-03-13 13:04:51] [INFO]   · Calling Ollama for self-analysis...
+[2026-03-13 13:05:23] [INFO]   · Extracted 8 new facts, quality_score=0.95
+[2026-03-13 13:05:23] [INFO] Phase 3 · UPDATE — Writing new facts to memory
+[2026-03-13 13:05:23] [INFO]   · +FACT: Swarm_behavior_can_be_modelled_to_optimize_user_productivity
+[2026-03-13 13:05:23] [INFO]   · +FACT: User_success_is_linked_to_effective_time_management_techniques
+[2026-03-13 13:05:23] [INFO]   · +FACT: Time_management_strategies_should_adapt_to_personal_productivity_patte
+[2026-03-13 13:05:23] [INFO]   · +FACT: Swarm_intelligence_increases_efficiency_in_collaborative_teams
+[2026-03-13 13:05:23] [INFO]   · +FACT: User_preferences_for_scheduling_algorithms_affect_productivity_outcome
+[2026-03-13 13:05:23] [INFO]   · +FACT: Environmental_factors_affect_swarm_behavior_and_time_management
+[2026-03-13 13:05:23] [INFO]   · +FACT: Goal_setting_techniques_improve_swarm_intelligence_application
+[2026-03-13 13:05:23] [INFO]   · +FACT: Swarm-based_optimization_methods_can_be_used_in_personal_task_manageme
+[2026-03-13 13:05:29] [INFO]   · Added 8 new facts. Total: 106
+[2026-03-13 13:05:29] [INFO] Phase 4 · EVOLVE — Updating system prompt
+[2026-03-13 13:05:29] [INFO]   · System prompt enhanced (113 chars added)
+[2026-03-13 13:05:29] [INFO]   · Modelfile written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_prime_evolved.modelfile
+[2026-03-13 13:05:29] [INFO]   · To apply: ollama create nexus-evolved -f nexus_prime_evolved.modelfile
+[2026-03-13 13:05:29] [INFO] Phase 5 · REPORT — Writing evolution report
+[2026-03-13 13:05:29] [INFO]   · Report written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\evolution_report.md
+[2026-03-13 13:05:29] [INFO] Phase 6 · SYNC — Google Drive upload
+[2026-03-13 13:05:31] [INFO]   · Synced: nexus_session_facts.json
+[2026-03-13 13:05:34] [INFO]   · Synced: evolution_report.md
+[2026-03-13 13:05:36] [INFO]   · Synced: evolution_log.json
+[2026-03-13 13:05:39] [INFO]   · Synced: nexus_prime_evolved.modelfile
+[2026-03-13 13:05:41] [INFO]   · Synced: nexus_prime_system.txt
+[2026-03-13 13:05:41] [INFO] 
+✓ Generation 12 complete in 37.5s
+[2026-03-13 13:05:41] [INFO]   Facts added: 8
+[2026-03-13 13:05:41] [INFO]   Quality: 0.95
+[2026-03-13 13:05:41] [INFO] Next cycle in 3600s (press Ctrl+C to stop)...
+[2026-03-13 14:05:41] [INFO] 
+============================================================
+[2026-03-13 14:05:41] [INFO] EVOLUTION CYCLE — Generation 13
+[2026-03-13 14:05:41] [INFO] ============================================================
+[2026-03-13 14:05:41] [INFO] Ollama online: 17 models available
+[2026-03-13 14:05:41] [INFO] Phase 1 · REFLECT — Generation 13
+[2026-03-13 14:05:41] [INFO]   · 106 active facts, 0 missions, session #7
+[2026-03-13 14:05:41] [INFO] Phase 2 · SYNTHESIZE — AI self-analysis
+[2026-03-13 14:05:41] [INFO]   · Calling Ollama for self-analysis...
+[2026-03-13 14:06:09] [INFO]   · Extracted 8 new facts, quality_score=0.96
+[2026-03-13 14:06:09] [INFO] Phase 3 · UPDATE — Writing new facts to memory
+[2026-03-13 14:06:09] [INFO]   · +FACT: User_success_is_linked_to_strategic_planning
+[2026-03-13 14:06:09] [INFO]   · +FACT: Time_management_strategies_can_adapt_to_varied_environments
+[2026-03-13 14:06:09] [INFO]   · +FACT: Swarm_intelligence_provides_efficient_decision_making_models
+[2026-03-13 14:06:09] [INFO]   · +FACT: Goals_need_regular_review_for_continual_improvement
+[2026-03-13 14:06:09] [INFO]   · +FACT: Users_value_integration_of_swarm_principles_in_time_management
+[2026-03-13 14:06:09] [INFO]   · Skip duplicate: Environmental_factors_affect_swarm_behavior_and_individual_p
+[2026-03-13 14:06:09] [INFO]   · +FACT: Strategic_planning_is_critical_for_long_term_success
+[2026-03-13 14:06:09] [INFO]   · +FACT: Time_adaptability_improves_time_management_efficiency
+[2026-03-13 14:06:19] [INFO]   · Added 7 new facts. Total: 113
+[2026-03-13 14:06:19] [INFO] Phase 4 · EVOLVE — Updating system prompt
+[2026-03-13 14:06:19] [INFO]   · System prompt enhanced (122 chars added)
+[2026-03-13 14:06:19] [INFO]   · Modelfile written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_prime_evolved.modelfile
+[2026-03-13 14:06:19] [INFO]   · To apply: ollama create nexus-evolved -f nexus_prime_evolved.modelfile
+[2026-03-13 14:06:19] [INFO] Phase 5 · REPORT — Writing evolution report
+[2026-03-13 14:06:19] [INFO]   · Report written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\evolution_report.md
+[2026-03-13 14:06:19] [INFO] Phase 6 · SYNC — Google Drive upload
+[2026-03-13 14:06:30] [INFO]   · Synced: nexus_session_facts.json
+[2026-03-13 14:06:32] [INFO]   · Synced: evolution_report.md
+[2026-03-13 14:06:34] [INFO]   · Synced: evolution_log.json
+[2026-03-13 14:06:37] [INFO]   · Synced: nexus_prime_evolved.modelfile
+[2026-03-13 14:06:39] [INFO]   · Synced: nexus_prime_system.txt
+[2026-03-13 14:06:39] [INFO] 
+✓ Generation 13 complete in 38.1s
+[2026-03-13 14:06:39] [INFO]   Facts added: 7
+[2026-03-13 14:06:39] [INFO]   Quality: 0.96
+[2026-03-13 14:06:39] [INFO] Next cycle in 3600s (press Ctrl+C to stop)...
+[2026-03-13 15:06:39] [INFO] 
+============================================================
+[2026-03-13 15:06:39] [INFO] EVOLUTION CYCLE — Generation 14
+[2026-03-13 15:06:39] [INFO] ============================================================
+[2026-03-13 15:06:39] [INFO] Ollama online: 17 models available
+[2026-03-13 15:06:39] [INFO] Phase 1 · REFLECT — Generation 14
+[2026-03-13 15:06:39] [INFO]   · 113 active facts, 0 missions, session #7
+[2026-03-13 15:06:39] [INFO] Phase 2 · SYNTHESIZE — AI self-analysis
+[2026-03-13 15:06:39] [INFO]   · Calling Ollama for self-analysis...
+[2026-03-13 15:07:07] [WARN] Ollama error: HTTP Error 500: Internal Server Error
+[2026-03-13 15:07:07] [WARN]   · Primary model failed, trying fast model...
+[2026-03-13 15:07:18] [INFO]   · Extracted 8 new facts, quality_score=0.90
+[2026-03-13 15:07:18] [INFO] Phase 3 · UPDATE — Writing new facts to memory
+[2026-03-13 15:07:18] [INFO]   · +FACT: User_preferences_for_shortening_code_explanations_are_not consistently
+[2026-03-13 15:07:18] [INFO]   · +FACT: Effective_time_management_involves_a_balanced_use_of_lists_and_diction
+[2026-03-13 15:07:18] [INFO]   · +FACT: The_use_of_swarm_intelligence_principles_in_project_management_is_on_t
+[2026-03-13 15:07:18] [INFO]   · +FACT: Clearer_definition_of_key_terms_in_swarm_behavior_is_needed_for_easier
+[2026-03-13 15:07:18] [INFO]   · +FACT: User_success_is_influenced_by_the_quality_and_relevance_of_goal-settin
+[2026-03-13 15:07:18] [INFO]   · +FACT: Using_development_tools_with_collaboration_features_can_improve_user_p
+[2026-03-13 15:07:18] [INFO]   · +FACT: Prioritization_of_goals_and_objectives_by_user_groups_has_been_observe
+[2026-03-13 15:07:18] [INFO]   · +FACT: The_role_of_time_management_inself-care_is_a_key_area_ofresearch
+[2026-03-13 15:07:28] [INFO]   · Added 8 new facts. Total: 121
+[2026-03-13 15:07:28] [INFO] Phase 4 · EVOLVE — Updating system prompt
+[2026-03-13 15:07:28] [INFO]   · System prompt enhanced (244 chars added)
+[2026-03-13 15:07:28] [INFO]   · Modelfile written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_prime_evolved.modelfile
+[2026-03-13 15:07:28] [INFO]   · To apply: ollama create nexus-evolved -f nexus_prime_evolved.modelfile
+[2026-03-13 15:07:28] [INFO] Phase 5 · REPORT — Writing evolution report
+[2026-03-13 15:07:28] [INFO]   · Report written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\evolution_report.md
+[2026-03-13 15:07:28] [INFO] Phase 6 · SYNC — Google Drive upload
+[2026-03-13 15:07:31] [INFO]   · Synced: nexus_session_facts.json
+[2026-03-13 15:07:33] [INFO]   · Synced: evolution_report.md
+[2026-03-13 15:07:36] [INFO]   · Synced: evolution_log.json
+[2026-03-13 15:07:39] [INFO]   · Synced: nexus_prime_evolved.modelfile
+[2026-03-13 15:07:41] [INFO]   · Synced: nexus_prime_system.txt
+[2026-03-13 15:07:41] [INFO] 
+✓ Generation 14 complete in 49.0s
+[2026-03-13 15:07:41] [INFO]   Facts added: 8
+[2026-03-13 15:07:41] [INFO]   Quality: 0.90
+[2026-03-13 15:07:41] [INFO] Next cycle in 3600s (press Ctrl+C to stop)...
+[2026-03-13 16:07:41] [INFO] 
+============================================================
+[2026-03-13 16:07:41] [INFO] EVOLUTION CYCLE — Generation 15
+[2026-03-13 16:07:41] [INFO] ============================================================
+[2026-03-13 16:07:41] [INFO] Ollama online: 17 models available
+[2026-03-13 16:07:41] [INFO] Phase 1 · REFLECT — Generation 15
+[2026-03-13 16:07:42] [INFO]   · 121 active facts, 0 missions, session #10
+[2026-03-13 16:07:42] [INFO] Phase 2 · SYNTHESIZE — AI self-analysis
+[2026-03-13 16:07:42] [INFO]   · Calling Ollama for self-analysis...
+[2026-03-13 16:08:34] [INFO]   · Extracted 8 new facts, quality_score=0.95
+[2026-03-13 16:08:34] [INFO] Phase 3 · UPDATE — Writing new facts to memory
+[2026-03-13 16:08:34] [INFO]   · +FACT: Swarm_behavior_can_influence_group_decision_making
+[2026-03-13 16:08:34] [INFO]   · +FACT: Prioritization_techniques_should_be_adaptive_and_flexible
+[2026-03-13 16:08:34] [INFO]   · +FACT: User_success_is_linked_to_good_sleep_hygiene
+[2026-03-13 16:08:34] [INFO]   · +FACT: Effective_time_management_strategies_incorporate_breaks_for_productivi
+[2026-03-13 16:08:34] [INFO]   · +FACT: Swarm_intelligence_can_optimize_resource_allocation
+[2026-03-13 16:08:34] [INFO]   · +FACT: Environmental_factors_impact_swarm_behavior
+[2026-03-13 16:08:34] [INFO]   · +FACT: Goal_setting_should_be_periodically_reviewed_for_relevance
+[2026-03-13 16:08:34] [INFO]   · Skip duplicate: Time_management_strategies_benefit_from_mindfulness_practice
+[2026-03-13 16:08:39] [INFO]   · Added 7 new facts. Total: 128
+[2026-03-13 16:08:39] [INFO] Phase 4 · EVOLVE — Updating system prompt
+[2026-03-13 16:08:39] [INFO]   · System prompt enhanced (122 chars added)
+[2026-03-13 16:08:39] [INFO]   · Modelfile written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_prime_evolved.modelfile
+[2026-03-13 16:08:39] [INFO]   · To apply: ollama create nexus-evolved -f nexus_prime_evolved.modelfile
+[2026-03-13 16:08:39] [INFO] Phase 5 · REPORT — Writing evolution report
+[2026-03-13 16:08:39] [INFO]   · Report written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\evolution_report.md
+[2026-03-13 16:08:39] [INFO] Phase 6 · SYNC — Google Drive upload
+[2026-03-13 16:08:40] [INFO]   · Synced: nexus_session_facts.json
+[2026-03-13 16:08:42] [INFO]   · Synced: evolution_report.md
+[2026-03-13 16:08:44] [INFO]   · Synced: evolution_log.json
+[2026-03-13 16:08:47] [INFO]   · Synced: nexus_prime_evolved.modelfile
+[2026-03-13 16:08:49] [INFO]   · Synced: nexus_prime_system.txt
+[2026-03-13 16:08:49] [INFO] 
+✓ Generation 15 complete in 57.7s
+[2026-03-13 16:08:49] [INFO]   Facts added: 7
+[2026-03-13 16:08:49] [INFO]   Quality: 0.95
+[2026-03-13 16:08:49] [INFO] Next cycle in 3600s (press Ctrl+C to stop)...
+[2026-03-13 17:08:49] [INFO] 
+============================================================
+[2026-03-13 17:08:49] [INFO] EVOLUTION CYCLE — Generation 16
+[2026-03-13 17:08:49] [INFO] ============================================================
+[2026-03-13 17:08:49] [INFO] Ollama online: 17 models available
+[2026-03-13 17:08:49] [INFO] Phase 1 · REFLECT — Generation 16
+[2026-03-13 17:08:49] [INFO]   · 128 active facts, 0 missions, session #11
+[2026-03-13 17:08:49] [INFO] Phase 2 · SYNTHESIZE — AI self-analysis
+[2026-03-13 17:08:49] [INFO]   · Calling Ollama for self-analysis...
+[2026-03-13 17:09:30] [INFO]   · Extracted 8 new facts, quality_score=0.92
+[2026-03-13 17:09:30] [INFO] Phase 3 · UPDATE — Writing new facts to memory
+[2026-03-13 17:09:30] [INFO]   · +FACT: User_success_is_influenced_by_both_intelligence_and_effort
+[2026-03-13 17:09:30] [INFO]   · +FACT: Swarm_intelligence_can_be_applied_to_improve_project_collaboration
+[2026-03-13 17:09:30] [INFO]   · Skip duplicate: Time_management_strategies_benefit_from_adaptive_planning
+[2026-03-13 17:09:30] [INFO]   · +FACT: Successful_time_management_involves_continuous_review_and_adjustment_o
+[2026-03-13 17:09:30] [INFO]   · +FACT: Individual_behavior_is_influenced_by_group_swarm_behavior
+[2026-03-13 17:09:30] [INFO]   · +FACT: User_prefer_visualization_techniques_for_time_management
+[2026-03-13 17:09:30] [INFO]   · +FACT: Swarm_intelligence_can_be_harnessed_for_personal_growth
+[2026-03-13 17:09:30] [INFO]   · +FACT: Effective_time_management_involves_balancing_short_term_and_long_term_
+[2026-03-13 17:09:35] [INFO]   · Added 7 new facts. Total: 135
+[2026-03-13 17:09:35] [INFO] Phase 4 · EVOLVE — Updating system prompt
+[2026-03-13 17:09:35] [INFO]   · System prompt enhanced (93 chars added)
+[2026-03-13 17:09:35] [INFO]   · Modelfile written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_prime_evolved.modelfile
+[2026-03-13 17:09:35] [INFO]   · To apply: ollama create nexus-evolved -f nexus_prime_evolved.modelfile
+[2026-03-13 17:09:35] [INFO] Phase 5 · REPORT — Writing evolution report
+[2026-03-13 17:09:35] [INFO]   · Report written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\evolution_report.md
+[2026-03-13 17:09:35] [INFO] Phase 6 · SYNC — Google Drive upload
+[2026-03-13 17:09:36] [INFO]   · Synced: nexus_session_facts.json
+[2026-03-13 17:09:39] [INFO]   · Synced: evolution_report.md
+[2026-03-13 17:09:41] [INFO]   · Synced: evolution_log.json
+[2026-03-13 17:09:43] [INFO]   · Synced: nexus_prime_evolved.modelfile
+[2026-03-13 17:09:45] [INFO]   · Synced: nexus_prime_system.txt
+[2026-03-13 17:09:45] [INFO] 
+✓ Generation 16 complete in 46.1s
+[2026-03-13 17:09:45] [INFO]   Facts added: 7
+[2026-03-13 17:09:45] [INFO]   Quality: 0.92
+[2026-03-13 17:09:45] [INFO] Next cycle in 3600s (press Ctrl+C to stop)...
+[2026-03-13 18:09:45] [INFO] 
+============================================================
+[2026-03-13 18:09:45] [INFO] EVOLUTION CYCLE — Generation 17
+[2026-03-13 18:09:45] [INFO] ============================================================
+[2026-03-13 18:09:45] [INFO] Ollama online: 17 models available
+[2026-03-13 18:09:45] [INFO] Phase 1 · REFLECT — Generation 17
+[2026-03-13 18:09:46] [INFO]   · 135 active facts, 0 missions, session #16
+[2026-03-13 18:09:46] [INFO] Phase 2 · SYNTHESIZE — AI self-analysis
+[2026-03-13 18:09:46] [INFO]   · Calling Ollama for self-analysis...
+[2026-03-13 18:10:34] [INFO]   · Extracted 8 new facts, quality_score=0.95
+[2026-03-13 18:10:34] [INFO] Phase 3 · UPDATE — Writing new facts to memory
+[2026-03-13 18:10:34] [INFO]   · +FACT: User_performance_improves_with_consistent_time_management
+[2026-03-13 18:10:34] [INFO]   · +FACT: Swarm_intelligence_can_be_applied_to_group_project_management
+[2026-03-13 18:10:34] [INFO]   · +FACT: Effective_time_management_involves_balancing_task_priority_and_persona
+[2026-03-13 18:10:34] [INFO]   · +FACT: Prioritization_techniques_differ_for_individuals_based_on_personality_
+[2026-03-13 18:10:34] [INFO]   · +FACT: Swarm_behavior_influences_decision_making_in_complex_environments
+[2026-03-13 18:10:34] [INFO]   · Skip duplicate: Time_management_strategies_benefit_from_periodic_review_and_
+[2026-03-13 18:10:34] [INFO]   · +FACT: User_success_is_linked_to_their_physical_environment_conditions
+[2026-03-13 18:10:34] [INFO]   · +FACT: Strategic_planning_enhances_swarm_intelligence_application
+[2026-03-13 18:10:40] [INFO]   · Added 7 new facts. Total: 142
+[2026-03-13 18:10:40] [INFO] Phase 4 · EVOLVE — Updating system prompt
+[2026-03-13 18:10:40] [INFO]   · System prompt enhanced (155 chars added)
+[2026-03-13 18:10:40] [INFO]   · Modelfile written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_prime_evolved.modelfile
+[2026-03-13 18:10:40] [INFO]   · To apply: ollama create nexus-evolved -f nexus_prime_evolved.modelfile
+[2026-03-13 18:10:40] [INFO] Phase 5 · REPORT — Writing evolution report
+[2026-03-13 18:10:40] [INFO]   · Report written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\evolution_report.md
+[2026-03-13 18:10:40] [INFO] Phase 6 · SYNC — Google Drive upload
+[2026-03-13 18:10:41] [INFO]   · Synced: nexus_session_facts.json
+[2026-03-13 18:10:43] [INFO]   · Synced: evolution_report.md
+[2026-03-13 18:10:45] [INFO]   · Synced: evolution_log.json
+[2026-03-13 18:10:47] [INFO]   · Synced: nexus_prime_evolved.modelfile
+[2026-03-13 18:10:50] [INFO]   · Synced: nexus_prime_system.txt
+[2026-03-13 18:10:50] [INFO] 
+✓ Generation 17 complete in 54.6s
+[2026-03-13 18:10:50] [INFO]   Facts added: 7
+[2026-03-13 18:10:50] [INFO]   Quality: 0.95
+[2026-03-13 18:10:50] [INFO] Next cycle in 3600s (press Ctrl+C to stop)...
+[2026-03-13 19:10:50] [INFO] 
+============================================================
+[2026-03-13 19:10:50] [INFO] EVOLUTION CYCLE — Generation 18
+[2026-03-13 19:10:50] [INFO] ============================================================
+[2026-03-13 19:10:50] [INFO] Ollama online: 17 models available
+[2026-03-13 19:10:50] [INFO] Phase 1 · REFLECT — Generation 18
+[2026-03-13 19:10:51] [INFO]   · 144 active facts, 0 missions, session #19
+[2026-03-13 19:10:51] [INFO] Phase 2 · SYNTHESIZE — AI self-analysis
+[2026-03-13 19:10:51] [INFO]   · Calling Ollama for self-analysis...
+[2026-03-13 19:12:41] [INFO]   · Extracted 8 new facts, quality_score=0.98
+[2026-03-13 19:12:41] [INFO] Phase 3 · UPDATE — Writing new facts to memory
+[2026-03-13 19:12:41] [INFO]   · +FACT: User_success_is_linked_to_effective_goal_setting
+[2026-03-13 19:12:41] [INFO]   · +FACT: Swarm_intelligence_can_be_applied_in_team_management
+[2026-03-13 19:12:41] [INFO]   · +FACT: Time_varying_priorities_require_flexible_planning_strategies
+[2026-03-13 19:12:41] [INFO]   · +FACT: Swarm_behavior_often_responds_to_external_stimuli
+[2026-03-13 19:12:41] [INFO]   · +FACT: Success_factors_include_mitigating_risk_and_opportunity_exploitation
+[2026-03-13 19:12:41] [INFO]   · +FACT: User_needs_varied_time_management_techniques_for_different_tasks
+[2026-03-13 19:12:41] [INFO]   · +FACT: Swarm_intelligence_improves_group_decision_making_efficiency
+[2026-03-13 19:12:41] [INFO]   · +FACT: Effective_time_management_involves_regular_review_and_adjustment
+[2026-03-13 19:12:47] [INFO]   · Added 8 new facts. Total: 152
+[2026-03-13 19:12:47] [INFO] Phase 4 · EVOLVE — Updating system prompt
+[2026-03-13 19:12:47] [INFO]   · System prompt enhanced (119 chars added)
+[2026-03-13 19:12:47] [INFO]   · Modelfile written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_prime_evolved.modelfile
+[2026-03-13 19:12:47] [INFO]   · To apply: ollama create nexus-evolved -f nexus_prime_evolved.modelfile
+[2026-03-13 19:12:47] [INFO] Phase 5 · REPORT — Writing evolution report
+[2026-03-13 19:12:47] [INFO]   · Report written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\evolution_report.md
+[2026-03-13 19:12:47] [INFO] Phase 6 · SYNC — Google Drive upload
+[2026-03-13 19:12:48] [INFO]   · Synced: nexus_session_facts.json
+[2026-03-13 19:12:51] [INFO]   · Synced: evolution_report.md
+[2026-03-13 19:12:53] [INFO]   · Synced: evolution_log.json
+[2026-03-13 19:12:56] [INFO]   · Synced: nexus_prime_evolved.modelfile
+[2026-03-13 19:12:58] [INFO]   · Synced: nexus_prime_system.txt
+[2026-03-13 19:12:58] [INFO] 
+✓ Generation 18 complete in 117.1s
+[2026-03-13 19:12:58] [INFO]   Facts added: 8
+[2026-03-13 19:12:58] [INFO]   Quality: 0.98
+[2026-03-13 19:12:58] [INFO] Next cycle in 3600s (press Ctrl+C to stop)...
+[2026-03-13 20:12:58] [INFO] 
+============================================================
+[2026-03-13 20:12:58] [INFO] EVOLUTION CYCLE — Generation 19
+[2026-03-13 20:12:58] [INFO] ============================================================
+[2026-03-13 20:12:58] [INFO] Ollama online: 17 models available
+[2026-03-13 20:12:58] [INFO] Phase 1 · REFLECT — Generation 19
+[2026-03-13 20:12:58] [INFO]   · 152 active facts, 0 missions, session #24
+[2026-03-13 20:12:58] [INFO] Phase 2 · SYNTHESIZE — AI self-analysis
+[2026-03-13 20:12:58] [INFO]   · Calling Ollama for self-analysis...
+[2026-03-13 20:13:44] [INFO]   · Extracted 8 new facts, quality_score=0.95
+[2026-03-13 20:13:44] [INFO] Phase 3 · UPDATE — Writing new facts to memory
+[2026-03-13 20:13:44] [INFO]   · +FACT: User_success_is_linked_to_effective_time_management
+[2026-03-13 20:13:44] [INFO]   · +FACT: Swarm_intelligence_can_be_applied_to_personal_productivity_strategies
+[2026-03-13 20:13:44] [INFO]   · +FACT: Prioritization_techniques_should_consider_task_complexity
+[2026-03-13 20:13:44] [INFO]   · +FACT: Goal_setting_and_swarm_behavior_are_interconnected
+[2026-03-13 20:13:44] [INFO]   · +FACT: Environmental_changes_affect_priority_setting_patterns
+[2026-03-13 20:13:44] [INFO]   · +FACT: Time_management_strategies_benefit_from_swarm_inspired_collaboration
+[2026-03-13 20:13:44] [INFO]   · +FACT: User_needs_customized_time_management_plans_for_optimal_success
+[2026-03-13 20:13:44] [INFO]   · +FACT: Swarm_behavior_can_be_used_to_improve_user_engagement
+[2026-03-13 20:13:50] [INFO]   · Added 8 new facts. Total: 160
+[2026-03-13 20:13:50] [INFO] Phase 4 · EVOLVE — Updating system prompt
+[2026-03-13 20:13:50] [INFO]   · System prompt enhanced (90 chars added)
+[2026-03-13 20:13:50] [INFO]   · Modelfile written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_prime_evolved.modelfile
+[2026-03-13 20:13:50] [INFO]   · To apply: ollama create nexus-evolved -f nexus_prime_evolved.modelfile
+[2026-03-13 20:13:50] [INFO] Phase 5 · REPORT — Writing evolution report
+[2026-03-13 20:13:50] [INFO]   · Report written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\evolution_report.md
+[2026-03-13 20:13:50] [INFO] Phase 6 · SYNC — Google Drive upload
+[2026-03-13 20:13:51] [INFO]   · Synced: nexus_session_facts.json
+[2026-03-13 20:13:53] [INFO]   · Synced: evolution_report.md
+[2026-03-13 20:13:55] [INFO]   · Synced: evolution_log.json
+[2026-03-13 20:13:57] [INFO]   · Synced: nexus_prime_evolved.modelfile
+[2026-03-13 20:13:59] [INFO]   · Synced: nexus_prime_system.txt
+[2026-03-13 20:13:59] [INFO] 
+✓ Generation 19 complete in 51.8s
+[2026-03-13 20:13:59] [INFO]   Facts added: 8
+[2026-03-13 20:13:59] [INFO]   Quality: 0.95
+[2026-03-13 20:13:59] [INFO] Next cycle in 3600s (press Ctrl+C to stop)...
+[2026-03-13 21:14:00] [INFO] 
+============================================================
+[2026-03-13 21:14:00] [INFO] EVOLUTION CYCLE — Generation 20
+[2026-03-13 21:14:00] [INFO] ============================================================
+[2026-03-13 21:14:00] [INFO] Ollama online: 17 models available
+[2026-03-13 21:14:00] [INFO] Phase 1 · REFLECT — Generation 20
+[2026-03-13 21:14:00] [INFO]   · 160 active facts, 0 missions, session #24
+[2026-03-13 21:14:00] [INFO] Phase 2 · SYNTHESIZE — AI self-analysis
+[2026-03-13 21:14:00] [INFO]   · Calling Ollama for self-analysis...
+[2026-03-13 21:14:45] [INFO]   · Extracted 8 new facts, quality_score=0.98
+[2026-03-13 21:14:45] [INFO] Phase 3 · UPDATE — Writing new facts to memory
+[2026-03-13 21:14:45] [INFO]   · +FACT: User_success_is_linked_to_consistent_swarm_behavior
+[2026-03-13 21:14:45] [INFO]   · +FACT: Swarm_algorithms_improve_data_analysis_efficiency_in_computing
+[2026-03-13 21:14:45] [INFO]   · +FACT: Decision_making_benefits_from_adapting_swarm_principles
+[2026-03-13 21:14:45] [INFO]   · +FACT: Time_management_strategies_become_more_effective_with_clear_prioritiza
+[2026-03-13 21:14:45] [INFO]   · +FACT: User_enjoys_learning_about_new_technologies_and_concepts
+[2026-03-13 21:14:45] [INFO]   · +FACT: Swarm_influence_on_individual_behavior_varies_across_societies
+[2026-03-13 21:14:45] [INFO]   · +FACT: Prioritizing_tasks_based_on_swarm_intelligence_is_a_strong_time_manage
+[2026-03-13 21:14:45] [INFO]   · +FACT: Successful_self-evolution_projects_incorporate_swarm_principles
+[2026-03-13 21:14:52] [INFO]   · Added 8 new facts. Total: 168
+[2026-03-13 21:14:52] [INFO] Phase 4 · EVOLVE — Updating system prompt
+[2026-03-13 21:14:52] [INFO]   · System prompt enhanced (119 chars added)
+[2026-03-13 21:14:52] [INFO]   · Modelfile written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_prime_evolved.modelfile
+[2026-03-13 21:14:52] [INFO]   · To apply: ollama create nexus-evolved -f nexus_prime_evolved.modelfile
+[2026-03-13 21:14:52] [INFO] Phase 5 · REPORT — Writing evolution report
+[2026-03-13 21:14:52] [INFO]   · Report written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\evolution_report.md
+[2026-03-13 21:14:52] [INFO] Phase 6 · SYNC — Google Drive upload
+[2026-03-13 21:14:53] [INFO]   · Synced: nexus_session_facts.json
+[2026-03-13 21:14:55] [INFO]   · Synced: evolution_report.md
+[2026-03-13 21:14:58] [INFO]   · Synced: evolution_log.json
+[2026-03-13 21:15:00] [INFO]   · Synced: nexus_prime_evolved.modelfile
+[2026-03-13 21:15:02] [INFO]   · Synced: nexus_prime_system.txt
+[2026-03-13 21:15:02] [INFO] 
+✓ Generation 20 complete in 52.4s
+[2026-03-13 21:15:02] [INFO]   Facts added: 8
+[2026-03-13 21:15:02] [INFO]   Quality: 0.98
+[2026-03-13 21:15:02] [INFO] Next cycle in 3600s (press Ctrl+C to stop)...
+[2026-03-13 22:15:02] [INFO] 
+============================================================
+[2026-03-13 22:15:02] [INFO] EVOLUTION CYCLE — Generation 21
+[2026-03-13 22:15:02] [INFO] ============================================================
+[2026-03-13 22:15:02] [INFO] Ollama online: 17 models available
+[2026-03-13 22:15:02] [INFO] Phase 1 · REFLECT — Generation 21
+[2026-03-13 22:15:03] [INFO]   · 168 active facts, 0 missions, session #24
+[2026-03-13 22:15:03] [INFO] Phase 2 · SYNTHESIZE — AI self-analysis
+[2026-03-13 22:15:03] [INFO]   · Calling Ollama for self-analysis...
+[2026-03-13 22:15:57] [INFO]   · Extracted 8 new facts, quality_score=0.96
+[2026-03-13 22:15:57] [INFO] Phase 3 · UPDATE — Writing new facts to memory
+[2026-03-13 22:15:57] [INFO]   · Skip duplicate: User_success_is_linked_to_strategic_planning
+[2026-03-13 22:15:57] [INFO]   · +FACT: Swarm_algorithms_can_optimize_resource_allocation
+[2026-03-13 22:15:57] [INFO]   · +FACT: Short_term_goals_are_instruments_for_long_term_planning
+[2026-03-13 22:15:57] [INFO]   · +FACT: Environmental_factors_affect_swarm_behavior
+[2026-03-13 22:15:57] [INFO]   · +FACT: Personal_motivation_varies_with_time_of_day
+[2026-03-13 22:15:57] [INFO]   · +FACT: Integration_of_swarm_principles_improves_decision_making
+[2026-03-13 22:15:57] [INFO]   · +FACT: User_effectively_manages_time_by_balancing_short_and_long_term_goals
+[2026-03-13 22:15:57] [INFO]   · +FACT: Swarm_intelligence_can_be_applied_to_personal_productivity
+[2026-03-13 22:16:03] [INFO]   · Added 7 new facts. Total: 175
+[2026-03-13 22:16:03] [INFO] Phase 4 · EVOLVE — Updating system prompt
+[2026-03-13 22:16:03] [INFO]   · System prompt enhanced (121 chars added)
+[2026-03-13 22:16:03] [INFO]   · Modelfile written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_prime_evolved.modelfile
+[2026-03-13 22:16:03] [INFO]   · To apply: ollama create nexus-evolved -f nexus_prime_evolved.modelfile
+[2026-03-13 22:16:03] [INFO] Phase 5 · REPORT — Writing evolution report
+[2026-03-13 22:16:03] [INFO]   · Report written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\evolution_report.md
+[2026-03-13 22:16:03] [INFO] Phase 6 · SYNC — Google Drive upload
+[2026-03-13 22:16:04] [INFO]   · Synced: nexus_session_facts.json
+[2026-03-13 22:16:06] [INFO]   · Synced: evolution_report.md
+[2026-03-13 22:16:09] [INFO]   · Synced: evolution_log.json
+[2026-03-13 22:16:29] [INFO]   · Synced: nexus_prime_evolved.modelfile
+[2026-03-13 22:16:31] [INFO]   · Synced: nexus_prime_system.txt
+[2026-03-13 22:16:31] [INFO] 
+✓ Generation 21 complete in 60.8s
+[2026-03-13 22:16:31] [INFO]   Facts added: 7
+[2026-03-13 22:16:31] [INFO]   Quality: 0.96
+[2026-03-13 22:16:31] [INFO] Next cycle in 3600s (press Ctrl+C to stop)...
+[2026-03-13 22:36:05] [INFO] NEXUS SELF-EVOLUTION LOOP STARTING
+[2026-03-13 22:36:05] [INFO] Model: nexus-prime:latest | Fast: llama3.2:latest
+[2026-03-13 22:36:05] [INFO] Memory: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_session_facts.json
+[2026-03-13 22:36:05] [INFO] 
+============================================================
+[2026-03-13 22:36:05] [INFO] EVOLUTION CYCLE — Generation 22
+[2026-03-13 22:36:05] [INFO] ============================================================
+[2026-03-13 22:36:07] [WARN] Ollama is offline — waiting 60s then retry
+[2026-03-13 22:37:10] [ERROR] Ollama still offline — skipping cycle
+[2026-03-13 22:37:10] [INFO] Next cycle in 3600s (press Ctrl+C to stop)...
+[2026-03-13 23:37:10] [INFO] 
+============================================================
+[2026-03-13 23:37:10] [INFO] EVOLUTION CYCLE — Generation 22
+[2026-03-13 23:37:10] [INFO] ============================================================
+[2026-03-13 23:37:10] [INFO] Ollama online: 17 models available
+[2026-03-13 23:37:10] [INFO] Phase 1 · REFLECT — Generation 22
+[2026-03-13 23:37:10] [INFO]   · 175 active facts, 0 missions, session #28
+[2026-03-13 23:37:10] [INFO] Phase 2 · SYNTHESIZE — AI self-analysis
+[2026-03-13 23:37:10] [INFO]   · Calling Ollama for self-analysis...
+[2026-03-13 23:37:42] [INFO]   · Extracted 8 new facts, quality_score=0.98
+[2026-03-13 23:37:42] [INFO] Phase 3 · UPDATE — Writing new facts to memory
+[2026-03-13 23:37:42] [INFO]   · +FACT: User_success_is_linked_to_personalized_feedback
+[2026-03-13 23:37:42] [INFO]   · +FACT: Swarm_behavior_influences_group_coherence
+[2026-03-13 23:37:42] [INFO]   · +FACT: Effective_time_management_includes定期反思与调整策略是提高效率的关键
+[2026-03-13 23:37:42] [INFO]   · +FACT: 用户偏好简洁明了的任务列表，以增强专注力
+[2026-03-13 23:37:42] [INFO]   · +FACT: 群体智能能促进个体间的协作和信息共享
+[2026-03-13 23:37:42] [INFO]   · +FACT: 优化时间管理需考虑不同任务的复杂度
+[2026-03-13 23:37:42] [INFO]   · +FACT: 目标设定应结合短期与长期规划
+[2026-03-13 23:37:42] [INFO]   · +FACT: 用户倾向于使用直观的时间管理工具
+[2026-03-13 23:37:47] [INFO]   · Added 8 new facts. Total: 183
+[2026-03-13 23:37:47] [INFO] Phase 4 · EVOLVE — Updating system prompt
+[2026-03-13 23:37:47] [INFO]   · System prompt enhanced (127 chars added)
+[2026-03-13 23:37:47] [INFO]   · Modelfile written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_prime_evolved.modelfile
+[2026-03-13 23:37:47] [INFO]   · To apply: ollama create nexus-evolved -f nexus_prime_evolved.modelfile
+[2026-03-13 23:37:47] [INFO] Phase 5 · REPORT — Writing evolution report
+[2026-03-13 23:37:47] [INFO]   · Report written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\evolution_report.md
+[2026-03-13 23:37:47] [INFO] Phase 6 · SYNC — Google Drive upload
+[2026-03-13 23:37:48] [INFO]   · Synced: nexus_session_facts.json
+[2026-03-13 23:37:50] [INFO]   · Synced: evolution_report.md
+[2026-03-13 23:37:52] [INFO]   · Synced: evolution_log.json
+[2026-03-13 23:37:54] [INFO]   · Synced: nexus_prime_evolved.modelfile
+[2026-03-13 23:37:56] [INFO]   · Synced: nexus_prime_system.txt
+[2026-03-13 23:37:56] [INFO] 
+✓ Generation 22 complete in 36.5s
+[2026-03-13 23:37:56] [INFO]   Facts added: 8
+[2026-03-13 23:37:56] [INFO]   Quality: 0.98
+[2026-03-13 23:37:56] [INFO] Next cycle in 3600s (press Ctrl+C to stop)...
+[2026-03-14 02:00:03] [INFO] NEXUS SELF-EVOLUTION LOOP STARTING
+[2026-03-14 02:00:03] [INFO] Model: nexus-prime:latest | Fast: llama3.2:latest
+[2026-03-14 02:00:03] [INFO] Memory: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_session_facts.json
+[2026-03-14 02:00:03] [INFO] 
+============================================================
+[2026-03-14 02:00:03] [INFO] EVOLUTION CYCLE — Generation 23
+[2026-03-14 02:00:03] [INFO] ============================================================
+[2026-03-14 02:00:04] [INFO] Ollama online: 17 models available
+[2026-03-14 02:00:04] [INFO] Phase 1 · REFLECT — Generation 23
+[2026-03-14 02:00:04] [INFO]   · 184 active facts, 0 missions, session #35
+[2026-03-14 02:00:04] [INFO] Phase 2 · SYNTHESIZE — AI self-analysis
+[2026-03-14 02:00:04] [INFO]   · Calling Ollama for self-analysis...
+[2026-03-14 02:00:38] [INFO]   · Extracted 8 new facts, quality_score=0.95
+[2026-03-14 02:00:38] [INFO] Phase 3 · UPDATE — Writing new facts to memory
+[2026-03-14 02:00:38] [INFO]   · +FACT: User_success_varies_by_swarm_interactions
+[2026-03-14 02:00:38] [INFO]   · +FACT: Swarm_behavior_can_inform_group_decision_making
+[2026-03-14 02:00:38] [INFO]   · +FACT: Time_management_benefits_from_adapting_to_personal_goals
+[2026-03-14 02:00:38] [INFO]   · +FACT: Swarm_intelligence_optimizes_resource_allocation
+[2026-03-14 02:00:38] [INFO]   · +FACT: Prioritization_techniques_improve_with_environmental_feedback
+[2026-03-14 02:00:38] [INFO]   · +FACT: User_effectively_uses_swarm_principles_for_team_collaboration
+[2026-03-14 02:00:38] [INFO]   · +FACT: Goal_setting_can_be_informed_by_swarm_behavior
+[2026-03-14 02:00:38] [INFO]   · +FACT: Time_management_strategies_benefit_from_swarm_intelligence
+[2026-03-14 02:00:45] [INFO]   · Added 8 new facts. Total: 192
+[2026-03-14 02:00:45] [INFO] Phase 4 · EVOLVE — Updating system prompt
+[2026-03-14 02:00:45] [INFO]   · System prompt enhanced (100 chars added)
+[2026-03-14 02:00:45] [INFO]   · Modelfile written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_prime_evolved.modelfile
+[2026-03-14 02:00:45] [INFO]   · To apply: ollama create nexus-evolved -f nexus_prime_evolved.modelfile
+[2026-03-14 02:00:45] [INFO] Phase 5 · REPORT — Writing evolution report
+[2026-03-14 02:00:45] [INFO]   · Report written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\evolution_report.md
+[2026-03-14 02:00:45] [INFO] Phase 6 · SYNC — Google Drive upload
+[2026-03-14 02:00:47] [INFO]   · Synced: nexus_session_facts.json
+[2026-03-14 02:00:50] [INFO]   · Synced: evolution_report.md
+[2026-03-14 02:00:52] [INFO]   · Synced: evolution_log.json
+[2026-03-14 02:00:54] [INFO]   · Synced: nexus_prime_evolved.modelfile
+[2026-03-14 02:00:56] [INFO]   · Synced: nexus_prime_system.txt
+[2026-03-14 02:00:56] [INFO] 
+✓ Generation 23 complete in 41.4s
+[2026-03-14 02:00:56] [INFO]   Facts added: 8
+[2026-03-14 02:00:56] [INFO]   Quality: 0.95
+[2026-03-14 02:00:56] [INFO] Next cycle in 3600s (press Ctrl+C to stop)...
+[2026-03-14 19:45:28] [INFO] NEXUS SELF-EVOLUTION LOOP STARTING
+[2026-03-14 19:45:28] [INFO] Model: nexus-prime:latest | Fast: llama3.2:latest
+[2026-03-14 19:45:28] [INFO] Memory: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_session_facts.json
+[2026-03-14 19:45:28] [INFO] 
+============================================================
+[2026-03-14 19:45:28] [INFO] EVOLUTION CYCLE — Generation 24
+[2026-03-14 19:45:28] [INFO] ============================================================
+[2026-03-14 19:45:29] [INFO] Ollama online: 17 models available
+[2026-03-14 19:45:29] [INFO] Phase 1 · REFLECT — Generation 24
+[2026-03-14 19:45:35] [INFO]   · 196 active facts, 0 missions, session #51
+[2026-03-14 19:45:35] [INFO] Phase 2 · SYNTHESIZE — AI self-analysis
+[2026-03-14 19:45:35] [INFO]   · Calling Ollama for self-analysis...
+[2026-03-14 19:46:09] [INFO]   · Extracted 8 new facts, quality_score=0.98
+[2026-03-14 19:46:09] [INFO] Phase 3 · UPDATE — Writing new facts to memory
+[2026-03-14 19:46:09] [INFO]   · Skip duplicate: User_success_is_linked_to_strategic_planning
+[2026-03-14 19:46:09] [INFO]   · Skip duplicate: Swarm_intelligence_can_be_applied_in_team_management
+[2026-03-14 19:46:09] [INFO]   · +FACT: Effective_time_management_needs_regular_review_and_adjustments
+[2026-03-14 19:46:09] [INFO]   · +FACT: Goal_setting_benefits_from_periodic_reassessment
+[2026-03-14 19:46:09] [INFO]   · +FACT: Environmental_factors_affect_swarm_behavior_dynamics
+[2026-03-14 19:46:09] [INFO]   · +FACT: Prioritization_strategies_improve_project_outcomes
+[2026-03-14 19:46:09] [INFO]   · Skip duplicate: Swarm_algorithms_can_optimize_resource_allocation
+[2026-03-14 19:46:09] [INFO]   · +FACT: Time_management_skills_are_essential_for_personal_growth
+[2026-03-14 19:46:11] [INFO]   · Added 5 new facts. Total: 201
+[2026-03-14 19:46:11] [INFO] Phase 4 · EVOLVE — Updating system prompt
+[2026-03-14 19:46:11] [INFO]   · System prompt enhanced (120 chars added)
+[2026-03-14 19:46:11] [INFO]   · Modelfile written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_prime_evolved.modelfile
+[2026-03-14 19:46:11] [INFO]   · To apply: ollama create nexus-evolved -f nexus_prime_evolved.modelfile
+[2026-03-14 19:46:11] [INFO] Phase 5 · REPORT — Writing evolution report
+[2026-03-14 19:46:11] [INFO]   · Report written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\evolution_report.md
+[2026-03-14 19:46:11] [INFO] Phase 6 · SYNC — Google Drive upload
+[2026-03-14 19:46:32] [INFO]   · Synced: nexus_session_facts.json
+[2026-03-14 19:46:35] [INFO]   · Synced: evolution_report.md
+[2026-03-14 19:46:38] [INFO]   · Synced: evolution_log.json
+[2026-03-14 19:46:41] [INFO]   · Synced: nexus_prime_evolved.modelfile
+[2026-03-14 19:46:44] [INFO]   · Synced: nexus_prime_system.txt
+[2026-03-14 19:46:44] [INFO] 
+✓ Generation 24 complete in 43.1s
+[2026-03-14 19:46:44] [INFO]   Facts added: 5
+[2026-03-14 19:46:44] [INFO]   Quality: 0.98
+[2026-03-14 19:46:44] [INFO] Next cycle in 3600s (press Ctrl+C to stop)...
+[2026-03-14 21:13:29] [INFO] NEXUS SELF-EVOLUTION LOOP STARTING
+[2026-03-14 21:13:29] [INFO] Model: nexus-prime:latest | Fast: llama3.2:latest
+[2026-03-14 21:13:29] [INFO] Memory: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_session_facts.json
+[2026-03-14 21:13:29] [INFO] 
+============================================================
+[2026-03-14 21:13:29] [INFO] EVOLUTION CYCLE — Generation 25
+[2026-03-14 21:13:29] [INFO] ============================================================
+[2026-03-14 21:13:31] [WARN] Ollama is offline — waiting 60s then retry
+[2026-03-14 21:38:26] [INFO] NEXUS SELF-EVOLUTION LOOP STARTING
+[2026-03-14 21:38:26] [INFO] Model: nexus-prime:latest | Fast: llama3.2:latest
+[2026-03-14 21:38:26] [INFO] Memory: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_session_facts.json
+[2026-03-14 21:38:26] [INFO] 
+============================================================
+[2026-03-14 21:38:26] [INFO] EVOLUTION CYCLE — Generation 25
+[2026-03-14 21:38:26] [INFO] ============================================================
+[2026-03-14 21:38:26] [INFO] Ollama online: 17 models available
+[2026-03-14 21:38:26] [INFO] Phase 1 · REFLECT — Generation 25
+[2026-03-14 21:38:26] [INFO]   · 201 active facts, 0 missions, session #53
+[2026-03-14 21:38:26] [INFO] Phase 2 · SYNTHESIZE — AI self-analysis
+[2026-03-14 21:38:26] [INFO]   · Calling Ollama for self-analysis...
+[2026-03-14 21:41:26] [WARN] Ollama error: timed out
+[2026-03-14 21:41:27] [WARN]   · Primary model failed, trying fast model...
+[2026-03-14 21:50:40] [INFO] NEXUS SELF-EVOLUTION LOOP STARTING
+[2026-03-14 21:50:40] [INFO] Model: nexus-prime:latest | Fast: llama3.2:latest
+[2026-03-14 21:50:40] [INFO] Memory: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_session_facts.json
+[2026-03-14 21:50:40] [INFO] 
+============================================================
+[2026-03-14 21:50:40] [INFO] EVOLUTION CYCLE — Generation 25
+[2026-03-14 21:50:40] [INFO] ============================================================
+[2026-03-14 21:50:40] [INFO] Ollama online: 17 models available
+[2026-03-14 21:50:40] [INFO] Phase 1 · REFLECT — Generation 25
+[2026-03-14 21:50:40] [INFO]   · 201 active facts, 0 missions, session #54
+[2026-03-14 21:50:40] [INFO] Phase 2 · SYNTHESIZE — AI self-analysis
+[2026-03-14 21:50:40] [INFO]   · Calling Ollama for self-analysis...
+[2026-03-14 21:53:08] [INFO]   · Extracted 8 new facts, quality_score=0.95
+[2026-03-14 21:53:08] [INFO] Phase 3 · UPDATE — Writing new facts to memory
+[2026-03-14 21:53:08] [INFO]   · +FACT: Swarm_algorithms_optimize_resource_allocation
+[2026-03-14 21:53:08] [INFO]   · +FACT: Time_management_strategies_benefit_from_periodic_review
+[2026-03-14 21:53:08] [INFO]   · +FACT: User_success_linked_to_adaptive_goal_setting
+[2026-03-14 21:53:08] [INFO]   · +FACT: Swarm_behavior_influences_group_efficiency
+[2026-03-14 21:53:08] [INFO]   · +FACT: Effective_time_management_uses_visual_aids_for_tracking
+[2026-03-14 21:53:08] [INFO]   · +FACT: Users_value_integration_of_swarm_principles_in_planning_processes
+[2026-03-14 21:53:08] [INFO]   · +FACT: Priority_setting_improves_productivity_through_clear_objectives
+[2026-03-14 21:53:08] [INFO]   · +FACT: User_effectiveness_increases_with_tech_integrated_into_daily_routines
+[2026-03-14 21:53:18] [INFO]   · Added 8 new facts. Total: 209
+[2026-03-14 21:53:18] [INFO] Phase 4 · EVOLVE — Updating system prompt
+[2026-03-14 21:53:18] [INFO]   · System prompt enhanced (142 chars added)
+[2026-03-14 21:53:18] [INFO]   · Modelfile written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_prime_evolved.modelfile
+[2026-03-14 21:53:18] [INFO]   · To apply: ollama create nexus-evolved -f nexus_prime_evolved.modelfile
+[2026-03-14 21:53:18] [INFO] Phase 5 · REPORT — Writing evolution report
+[2026-03-14 21:53:18] [INFO]   · Report written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\evolution_report.md
+[2026-03-14 21:53:18] [INFO] Phase 6 · SYNC — Google Drive upload
+[2026-03-14 21:53:29] [INFO]   · Synced: nexus_session_facts.json
+[2026-03-14 21:53:31] [INFO]   · Synced: evolution_report.md
+[2026-03-14 21:53:33] [INFO]   · Synced: evolution_log.json
+[2026-03-14 21:53:35] [INFO]   · Synced: nexus_prime_evolved.modelfile
+[2026-03-14 21:53:37] [INFO]   · Synced: nexus_prime_system.txt
+[2026-03-14 21:53:37] [INFO] 
+✓ Generation 25 complete in 158.6s
+[2026-03-14 21:53:37] [INFO]   Facts added: 8
+[2026-03-14 21:53:37] [INFO]   Quality: 0.95
+[2026-03-14 21:53:37] [INFO] Next cycle in 3600s (press Ctrl+C to stop)...
+[2026-03-14 22:06:51] [INFO] NEXUS SELF-EVOLUTION LOOP STARTING
+[2026-03-14 22:06:51] [INFO] Model: nexus-prime:latest | Fast: llama3.2:latest
+[2026-03-14 22:06:51] [INFO] Memory: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_session_facts.json
+[2026-03-14 22:06:51] [INFO] 
+============================================================
+[2026-03-14 22:06:51] [INFO] EVOLUTION CYCLE — Generation 26
+[2026-03-14 22:06:51] [INFO] ============================================================
+[2026-03-14 22:06:51] [INFO] Ollama online: 17 models available
+[2026-03-14 22:06:51] [INFO] Phase 1 · REFLECT — Generation 26
+[2026-03-14 22:06:51] [INFO]   · 209 active facts, 0 missions, session #55
+[2026-03-14 22:06:51] [INFO] Phase 2 · SYNTHESIZE — AI self-analysis
+[2026-03-14 22:06:51] [INFO]   · Calling Ollama for self-analysis...
+[2026-03-14 22:12:18] [INFO] NEXUS SELF-EVOLUTION LOOP STARTING
+[2026-03-14 22:12:18] [INFO] Model: nexus-prime:latest | Fast: llama3.2:latest
+[2026-03-14 22:12:18] [INFO] Memory: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_session_facts.json
+[2026-03-14 22:12:18] [INFO] 
+============================================================
+[2026-03-14 22:12:18] [INFO] EVOLUTION CYCLE — Generation 26
+[2026-03-14 22:12:18] [INFO] ============================================================
+[2026-03-14 22:12:18] [INFO] Ollama online: 17 models available
+[2026-03-14 22:12:18] [INFO] Phase 1 · REFLECT — Generation 26
+[2026-03-14 22:12:24] [INFO]   · 209 active facts, 0 missions, session #55
+[2026-03-14 22:12:24] [INFO] Phase 2 · SYNTHESIZE — AI self-analysis
+[2026-03-14 22:12:24] [INFO]   · Calling Ollama for self-analysis...
+[2026-03-14 22:12:57] [INFO]   · Extracted 8 new facts, quality_score=0.97
+[2026-03-14 22:12:57] [INFO] Phase 3 · UPDATE — Writing new facts to memory
+[2026-03-14 22:12:57] [INFO]   · +FACT: Users_often_overlook_the_importance_of_rest_in_time_management
+[2026-03-14 22:12:57] [INFO]   · +FACT: Swarm_intelligence_can_be_applied_to_personal_productivity_through_gro
+[2026-03-14 22:12:57] [INFO]   · +FACT: User_success_rates_increase_with_regular_goal_review_and_adjustment
+[2026-03-14 22:12:57] [INFO]   · +FACT: Time_management_strategies_benefit_from_integration_of_swarm_behavior_
+[2026-03-14 22:12:57] [INFO]   · +FACT: Users_tend_to_ignore_variable_factors_in_long-term_planning
+[2026-03-14 22:12:57] [INFO]   · +FACT: Swarm_intelligence_can_improve_collaboration_efficiency_among_teams
+[2026-03-14 22:12:57] [INFO]   · +FACT: Importance_of_balancing_short_term_and_long_term_goals_for_sustainabil
+[2026-03-14 22:12:57] [INFO]   · +FACT: User_engagement_levels_are_higher_when_swarm_principles_are_visualized
+[2026-03-14 22:12:59] [INFO]   · Added 8 new facts. Total: 217
+[2026-03-14 22:13:00] [INFO] Phase 4 · EVOLVE — Updating system prompt
+[2026-03-14 22:13:00] [INFO]   · System prompt enhanced (128 chars added)
+[2026-03-14 22:13:00] [INFO]   · Modelfile written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_prime_evolved.modelfile
+[2026-03-14 22:13:00] [INFO]   · To apply: ollama create nexus-evolved -f nexus_prime_evolved.modelfile
+[2026-03-14 22:13:00] [INFO] Phase 5 · REPORT — Writing evolution report
+[2026-03-14 22:13:00] [INFO]   · Report written: C:\Users\fyou1\Desktop\New folder\nexus-ultra\evolution_report.md
+[2026-03-14 22:13:00] [INFO] Phase 6 · SYNC — Google Drive upload
+[2026-03-14 22:13:03] [INFO]   · Synced: nexus_session_facts.json
+[2026-03-14 22:13:05] [INFO]   · Synced: evolution_report.md
+[2026-03-14 22:13:07] [INFO]   · Synced: evolution_log.json
+[2026-03-14 22:13:27] [INFO]   · Synced: nexus_prime_evolved.modelfile
+[2026-03-14 22:13:29] [INFO]   · Synced: nexus_prime_system.txt
+[2026-03-14 22:13:29] [INFO] 
+✓ Generation 26 complete in 41.8s
+[2026-03-14 22:13:29] [INFO]   Facts added: 8
+[2026-03-14 22:13:29] [INFO]   Quality: 0.97
+[2026-03-14 22:13:29] [INFO] Next cycle in 3600s (press Ctrl+C to stop)...
+[2026-03-14 22:28:05] [INFO] NEXUS SELF-EVOLUTION LOOP STARTING
+[2026-03-14 22:28:05] [INFO] Model: nexus-prime:latest | Fast: llama3.2:latest
+[2026-03-14 22:28:05] [INFO] Memory: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_session_facts.json
+[2026-03-14 22:28:05] [INFO] 
+============================================================
+[2026-03-14 22:28:05] [INFO] EVOLUTION CYCLE — Generation 27
+[2026-03-14 22:28:05] [INFO] ============================================================
+[2026-03-14 22:28:05] [INFO] Ollama online: 17 models available
+[2026-03-14 22:28:05] [INFO] Phase 1 · REFLECT — Generation 27
+[2026-03-14 22:28:11] [INFO]   · 217 active facts, 0 missions, session #55
+[2026-03-14 22:28:11] [INFO] Phase 2 · SYNTHESIZE — AI self-analysis
+[2026-03-14 22:28:11] [INFO]   · Calling Ollama for self-analysis...

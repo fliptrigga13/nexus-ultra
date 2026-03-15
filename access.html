@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>optimized <title> tag content</title>
+    <title>VeilPiercer — Your Access Portal | NEXUS ULTRA</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap"
         rel="stylesheet">
     <style>
@@ -417,9 +417,9 @@
             animation-delay: 0.4s;
         }
     </style>
-  <meta name="description" content="optimized meta description (150-160 chars)">
-  <meta property="og:title" content="Open Graph title">
-  <meta property="og:description" content="Open Graph description">
+  <meta name="description" content="Your VeilPiercer access is confirmed. Access your AI agent observatory, download your files, and get your personalized onboarding guide.">
+  <meta property="og:title" content="VeilPiercer Access Portal">
+  <meta property="og:description" content="Your purchase is confirmed. Access your AI observatory and onboarding resources.">
 </head>
 
 <body>
@@ -473,6 +473,37 @@
                 <div class="cards-grid" id="access-cards"></div>
             </div>
 
+            <!-- ⚡ Submit a Task to the Swarm -->
+            <div class="section animate-in delay-2" id="task-section">
+                <div class="section-label">⚡ Submit a Task to the Swarm</div>
+                <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;display:grid;gap:16px;">
+                    <p style="font-size:0.85rem;color:var(--muted);line-height:1.6;">Tell the swarm what to research or build. It runs overnight and delivers results here in the morning.</p>
+                    <div>
+                        <label style="font-size:0.75rem;font-weight:600;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:8px;">Your Business Context (optional)</label>
+                        <input id="task-context" type="text" placeholder="e.g. I run a SaaS for freelancers, target market is designers" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:0.875rem;font-family:inherit;">
+                    </div>
+                    <div>
+                        <label style="font-size:0.75rem;font-weight:600;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:8px;">Your Task *</label>
+                        <textarea id="task-input" placeholder="e.g. Research the top 5 competitors to my product and write a comparison with pricing, strengths, and weaknesses..." rows="4" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:0.875rem;font-family:inherit;resize:vertical;"></textarea>
+                    </div>
+                    <button id="task-submit-btn" onclick="submitSwarmTask()" class="download-btn" style="align-self:flex-start;">
+                        ⚡ Send to Swarm
+                    </button>
+                    <div id="task-status" style="display:none;padding:16px;border-radius:10px;font-size:0.875rem;line-height:1.6;"></div>
+                </div>
+
+                <!-- Live Result Viewer -->
+                <div id="task-result-box" style="display:none;margin-top:16px;background:var(--surface);border:1px solid rgba(124,58,237,0.3);border-radius:16px;padding:28px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                        <div class="section-label" style="margin:0;">🔴 Live Swarm Output</div>
+                        <span id="result-score" style="font-size:0.8rem;color:var(--accent);font-weight:700;"></span>
+                    </div>
+                    <div style="font-size:0.75rem;color:var(--muted);margin-bottom:8px;" id="result-task-label"></div>
+                    <div id="result-output" style="font-size:0.85rem;line-height:1.7;color:var(--text);white-space:pre-wrap;max-height:400px;overflow-y:auto;background:rgba(0,0,0,0.3);padding:16px;border-radius:8px;font-family:monospace;"></div>
+                    <div style="margin-top:12px;font-size:0.75rem;color:var(--muted);" id="result-meta"></div>
+                </div>
+            </div>
+
             <!-- AI Onboarding Guide -->
             <div class="section animate-in delay-3">
                 <div class="section-label">AI Onboarding Guide</div>
@@ -498,41 +529,63 @@
                 </div>
             </div>
 
+            <!-- Feedback -->
+            <div class="section animate-in delay-4" style="margin-top:0;">
+                <div class="section-label">Quick Feedback</div>
+                <div id="feedback-form" style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;">
+                    <p style="font-size:0.85rem;color:var(--muted);margin-bottom:20px;line-height:1.6;">
+                        Takes 60 seconds. Helps us improve. Genuinely appreciated. 🙏
+                    </p>
+                    <div style="display:grid;gap:16px;">
+                        <div>
+                            <label style="font-size:0.75rem;font-weight:600;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:8px;">Did it work? *</label>
+                            <div style="display:flex;gap:12px;">
+                                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.9rem;"><input type="radio" name="worked" value="yes" style="accent-color:var(--accent);"> Yes, worked great</label>
+                                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.9rem;"><input type="radio" name="worked" value="no" style="accent-color:var(--accent);"> Had issues</label>
+                            </div>
+                        </div>
+                        <div>
+                            <label style="font-size:0.75rem;font-weight:600;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:8px;">Overall rating (1-10)</label>
+                            <input type="range" id="fb-rating" min="1" max="10" value="8" style="width:100%;accent-color:var(--accent);">
+                            <span id="rating-val" style="font-size:0.85rem;color:var(--muted);">8 / 10</span>
+                        </div>
+                        <div>
+                            <label style="font-size:0.75rem;font-weight:600;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:8px;">Would you recommend it? (1-10)</label>
+                            <input type="range" id="fb-recommend" min="1" max="10" value="8" style="width:100%;accent-color:var(--accent);">
+                            <span id="recommend-val" style="font-size:0.85rem;color:var(--muted);">8 / 10</span>
+                        </div>
+                        <div>
+                            <label style="font-size:0.75rem;font-weight:600;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:8px;">What will you use it for?</label>
+                            <textarea id="fb-usecase" placeholder="Client demos, personal AI monitoring, agency work..." rows="2" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:0.875rem;font-family:inherit;resize:vertical;"></textarea>
+                        </div>
+                        <div>
+                            <label style="font-size:0.75rem;font-weight:600;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:8px;">What would make it better?</label>
+                            <textarea id="fb-suggestion" placeholder="More protocols, mobile app, better docs..." rows="2" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:0.875rem;font-family:inherit;resize:vertical;"></textarea>
+                        </div>
+                        <button id="fb-submit" onclick="submitFeedback()" class="download-btn" style="align-self:flex-start;">
+                            Send Feedback ✨
+                        </button>
+                    </div>
+                </div>
+                <div id="feedback-thanks" style="display:none;background:linear-gradient(135deg,rgba(124,58,237,0.1),rgba(6,182,212,0.05));border:1px solid rgba(124,58,237,0.2);border-radius:16px;padding:32px;text-align:center;">
+                    <div style="font-size:2.5rem;margin-bottom:12px;">🙏</div>
+                    <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:8px;">Thank you!</h3>
+                    <p style="color:var(--muted);font-size:0.9rem;">Your feedback helps shape the next version of VeilPiercer.</p>
+                </div>
+            </div>
+
             <div class="portal-footer">
                 <p>VeilPiercer — NEXUS ULTRA &nbsp;|&nbsp; <span id="footer-email"></span> &nbsp;|&nbsp; <span
                         id="footer-tier"></span></p>
             </div>
+
         </div>
     </div>
 
     <script>
         const NEXUS = window.location.origin; // Points to the server where this is hosted (e.g. port 9100)
 
-        const TIER_CONTENT = {
-            Starter: [
-                { icon: '🖥️', title: 'VeilPiercer Dashboard', desc: 'Full interactive agent observatory with 4 protocol modes', badge: 'included', link: '/veilpiercer-pitch.html' },
-                { icon: '📦', title: 'Source Code Bundle', desc: 'Complete frontend source — HTML, CSS, JavaScript', badge: null, link: '#' },
-                { icon: '📄', title: 'Setup Guide', desc: 'Step-by-step deployment guide for your install', badge: null, link: '#' },
-                { icon: '🔑', title: 'License Key', desc: 'Your personal Starter license — single domain', badge: null, link: '#' },
-            ],
-            Pro: [
-                { icon: '🖥️', title: 'VeilPiercer Dashboard', desc: 'Full interactive agent observatory with 4 protocol modes', badge: 'included', link: '/veilpiercer-pitch.html' },
-                { icon: '📦', title: 'Full Source + safeLog', desc: 'Complete source with safeLog module + simulation model', badge: null, link: '#' },
-                { icon: '📊', title: 'Buyer Decks', desc: 'All investor/client pitch decks in PDF + PPTX', badge: 'pro', link: '#' },
-                { icon: '🤖', title: 'AI Agent Blueprints', desc: 'n8n + Ollama workflow templates (what you just used)', badge: 'pro', link: '#' },
-                { icon: '🔑', title: 'Pro License Key', desc: 'Multi-domain license — use on up to 3 projects', badge: null, link: '#' },
-                { icon: '💬', title: 'Priority Support', desc: 'Direct access — 12hr response time', badge: 'pro', link: '#' },
-            ],
-            Agency: [
-                { icon: '🖥️', title: 'VeilPiercer Dashboard', desc: 'Full system + all protocols', badge: 'included', link: '/veilpiercer-pitch.html' },
-                { icon: '📦', title: 'White-Label Source', desc: 'Fully rebrandable — your name, your colors, your domain', badge: 'agency', link: '#' },
-                { icon: '📊', title: 'Client Pitch Deck', desc: 'Ready-to-present deck for selling to your clients', badge: 'agency', link: '#' },
-                { icon: '🤖', title: 'AI Workflow Pack', desc: 'Complete n8n + Ollama + Gemini workflow library', badge: 'agency', link: '#' },
-                { icon: '🔑', title: 'Unlimited License', desc: 'Deploy on unlimited client projects', badge: 'agency', link: '#' },
-                { icon: '🎯', title: 'Revenue Share Rights', desc: 'Sell VeilPiercer to clients and keep 100% profit', badge: 'agency', link: '#' },
-                { icon: '☎️', title: 'Onboarding Call', desc: '30-min strategy call with the NEXUS ULTRA team', badge: 'agency', link: '#' },
-            ]
-        };
+        // TIER_CONTENT is built dynamically in showPortal() using the real token
 
         async function init() {
             const params = new URLSearchParams(window.location.search);
@@ -572,10 +625,37 @@
             document.getElementById('footer-email').textContent = email;
             document.getElementById('footer-tier').textContent = `${tier} Access`;
 
-            // Load cards
+            // Build tier cards with real download links
+            const DL = `/download?token=${encodeURIComponent(token)}`;
+            const TIER_CONTENT = {
+                Starter: [
+                    { icon: '🖥️', title: 'VeilPiercer Command Hub', desc: 'Click to open your live AI agent observatory', badge: 'included', link: `${NEXUS}/veilpiercer-command.html?token=${encodeURIComponent(token)}` },
+                    { icon: '📦', title: 'Download Source Bundle', desc: 'Click to download your VeilPiercer Starter ZIP', badge: null, link: DL },
+                    { icon: '📄', title: 'Setup Guide', desc: 'Open index.html in any browser — no server needed', badge: null, link: DL },
+                    { icon: '🔑', title: 'Your License', desc: `Single-domain license for ${email}`, badge: null, link: DL },
+                ],
+                Pro: [
+                    { icon: '🖥️', title: 'VeilPiercer Command Hub', desc: 'AI commands + Sentinel active — click to open', badge: 'included', link: `${NEXUS}/veilpiercer-command.html?token=${encodeURIComponent(token)}` },
+                    { icon: '📦', title: 'Download Pro Bundle', desc: 'Full source + safeLog module — click to download', badge: null, link: DL },
+                    { icon: '📊', title: 'Pitch Decks', desc: 'Investor + client decks — included in your ZIP', badge: 'pro', link: DL },
+                    { icon: '🤖', title: 'AI Agent Blueprints', desc: 'n8n + Ollama workflow templates — included in ZIP', badge: 'pro', link: DL },
+                    { icon: '🔑', title: 'Pro License', desc: `Multi-domain (3 projects) for ${email}`, badge: null, link: DL },
+                    { icon: '💬', title: 'Priority Support', desc: 'Email support@veilpiercer.com — 12hr response', badge: 'pro', link: 'mailto:support@veilpiercer.com' },
+                ],
+                Agency: [
+                    { icon: '🖥️', title: 'VeilPiercer Command Hub', desc: 'Full agency hub — all protocols + export rights', badge: 'included', link: `${NEXUS}/veilpiercer-command.html?token=${encodeURIComponent(token)}` },
+                    { icon: '📦', title: 'Download Agency Bundle', desc: 'White-label source — click to download your ZIP', badge: 'agency', link: DL },
+                    { icon: '📊', title: 'Client Pitch Deck', desc: 'Ready-to-present deck — included in ZIP', badge: 'agency', link: DL },
+                    { icon: '🤖', title: 'AI Workflow Pack', desc: 'Full n8n + Ollama + Gemini library — in ZIP', badge: 'agency', link: DL },
+                    { icon: '🔑', title: 'Unlimited License', desc: 'Unlimited client deployments', badge: 'agency', link: DL },
+                    { icon: '🎯', title: 'Revenue Share Rights', desc: 'Sell to clients, keep 100% profit', badge: 'agency', link: DL },
+                    { icon: '☎️', title: 'Onboarding Call', desc: 'Book at support@veilpiercer.com', badge: 'agency', link: 'mailto:support@veilpiercer.com' },
+                ]
+            };
+
             const cards = TIER_CONTENT[tier] || TIER_CONTENT.Starter;
             document.getElementById('access-cards').innerHTML = cards.map(c => `
-    <a class="card" href="${c.link === '/veilpiercer-pitch.html' ? `/veilpiercer-pitch?tk=${encodeURIComponent(token)}` : c.link}" ${c.link === '#' ? '' : 'target="_blank"'}>
+    <a class="card" href="${c.link}" target="${c.link.startsWith('mailto') ? '_self' : '_blank'}">
       <div class="card-icon">${c.icon}</div>
       ${c.badge ? `<span class="badge badge-${c.badge}">${c.badge}</span>` : ''}
       <h3>${c.title}</h3>
@@ -619,6 +699,121 @@
         }
 
         init();
+
+        // Slider live display
+        document.getElementById('fb-rating').addEventListener('input', e => {
+            document.getElementById('rating-val').textContent = e.target.value + ' / 10';
+        });
+        document.getElementById('fb-recommend').addEventListener('input', e => {
+            document.getElementById('recommend-val').textContent = e.target.value + ' / 10';
+        });
+
+        async function submitFeedback() {
+            const token = new URLSearchParams(window.location.search).get('token');
+            const worked = document.querySelector('input[name="worked"]:checked')?.value || '';
+            if (!worked) { alert('Please select if it worked for you.'); return; }
+
+            const btn = document.getElementById('fb-submit');
+            btn.textContent = 'Sending...';
+            btn.disabled = true;
+
+            try {
+                const r = await fetch(`${NEXUS}/feedback`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        token,
+                        worked,
+                        rating: document.getElementById('fb-rating').value,
+                        recommend: document.getElementById('fb-recommend').value,
+                        useCase: document.getElementById('fb-usecase').value,
+                        suggestion: document.getElementById('fb-suggestion').value,
+                    })
+                });
+                const d = await r.json();
+                if (d.ok) {
+                    document.getElementById('feedback-form').style.display = 'none';
+                    document.getElementById('feedback-thanks').style.display = 'block';
+                } else {
+                    btn.textContent = 'Send Feedback ✨';
+                    btn.disabled = false;
+                    alert('Something went wrong. Try again.');
+                }
+            } catch {
+                btn.textContent = 'Send Feedback ✨';
+                btn.disabled = false;
+                alert('Could not connect. Please try again.');
+            }
+        }
+
+        // ── Swarm Task Submission ──────────────────────────────
+        let resultPoller = null;
+
+        async function submitSwarmTask() {
+            const task = document.getElementById('task-input').value.trim();
+            const context = document.getElementById('task-context').value.trim();
+            const btn = document.getElementById('task-submit-btn');
+            const statusEl = document.getElementById('task-status');
+
+            if (!task || task.length < 10) {
+                statusEl.style.display = 'block';
+                statusEl.style.background = 'rgba(255,31,61,0.1)';
+                statusEl.style.border = '1px solid rgba(255,31,61,0.3)';
+                statusEl.textContent = '⚠️ Please enter a task (at least 10 characters).';
+                return;
+            }
+
+            btn.textContent = '⏳ Queuing...';
+            btn.disabled = true;
+
+            try {
+                const r = await fetch(`${NEXUS}/api/customer-task`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token, task, context })
+                });
+                const d = await r.json();
+                if (d.ok) {
+                    statusEl.style.display = 'block';
+                    statusEl.style.background = 'rgba(0,229,255,0.07)';
+                    statusEl.style.border = '1px solid rgba(0,229,255,0.2)';
+                    statusEl.innerHTML = `✅ Task queued! Position in queue: <strong>${d.queue_depth}</strong>. Est. time: <strong>~${d.eta_minutes} min</strong>.<br><span style="color:var(--muted);font-size:0.8rem;">The swarm is working on it. Results appear below automatically.</span>`;
+                    document.getElementById('task-result-box').style.display = 'block';
+                    startResultPoller();
+                } else {
+                    statusEl.style.display = 'block';
+                    statusEl.style.background = 'rgba(255,31,61,0.1)';
+                    statusEl.style.border = '1px solid rgba(255,31,61,0.3)';
+                    statusEl.textContent = '❌ ' + (d.error || 'Something went wrong.');
+                    btn.textContent = '⚡ Send to Swarm';
+                    btn.disabled = false;
+                }
+            } catch {
+                statusEl.style.display = 'block';
+                statusEl.style.background = 'rgba(255,31,61,0.1)';
+                statusEl.textContent = '❌ Could not connect to server. Please try again.';
+                btn.textContent = '⚡ Send to Swarm';
+                btn.disabled = false;
+            }
+        }
+
+        function startResultPoller() {
+            if (resultPoller) clearInterval(resultPoller);
+            resultPoller = setInterval(async () => {
+                try {
+                    const r = await fetch(`${NEXUS}/api/result`);
+                    const d = await r.json();
+                    if (!d.ok) return;
+                    document.getElementById('result-task-label').textContent = '📋 ' + (d.task || '');
+                    document.getElementById('result-score').textContent = d.score ? `Score: ${(d.score * 100).toFixed(0)}%` : '';
+                    const out = d.last_output;
+                    if (out && out.text) {
+                        document.getElementById('result-output').textContent = `[${out.agent}] ${out.text}`;
+                    }
+                    document.getElementById('result-meta').textContent = `MVP: ${d.mvp || '—'}  |  Cycle: ${d.cycle_count || 0}  |  Queue: ${d.queue_depth || 0}  |  Updated: ${d.ts ? new Date(d.ts).toLocaleTimeString() : '—'}`;
+                } catch {}
+            }, 6000);
+        }
     </script>
 </body>
 

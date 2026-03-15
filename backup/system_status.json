@@ -1,0 +1,8 @@
+{
+    "status":  "ACTIVE",
+    "firewall":  "Hardened",
+    "monitor_task":  "Every 15 min",
+    "rclone":  "v1.73.2 installed",
+    "setup_time":  "2026-03-12 21:04:05",
+    "backup_task":  "Daily 2AM -\u003e Google Drive"
+}

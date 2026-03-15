@@ -195,12 +195,15 @@ end
 # ────────────────────────────────────────────────────────────
 #  TRAINING LOOP (runs in background @async task)
 # ────────────────────────────────────────────────────────────
-const SWARM      = Ref{SwarmState}()
-const STOP_FLAG  = Atomic{Bool}(false)
-const CLIENTS    = Set{Any}()
+const SWARM        = Ref{SwarmState}()
+const STOP_FLAG    = Atomic{Bool}(false)
+const CLIENTS      = Set{Any}()
+const CLIENTS_LOCK = ReentrantLock()
 
 function broadcast_frame()
-    sw   = SWARM[]
+    sw      = SWARM[]
+    x_cpu   = Array(sw.x)
+    fit_cpu = Array(sw.fitness)
     frame = Dict(
         "iter"      => sw.iter,
         "g_fit"     => sw.g_fit,
@@ -208,7 +211,10 @@ function broadcast_frame()
         "converged" => sw.converged,
         "running"   => sw.running,
         "gpu"       => USE_GPU,
-        "device"    => USE_GPU ? string(CUDA.name(CUDA.device())) : "CPU"
+        "device"    => USE_GPU ? string(CUDA.name(CUDA.device())) : "CPU",
+        "px"        => x_cpu[:, 1],    # dim-1 positions for scatter plot
+        "py"        => x_cpu[:, 2],    # dim-2 positions for scatter plot
+        "pfit"      => fit_cpu          # per-particle fitness for colouring
     )
     local json_str
     try
@@ -218,15 +224,17 @@ function broadcast_frame()
         return
     end
     dead = Set{Any}()
-    for ws in CLIENTS
-        try
-            HTTP.WebSockets.send(ws, json_str)
-        catch
-            push!(dead, ws)
+    lock(CLIENTS_LOCK) do
+        for ws in CLIENTS
+            try
+                HTTP.WebSockets.send(ws, json_str)
+            catch
+                push!(dead, ws)
+            end
         end
-    end
-    for ws in dead
-        delete!(CLIENTS, ws)
+        for ws in dead
+            delete!(CLIENTS, ws)
+        end
     end
 end
 
@@ -262,7 +270,7 @@ end
 #  HTTP / WEBSOCKET SERVER
 # ────────────────────────────────────────────────────────────
 function handle_ws(ws)
-    push!(CLIENTS, ws)
+    lock(CLIENTS_LOCK) do; push!(CLIENTS, ws); end
     println("  [PSO] WS client connected (total: $(length(CLIENTS)))")
     # Send current state immediately on connect
     if isassigned(SWARM)
@@ -282,7 +290,7 @@ function handle_ws(ws)
     catch e
         # EOFError / IOError = client disconnected
     finally
-        delete!(CLIENTS, ws)
+        lock(CLIENTS_LOCK) do; delete!(CLIENTS, ws); end
         println("  [PSO] WS client disconnected (total: $(length(CLIENTS)))")
     end
 end
@@ -380,8 +388,9 @@ server = HTTP.listen!("0.0.0.0", PORT) do http::HTTP.Stream
             handle_ws(ws)
         end
     else
-        req  = http.message
-        resp = router(req)
+        req      = http.message
+        req.body = read(http)        # buffer full body from stream (fixes empty POST body)
+        resp     = router(req)
 
         # CORS headers for the HTML dashboard
         push!(resp.headers, "Access-Control-Allow-Origin" => "*")

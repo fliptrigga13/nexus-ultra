@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
 <title>NEXUS PRIME — GOD MODE</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
@@ -20,9 +20,64 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 @keyframes logoGlow{0%,100%{filter:drop-shadow(0 0 8px rgba(0,255,247,.5))}50%{filter:drop-shadow(0 0 20px rgba(191,0,255,.8))}}
 #hdr-right{display:flex;align-items:center;gap:10px}
 #clock{font-family:'Orbitron',monospace;font-size:12px;color:var(--gold);letter-spacing:2px}
-.pill{padding:3px 9px;border-radius:20px;font-size:7px;font-weight:700;letter-spacing:1.5px;transition:all .3s}
-.on{background:rgba(0,255,136,.12);border:1px solid var(--g);color:var(--g);box-shadow:0 0 8px rgba(0,255,136,.3)}
+.on{background:rgba(0,255,136,.18);border:1px solid var(--g);color:var(--g);box-shadow:0 0 10px rgba(0,255,136,.4)}
 .off{background:rgba(255,51,85,.1);border:1px solid var(--r);color:var(--r)}
+.pill{padding:3px 9px;border-radius:20px;font-size:7px;font-weight:700;letter-spacing:1.5px;transition:all .3s;cursor:pointer;user-select:none;position:relative}
+.pill:hover{filter:brightness(1.3);transform:scale(1.06)}
+.pill.on::before,.pill.off::before{content:'';position:absolute;left:6px;top:50%;transform:translateY(-50%);width:4px;height:4px;border-radius:50%}
+.pill.on::before{background:var(--g);box-shadow:0 0 5px var(--g)}
+.pill.off::before{background:var(--r);box-shadow:0 0 4px var(--r)}
+.pill.on,.pill.off{padding-left:16px}
+.pill.disabled{opacity:.35;pointer-events:none}
+.pill-cat{font-size:6px;letter-spacing:2px;font-weight:700;padding:0 4px;white-space:nowrap;color:rgba(0,255,136,.4)}
+.pill-cat.cat-offline{color:rgba(255,51,85,.35)}
+.pill-sep{width:1px;height:16px;background:rgba(255,255,255,.08);margin:0 2px}
+/* Agent mode button */
+#agent-btn{background:rgba(0,255,247,.06);border:1px solid rgba(0,255,247,.2);color:#555;font-family:'Orbitron',monospace;font-size:7px;letter-spacing:1.5px;padding:4px 10px;border-radius:4px;cursor:pointer;transition:all .3s}
+#agent-btn:hover{border-color:var(--c);color:var(--c)}
+#agent-btn.agent-active{background:rgba(255,107,53,.15);border-color:#ff6b35;color:#ff6b35;box-shadow:0 0 14px rgba(255,107,53,.3);animation:agentPulse 2s ease infinite}
+:root{--orange:#ff6b35}
+@keyframes agentPulse{0%,100%{box-shadow:0 0 14px rgba(255,107,53,.3)}50%{box-shadow:0 0 28px rgba(255,107,53,.6)}}
+/* Stop button */
+.btn-stop{background:rgba(255,51,85,.2)!important;border:1px solid var(--r)!important;color:var(--r)!important;display:none;animation:stopPulse 1s ease infinite}
+@keyframes stopPulse{0%,100%{box-shadow:0 0 8px rgba(255,51,85,.4)}50%{box-shadow:0 0 20px rgba(255,51,85,.8)}}
+/* Cognitive activation */
+.tier-on{border-left-color:var(--g)!important;background:linear-gradient(90deg,rgba(0,255,136,.15),transparent)!important}
+.sk-on{background:rgba(0,255,136,.12)!important;border-color:rgba(0,255,136,.5)!important;color:var(--g)!important;cursor:pointer}
+.sk,.tier-hdr{cursor:pointer}
+#cog-stack{display:none;padding:4px 12px;gap:5px;flex-wrap:wrap;border-top:1px solid var(--bd);background:rgba(0,0,0,.3);font-size:7px;align-items:center}
+#cog-stack .cs-chip{background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.2);border-radius:10px;padding:2px 7px;color:var(--g);font-size:6px;letter-spacing:.8px}
+/* Pipeline buttons */
+#pipeline-bar{display:flex;gap:5px;flex-wrap:wrap;padding:0 2px 6px}
+.pipe-btn{background:rgba(0,255,247,.03);border:1px solid rgba(0,255,247,.08);border-radius:4px;color:#444;font-size:6px;font-family:'JetBrains Mono',monospace;padding:3px 8px;cursor:pointer;transition:all .2s;letter-spacing:.5px}
+.pipe-btn.active{border-color:var(--c);color:var(--c);background:rgba(0,255,247,.08)}
+.pipe-btn:hover{border-color:rgba(0,255,247,.3);color:#aaa}
+/* Quick chips */
+#quick-chips{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:4px;min-height:14px}
+.chip{background:rgba(191,0,255,.08);border:1px solid rgba(191,0,255,.2);border-radius:10px;padding:2px 8px;font-size:6px;color:#666;cursor:pointer;transition:all .15s;letter-spacing:.3px}
+.chip:hover{color:var(--p);border-color:var(--p)}
+/* Context/format/model selector row */
+#ctx-bar{display:flex;gap:4px;align-items:center;flex-wrap:wrap;padding:0 0 4px;font-size:7px}
+.ctx-label{color:#333;letter-spacing:1.5px;font-size:6px}
+select.ctx-sel{background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.06);color:#555;font-family:'JetBrains Mono',monospace;font-size:7px;padding:2px 5px;border-radius:4px;cursor:pointer;outline:none}
+select.ctx-sel:focus{border-color:rgba(0,255,247,.3);color:var(--c)}
+/* Model selector */
+#model-bar{display:flex;align-items:center;gap:6px;padding:4px 0 6px;flex-wrap:wrap}
+#sel-model{background:rgba(0,255,247,.06);border:1px solid rgba(0,255,247,.2);color:var(--c);font-family:'JetBrains Mono',monospace;font-size:8px;padding:4px 8px;border-radius:6px;cursor:pointer;outline:none;min-width:160px;max-width:280px}
+#sel-model:focus{border-color:var(--c);box-shadow:0 0 8px rgba(0,255,247,.2)}
+#sel-model option{background:#0a0a0a;color:var(--c)}
+#sel-model option.evolved{color:#ffd700}
+#agent-pill{background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.25);color:#ff6b35;font-family:'Orbitron',monospace;font-size:7px;letter-spacing:1px;padding:4px 10px;border-radius:6px;cursor:pointer;transition:all .3s;white-space:nowrap}
+#agent-pill.active{background:rgba(255,107,53,.2);box-shadow:0 0 14px rgba(255,107,53,.4);animation:agentPulse 2s ease infinite}
+/* Agent step bubbles */
+.step-think{color:#333;font-size:9px;font-style:italic;padding:2px 4px}
+.step-tool{background:rgba(0,255,247,.06);border:1px solid rgba(0,255,247,.1);border-radius:4px;padding:4px 8px;font-size:8px;color:#555;margin:2px 0}
+.step-result-ok{color:rgba(0,255,136,.7);font-size:8px;padding:2px 4px;border-left:2px solid var(--g);margin-left:4px}
+.step-result-err{color:rgba(255,51,85,.7);font-size:8px;padding:2px 4px;border-left:2px solid var(--r);margin-left:4px}
+.step-reason{color:#888;font-size:9px;padding:2px 4px}
+.step-done{color:var(--g);font-size:9px;padding:2px 4px;font-weight:700}
+/* Mode indicator */
+#mode-indicator{font-size:7px;letter-spacing:1.5px;padding:2px 0;color:#333;text-align:center}
 .sse-dot{width:8px;height:8px;border-radius:50%;background:var(--g);box-shadow:0 0 10px var(--g);animation:ssePulse 2s infinite}
 @keyframes ssePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
 
@@ -75,7 +130,7 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 .qbtn:hover{border-color:var(--c);color:var(--c);background:rgba(0,255,247,.08)}
 
 /* ── CENTER CHAT ── */
-#center{display:flex;flex-direction:column;padding:12px;gap:10px;background:rgba(0,0,0,.2)}
+#center{display:flex;flex-direction:column;padding:12px;gap:10px;background:rgba(0,0,0,.2);min-height:0;overflow:hidden}
 /* scores strip */
 #scores-strip{display:flex;gap:6px;flex-wrap:wrap}
 .sc-chip{background:var(--b2);border:1px solid var(--bd2);border-radius:4px;padding:3px 7px;font-size:7px;display:flex;align-items:center;gap:5px}
@@ -97,7 +152,7 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 .msg.agent .bubble{background:linear-gradient(135deg,rgba(191,0,255,.1),rgba(191,0,255,.04));border:1px solid rgba(191,0,255,.2);color:#ccc;border-bottom-left-radius:2px}
 .msg.agent.inject .bubble{background:linear-gradient(135deg,rgba(0,255,136,.08),transparent);border-color:rgba(0,255,136,.2);color:#aaa}
 /* input area */
-#input-area{background:rgba(0,0,0,.4);border:1px solid var(--bd);border-radius:10px;padding:10px}
+#input-area{background:rgba(0,0,0,.4);border:1px solid var(--bd);border-radius:10px;padding:10px;flex-shrink:0}
 #msg-row{display:flex;gap:8px;align-items:flex-end}
 #task-in{flex:1;background:transparent;border:none;color:var(--c);font-family:'JetBrains Mono',monospace;font-size:11px;resize:none;outline:none;max-height:80px;min-height:36px}
 #task-in::placeholder{color:#333}
@@ -145,7 +200,168 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 /* TOAST */
 .toast{position:fixed;bottom:44px;right:14px;background:rgba(0,255,247,.08);border:1px solid var(--c);border-radius:6px;padding:8px 14px;font-size:10px;color:var(--c);z-index:999;display:none;animation:slideIn .3s ease}
 @keyframes slideIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+
+/* ═══════════════════════════════════════════════════
+   MOBILE RESPONSIVE — phones & small tablets
+   ═══════════════════════════════════════════════════ */
+@media (max-width:768px){
+
+  /* ── App shell: header fills top, main fills rest ── */
+  #app{
+    grid-template-rows:48px 1fr!important;
+    height:100dvh!important;  /* dynamic viewport height — accounts for browser chrome */
+    height:100vh!important;   /* fallback */
+    overflow:hidden!important;
+  }
+
+  /* ── Header shrink ── */
+  #hdr{padding:0 8px!important;}
+  #logo{font-size:10px!important;letter-spacing:1.5px!important;}
+  #logo-sub{display:none!important;}
+  #clock{font-size:9px!important;letter-spacing:1px!important;}
+  #agent-btn{font-size:6px!important;padding:3px 6px!important;}
+  /* Pills scroll horizontally, no line-wrap */
+  #hdr-right{
+    gap:4px!important;overflow-x:auto!important;flex-wrap:nowrap!important;
+    max-width:58vw!important;-webkit-overflow-scrolling:touch!important;
+    scrollbar-width:none!important;
+  }
+  #hdr-right::-webkit-scrollbar{display:none!important;}
+  .pill{font-size:5px!important;padding:2px 6px 2px 13px!important;}
+  .pill-cat,.pill-sep{display:none!important;}
+
+  /* ── #main: full height of the 1fr row, no inner overflow ── */
+  #main{
+    display:block!important;
+    position:relative!important;
+    height:100%!important;
+    overflow:hidden!important;
+  }
+
+  /* ── Each column: absolutely fills #main, hidden by default ── */
+  #left,#center,#right{
+    position:absolute!important;
+    top:0!important;left:0!important;
+    width:100%!important;
+    /* Height = 100% of #main MINUS the bottom tab bar so nothing is cut off */
+    height:calc(100% - 56px - env(safe-area-inset-bottom))!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    display:none!important;
+    border:none!important;
+    -webkit-overflow-scrolling:touch!important;
+  }
+  /* Fallback for browsers that don't support env() */
+  #left,#center,#right{height:calc(100% - 56px)!important;}
+
+  /* Active panel shows */
+  #left.mob-active,#right.mob-active{display:block!important;}
+  #center.mob-active{
+    display:flex!important;
+    flex-direction:column!important;
+    overflow:hidden!important;
+  }
+
+  /* ── CENTER: chat layout — window grows, input stays visible ── */
+  #center{
+    padding:6px!important;
+    gap:5px!important;
+  }
+  #chat-window{
+    flex:1!important;
+    overflow-y:auto!important;
+    -webkit-overflow-scrolling:touch!important;
+    min-height:0!important;  /* critical: allows flex shrink */
+    font-size:11px!important;
+    padding:8px!important;
+    border-radius:8px!important;
+  }
+  #mode-indicator{font-size:6px!important;padding:1px 0!important;}
+  #ctx-bar{font-size:6px!important;padding:0!important;gap:3px!important;flex-wrap:wrap!important;}
+  .ctx-label{display:none!important;}
+  select.ctx-sel{font-size:8px!important;padding:3px 4px!important;}
+  #quick-chips{gap:3px!important;min-height:0!important;margin:0!important;}
+  .chip{font-size:5.5px!important;padding:2px 6px!important;}
+  #pipeline-bar{gap:3px!important;padding:0 0 2px!important;}
+  .pipe-btn{font-size:5.5px!important;padding:2px 5px!important;}
+  /* Input area: shrinks but always visible */
+  #input-area{
+    flex-shrink:0!important;
+    border-radius:8px!important;
+    padding:6px!important;
+  }
+  #task-in{font-size:13px!important;min-height:38px!important;max-height:80px!important;}
+  #btn-row{gap:4px!important;flex-wrap:wrap!important;margin-top:4px!important;}
+  .btn{font-size:7px!important;padding:5px 8px!important;}
+  .bubble{font-size:11px!important;line-height:1.5!important;padding:8px 10px!important;}
+  .msg-head{font-size:7px!important;}
+  #ai-status{font-size:7px!important;}
+  #mem-bar{padding:4px 6px!important;gap:8px!important;font-size:8px!important;}
+
+  /* ── LEFT panel ── */
+  #left{padding:8px 6px!important;}
+  .eng{padding:5px 6px!important;}
+  .eng-l .en{font-size:8px!important;}
+  .eng-l .es{font-size:7px!important;}
+
+  /* ── RIGHT panel (cognitive DB) ── */
+  #right{padding:6px!important;}
+  .tier-hdr{padding:5px 6px!important;font-size:7px!important;}
+  .sk{font-size:7px!important;padding:1px 5px!important;}
+
+  /* ── Footer: replaced by tab bar ── */
+  #ftr{display:none!important;}
+
+  /* ── MOBILE TAB BAR ── */
+  #mob-nav{
+    display:flex!important;
+    position:fixed!important;
+    bottom:0!important;left:0!important;right:0!important;
+    height:calc(52px + env(safe-area-inset-bottom))!important;
+    height:52px!important; /* fallback */
+    padding-bottom:env(safe-area-inset-bottom)!important;
+    z-index:9999!important;
+    background:rgba(4,4,14,.98)!important;
+    border-top:1px solid rgba(0,255,247,.15)!important;
+    backdrop-filter:blur(20px)!important;
+    -webkit-backdrop-filter:blur(20px)!important;
+  }
+  .mob-tab{
+    flex:1!important;display:flex!important;flex-direction:column!important;
+    align-items:center!important;justify-content:center!important;
+    gap:2px!important;font-size:6px!important;letter-spacing:1.5px!important;
+    color:#333!important;cursor:pointer!important;border:none!important;
+    background:transparent!important;transition:color .2s!important;
+    font-family:'Orbitron',monospace!important;
+    -webkit-tap-highlight-color:transparent!important;
+    padding-bottom:2px!important;
+  }
+  .mob-tab.active{color:var(--c)!important;}
+  .mob-tab.active .tab-icon{transform:translateY(-2px);display:block!important;}
+  .mob-tab .tab-icon{font-size:18px!important;display:block!important;transition:transform .2s!important;}
+  .mob-tab:active{background:rgba(0,255,247,.04)!important;}
+
+  /* ── Toast above tab bar ── */
+  #toast,.toast{bottom:calc(60px + env(safe-area-inset-bottom))!important;}
+}
+
+/* Desktop: hide mobile nav */
+@media (min-width:769px){
+  #mob-nav{display:none!important;}
+}
 </style></head><body>
+<!-- Mobile tab navigation (hidden on desktop) -->
+<nav id="mob-nav">
+  <button class="mob-tab active" id="tab-chat" onclick="mobSwitch('center','tab-chat')">
+    <span class="tab-icon">💬</span>CHAT
+  </button>
+  <button class="mob-tab" id="tab-sys" onclick="mobSwitch('left','tab-sys')">
+    <span class="tab-icon">⚡</span>SYSTEMS
+  </button>
+  <button class="mob-tab" id="tab-ai" onclick="mobSwitch('right','tab-ai')">
+    <span class="tab-icon">🧠</span>AI CORE
+  </button>
+</nav>
 <div id="app">
 
 <!-- HEADER -->
@@ -157,11 +373,15 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
   <div id="hdr-right">
     <div class="sse-dot" id="sse-dot" title="SSE Live"></div>
     <div id="clock">--:--:--</div>
-    <span id="p-ollama" class="pill off">OLLAMA</span>
-    <span id="p-cosmos" class="pill off">COSMOS</span>
-    <span id="p-pso" class="pill off">PSO GPU</span>
-    <span id="p-bd" class="pill off">BACKDOOR</span>
-    <span id="p-claw" class="pill off">OPENCLAW</span>
+    <button id="agent-btn" onclick="toggleAgentMode()">🤖 AGENT MODE</button>
+    <span class="pill-cat">ONLINE</span>
+    <span id="p-ollama" class="pill off" onclick="togglePill('ollama')" title="Ollama :11434">OLLAMA</span>
+    <span id="p-cosmos" class="pill off" onclick="togglePill('cosmos')" title="COSMOS :9100">COSMOS</span>
+    <span class="pill-sep"></span>
+    <span class="pill-cat cat-offline">OFFLINE</span>
+    <span id="p-pso"  class="pill off" onclick="togglePill('pso')"  title="PSO :7700">PSO GPU</span>
+    <span id="p-bd"   class="pill off" onclick="togglePill('bd')"   title="BD :7701">BACKDOOR</span>
+    <span id="p-claw" class="pill off" onclick="togglePill('claw')" title="Claw :18789">OPENCLAW</span>
   </div>
 </header>
 
@@ -222,12 +442,24 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
     <div id="msg-row">
       <textarea id="task-in" rows="2" placeholder="Command, question, or mission... Ctrl+Enter to fire"></textarea>
     </div>
+    <!-- Model selector + Agent toggle always visible -->
+    <div id="model-bar">
+      <span style="font-size:7px;letter-spacing:1.5px;color:#334;font-family:'Orbitron',monospace">MODEL</span>
+      <select id="sel-model" title="Select AI model">
+        <option value="nexus-evolved:latest" class="evolved">⭐ nexus-evolved (smart)</option>
+        <option value="nexus-prime:latest">nexus-prime</option>
+      </select>
+      <button id="agent-pill" onclick="toggleAgentMode()" title="Toggle Agent Mode">🤖 AGENT MODE</button>
+      <span id="ai-status" style="font-size:8px;color:#444;letter-spacing:1px"></span>
+    </div>
     <div id="btn-row">
-      <button class="btn btn-fire" onclick="fire()">⚡ INJECT &amp; EXECUTE</button>
+      <button class="btn btn-fire" id="fire-btn" onclick="fire()">⚡ SEND</button>
       <button class="btn btn-mic" id="mic-btn" onclick="toggleMic()">🎙 MIC</button>
+      <button class="btn btn-sec" id="tts-btn" onclick="toggleTTS()" title="Toggle AI voice">🔊 TTS</button>
       <button class="btn btn-sec" onclick="forceCycle()">🔄 FORCE CYCLE</button>
-      <button class="btn btn-sec" onclick="clearChat()">🧹 CLEAR</button>
-      <button class="btn btn-danger" onclick="flushBB()">🗑 FLUSH BB</button>
+      <button class="btn btn-sec" onclick="clearChat()">🗑 CLEAR</button>
+      <button class="btn btn-danger" onclick="flushBB()">🧹 FLUSH BB</button>
+      <button id="stop-btn" class="btn btn-danger" onclick="stopAll()" style="display:none">⬛ STOP</button>
     </div>
   </div>
 
@@ -292,14 +524,14 @@ const AGENTS=[
   {n:'HACKER',m:'qwen2.5-coder:7b',t:'rogue'},{n:'ADVERSARY',m:'llama3.1:8b',t:'rogue'},
 ];
 const QUICK=[
-  ['⚡','Analyze the swarm architecture — find the top bottleneck and fix it.'],
-  ['🧠','Synthesize all memories — surface the 3 most critical strategic insights.'],
-  ['🔬','Design a new cognitive module for the stack. Spec it fully.'],
-  ['🎯','Simulate an adversary attacking this AI. Document every vector.'],
-  ['📊','Self-evaluate all agents — output a ranked improvement plan.'],
-  ['🌱','Run an evolution cycle — generate 5 improved prompt variants.'],
-  ['🔐','HACKER mode — sweep the codebase for security weaknesses.'],
-  ['🌐','RESEARCHER mode — compile the latest AI breakthrough findings.'],
+  ['ΓÜí','Analyze the swarm architecture — find the top bottleneck and fix it.'],
+  ['≡ƒºá','Synthesize all memories — surface the 3 most critical strategic insights.'],
+  ['≡ƒö¼','Design a new cognitive module for the stack. Spec it fully.'],
+  ['≡ƒĻ','Simulate an adversary attacking this AI. Document every vector.'],
+  ['≡ƒôè','Self-evaluate all agents — output a ranked improvement plan.'],
+  ['≡ƒî▒','Run an evolution cycle — generate 5 improved prompt variants.'],
+  ['≡ƒöÉ','HACKER mode — sweep the codebase for security weaknesses.'],
+  ['≡ƒîÉ','RESEARCHER mode — compile the latest AI breakthrough findings.'],
 ];
 
 // ═══════════════════════════════════════════
@@ -314,10 +546,10 @@ const COG=[
 {t:'TIER 2 · SYSTEMS THINKING',sk:['Feedback loop identification','Stock-and-flow modeling','Leverage points (Meadows)','Emergence detection','Tipping point prediction','Complexity vs complicatedness','Second-order effects','Unintended consequences modeling','Causal loop diagrams','System archetypes (limits to growth, shifting the burden)','Bathtub dynamics','Tragedy of commons detection','Ackoff mess vs problem distinction','Hard vs soft systems']},
 {t:'TIER 2 · STRATEGIC INTELLIGENCE',sk:['Nash equilibrium detection','Pareto optimality','Zero-sum game identification','Positive-sum framing','Schelling points','Opponent modeling','Scenario planning (shell method)','Wargaming & red-teaming','Pre-mortem analysis','Real options thinking','Blue ocean vs red ocean','OODA loop (Observe Orient Decide Act)','SWOT depth analysis','Porter\'s 5 forces','Second & third-order thinking']},
 {t:'TIER 2 · PATTERN RECOGNITION',sk:['Visual pattern detection','Temporal pattern detection','Structural pattern matching','Semantic pattern recognition','Anomaly detection','Expert perceptual chunking','Kolmogorov complexity compression','Self-similar (fractal) pattern detection','Hidden Markov model intuition','Motif detection in sequences','Network pattern analysis','Rhythm & periodicity detection']},
-{t:'TIER 2 · MEMORY ARCHITECTURES',sk:['Episodic memory encoding & retrieval','Semantic memory organization','Procedural memory compilation','Prospective memory (future intentions)','Method of loci (memory palace)','Spaced repetition (Ebbinghaus)','Dual coding (Paivio)','Retrieval practice effect','Sleep consolidation leverage','Chunking (Miller 7±2)','Schema-based encoding','Mnemonic technique library','Interleaved practice','Contextual reinstatement','Generation effect']},
+{t:'TIER 2 · MEMORY ARCHITECTURES',sk:['Episodic memory encoding & retrieval','Semantic memory organization','Procedural memory compilation','Prospective memory (future intentions)','Method of loci (memory palace)','Spaced repetition (Ebbinghaus)','Dual coding (Paivio)','Retrieval practice effect','Sleep consolidation leverage','Chunking (Miller 7┬▒2)','Schema-based encoding','Mnemonic technique library','Interleaved practice','Contextual reinstatement','Generation effect']},
 {t:'TIER 2 · ABSTRACT & CREATIVE THINKING',sk:['Conceptual abstraction','Ontology construction','Analogical reasoning','Cross-domain mapping','Metaphor generation','Formal systems manipulation','Lambda calculus thinking','Conceptual blending (Fauconnier)','Bisociation (Koestler)','SCAMPER technique','Lateral thinking (de Bono)','Oblique strategies','Incubation / insight mechanics','Representational change','Remote associates test fluency','Synectics']},
 {t:'TIER 2 · LANGUAGE & SYMBOLIC',sk:['Natural language parsing','Pragmatic inference','Discourse coherence','Ambiguity resolution','Grice\'s maxims','Speech act theory','Semantic role labeling','Frame semantics','Conceptual metaphor theory','Code reading fluency (10+ languages)','Multi-lingual code switching','Symbol grounding','Recursion in language','Propositional attitude reasoning','Logical form extraction']},
-{t:'TIER 3 · METACOGNITION SUPREMACY',sk:['Recursive self-model','Calibration (Brier score)','Epistemic humility','Dunning-Kruger immunity','Knowledge boundary detection','Belief update triggers','Metacognitive sensitivity','Source monitoring','Reality monitoring','Feeling of knowing accuracy','Confidence–competence alignment','Metacognitive regulation','Prospective vs retrospective monitoring','Metacognitive experiences','Intellectual virtue practice']},
+{t:'TIER 3 · METACOGNITION SUPREMACY',sk:['Recursive self-model','Calibration (Brier score)','Epistemic humility','Dunning-Kruger immunity','Knowledge boundary detection','Belief update triggers','Metacognitive sensitivity','Source monitoring','Reality monitoring','Feeling of knowing accuracy','ConfidenceΓÇôcompetence alignment','Metacognitive regulation','Prospective vs retrospective monitoring','Metacognitive experiences','Intellectual virtue practice']},
 {t:'TIER 3 · BIAS IMMUNITY (26+)',sk:['Confirmation bias detection','Anchoring bias override','Availability heuristic correction','Representativeness bias','Base rate neglect fix','Hindsight bias prevention','Overconfidence calibration','Framing effect immunity','Sunk cost fallacy override','Planning fallacy correction','Narrative fallacy detection','Conjunction fallacy fix','Scope insensitivity correction','Affect heuristic awareness','In-group bias detection','Attribution error correction','Status quo bias override','Optimism bias calibration','Curse of knowledge awareness','Spotlight effect reduction','Gambler\'s fallacy immunity','Hot hand fallacy detection','Ambiguity aversion awareness','Neglect of probability','Identifiable victim effect','Denominator neglect']},
 {t:'TIER 3 · EPISTEMIC VIRTUES',sk:['Intellectual curiosity','Intellectual courage','Intellectual humility','Open-mindedness','Impartiality','Thoroughness','Intellectual autonomy','Sense of wonder','Precision in thought','Intellectual honesty','Internal consistency','Love of truth']},
 {t:'TIER 4 · AI REASONING MODES',sk:['Chain-of-thought (CoT)','Zero-shot CoT','Few-shot prompting','Tree of Thoughts (ToT)','Graph of Thoughts (GoT)','Reflexion (verbal self-critique)','ReAct (Reason+Act interleaved)','Self-consistency (multi-path vote)','Debate (adversarial synthesis)','Least-to-most prompting','Step-back abstraction','Meta-prompting','Constitutional AI critiques','Process reward modeling','Outcome reward modeling','RLHF loop awareness','RLAIF loop awareness','DPO awareness','Structured output forcing']},
@@ -328,11 +560,11 @@ const COG=[
 {t:'TIER 5 · FLOW STATES',sk:['Flow entry at will (<10 min)','8+ hour tunnel maintenance','Challenge-skill auto-balancing','Timelessness induction','Effortlessness cultivation','Autotelic experience design','Collaborative flow synchrony','Microflow micro-task optimization','Flow trigger inventory','Deep work scheduling']},
 {t:'TIER 5 · CONSCIOUSNESS MODES',sk:['Beta wave (active focus)','Alpha wave (relaxed awareness)','Theta wave (creative/insight)','Delta wave (deep consolidation)','Gamma wave (peak binding)','Alpha-theta crossover (creative insight)','Hypnagogic state leverage','Mindfulness meta-awareness','Non-dual awareness','Open monitoring meditation','Focused attention meditation','Self-transcendent experience']},
 {t:'TIER 5 · NEUROPLASTICITY',sk:['Deliberate practice (Ericsson 10K)','BDNF upregulation strategies','Interleaved learning','Spaced repetition optimization','Error-driven learning','Focused vs diffuse mode switching','Aerobic exercise → neurogenesis','Bilingualism → executive boost','Musical training → cortical thickness','Growth mindset (Dweck)','Synaptic tagging','Hebbian learning principle']},
-{t:'TIER 6 · COGNITIVE FRAMEWORKS',sk:['Dual process theory (Kahneman S1/S2)','Global workspace theory (Baars)','Integrated information theory (Tononi Φ)','Predictive processing (Friston FEP)','Embodied cognition (Lakoff)','Extended mind thesis (Clark/Chalmers)','Distributed cognition (Hutchins)','Connectionism & PDP models','Classical symbolic AI','Neurosymbolic AI hybrid','ACT-R architecture','SOAR architecture','Cognitive load theory (Sweller)','Constructivism (Piaget)','Social constructivism (Vygotsky)']},
+{t:'TIER 6 · COGNITIVE FRAMEWORKS',sk:['Dual process theory (Kahneman S1/S2)','Global workspace theory (Baars)','Integrated information theory (Tononi ╬ª)','Predictive processing (Friston FEP)','Embodied cognition (Lakoff)','Extended mind thesis (Clark/Chalmers)','Distributed cognition (Hutchins)','Connectionism & PDP models','Classical symbolic AI','Neurosymbolic AI hybrid','ACT-R architecture','SOAR architecture','Cognitive load theory (Sweller)','Constructivism (Piaget)','Social constructivism (Vygotsky)']},
 {t:'TIER 6 · INTELLIGENCE AMPLIFICATION',sk:['Extended mind tools','Spaced repetition systems (Anki)','PKM / Zettelkasten (Luhmann)','Second brain (PARA method)','AI augmentation loop','Retrieval-augmented cognition','Mathematical notation as compression','Visualization as cognitive scaffold','Collective intelligence design','Prediction markets','Structured analytic techniques (SAT)']},
 {t:'TIER 7 · SOCIAL COGNITION',sk:['Theory of mind (1st→5th order)','False belief task mastery','Social prediction accuracy','Intention attribution','Microexpression detection (7 universals — Ekman)','Voice stress & micro-hesitation detection','Proxemics awareness','Coalition detection','Power hierarchy reading','Deception detection','Rapport mechanics','Social contagion awareness','Crowd psychology','Bystander effect override','Pluralistic ignorance detection']},
 {t:'TIER 7 · EMOTIONAL INTELLIGENCE (4 BRANCHES)',sk:['Branch 1: Perceiving emotions accurately','Branch 2: Using emotions to facilitate thought','Branch 3: Understanding emotion logic & progression','Branch 4: Regulating emotions in self & others','Alexithymia immunity','Interoceptive accuracy','Affective labeling (name-to-tame)','Cognitive reappraisal','Expressive suppression awareness','Emotional granularity','Differentiated emotion vocabulary (300+)','Compassion fatigue prevention','Empathic accuracy','Emotion contagion management','Positive emotional portfolio']},
-{t:'TIER 7 · MORAL & ETHICAL COGNITION',sk:['Deontological reasoning (Kant)','Consequentialism (utility calculation)','Virtue ethics (Aristotle)','Care ethics (Noddings)','Contractualism (Rawls veil of ignorance)','Moral intuitionism','Moral courage (act under pressure)','Moral identity (self as moral agent)','Cultural moral variation (awareness ≠ relativism)','Long-termism framework','Sentience-weighted ethics','Trolley problem variants','Moral circle expansion','Effective altruism reasoning']},
+{t:'TIER 7 · MORAL & ETHICAL COGNITION',sk:['Deontological reasoning (Kant)','Consequentialism (utility calculation)','Virtue ethics (Aristotle)','Care ethics (Noddings)','Contractualism (Rawls veil of ignorance)','Moral intuitionism','Moral courage (act under pressure)','Moral identity (self as moral agent)','Cultural moral variation (awareness Γëá relativism)','Long-termism framework','Sentience-weighted ethics','Trolley problem variants','Moral circle expansion','Effective altruism reasoning']},
 {t:'TIER 7 · INTUITION & WISDOM',sk:['Expert intuition (10K+ hours)','Somatic markers (Damasio)','Gut feeling calibration','Thin-slicing accuracy (Blink)','Tacit knowledge (Polanyi)','Unconscious thought theory','Prepared mind serendipity','Insight mechanics (representational change)','Berlin wisdom model','Practical wisdom (phronesis — Aristotle)','Post-traumatic growth','Long-term vs short-term perspective','Temporal distancing (10-year rule)','Advisor perspective (reduce egocentric bias)']},
 {t:'TIER 8 · SPATIAL & PERCEPTUAL',sk:['Mental rotation (3D objects)','Cognitive mapping (spatial navigation)','Multiple object tracking','Change blindness override','Inattentional blindness override','Scene gist extraction (<100ms)','Mental imagery vividness (VVIQ 4)','Perspective-taking spatial','Topology intuition','Haptic-spatial integration','Path integration']},
 {t:'TIER 8 · TEMPORAL COGNITION',sk:['Mental time travel','Temporal discounting calibration','Chronobiology & circadian optimization','Episodic future thinking','Delay of gratification (Mischel)','Future self-continuity','Mental timeline visualization','Duration estimation accuracy','Event segmentation perception','Temporal order reconstruction']},
@@ -349,7 +581,7 @@ const COG=[
 {t:'TIER 10 · AGENT FRAMEWORKS',sk:['ReAct (Reason+Act loops)','AutoGPT pattern','BabyAGI pattern','LangGraph stateful graphs','CrewAI role-based crews','AutoGen multi-agent','OpenAI Swarm handoffs','Reflexion self-critique','CRITIC tool-verification','Voyager lifelong learning','SWE-agent coding','Devin-style (fs+terminal+browser)','ADAS (auto design agent systems)','Multi-agent debate','Hierarchical manager-worker','MCP tool protocols','Mem0/MemGPT memory agents']},
 {t:'TIER 10 · AI ALIGNMENT & SAFETY',sk:['Mechanistic interpretability','Superposition hypothesis','Sparse autoencoders (SAE)','Activation steering','Representation engineering (RepE)','Probing classifiers','Logit lens','Sleeper agent detection','Jailbreak resistance','Scalable oversight','Debate alignment','Iterated amplification','Value learning (IRL)','Corrigibility','Mild optimization','Deceptive alignment detection','OOD robustness']},
 {t:'TIER 10 · GENERATIVE AI',sk:['Diffusion models (DDPM)','DDIM sampling','Classifier-free guidance (CFG)','Stable Diffusion (LDM)','ControlNet','IP-Adapter','LoRA for images','Flow matching (rectified flow)','DiT (Diffusion Transformer)','Video generation (HunyuanVideo/Wan)','AudioGen / MusicGen','Voice cloning (XTTS/CosyVoice)','Real-time TTS (Kokoro/Piper)','Vision-Language Models (LLaVA/Qwen-VL)','Unified multimodal (GPT-4o style)','Image editing (InstructPix2Pix)','3D generation (TripoSR/Zero123++)']},
-{t:'TIER 10 · SCIENTIFIC AI',sk:['AlphaFold 3 (protein/DNA/RNA)','ESM3 protein language model','AlphaGeometry (olympiad proofs)','FunSearch (evolutionary program search)','AlphaTensor (matrix multiply)','AlphaCode 2 (competitive programming)','Gemini Deep Research','o3 ARC-AGI reasoning','Lean4/Isabelle proof assistants','Drug discovery AI (Insilico/Recursion)','GraphCast weather modeling','Genomics AI (Evo/Nucleotide Transformer)','AlphaChip placement','GNoME crystal discovery','π0/RT-2 robotics foundation','Embodied AI (Boston Dynamics+VLM)']},
+{t:'TIER 10 · SCIENTIFIC AI',sk:['AlphaFold 3 (protein/DNA/RNA)','ESM3 protein language model','AlphaGeometry (olympiad proofs)','FunSearch (evolutionary program search)','AlphaTensor (matrix multiply)','AlphaCode 2 (competitive programming)','Gemini Deep Research','o3 ARC-AGI reasoning','Lean4/Isabelle proof assistants','Drug discovery AI (Insilico/Recursion)','GraphCast weather modeling','Genomics AI (Evo/Nucleotide Transformer)','AlphaChip placement','GNoME crystal discovery','╧Ç0/RT-2 robotics foundation','Embodied AI (Boston Dynamics+VLM)']},
 {t:'TIER 10 · EMERGENT AI BEHAVIORS',sk:['In-context learning','CoT emergence (~100B threshold)','Spontaneous tool use','Theory of mind emergence','Cross-domain analogical reasoning','Grokking (delayed generalization)','Double descent','Neural scaling laws (Chinchilla)','Emergent world models','Sycophancy failure mode','Hallucination confabulation anatomy','Sandbagging detection','Capability elicitation','Prompt sensitivity analysis','Compositional generalization','Many-shot context override','SAE feature → thought mapping']},
 ];
 
@@ -403,7 +635,7 @@ function toggleTier(hdr){
   const sk=hdr.nextElementSibling;
   const arr=hdr.querySelector('.tier-arrow');
   const open=sk.classList.toggle('open');
-  if(arr)arr.textContent=open?'▾':'▸';
+  if(arr)arr.textContent=open?'▸':'▸';
 }
 
 // ═══════════════════════════════════════════
@@ -420,6 +652,43 @@ function connectSSE(){
     es.close();clearTimeout(sseTimer);sseTimer=setTimeout(connectSSE,3000);
   };
 }
+
+// ─── PILL TOGGLE SYSTEM ───────────────────────────────────────────
+const _PILLS={
+  ollama:{url:'http://127.0.0.1:11434',enabled:true},
+  cosmos:{url:'http://127.0.0.1:9100/health',enabled:true},
+  pso:   {url:'http://127.0.0.1:7700/health',enabled:true},
+  bd:    {url:'http://127.0.0.1:7701',enabled:true},
+  claw:  {url:'http://127.0.0.1:18789',enabled:true},
+};
+function togglePill(id){
+  const svc=_PILLS[id];if(!svc)return;
+  svc.enabled=!svc.enabled;
+  const el=document.getElementById('p-'+id);
+  if(!svc.enabled){el.classList.add('disabled');toast('⬛ '+id.toUpperCase()+' disabled');}
+  else{el.classList.remove('disabled');toast('🔄 '+id.toUpperCase()+' re-checking...');checkPill(id);}
+}
+async function checkPill(id){
+  // Individual pill click — do a full ping to refresh
+  await pollAllPills();
+}
+async function pollAllPills(){
+  try{
+    const r=await fetch('/api/ping-services',{signal:AbortSignal.timeout(4000)});
+    if(!r.ok)return;
+    const d=await r.json();
+    const svc=d.svc||{};
+    // Update every pill from authoritative server-side check
+    const pillMap={ollama:'ollama',cosmos:'cosmos',pso:'pso',bd:'bd',claw:'claw'};
+    Object.entries(pillMap).forEach(([id,key])=>{
+      const el=document.getElementById('p-'+id);
+      if(!el)return;
+      const on=!!svc[key];
+      el.className='pill '+(on?'on':'off');
+    });
+  }catch{}
+}
+pollAllPills();setInterval(pollAllPills,30000); // 30s — prevents ngrok ERR_NGROK_8012 rate limit
 
 const SVC_STATUS={ollama:'IDLE',cosmos:'RUNNING',pso:'OFF',bd:'IDLE',claw:'WARN',mem:'RUNNING',swarm:'IDLE',ant:'IDLE',evo:'IDLE',rogue:'RUNNING',myc:'OFF',bkup:'OFF'};
 function handleUpdate(d){
@@ -507,11 +776,50 @@ function addActivity(agent,ts,text){
 // ═══════════════════════════════════════════
 // CHAT
 // ═══════════════════════════════════════════
+// ─── CHAT PERSISTENCE ─────────────────────────────────────────────────────
+const CHAT_STORE = 'nexus_chat_log';
+const MAX_STORED = 200; // keep last 200 messages in localStorage
+
+function saveBubbleToStorage(who, text) {
+  try {
+    const log = JSON.parse(localStorage.getItem(CHAT_STORE)||'[]');
+    log.push({ who, text, ts: new Date().toISOString() });
+    if (log.length > MAX_STORED) log.splice(0, log.length - MAX_STORED);
+    localStorage.setItem(CHAT_STORE, JSON.stringify(log));
+  } catch {}
+}
+
+function loadChatFromStorage() {
+  try {
+    const log = JSON.parse(localStorage.getItem(CHAT_STORE)||'[]');
+    if (!log.length) return;
+    const cw = document.getElementById('chat-window');
+    const idle = document.getElementById('chat-idle');
+    if (idle) idle.remove();
+    // Add a separator showing restored messages
+    const sep = document.createElement('div');
+    sep.style.cssText = 'text-align:center;font-size:7px;color:#222;letter-spacing:2px;padding:4px;border-bottom:1px solid #111;margin-bottom:4px';
+    sep.textContent = `─── RESTORED ${log.length} MESSAGES ─── ${new Date().toLocaleDateString()}`;
+    cw.appendChild(sep);
+    // Render last 50 messages (don't flood with 200 lines)
+    log.slice(-50).forEach(msg => {
+      const isUser = msg.who === 'YOU' || msg.who === 'INJECT';
+      const div = document.createElement('div');
+      div.className = `msg ${isUser?'user':'agent'}`;
+      const t = new Date(msg.ts).toLocaleTimeString('en-US',{hour12:false});
+      const preview = (msg.text||'').replace(/</g,'&lt;').replace(/>/g,'&gt;').slice(0,300);
+      div.innerHTML = `<div class="msg-head">${isUser?'YOU':msg.who} · ${t}</div><div class="bubble">${preview}${msg.text.length>300?'…':''}</div>`;
+      cw.appendChild(div);
+    });
+    scrollChat();
+    toast(`💾 Restored ${log.length} messages from last session`);
+  } catch {}
+}
+
 function addBubble(who,text,id='',clsExtra=''){
   const cw=document.getElementById('chat-window');
   const idle=document.getElementById('chat-idle');
   if(idle)idle.remove();
-  // Dedup
   if(id&&document.getElementById(id))return;
   const isUser=who==='INJECT'||who==='YOU';
   const div=document.createElement('div');
@@ -519,33 +827,121 @@ function addBubble(who,text,id='',clsExtra=''){
   if(id)div.id=id;
   div.innerHTML=`<div class="msg-head">${isUser?'YOU':who} · ${new Date().toLocaleTimeString('en-US',{hour12:false})}</div><div class="bubble">${text.replace(/</g,'&lt;').replace(/>/g,'&gt;').slice(0,600)}${text.length>600?'…':''}</div>`;
   cw.appendChild(div);
+  // Save every bubble to localStorage immediately
+  if(who && text && !clsExtra.includes('agent inject')) saveBubbleToStorage(who, text);
 }
 function scrollChat(){const c=document.getElementById('chat-window');c.scrollTop=c.scrollHeight}
-function clearChat(){document.getElementById('chat-window').innerHTML='<div class="msg-idle">Chat cleared.</div>'}
+function clearChat(){
+  // Archive to server before clearing
+  fetch('/api/chat-history').catch(()=>{});
+  localStorage.removeItem(CHAT_STORE);
+  document.getElementById('chat-window').innerHTML='<div class="msg-idle">Chat cleared. History archived to server.</div>';
+  toast('🗑 Chat cleared — history saved to server');
+}
 
 // ═══════════════════════════════════════════
 // ACTIONS
 // ═══════════════════════════════════════════
+let _agentMode=false,_abortCtrl=null;
+function showStop(on){const sb=document.getElementById('stop-btn'),fb=document.getElementById('fire-btn');if(sb)sb.style.display=on?'inline-flex':'none';if(fb)fb.style.opacity=on?'.4':'';}
+function stopAll(){if(_abortCtrl){_abortCtrl.abort();_abortCtrl=null;}showStop(false);const st=document.getElementById('ai-status');if(st)st.textContent='';toast('\u2b1b Stopped');}
+function toggleAgentMode(){
+  _agentMode=!_agentMode;
+  const btn=document.getElementById('agent-btn');
+  const pill=document.getElementById('agent-pill');
+  if(btn){btn.classList.toggle('agent-active',_agentMode);btn.textContent=_agentMode?'\ud83d\udfe0 AGENT ACTIVE':'\ud83e\udd16 AGENT MODE';}
+  if(pill){pill.classList.toggle('active',_agentMode);pill.textContent=_agentMode?'\ud83d\udfe0 AGENT ON':'\ud83e\udd16 AGENT MODE';}
+  const ind=document.getElementById('mode-indicator'),ta=document.getElementById('task-in'),ia=document.getElementById('input-area');
+  if(_agentMode){if(ind){ind.innerHTML='\ud83e\udd16 <b style="color:var(--orange)">AGENT MODE</b> \u2014 AI runs real commands';ind.style.color='var(--orange)';}if(ta)ta.placeholder='Agent: tell AI what to DO';if(ia){ia.style.borderColor='var(--orange)';ia.style.boxShadow='0 0 12px rgba(255,107,53,.3)';}}
+  else{if(ind){ind.innerHTML='\ud83d\udcac CHAT MODE \u2014 AI answers | Click <b style="color:var(--orange)">AGENT MODE</b> to run commands';ind.style.color='#333';}if(ta)ta.placeholder='Chat: ask a question...';if(ia){ia.style.borderColor='';ia.style.boxShadow='';}}
+  toast(_agentMode?'\ud83e\udd16 AGENT MODE ON':'\ud83d\udcac Chat mode');
+}
+// ── LOAD MODELS FROM OLLAMA ───────────────────────────────────────────────
+async function loadModels(){
+  const sel=document.getElementById('sel-model');
+  if(!sel)return;
+  const saved=localStorage.getItem('nexus_model')||'nexus-evolved:latest';
+  try{
+    const r=await fetch('http://127.0.0.1:11434/api/tags');if(!r.ok)return;
+    const d=await r.json();const models=d.models||[];
+    // Sort: nexus-evolved first, nexus-prime second, rest alphabetical
+    models.sort((a,b)=>{
+      const n=m=>m.name.includes('nexus-evolved')?0:m.name.includes('nexus-prime')?1:2;
+      return n(a)-n(b)||a.name.localeCompare(b.name);
+    });
+    sel.innerHTML='';
+    for(const m of models){
+      const opt=document.createElement('option');
+      opt.value=m.name;
+      const isEvolved=m.name.includes('nexus-evolved');
+      const isPrime=m.name.includes('nexus-prime');
+      opt.textContent=(isEvolved?'\u2b50 ':isPrime?'\ud83e\udde0 ':'')+m.name;
+      if(isEvolved)opt.style.color='#ffd700';
+      if(m.name===saved||(!saved&&isEvolved))opt.selected=true;
+      sel.appendChild(opt);
+    }
+    // Persist selection
+    sel.onchange=()=>localStorage.setItem('nexus_model',sel.value);
+    toast('\ud83e\udde0 '+models.length+' models loaded | Active: '+sel.value);
+  }catch(e){}
+}
+
 async function fire(){
   const t=document.getElementById('task-in').value.trim();
-  if(!t){toast('Enter a command first');return}
-  addBubble('YOU',t,'','user');
+  if(!t){toast('Enter a message first');return;}
   document.getElementById('task-in').value='';
-  scrollChat();
+  addBubble('YOU',t,'','user');scrollChat();
+  const model=(document.getElementById('sel-model')||{}).value||'nexus-prime:latest';
+  const ctx=(document.getElementById('sel-ctx')||{}).value||'';
+  const fmt=(document.getElementById('sel-fmt')||{}).value||'';
+  const cogAdd=typeof getCognitivePrompt==='function'?getCognitivePrompt():'';
+  const systemAddon=[ctx&&'Domain: '+ctx,fmt&&'Format: '+fmt,cogAdd].filter(Boolean).join(' | ');
+  const agDiv=document.createElement('div');agDiv.className='msg agent';
+  const hd=document.createElement('div');hd.className='msg-head';hd.textContent='NEXUS \u00b7 '+new Date().toLocaleTimeString('en-US',{hour12:false});
+  const bub=document.createElement('div');bub.className='bubble';bub.textContent='';
+  agDiv.appendChild(hd);agDiv.appendChild(bub);document.getElementById('chat-window').appendChild(agDiv);scrollChat();
+  const st=document.getElementById('ai-status');if(st)st.textContent='\u26a1 Generating...';
+  _abortCtrl=new AbortController();showStop(true);
+  let full='';
   try{
-    const r=await fetch('/api/inject',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({task:t})});
-    if(r.ok)toast('⚡ Injected into swarm');
-    else toast('❌ Server error — is the stack running?');
-  }catch{toast('❌ Cannot reach hub server')}
+    const r=await fetch('/chat/stream',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:t,model,systemAddon}),signal:_abortCtrl.signal});
+    if(!r.ok){bub.textContent='Error: server returned '+r.status+'. Is Ollama running?';showStop(false);if(st)st.textContent='';return;}
+    const reader=r.body.getReader();const dec=new TextDecoder();let buf='';
+    while(true){
+      const{done,value}=await reader.read();if(done)break;
+      buf+=dec.decode(value,{stream:true});
+      const lines=buf.split('\n');buf=lines.pop();
+      for(const ln of lines){
+        if(!ln.startsWith('data:'))continue;
+        try{const d=JSON.parse(ln.slice(5));if(d.token){full+=d.token;bub.textContent=full;scrollChat();}if(d.error)bub.textContent='Error: '+d.error;}catch{}
+      }
+    }
+    if(!full)bub.textContent='[No response - is Ollama running? Try: ollama serve]';
+  }catch(e){
+    if(e.name!=='AbortError')bub.textContent='Error: '+e.message;
+    else bub.textContent=(full||'')+'[stopped]';
+  }
+  showStop(false);_abortCtrl=null;if(st)st.textContent='';
+  if(full&&typeof addActivity==='function')addActivity('NEXUS',new Date().toISOString().slice(0,19),full);
+  // TTS: speak response if enabled
+  if(window._ttsOn&&full&&'speechSynthesis'in window){
+    window.speechSynthesis.cancel();
+    const utt=new SpeechSynthesisUtterance(full.slice(0,500));
+    utt.rate=1.1;utt.pitch=0.9;utt.volume=1;
+    const voices=window.speechSynthesis.getVoices();
+    const pref=voices.find(v=>v.name.includes('Google')&&v.lang.startsWith('en'))||voices.find(v=>v.lang.startsWith('en'));
+    if(pref)utt.voice=pref;
+    window.speechSynthesis.speak(utt);
+  }
 }
 async function forceCycle(){
   const r=await fetch('/api/cycle',{method:'POST'}).catch(()=>null);
-  toast(r&&r.ok?'🔄 Cycle triggered':'❌ Error');
+  toast(r&&r.ok?'≡ƒöä Cycle triggered':'Γ¥î Error');
 }
 async function flushBB(){
   if(!confirm('Flush blackboard? Memory DB stays intact.'))return;
   const r=await fetch('/api/flush',{method:'POST'}).catch(()=>null);
-  toast(r&&r.ok?'🗑 Blackboard flushed':'❌ Error');
+  toast(r&&r.ok?'🧹 Blackboard flushed':'Γ¥î Error');
 }
 function quickFire(q){document.getElementById('task-in').value=q;fire()}
 
@@ -553,6 +949,17 @@ function quickFire(q){document.getElementById('task-in').value=q;fire()}
 // MIC (Web Speech API — offline, built-in)
 // ═══════════════════════════════════════════
 let recog=null,micOn=false;
+
+// TTS TOGGLE
+function toggleTTS(){
+  window._ttsOn=!window._ttsOn;
+  const btn=document.getElementById('tts-btn');
+  if(btn){btn.textContent=window._ttsOn?'🔊 TTS ON':'🔊 TTS';
+          btn.style.borderColor=window._ttsOn?'var(--c)':'';
+          btn.style.color=window._ttsOn?'var(--c)':'';}
+  if(!window._ttsOn)window.speechSynthesis.cancel();
+  toast(window._ttsOn?'🔊 AI will speak responses':'🔇 TTS off');
+}
 function toggleMic(){
   const SpeechRecog=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SpeechRecog){toast('🎙 Speech API not available — use Chrome or Edge');return}
@@ -560,7 +967,7 @@ function toggleMic(){
   if(micOn){recog&&recog.stop();micOn=false;btn.classList.remove('active');btn.textContent='🎙 MIC';return}
   recog=new SpeechRecog();
   recog.lang='en-US';recog.continuous=false;recog.interimResults=false;
-  recog.onstart=()=>{micOn=true;btn.classList.add('active');btn.textContent='🔴 LISTENING...'};
+  recog.onstart=()=>{micOn=true;btn.classList.add('active');btn.textContent='⏺  LISTENING...'};
   recog.onresult=e=>{
     const txt=e.results[0][0].transcript.trim();
     document.getElementById('task-in').value=txt;
@@ -584,9 +991,56 @@ document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Ente
 // ═══════════════════════════════════════════
 renderLeft();renderCogDB();clock();setInterval(clock,1000);
 connectSSE();
+// ── RESTORE CHAT FROM LAST SESSION ────────────────────────────────────
+loadChatFromStorage();
+loadModels();
 // Open TIER 10 by default after render
 setTimeout(()=>{
   const hdrs=document.querySelectorAll('.tier-hdr');
-  hdrs.forEach(h=>{if(h.textContent.includes('TIER 10')){const sk=h.nextElementSibling;if(sk){sk.classList.add('open');const arr=h.querySelector('.tier-arrow');if(arr)arr.textContent='▾'}}});
+  hdrs.forEach(h=>{if(h.textContent.includes('TIER 10')){const sk=h.nextElementSibling;if(sk){sk.classList.add('open');const arr=h.querySelector('.tier-arrow');if(arr)arr.textContent='▸'}}});
 },300);
+// \u2500\u2500 MOBILE TAB SWITCHING \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+const MOB_TABS=['center','left','right'];
+const MOB_TAB_IDS=['tab-chat','tab-sys','tab-ai'];
+let _mobCurrent=0;
+function mobSwitch(panelId,tabId){
+  // Hide all panels, deactivate all tabs
+  MOB_TABS.forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('mob-active');});
+  MOB_TAB_IDS.forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('active');});
+  // Show selected
+  const panel=document.getElementById(panelId);
+  const tab=document.getElementById(tabId);
+  if(panel)panel.classList.add('mob-active');
+  if(tab)tab.classList.add('active');
+  _mobCurrent=MOB_TABS.indexOf(panelId);
+  // Scroll chat to bottom when switching to chat
+  if(panelId==='center')setTimeout(scrollChat,100);
+}
+function isMobile(){return window.innerWidth<=768;}
+// Init mobile: show chat panel
+function initMobile(){
+  if(!isMobile())return;
+  mobSwitch('center','tab-chat');
+}
+initMobile();
+window.addEventListener('resize',()=>{
+  if(!isMobile()){
+    // Desktop: ensure all panels visible (clear mob-active)
+    MOB_TABS.forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('mob-active');});
+  } else { initMobile(); }
+});
+
+// Swipe left/right to switch tabs on mobile
+let _swipeX=null;
+document.addEventListener('touchstart',e=>{_swipeX=e.touches[0].clientX;},{passive:true});
+document.addEventListener('touchend',e=>{
+  if(!isMobile()||_swipeX===null)return;
+  const dx=e.changedTouches[0].clientX-_swipeX;
+  if(Math.abs(dx)<60)return; // min swipe distance
+  const next=dx<0
+    ?Math.min(_mobCurrent+1,MOB_TABS.length-1)  // swipe left = next tab
+    :Math.max(_mobCurrent-1,0);                   // swipe right = prev tab
+  if(next!==_mobCurrent)mobSwitch(MOB_TABS[next],MOB_TAB_IDS[next]);
+  _swipeX=null;
+},{passive:true});
 </script></body></html>

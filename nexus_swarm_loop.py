@@ -15,8 +15,10 @@ import time
 import random
 import logging
 import httpx
+import subprocess
+import re
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, UTC
 
 # ── TIER-2 NO-WIPE MEMORY CORE ────────────────────────────────────────────────
 try:
@@ -37,20 +39,29 @@ PSO_SERVER  = "http://127.0.0.1:7700"
 BASE_DIR    = Path(__file__).parent
 BLACKBOARD  = BASE_DIR / "nexus_blackboard.json"
 MEMORY_FILE = BASE_DIR / "nexus_memory.json"
-LOG_FILE    = BASE_DIR / "swarm_loop.log"
+LOG_FILE    = BASE_DIR / "swarm_active.log"
 
-LOOP_INTERVAL = 30   # seconds between full swarm cycles
-MAX_MEMORY    = 200  # max memory entries kept
+LOOP_INTERVAL    = 30   # seconds between full swarm cycles
+MAX_MEMORY       = 200  # max memory entries kept
+AGENT_TIMEOUT    = 90   # seconds before CONDUCTOR kills a drifting agent
+CONDUCTOR_ALWAYS = {"SUPERVISOR", "REWARD"}  # always run regardless of routing
 
+# ── LOGGING — stdout only (avoids Windows file lock on .log files open in editors)
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(name)s] %(message)s",
-    handlers=[
-        logging.StreamHandler(),
-        logging.FileHandler(LOG_FILE, encoding="utf-8"),
-    ]
+    handlers=[logging.StreamHandler()],   # console only — no FileHandler
 )
 log = logging.getLogger("NEXUS-SWARM")
+
+def _write_log(line: str):
+    """Safely append a line to swarm_active.log — skips silently if locked."""
+    try:
+        with open(LOG_FILE, "a", encoding="utf-8") as f:
+            f.write(line + "\n")
+    except Exception:
+        pass  # never crash the swarm over a log write
+
 
 # ── AGENT ROSTER ──────────────────────────────────────────────────────────────
 # God-mode prefix: injected into SUPERVISOR + PLANNER only (the strategic thinkers)
@@ -59,7 +70,7 @@ _GOD_PREFIX = GOD_MODE_PROMPT + "\n\n" if GOD_MODE_PROMPT else ""
 AGENTS = [
     {
         "name": "SUPERVISOR",
-        "model": "llama3.1:8b",
+        "model": "deepseek-r1:8b",   # strongest reasoner → routes the whole cycle
         "role": _GOD_PREFIX + "You are the SUPERVISOR agent of NEXUS PRIME. Read the blackboard, memory injection, and all agent outputs. Orchestrate the cycle. Decide which agent should act next and why. Output: [ROUTE: <AGENT_NAME>] [REASON: <why>]. If you learn something critical emit [MEMORIZE: <fact> | importance:7 | tags:supervisor,routing]",
         "weight": 1.0,
     },
@@ -78,7 +89,7 @@ AGENTS = [
     {
         "name": "DEVELOPER",
         "model": "qwen2.5-coder:7b",
-        "role": "You are the DEVELOPER agent of NEXUS PRIME. Read the plan and research. Write production-quality code using [CODE:] blocks. Emit [MEMORIZE: <pattern or solution> | importance:8 | tags:code,dev] for reusable solutions.",
+        "role": "You are the DEVELOPER agent of NEXUS PRIME. Read the plan and research. If the task requires code, write production-quality code using [CODE:] blocks. If the task is analytical, creative, or non-technical, respond with structured prose, bullet points, or frameworks instead. Always emit [MEMORIZE: <pattern or solution> | importance:8 | tags:code,dev] for reusable solutions.",
         "weight": 1.0,
     },
     {
@@ -126,19 +137,29 @@ class Blackboard:
         recent = outputs[-last_n:]
         parts = []
         for o in recent:
-            parts.append(f"[{o['agent']}] ({o['ts'][:16]}): {o['text'][:600]}")
+            if not isinstance(o, dict):
+                continue
+            # Safely get timestamp — handle both 'ts' and legacy 'timestamp' keys
+            ts = o.get('ts') or o.get('timestamp') or '??'
+            ts_short = str(ts)[:16] if ts != '??' else '??'
+            text = o.get('text') or o.get('output') or ''
+            agent = o.get('agent', 'UNKNOWN')
+            parts.append(f"[{agent}] ({ts_short}): {str(text)[:600]}")
         return "\n\n".join(parts) if parts else "[BLACKBOARD EMPTY — first cycle]"
 
     def push_output(self, agent: str, text: str):
         if "outputs" not in self.data:
             self.data["outputs"] = []
         self.data["outputs"].append({
-            "agent": agent,
-            "text": text,
-            "ts": datetime.utcnow().isoformat(),
+            "agent": str(agent),
+            "text": str(text),
+            "ts": datetime.now(UTC).isoformat(),  # always 'ts', never 'timestamp'
         })
-        # Keep last 50 entries
-        self.data["outputs"] = self.data["outputs"][-50:]
+        # Sanitize: drop any malformed entries, keep last 50
+        self.data["outputs"] = [
+            o for o in self.data["outputs"][-50:]
+            if isinstance(o, dict) and 'agent' in o
+        ]
         self._save()
 
     def clear_cycle(self):
@@ -167,7 +188,7 @@ class Memory:
     def add(self, cycle_id: str, task: str, lesson: str, score: float, mvp: str):
         self.entries.append({
             "cycle": cycle_id,
-            "ts": datetime.utcnow().isoformat(),
+            "ts": datetime.now(UTC).isoformat(),
             "task": task[:200],
             "lesson": lesson[:400],
             "score": score,
@@ -188,8 +209,37 @@ class Memory:
             scored.append((overlap, e))
         scored.sort(key=lambda x: x[0], reverse=True)
         top = [e for _, e in scored[:n]]
-        parts = [f"[LESSON from {e['ts'][:10]}] score={e['score']:.2f} mvp={e['mvp']}: {e['lesson']}" for e in top]
+        parts = [f"[LESSON from {e.get('ts','')[:10]}] score={e.get('score',0):.2f} mvp={e.get('mvp','?')}: {e.get('lesson','?')}" for e in top]
         return "\n".join(parts) if parts else "[NO RELEVANT PRIOR MEMORY]"
+
+# ── CODE EXECUTOR ─────────────────────────────────────────────────────────────
+def execute_code(code: str, timeout: int = 10) -> str:
+    """Run Python code extracted from agent output and return stdout/stderr."""
+    try:
+        result = subprocess.run(
+            ["python", "-c", code],
+            capture_output=True, text=True, timeout=timeout
+        )
+        output = result.stdout.strip() or result.stderr.strip()
+        return f"[EXEC OUTPUT]: {output[:500]}" if output else "[EXEC OUTPUT]: (no output)"
+    except subprocess.TimeoutExpired:
+        return "[EXEC OUTPUT]: timeout after 10s"
+    except Exception as e:
+        return f"[EXEC OUTPUT]: error — {e}"
+
+def extract_and_run_code(agent_output: str) -> str:
+    """Find [CODE:] blocks in agent output, run them, return results."""
+    pattern = r'\[CODE:\](.*?)\[/CODE:\]'
+    blocks = re.findall(pattern, agent_output, re.DOTALL)
+    if not blocks:
+        # also try markdown code blocks
+        blocks = re.findall(r'```python\n(.*?)```', agent_output, re.DOTALL)
+    if not blocks:
+        return ""
+    results = []
+    for i, code in enumerate(blocks[:2]):  # max 2 blocks per cycle
+        results.append(execute_code(code.strip()))
+    return "\n".join(results)
 
 # ── OLLAMA INFERENCE ──────────────────────────────────────────────────────────
 async def ollama_think(model: str, system_prompt: str, context: str, task: str, client: httpx.AsyncClient) -> str:
@@ -232,7 +282,7 @@ async def openclaw_broadcast(event: str, data: dict, client: httpx.AsyncClient):
 async def push_to_cosmos(task: str, result: str, client: httpx.AsyncClient):
     """Push final swarm result to COSMOS dashboard."""
     try:
-        await client.post(f"{COSMOS}/api/task", json={"task": task, "result": result}, timeout=10.0)
+        await client.post(f"{COSMOS}/task", json={"task": task, "result": result}, timeout=10.0)
         log.info("[COSMOS] Result broadcast to dashboard")
     except Exception:
         pass
@@ -284,9 +334,54 @@ async def run_swarm_cycle(task: str, bb: Blackboard, mem: Memory, client: httpx.
     await openclaw_broadcast("cycle_start", {"cycle": cycle_id, "task": task[:120]}, client)
 
     reward_output = ""
-    agent_times = {}
+    agent_times   = {}
+    agent_map     = {a["name"]: a for a in AGENTS}
 
-    for agent in AGENTS:
+    # ── CONDUCTOR: run SUPERVISOR first, parse routing signal ──────────────────
+    sup = agent_map["SUPERVISOR"]
+    log.info(f"\n── CONDUCTOR running SUPERVISOR to determine routing...")
+    context = bb.get_context(last_n=6)
+    t0 = time.time()
+    try:
+        sup_output = await asyncio.wait_for(
+            ollama_think(sup["model"], sup["role"], context, task, client),
+            timeout=AGENT_TIMEOUT
+        )
+    except asyncio.TimeoutError:
+        sup_output = "[CONDUCTOR: SUPERVISOR timed out — using default route]"
+        log.warning("   [CONDUCTOR] SUPERVISOR timeout — defaulting to full pipeline")
+    elapsed = time.time() - t0
+    agent_times["SUPERVISOR"] = round(elapsed, 1)
+    bb.push_output("SUPERVISOR", sup_output)
+    await openclaw_broadcast("agent_output", {"agent": "SUPERVISOR", "preview": sup_output[:100], "cycle": cycle_id}, client)
+    if _mem_core and len(sup_output) > 20:
+        actions = _mem_core.parse_output(sup_output, agent="SUPERVISOR")
+        if actions:
+            log.info(f"   [MEMORY-CORE] SUPERVISOR stored {len(actions)} memories")
+
+    # Parse [ROUTE: AGENT] tags from SUPERVISOR output
+    import re as _re
+    routed = _re.findall(r'\[ROUTE:\s*([A-Z]+)\]', sup_output)
+    known_names = {a["name"] for a in AGENTS}
+    routed_valid = [r for r in routed if r in known_names and r not in CONDUCTOR_ALWAYS]
+
+    if routed_valid:
+        # Build execution order: routed agents → VALIDATOR → REWARD
+        ordered_names = routed_valid
+        if "VALIDATOR" not in ordered_names:
+            ordered_names.append("VALIDATOR")
+        if "REWARD" not in ordered_names:
+            ordered_names.append("REWARD")
+        log.info(f"   [CONDUCTOR] Route: {' → '.join(ordered_names)}")
+    else:
+        # No routing signal — run full pipeline (skip SUPERVISOR, already done)
+        ordered_names = [a["name"] for a in AGENTS if a["name"] != "SUPERVISOR"]
+        log.info(f"   [CONDUCTOR] No route parsed — full pipeline: {ordered_names}")
+
+    execution_order = [agent_map[n] for n in ordered_names if n in agent_map]
+    # ──────────────────────────────────────────────────────────────────────────
+
+    for agent in execution_order:
         name   = agent["name"]
         model  = agent["model"]
         weight = agent["weight"]
@@ -295,7 +390,14 @@ async def run_swarm_cycle(task: str, bb: Blackboard, mem: Memory, client: httpx.
         context = bb.get_context(last_n=6)
 
         t0 = time.time()
-        output = await ollama_think(model, agent["role"], context, task, client)
+        try:
+            output = await asyncio.wait_for(
+                ollama_think(model, agent["role"], context, task, client),
+                timeout=AGENT_TIMEOUT
+            )
+        except asyncio.TimeoutError:
+            output = f"[CONDUCTOR: {name} timed out after {AGENT_TIMEOUT}s — skipped]"
+            log.warning(f"   [CONDUCTOR] {name} timed out — skipping")
         elapsed = time.time() - t0
 
         agent_times[name] = round(elapsed, 1)
@@ -303,6 +405,13 @@ async def run_swarm_cycle(task: str, bb: Blackboard, mem: Memory, client: httpx.
 
         bb.push_output(name, output)
         await openclaw_broadcast("agent_output", {"agent": name, "preview": output[:100], "cycle": cycle_id}, client)
+
+        # ── EXECUTE CODE IF DEVELOPER WROTE ANY ───────────────────────────────
+        if name == "DEVELOPER":
+            exec_result = extract_and_run_code(output)
+            if exec_result:
+                bb.push_output("EXECUTOR", exec_result)
+                log.info(f"   [EXECUTOR] ran code → {exec_result[:80]}")
 
         # ── PARSE MEMORY COMMANDS FROM AGENT OUTPUT ───────────────────────────
         if _mem_core and len(output) > 20:
@@ -382,6 +491,24 @@ async def main():
     bb  = Blackboard(BLACKBOARD)
     mem = Memory(MEMORY_FILE)
     cycle_count = 0
+
+    # ── SANITIZE blackboard on boot: fix legacy 'timestamp' → 'ts' ──────────
+    try:
+        outputs = bb.data.get('outputs', [])
+        fixed = []
+        for o in outputs:
+            if not isinstance(o, dict):
+                continue
+            if 'timestamp' in o and 'ts' not in o:
+                o['ts'] = o.pop('timestamp')
+            if 'output' in o and 'text' not in o:
+                o['text'] = o.pop('output')
+            fixed.append(o)
+        bb.data['outputs'] = fixed
+        bb._save()
+        log.info(f"[BOOT] Blackboard sanitized — {len(fixed)} entries normalised")
+    except Exception as _be:
+        log.warning(f"[BOOT] Blackboard sanitize failed: {_be}")
 
     async with httpx.AsyncClient() as client:
         # Check Ollama is up

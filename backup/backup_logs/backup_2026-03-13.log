@@ -1,0 +1,24 @@
+[02:00:02] ══════════════════════════════════════════
+[02:00:02]  NEXUS ULTRA BACKUP STARTED
+[02:00:02]  Target: googledrive:Nexus-Ultra-Backup
+[02:00:02] ══════════════════════════════════════════
+[02:00:02] Checking Google Drive connection...
+[02:00:02] Google Drive: CONNECTED
+[02:00:02] 
+[02:00:02] SYNCING: C:\Users\fyou1\Desktop\New folder\nexus-ultra  →  googledrive:Nexus-Ultra-Backup/nexus-ultra
+[02:00:04] WARN: nexus-ultra finished with exit code 2
+[02:00:04] 
+[02:00:04] SYNCING: C:\Users\fyou1\Desktop  →  googledrive:Nexus-Ultra-Backup/desktop
+[02:00:05] WARN: desktop finished with exit code 2
+[02:00:05] 
+[02:00:05] SYNCING: C:\Users\fyou1\Documents  →  googledrive:Nexus-Ultra-Backup/documents
+[02:00:06] WARN: documents finished with exit code 2
+[02:00:06] 
+[02:00:06] SYNCING: C:\Users\fyou1\.gemini  →  googledrive:Nexus-Ultra-Backup/ai-brain
+[02:00:07] WARN: ai-brain finished with exit code 2
+[02:00:07] 
+[02:00:07] ══════════════════════════════════════════
+[02:00:07]  BACKUP COMPLETE in 0.1 minutes
+[02:00:07]  FAILED sources: nexus-ultra, desktop, documents, ai-brain
+[02:00:07] ══════════════════════════════════════════
+[02:00:08] Status written to backup_status.json

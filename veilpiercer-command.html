@@ -904,12 +904,116 @@
     <div id="nt-body"></div>
   </div>
 
+  <!-- Token gate overlay -->
+  <div id="gate" style="position:fixed;inset:0;background:#020a14;display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:16px;font-family:'JetBrains Mono',monospace;">
+    <div style="font-size:11px;letter-spacing:4px;color:#00eeff;text-transform:uppercase;">Verifying Access</div>
+    <div style="display:flex;gap:6px;">
+      <div style="width:6px;height:6px;border-radius:50%;background:#00eeff;animation:dotPulse 1.2s ease infinite;"></div>
+      <div style="width:6px;height:6px;border-radius:50%;background:#00eeff;animation:dotPulse 1.2s ease infinite;animation-delay:0.2s;"></div>
+      <div style="width:6px;height:6px;border-radius:50%;background:#00eeff;animation:dotPulse 1.2s ease infinite;animation-delay:0.4s;"></div>
+    </div>
+  </div>
+  <div id="denied" style="position:fixed;inset:0;background:#0f0208;display:none;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:20px;font-family:'JetBrains Mono',monospace;text-align:center;padding:40px;">
+    <div style="font-size:48px;">🔒</div>
+    <div style="font-size:13px;letter-spacing:3px;color:#ff3355;text-transform:uppercase;">Access Denied</div>
+    <div style="font-size:10px;color:#456070;line-height:1.8;max-width:400px;">Invalid or expired access token.<br>Purchase VeilPiercer to get your access link.</div>
+    <a href="https://fliptrigga13.github.io/VEIL-PIERCER/" style="padding:12px 32px;background:#00eeff;color:#020a14;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:2px;text-decoration:none;text-transform:uppercase;">Get Access →</a>
+  </div>
+
   <script>
     // ════════════════════════════════════════════════════════════
     //  VEILPIERCER — Protocol Command Interface
     //  Lock Down · Amplify · Selective · Nominal
     //  AI-powered command interpreter + node visualization
     // ════════════════════════════════════════════════════════════
+
+    const NEXUS = window.location.origin;
+    let BUYER_TIER = 'Starter';
+    let BUYER_EMAIL = '';
+
+    // ── TIER FEATURE MAP ─────────────────────────────────────────
+    const TIER_FEATURES = {
+      Starter: { aiCommands: false, sentinelLive: false, exportData: false, label: '⚡ STARTER' },
+      Pro:     { aiCommands: true,  sentinelLive: true,  exportData: false, label: '🔥 PRO' },
+      Agency:  { aiCommands: true,  sentinelLive: true,  exportData: true,  label: '🏆 AGENCY' },
+    };
+
+    async function verifyAndUnlock() {
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get('token');
+
+      if (!token) {
+        // Allow demo mode without a token — just hide the gate
+        unlockTier('Starter', 'demo@veilpiercer.com', true);
+        return;
+      }
+
+      try {
+        const r = await fetch(`${NEXUS}/access/verify?token=${encodeURIComponent(token)}`);
+        const d = await r.json();
+        if (d.ok) {
+          unlockTier(d.tier || 'Starter', d.email || '');
+        } else {
+          showDenied();
+        }
+      } catch {
+        // Server unreachable — allow demo mode
+        unlockTier('Starter', '', true);
+      }
+    }
+
+    function unlockTier(tier, email, demo = false) {
+      BUYER_TIER = tier;
+      BUYER_EMAIL = email;
+      const features = TIER_FEATURES[tier] || TIER_FEATURES.Starter;
+
+      // Hide gate, show hub
+      document.getElementById('gate').style.display = 'none';
+
+      // Add tier badge to topbar
+      const topbar = document.getElementById('topbar');
+      const badge = document.createElement('div');
+      badge.style.cssText = 'font-size:9px;letter-spacing:2px;font-weight:700;padding:3px 12px;border-radius:2px;background:rgba(0,238,255,0.08);color:#00eeff;border:1px solid rgba(0,238,255,0.3);margin-left:8px;';
+      badge.textContent = demo ? '🔵 DEMO' : features.label;
+      topbar.appendChild(badge);
+
+      // Show email in status bar
+      if (email) {
+        const bar = document.getElementById('cmdbar');
+        const emailEl = document.createElement('div');
+        emailEl.className = 'cb-item';
+        emailEl.style.marginLeft = 'auto';
+        emailEl.innerHTML = `<span style="color:#1a3045">${email}</span>`;
+        bar.insertBefore(emailEl, bar.querySelector('.cb-hint'));
+      }
+
+      // Lock AI command input for Starter/demo
+      if (!features.aiCommands) {
+        const cmdInput = document.getElementById('cmd-input');
+        if (cmdInput) {
+          cmdInput.placeholder = 'AI Commands — Pro & Agency only\nUpgrade at veilpiercer.com';
+          cmdInput.style.opacity = '0.4';
+          cmdInput.readOnly = true;
+        }
+        const sendBtn = document.querySelector('.cmd-send');
+        if (sendBtn) { sendBtn.style.opacity = '0.3'; sendBtn.disabled = true; }
+      }
+
+      // Sentinel live — Pro+
+      if (features.sentinelLive) {
+        const sentinelEl = document.getElementById('cb-sentinel');
+        const sentinelDot = document.getElementById('cb-sentinel-dot');
+        if (sentinelEl) { sentinelEl.textContent = 'SENTINEL ACTIVE'; sentinelEl.style.color = '#00ff99'; }
+        if (sentinelDot) { sentinelDot.style.background = '#00ff99'; }
+      }
+    }
+
+    function showDenied() {
+      document.getElementById('gate').style.display = 'none';
+      document.getElementById('denied').style.display = 'flex';
+    }
+
+    verifyAndUnlock();
 
     const bgC = document.getElementById('bg-canvas');
     const nc = document.getElementById('node-canvas');
@@ -995,35 +1099,34 @@
     function initPositions() {
       const cw = W(), ch = H();
       const CL = {
-        vis: { cx: cw * 0.22, cy: ch * 0.55 },
-        saf: { cx: cw * 0.50, cy: ch * 0.32 },
-        priv: { cx: cw * 0.78, cy: ch * 0.55 },
+        vis:  { cx: cw * 0.22, cy: ch * 0.52 },
+        saf:  { cx: cw * 0.50, cy: ch * 0.30 },
+        priv: { cx: cw * 0.78, cy: ch * 0.52 },
       };
-      NODES.forEach(nd => {
+      const orbitR = Math.min(cw, ch) * 0.20; // 20% — large and visible
+      NODES.filter(n => n.pillar !== 'sentinel').forEach(nd => {
         const cl = CL[nd.pillar];
-        const idx = NODES.filter(n => n.pillar === nd.pillar).indexOf(nd);
+        const idx = NODES.filter(n => n.pillar === nd.pillar && n.pillar !== 'sentinel').indexOf(nd);
         const angle = (idx / 3) * Math.PI * 2 - Math.PI / 2;
-        const r = Math.min(cw, ch) * 0.13;
-        nd.cx = cl.cx; nd.cy = cl.cy; nd.orbitR = r;
+        nd.cx = cl.cx; nd.cy = cl.cy; nd.orbitR = orbitR;
         nd.orbitAngle = angle;
         nd.orbitSpeed = (0.00014 + Math.random() * 0.00018) * (Math.random() > .5 ? 1 : -1);
-        nd.x = cl.cx + Math.cos(angle) * r;
-        nd.y = cl.cy + Math.sin(angle) * r;
-        nd.R = 28; nd.fireT = 0; nd.pulseT = 0; nd.dragging = false;
+        nd.x = cl.cx + Math.cos(angle) * orbitR;
+        nd.y = cl.cy + Math.sin(angle) * orbitR;
+        nd.R = 30; nd.fireT = 0; nd.pulseT = 0; nd.dragging = false;
         nd.targetPower = nd.power;
       });
-      // Position sentinel nodes at bottom center
-      const sentinelNodes = NODES.filter(n => n.pillar === 'sentinel');
-      const sentCx = W() * 0.50, sentCy = H() * 0.78;
-      sentinelNodes.forEach((nd, idx) => {
+      // Sentinel at bottom center
+      const sentCx = cw * 0.50, sentCy = ch * 0.78;
+      const sentR  = Math.min(cw, ch) * 0.13;
+      NODES.filter(n => n.pillar === 'sentinel').forEach((nd, idx) => {
         const angle = (idx / 3) * Math.PI * 2 - Math.PI / 2;
-        const r = Math.min(W(), H()) * 0.10;
-        nd.cx = sentCx; nd.cy = sentCy; nd.orbitR = r;
+        nd.cx = sentCx; nd.cy = sentCy; nd.orbitR = sentR;
         nd.orbitAngle = angle;
         nd.orbitSpeed = (0.0002 + Math.random() * 0.0002) * (Math.random() > .5 ? 1 : -1);
-        nd.x = sentCx + Math.cos(angle) * r;
-        nd.y = sentCy + Math.sin(angle) * r;
-        nd.R = 28; nd.fireT = 0; nd.pulseT = 0; nd.dragging = false;
+        nd.x = sentCx + Math.cos(angle) * sentR;
+        nd.y = sentCy + Math.sin(angle) * sentR;
+        nd.R = 26; nd.fireT = 0; nd.pulseT = 0; nd.dragging = false;
         nd.targetPower = nd.power;
       });
     }
@@ -1331,27 +1434,65 @@ At this level you can reconstruct any agent chain from logs and detect model deg
       processCommand(text);
     }
 
-    function processCommand(text) {
+    async function processCommand(text) {
       addAI('YOU', text, 'user');
       const loading = addLoading();
 
-      setTimeout(() => {
-        removeLoading(loading);
-        let matched = false;
-        for (const p of CMD_PATTERNS) {
-          if (p.re.test(text)) {
-            if (p.action) p.action();
-            addAI('VEILPIERCER', p.response, 'agent');
-            matched = true;
-            break;
+      // Always run local keyword visual actions immediately
+      let cannedResponse = null;
+      for (const p of CMD_PATTERNS) {
+        if (p.re.test(text)) {
+          if (p.action) p.action();
+          cannedResponse = p.response;
+          break;
+        }
+      }
+
+      // Pro/Agency: call real Ollama backend
+      const token = new URLSearchParams(window.location.search).get('token');
+      const features = TIER_FEATURES[BUYER_TIER] || TIER_FEATURES.Starter;
+
+      if (features.aiCommands && token) {
+        try {
+          const r = await fetch(`${NEXUS}/veilpiercer/command`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              token,
+              command: text,
+              protocol: currentProtocol.toUpperCase(),
+              scores: {
+                vis: SIM.vis.score,
+                saf: SIM.saf.score,
+                priv: SIM.priv.score
+              },
+              useCase: document.getElementById('cb-use-case')?.textContent || 'General'
+            })
+          });
+          const d = await r.json();
+          removeLoading(loading);
+          if (d.ok && d.response) {
+            addAI('VEILPIERCER', d.response.replace(/\n/g, '<br>'), 'agent');
+          } else {
+            addAI('VEILPIERCER', cannedResponse || 'Command received. No response from AI backend.', 'agent');
           }
+        } catch {
+          removeLoading(loading);
+          addAI('VEILPIERCER', cannedResponse || `Command received: "<em>${text}</em>"<br><br>NEXUS offline — try: <strong>ollama serve</strong>`, 'agent');
         }
-        if (!matched) {
-          addAI('VEILPIERCER',
-            `Command received: "<em>${text}</em>"<br><br>Try: <strong>lock down</strong>, <strong>amplify</strong>, <strong>selective</strong>, <strong>nominal</strong>, or ask what this can be used for.<br><br>You can also target a pillar: "amplify visibility", "lock down privacy", "max safety nodes".`,
-            'agent');
-        }
-      }, 600 + Math.random() * 400);
+      } else {
+        // Starter: use canned responses
+        setTimeout(() => {
+          removeLoading(loading);
+          if (cannedResponse) {
+            addAI('VEILPIERCER', cannedResponse, 'agent');
+          } else {
+            addAI('VEILPIERCER',
+              `Command received: "<em>${text}</em>"<br><br>Try: <strong>lock down</strong>, <strong>amplify</strong>, <strong>selective</strong>, <strong>nominal</strong>, or ask what this can be used for.<br><br><em>Upgrade to Pro for live AI responses powered by Ollama.</em>`,
+              'agent');
+          }
+        }, 600 + Math.random() * 400);
+      }
     }
 
     document.getElementById('cmd-input').addEventListener('keydown', e => {
@@ -1384,19 +1525,47 @@ At this level you can reconstruct any agent chain from logs and detect model deg
       drawBg(now * 0.001);
       ctx.clearRect(0, 0, W(), H());
 
-      // Pillar glows
-      [{ cx: W() * 0.22, cy: H() * 0.55, c: '#00eeff' }, { cx: W() * .5, cy: H() * .32, c: '#00ff99' }, { cx: W() * .78, cy: H() * .55, c: '#cc44ff' }].forEach(o => {
-        const g = ctx.createRadialGradient(o.cx, o.cy, 0, o.cx, o.cy, 170);
-        g.addColorStop(0, o.c + '12'); g.addColorStop(1, 'transparent');
-        ctx.beginPath(); ctx.arc(o.cx, o.cy, 170, 0, Math.PI * 2);
+      // ── MASTER OUTER RING — the big circle that ties all clusters ──
+      const mx = W() * 0.5, my = H() * 0.46;
+      const masterR = Math.min(W(), H()) * 0.44;
+      ctx.beginPath(); ctx.arc(mx, my, masterR, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(0,229,255,0.10)'; ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 18]); ctx.stroke(); ctx.setLineDash([]);
+      // Inner supporting ring
+      ctx.beginPath(); ctx.arc(mx, my, masterR * 0.62, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(0,229,255,0.05)'; ctx.lineWidth = 1;
+      ctx.setLineDash([2, 14]); ctx.stroke(); ctx.setLineDash([]);
+
+      // ── PILLAR GLOWS — large ambient radials per cluster ──
+      const pillars = [
+        { cx: W() * 0.22, cy: H() * 0.52, c: '#00eeff' },
+        { cx: W() * 0.50, cy: H() * 0.30, c: '#00ff99' },
+        { cx: W() * 0.78, cy: H() * 0.52, c: '#cc44ff' }
+      ];
+      pillars.forEach(o => {
+        const glowR = Math.min(W(), H()) * 0.26;
+        const g = ctx.createRadialGradient(o.cx, o.cy, 0, o.cx, o.cy, glowR);
+        g.addColorStop(0, o.c + '28'); g.addColorStop(0.5, o.c + '0c'); g.addColorStop(1, 'transparent');
+        ctx.beginPath(); ctx.arc(o.cx, o.cy, glowR, 0, Math.PI * 2);
         ctx.fillStyle = g; ctx.fill();
       });
 
-      // Orbit rings
+      // ── ORBIT RINGS — visible dashed rings per cluster ──
+      const drawn = new Set();
       NODES.forEach(nd => {
+        const key = `${nd.cx.toFixed(0)},${nd.cy.toFixed(0)},${nd.orbitR.toFixed(0)}`;
+        if (drawn.has(key)) return; drawn.add(key);
+        // Outer glow ring
+        ctx.beginPath(); ctx.arc(nd.cx, nd.cy, nd.orbitR + 4, 0, Math.PI * 2);
+        ctx.strokeStyle = nd.color + '14'; ctx.lineWidth = 8; ctx.stroke();
+        // Main ring
         ctx.beginPath(); ctx.arc(nd.cx, nd.cy, nd.orbitR, 0, Math.PI * 2);
-        ctx.strokeStyle = nd.color + '0c'; ctx.lineWidth = 0.7;
-        ctx.setLineDash([2, 10]); ctx.stroke(); ctx.setLineDash([]);
+        ctx.strokeStyle = nd.color + '30'; ctx.lineWidth = 1.5;
+        ctx.setLineDash([4, 12]); ctx.stroke(); ctx.setLineDash([]);
+        // Inner accent ring
+        ctx.beginPath(); ctx.arc(nd.cx, nd.cy, nd.orbitR * 0.55, 0, Math.PI * 2);
+        ctx.strokeStyle = nd.color + '18'; ctx.lineWidth = 0.8;
+        ctx.setLineDash([2, 8]); ctx.stroke(); ctx.setLineDash([]);
       });
 
       // Edges
@@ -1447,13 +1616,16 @@ At this level you can reconstruct any agent chain from logs and detect model deg
           ctx.lineWidth = 2.5; ctx.stroke();
         }
 
+        // Outer glow halo
+        ctx.beginPath(); ctx.arc(nd.x, nd.y, R + 18, 0, Math.PI * 2);
+        ctx.strokeStyle = col + '14'; ctx.lineWidth = 10; ctx.stroke();
         // Power arc bg
         ctx.beginPath(); ctx.arc(nd.x, nd.y, R + 7, 0, Math.PI * 2);
-        ctx.strokeStyle = col + '1a'; ctx.lineWidth = 6; ctx.stroke();
+        ctx.strokeStyle = col + '22'; ctx.lineWidth = 7; ctx.stroke();
         // Power arc fill
         ctx.beginPath(); ctx.arc(nd.x, nd.y, R + 7, -Math.PI / 2, -Math.PI / 2 + nd.power * Math.PI * 2);
-        ctx.strokeStyle = col; ctx.lineWidth = 6; ctx.lineCap = 'round';
-        ctx.shadowColor = col; ctx.shadowBlur = nd.power > 0.9 ? 16 : 8; ctx.stroke();
+        ctx.strokeStyle = col; ctx.lineWidth = 7; ctx.lineCap = 'round';
+        ctx.shadowColor = col; ctx.shadowBlur = nd.power > 0.9 ? 28 : 16; ctx.stroke();
         ctx.shadowBlur = 0; ctx.lineCap = 'butt';
 
         // Body

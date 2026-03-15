@@ -585,3 +585,16 @@
 2026-03-11 10:17:48,027 [NEXUS-SWARM] ============================================================
 2026-03-11 10:17:48,045 [NEXUS-SWARM] ❌ Cycle #64 error: 'ts'
 2026-03-11 10:17:48,053 [NEXUS-SWARM] ⏳ Sleeping 30s before next cycle...
+2026-03-13 23:38:15,778 [MEMORY] \u2705 MemoryCore online � DB: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_mind.db
+2026-03-13 23:38:15,779 [MEMORY]    \U0001f4da 82 memories loaded from previous sessions (no wipe)
+Traceback (most recent call last):
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_swarm_loop.py", line 50, in <module>
+    logging.FileHandler(LOG_FILE, encoding="utf-8"),
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\logging\__init__.py", line 1219, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ~~~~~~~~~~^^
+  File "C:\Python314\Lib\logging\__init__.py", line 1248, in _open
+    return open_func(self.baseFilename, self.mode,
+                     encoding=self.encoding, errors=self.errors)
+PermissionError: [Errno 13] Permission denied: 'C:\\Users\\fyou1\\Desktop\\New folder\\nexus-ultra\\swarm_loop.log'

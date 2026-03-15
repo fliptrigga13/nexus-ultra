@@ -46,6 +46,26 @@ OLLAMA      = "http://127.0.0.1:11434"
 log = logging.getLogger("BACKDOOR")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(message)s")
 
+# ── SECURITY HELPERS ──────────────────────────────────────────────────────────
+ALLOWED_IPS = {"127.0.0.1", "::1", "localhost"}
+
+def check_ip_allowed(ip: str) -> bool:
+    """Only allow localhost connections — backdoor is local-only."""
+    return ip in ALLOWED_IPS
+
+def sanitize_task(task: str) -> tuple:
+    """Basic injection guard — returns (clean_task, error_or_None)."""
+    if not task:
+        return "", "Empty task"
+    if len(task) > 2000:
+        return "", "Task too long (max 2000 chars)"
+    # Block obvious injection attempts
+    blocked = ["__import__", "eval(", "exec(", "os.system", "subprocess"]
+    for b in blocked:
+        if b in task.lower():
+            return "", f"Blocked pattern: {b}"
+    return task.strip(), None
+
 # ── HELPERS ───────────────────────────────────────────────────────────────────
 def read_json(path: Path):
     if path.exists():
@@ -250,7 +270,13 @@ async def handle(reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
         method = first[0]
         path   = first[1].split("?")[0]
 
-        # Parse body for POST
+        # ── IP ALLOWLIST CHECK ────────────────────────────────────────────────────
+        peer = writer.get_extra_info('peername', ('0.0.0.0', 0))
+        client_ip = peer[0] if peer else '0.0.0.0'
+        if path != '/health' and not check_ip_allowed(client_ip):
+            deny = b'HTTP/1.1 403 Forbidden\r\nContent-Type: application/json\r\n\r\n{"error":"IP not allowed"}'
+            writer.write(deny); await writer.drain(); writer.close(); return
+        # ─────────────────────────────────────────────────────────────────────────
         body = {}
         if method == "POST":
             body_start = text.find("\r\n\r\n")
@@ -295,8 +321,12 @@ async def handle(reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
 
         elif path == "/inject" and method == "POST":
             content_type = "application/json"
-            task = body.get("task", "").strip()
-            if task:
+            raw_task = body.get("task", "").strip()
+            task, err = sanitize_task(raw_task)  # ← security: blocks injection attempts
+            if err:
+                status = 400
+                response_body = json.dumps({"ok": False, "error": err})
+            elif task:
                 result = inject_task(task)
                 response_body = json.dumps(result)
                 log.info(f"[BACKDOOR] Injected task: {task[:80]}")

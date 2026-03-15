@@ -1,0 +1,14 @@
+version: "3"
+tunnels:
+  veilpiercer:
+    proto: http
+    addr: 3000
+    schemes:
+      - https
+    traffic_policy:
+      inbound:
+        - actions:
+            - type: add-headers
+              config:
+                headers:
+                  ngrok-skip-browser-warning: "true"

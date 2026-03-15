@@ -1,0 +1,23 @@
+{
+  "name": "NEXUS PERSONAL",
+  "short_name": "NEXUS",
+  "description": "Unified AI hub — chat, memory, services, agent control",
+  "start_url": "/nexus_personal.html",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#060616",
+  "theme_color": "#060616",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' fill='%23060616'/><text y='130' font-size='140' text-anchor='middle' x='96'>🧠</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "shortcuts": [
+    {"name": "Chat", "url": "/nexus_personal.html#chat", "description": "Open AI chat"},
+    {"name": "Memory", "url": "/nexus_personal.html#memory", "description": "View memory vault"},
+    {"name": "Nexus Hub", "url": "/nexus_hub.html", "description": "Main hub control"}
+  ]
+}

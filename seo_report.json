@@ -1,0 +1,42 @@
+{
+  "veilpiercer-ad.html": {},
+  "access.html": {
+    "title": "optimized <title> tag content",
+    "description": "optimized meta description (150-160 chars)",
+    "keywords": [
+      "VeilPiercer \u2014 AI security swarm, RTX 4060, local CUDA, autonomous agents.",
+      "AI security swarm",
+      "local CUDA AI",
+      "VeilPiercer",
+      "nexus prime",
+      "offline AI."
+    ],
+    "og_title": "Open Graph title",
+    "og_description": "Open Graph description",
+    "h1": "recommended H1 text if missing or weak",
+    "issues": [
+      "list of SEO issues found",
+      {
+        "element": "CSS selector or tag",
+        "attribute": "font-size",
+        "value": "16px"
+      },
+      {
+        "element": "alt attribute in img tags",
+        "attribute": "alt text",
+        "value": ""
+      }
+    ],
+    "fixes": [
+      {
+        "element": ".ai-box",
+        "attribute": "-webkit-appearance: none;"
+      },
+      {
+        "element": "#loading",
+        "attribute": "display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; gap: 24px; text-align: center;"
+      }
+    ],
+    "score": 50
+  }
+}

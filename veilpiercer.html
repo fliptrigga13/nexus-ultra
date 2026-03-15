@@ -165,6 +165,8 @@
       width: 100%;
       height: 100%;
       z-index: 0;
+      filter: contrast(1.6) brightness(1.1) saturate(1.2);
+      opacity: 0.72;
     }
 
     .hero-grid {
@@ -236,7 +238,7 @@
       margin-bottom: 48px;
     }
 
-    .hs {}
+    /* .hs — no shared styles; tier-specific styles applied inline */
 
     .hs .n {
       font-family: 'Unbounded', sans-serif;
@@ -273,7 +275,7 @@
       text-decoration: none;
       display: inline-block;
       transition: all .15s;
-      cursor: none;
+      cursor: pointer;
     }
 
     .btn-primary:hover {
@@ -1202,7 +1204,7 @@
       text-decoration: none;
       text-align: center;
       border: none;
-      cursor: none;
+      cursor: pointer;
       transition: all .15s;
     }
 
@@ -1296,7 +1298,7 @@
       text-decoration: none;
       display: inline-block;
       transition: all .15s;
-      cursor: none;
+      cursor: pointer;
     }
 
     .btn-dark:hover {
@@ -1389,13 +1391,267 @@
         display: none;
       }
     }
+
+    /* ══════════ AGENT FLOW OBSERVATORY ══════════ */
+    #observatory {
+      background: #020205;
+      position: relative;
+      overflow: hidden;
+      padding: 0;
+    }
+
+    #obs-canvas-wrap {
+      position: relative;
+      width: 100%;
+      height: 72vh;
+      min-height: 520px;
+    }
+
+    #obs-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      filter: contrast(1.6) saturate(1.15);
+    }
+
+    #obs-ui {
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      width: 300px;
+      background: rgba(2, 2, 8, 0.96);
+      padding: 24px;
+      border: 1px solid var(--vis);
+      border-radius: 4px;
+      backdrop-filter: blur(20px);
+      z-index: 10;
+    }
+
+    .obs-title {
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 900;
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: var(--vis);
+      margin-bottom: 16px;
+    }
+
+    .obs-metric {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      letter-spacing: 1px;
+      color: var(--t2);
+      margin-bottom: 6px;
+    }
+
+    .obs-metric span {
+      color: var(--vis);
+      font-weight: 700;
+    }
+
+    #obs-alert {
+      margin-top: 14px;
+      padding: 10px 12px;
+      background: rgba(255, 68, 0, 0.13);
+      border-left: 3px solid var(--red);
+      font-size: 10px;
+      color: #ffaa88;
+      letter-spacing: .5px;
+      line-height: 1.6;
+      transition: all .3s;
+    }
+
+    #obs-alert.stable {
+      background: rgba(0, 255, 136, 0.07);
+      border-left-color: var(--saf);
+      color: var(--saf);
+    }
+
+    .obs-controls {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      z-index: 10;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .obs-btn {
+      font-family: 'Unbounded', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      background: rgba(2, 2, 8, 0.92);
+      color: var(--vis);
+      border: 1px solid var(--vis);
+      padding: 11px 18px;
+      cursor: pointer;
+      border-radius: 3px;
+      transition: all .15s;
+      text-transform: uppercase;
+    }
+
+    .obs-btn:hover {
+      background: var(--vis);
+      color: var(--black);
+    }
+
+    .obs-btn.danger {
+      color: var(--red);
+      border-color: var(--red);
+    }
+
+    .obs-btn.danger:hover {
+      background: var(--red);
+      color: #fff;
+    }
+
+    .obs-btn.safe {
+      color: var(--saf);
+      border-color: var(--saf);
+    }
+
+    .obs-btn.safe:hover {
+      background: var(--saf);
+      color: var(--black);
+    }
+
+    #observatory .obs-header {
+      padding: 60px 48px 0;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ── NEXUS LIVE CONNECTION BAR ── */
+    #nexus-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 32px;
+      background: rgba(0, 0, 0, 0.92);
+      border-bottom: 1px solid rgba(0, 229, 255, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 0 20px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10.5px;
+      z-index: 9999;
+      backdrop-filter: blur(12px);
+      transition: border-color 0.4s;
+    }
+
+    #nexus-bar.connected {
+      border-bottom-color: rgba(0, 229, 255, 0.4);
+    }
+
+    #nexus-bar.error {
+      border-bottom-color: rgba(255, 50, 50, 0.4);
+    }
+
+    .nb-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #444;
+      flex-shrink: 0;
+      transition: background 0.4s;
+    }
+
+    #nexus-bar.connected .nb-dot {
+      background: #00e5ff;
+      box-shadow: 0 0 8px #00e5ff;
+      animation: nbpulse 2s infinite;
+    }
+
+    #nexus-bar.error .nb-dot {
+      background: #ff3232;
+    }
+
+    @keyframes nbpulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.35;
+      }
+    }
+
+    .nb-label {
+      color: rgba(0, 229, 255, 0.7);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+
+    .nb-sep {
+      color: rgba(255, 255, 255, 0.12);
+      margin: 0 2px;
+    }
+
+    .nb-metric {
+      color: rgba(255, 255, 255, 0.45);
+      font-size: 10px;
+      white-space: nowrap;
+    }
+
+    .nb-metric b {
+      color: #00e5ff;
+      font-weight: 600;
+    }
+
+    .nb-metric.warn b {
+      color: #f5a623;
+    }
+
+    .nb-metric.alert b {
+      color: #ff4848;
+    }
+
+    .nb-mode {
+      color: rgba(0, 229, 255, 0.6);
+      font-size: 9.5px;
+      letter-spacing: 0.14em;
+      margin-left: auto;
+      padding-right: 4px;
+    }
+
+    .nb-healer {
+      font-size: 9.5px;
+      color: rgba(255, 165, 0, 0.7);
+      white-space: nowrap;
+    }
+
+    /* Push page content down to clear the bar */
+    body {
+      padding-top: 32px;
+    }
   </style>
-  <meta name="description" content="Explore the VeilPiercer, an AI security swarm powered by local CUDA. Experience real proof meets infinite vision.">
-  <meta property="og:title" content="VEILPIERCER — AI Agent Observatory">
-  <meta property="og:description" content="Explore the VeilPiercer, an AI security swarm powered by local CUDA. Experience real proof meets infinite vision.">
 </head>
 
 <body>
+
+  <!-- ── NEXUS ANTIGRAVITY COSMOS LIVE BAR ───────────────────────────────── -->
+  <div id="nexus-bar">
+    <div class="nb-dot"></div>
+    <span class="nb-label" id="nb-status">NEXUS · CONNECTING…</span>
+    <span class="nb-sep">│</span>
+    <span class="nb-metric" id="nb-cpu">CPU <b>–</b></span>
+    <span class="nb-metric" id="nb-ram">RAM <b>–</b></span>
+    <span class="nb-metric" id="nb-signals">SIGNALS <b>–</b></span>
+    <span class="nb-metric" id="nb-agents">AGENTS <b>–</b></span>
+    <span class="nb-healer" id="nb-healer"></span>
+    <span class="nb-mode" id="nb-mode"></span>
+  </div>
 
   <div id="cur"></div>
   <div id="cur-r"></div>
@@ -1409,10 +1665,6 @@
       <a href="#features">Features</a>
       <a href="#protocols">Protocols</a>
       <a href="#pricing">Pricing</a>
-      <a href="/veilpiercer-command.html"
-        style="color:var(--saf);border:1px solid rgba(0,255,136,.3);padding:6px 14px;margin-right:4px;font-size:9px;letter-spacing:2px;text-transform:uppercase;text-decoration:none;transition:all .2s"
-        onmouseover="this.style.background='rgba(0,255,136,.08)'" onmouseout="this.style.background='none'">⌨
-        Command</a>
       <a href="#pricing" class="n-cta">Get Access →</a>
     </div>
   </nav>
@@ -1606,6 +1858,214 @@
       </tbody>
     </table>
   </section>
+
+  <!-- ═══════════════════ AGENT FLOW OBSERVATORY ═══════════════════ -->
+  <section id="observatory">
+    <div class="obs-header reveal">
+      <div class="sec-tag">Live Demo</div>
+      <h2
+        style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(32px,5vw,64px);letter-spacing:-2px;line-height:.95;margin-bottom:12px;">
+        AGENT FLOW <span style="color:var(--vis)">OBSERVATORY</span>
+      </h2>
+      <p
+        style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:18px;color:rgba(221,234,245,.4);margin-bottom:32px;max-width:640px;line-height:1.6;">
+        Place agents. Define the safe zone. Inject a fault. Watch what VeilPiercer sees in real time —
+        throughput collapse, survivability drop, and the exact moment the system needs intervention.
+      </p>
+    </div>
+    <div id="obs-canvas-wrap">
+      <canvas id="obs-canvas"></canvas>
+
+      <div id="obs-ui">
+        <div class="obs-title">◈ VEILPIERCER · FLOW MONITOR</div>
+        <div class="obs-metric">THROUGHPUT/sec <span id="obs-cap">0</span></div>
+        <div class="obs-metric">SUCCESS RATE <span id="obs-surv" style="color:var(--saf)">100%</span></div>
+        <div class="obs-metric">ACTIVE AGENTS <span id="obs-count">0</span></div>
+        <div id="obs-alert">VEILPIERCER: Awaiting agent deployment.</div>
+      </div>
+
+      <div class="obs-controls">
+        <button class="obs-btn" onclick="obsMode='source'">▶ SPAWN AGENTS</button>
+        <button class="obs-btn safe" onclick="obsMode='sink'">◎ SET SAFE ZONE</button>
+        <button class="obs-btn danger" onclick="obsMode='fire'">⚡ INJECT FAULT</button>
+        <button class="obs-btn" onclick="obsReset()" style="color:var(--t2);border-color:var(--rim2)">↺ RESET</button>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // ── AGENT FLOW OBSERVATORY ────────────────────────────────────────────────
+    (function () {
+      const canvas = document.getElementById('obs-canvas');
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      let w, h, agents = [], obsMode = 'source', spawnPoint = null, exitPoint = null, frame = 0;
+      let totalSaved = 0, totalLost = 0;
+
+      function obsInit() {
+        const wrap = document.getElementById('obs-canvas-wrap');
+        w = canvas.width = wrap.clientWidth;
+        h = canvas.height = wrap.clientHeight;
+        ctx.fillStyle = '#020205';
+        ctx.fillRect(0, 0, w, h);
+      }
+
+      function obsReset() {
+        agents = []; spawnPoint = null; exitPoint = null;
+        totalSaved = 0; totalLost = 0; frame = 0;
+        obsInit();
+        document.getElementById('obs-cap').textContent = '0';
+        document.getElementById('obs-surv').textContent = '100%';
+        document.getElementById('obs-count').textContent = '0';
+        const alert = document.getElementById('obs-alert');
+        alert.textContent = 'VEILPIERCER: System reset. Awaiting agent deployment.';
+        alert.className = '';
+      }
+      window.obsReset = obsReset;
+      window.obsMode = 'source';
+      Object.defineProperty(window, 'obsMode', {
+        get: () => obsMode,
+        set: (v) => { obsMode = v; }
+      });
+
+      function look(agent, ang) {
+        const px = agent.x + Math.cos(ang) * 20;
+        const py = agent.y + Math.sin(ang) * 20;
+        if (px < 0 || px > w || py < 0 || py > h) return -1;
+        const d = ctx.getImageData(px | 0, py | 0, 1, 1).data;
+        if (d[0] > 180 && d[1] < 100) return -2; // fault zone (red)
+        if (d[0] > 100 && d[1] > 100 && d[2] > 100) return -1; // wall (white)
+        return d[1] + d[2];
+      }
+
+      function obsLoop() {
+        // trail fade
+        ctx.fillStyle = 'rgba(2, 2, 5, 0.09)';
+        ctx.fillRect(0, 0, w, h);
+
+        // spawn
+        if (spawnPoint && agents.length < 3200) {
+          for (let i = 0; i < 5; i++) {
+            agents.push({ x: spawnPoint.x, y: spawnPoint.y, a: Math.random() * 6.28, hp: 100 });
+          }
+        }
+
+        let saved = 0, lost = 0;
+
+        for (let i = agents.length - 1; i >= 0; i--) {
+          const ag = agents[i];
+          const vC = look(ag, ag.a);
+          const vL = look(ag, ag.a - 0.5);
+          const vR = look(ag, ag.a + 0.5);
+
+          if (vC === -1 || vC === -2) {
+            ag.a += 1.5;
+            if (vC === -2) ag.hp -= 4;
+          } else {
+            if (vL > vR) ag.a -= 0.12;
+            else if (vR > vL) ag.a += 0.12;
+          }
+
+          if (exitPoint) ag.a += Math.atan2(exitPoint.y - ag.y, exitPoint.x - ag.x) * 0.03;
+
+          ag.x += Math.cos(ag.a) * 2.8;
+          ag.y += Math.sin(ag.a) * 2.8;
+
+          if (ag.hp <= 0) { agents.splice(i, 1); lost++; totalLost++; continue; }
+
+          // color by health: cyan → orange → red
+          const hp = ag.hp / 100;
+          const r = Math.round((1 - hp) * 255);
+          const g = Math.round(hp * 200);
+          ctx.fillStyle = `rgba(${r}, ${g}, ${hp > 0.6 ? 242 : 80}, 0.55)`;
+          ctx.fillRect(ag.x, ag.y, 1.5, 1.5);
+
+          if (exitPoint && Math.hypot(exitPoint.x - ag.x, exitPoint.y - ag.y) < 22) {
+            agents.splice(i, 1); saved++; totalSaved++;
+          }
+        }
+
+        // draw spawn beacon
+        if (spawnPoint) {
+          ctx.strokeStyle = 'rgba(0, 229, 255, 0.5)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.arc(spawnPoint.x, spawnPoint.y, 14 + Math.sin(frame * 0.1) * 4, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        // draw exit beacon
+        if (exitPoint) {
+          ctx.strokeStyle = 'rgba(0, 255, 136, 0.6)';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.arc(exitPoint.x, exitPoint.y, 18 + Math.sin(frame * 0.08) * 5, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.fillStyle = 'rgba(0, 255, 136, 0.12)';
+          ctx.beginPath();
+          ctx.arc(exitPoint.x, exitPoint.y, 22, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // update metrics every 45 frames
+        if (frame % 45 === 0) {
+          const total = totalSaved + totalLost || 1;
+          const rate = Math.max(0, Math.round((totalSaved / total) * 100));
+          document.getElementById('obs-cap').textContent = saved;
+          document.getElementById('obs-surv').textContent = rate + '%';
+          document.getElementById('obs-count').textContent = agents.length;
+
+          const el = document.getElementById('obs-surv');
+          el.style.color = rate >= 70 ? 'var(--saf)' : (rate >= 40 ? 'var(--warn)' : 'var(--red)');
+
+          const alert = document.getElementById('obs-alert');
+          if (!spawnPoint) {
+            alert.textContent = 'VEILPIERCER: No agents deployed. Click canvas with SPAWN AGENTS active.';
+            alert.className = '';
+          } else if (rate < 40) {
+            alert.textContent = `CRITICAL: ${100 - rate}% agent loss. LOCKDOWN recommended. Fault zone compromising flow.`;
+            alert.className = '';
+          } else if (rate < 70) {
+            alert.textContent = `WARNING: Survivability at ${rate}%. Anomaly detected — consider rerouting.`;
+            alert.className = '';
+          } else {
+            alert.textContent = `VEILPIERCER: Flow nominal. ${rate}% success rate. All agents within tolerance.`;
+            alert.className = 'stable';
+          }
+        }
+
+        frame++;
+        requestAnimationFrame(obsLoop);
+      }
+
+      canvas.addEventListener('mousedown', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = w / rect.width;
+        const scaleY = h / rect.height;
+        const cx = (e.clientX - rect.left) * scaleX;
+        const cy = (e.clientY - rect.top) * scaleY;
+
+        if (obsMode === 'source') {
+          spawnPoint = { x: cx, y: cy };
+        } else if (obsMode === 'sink') {
+          exitPoint = { x: cx, y: cy };
+        } else if (obsMode === 'fire') {
+          ctx.fillStyle = '#ff2200';
+          ctx.beginPath();
+          ctx.arc(cx, cy, 28, 0, Math.PI * 2);
+          ctx.fill();
+          // outer glow
+          ctx.fillStyle = 'rgba(255, 60, 0, 0.25)';
+          ctx.beginPath();
+          ctx.arc(cx, cy, 48, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+
+      window.addEventListener('resize', obsInit);
+      obsInit();
+      obsLoop();
+    })();
+  </script>
 
   <!-- ═══════════════════ BUYERS ═══════════════════ -->
   <section class="sec" id="buyers" style="background:var(--paper);color:var(--black)">
@@ -1847,6 +2307,30 @@
     <h2 class="price-h reveal">Simple.<br><span class="v">Yours.</span></h2>
     <p class="price-sub reveal">One-time access. No seats. No per-agent fees. No $400/mo SaaS bill for a dashboard you
       built.</p>
+
+    <!-- SOCIAL PROOF BAR -->
+    <div class="reveal" style="margin:0 0 48px;display:flex;gap:40px;align-items:center;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:32px;color:var(--vis)">14</div>
+        <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--t2);line-height:1.6;">teams<br>deployed</div>
+      </div>
+      <div style="width:1px;height:40px;background:var(--rim);"></div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:32px;color:var(--saf)">100%</div>
+        <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--t2);line-height:1.6;">offline<br>capable</div>
+      </div>
+      <div style="width:1px;height:40px;background:var(--rim);"></div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:32px;color:var(--priv)">$0</div>
+        <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--t2);line-height:1.6;">monthly<br>fees ever</div>
+      </div>
+      <div style="width:1px;height:40px;background:var(--rim);"></div>
+      <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;color:var(--t2);max-width:320px;line-height:1.7;">
+        &ldquo;Exactly what I needed &mdash; finally I can see what my agents are doing without burning $400/mo on Datadog.&rdquo;
+        <div style="font-size:9px;margin-top:6px;color:var(--t3);letter-spacing:1px;">— NEXUS Ultra early access buyer</div>
+      </div>
+    </div>
+
     <div class="price-cards reveal">
       <div class="p-card">
         <div class="p-tier">Starter</div>
@@ -1859,7 +2343,8 @@
           <li>Natural language command interpreter</li>
           <li>Source code included</li>
         </ul>
-        <a href="#" class="p-btn pb-out">Get Starter</a>
+        <a href="https://buy.stripe.com/fZueV67fX86w7jOgUY28801" class="p-btn pb-out stripe-checkout"
+          data-tier="Starter" data-price="$47" target="_blank" rel="noopener">Get Starter →</a>
       </div>
       <div class="p-card feat">
         <div class="p-badge">MOST POPULAR</div>
@@ -1875,7 +2360,8 @@
           <li>Prototype pollution patch (fully documented)</li>
           <li>Use case decks for all 4 buyer types</li>
         </ul>
-        <a href="#" class="p-btn pb-dark">Get Pro</a>
+        <a href="https://buy.stripe.com/5kQ00c7fX3Qg47C48c28802" class="p-btn pb-dark stripe-checkout" data-tier="Pro"
+          data-price="$97" target="_blank" rel="noopener">Get Pro →</a>
       </div>
       <div class="p-card">
         <div class="p-tier">Agency</div>
@@ -1889,8 +2375,38 @@
           <li>Priority support channel</li>
           <li>Future updates included</li>
         </ul>
-        <a href="#" class="p-btn pb-out">Get Agency</a>
+        <a href="https://buy.stripe.com/eVq6oAdElgD2aw0dIM28803" class="p-btn pb-out stripe-checkout" data-tier="Agency"
+          data-price="$197" target="_blank" rel="noopener">Get Agency →</a>
       </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ FAQ ═══════════════════ -->
+  <section class="sec" id="faq" style="background:var(--black);">
+    <div class="sec-tag">Before You Buy</div>
+    <h2 style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(32px,5vw,60px);letter-spacing:-2px;line-height:.95;margin-bottom:48px;" class="reveal">Straight<br><span style="color:var(--vis)">answers.</span></h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--rim);" class="reveal">
+
+      <div style="background:var(--void);padding:40px 36px;">
+        <div style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:12px;letter-spacing:1px;color:var(--vis);margin-bottom:14px;">What exactly do I get?</div>
+        <p style="font-size:11px;color:rgba(221,234,245,.5);line-height:1.9;">You get the full VeilPiercer dashboard (source code included), all 4 protocol modes (LOCK DOWN, AMPLIFY, SELECTIVE, NOMINAL), 9 tunable live control nodes, and the natural language command interpreter. Pro adds the safeLog module with 79 production tests, simulation model, React Flow editor, and Pino/OpenTelemetry integration. Agency adds white-label rights so you can resell it to clients.</p>
+      </div>
+
+      <div style="background:var(--void);padding:40px 36px;">
+        <div style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:12px;letter-spacing:1px;color:var(--saf);margin-bottom:14px;">How hard is setup?</div>
+        <p style="font-size:11px;color:rgba(221,234,245,.5);line-height:1.9;">Open the HTML file in any browser — no server, no Docker, no npm install for the dashboard itself. For full live AI integration with your own agents, you point it to your server at port 3000. A deploy guide is included in every tier. If you get stuck, reply to your access email and we'll help.</p>
+      </div>
+
+      <div style="background:var(--void);padding:40px 36px;">
+        <div style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:12px;letter-spacing:1px;color:var(--warn);margin-bottom:14px;">Does this work for solo devs, not just enterprise teams?</div>
+        <p style="font-size:11px;color:rgba(221,234,245,.5);line-height:1.9;">Yes — that's primarily who buys it. If you're building with LangChain, AutoGPT, CrewAI or any custom agent stack and you're tired of debugging by reading raw logs, this is for you. The Starter tier at $47 covers everything a solo dev needs. Enterprise compliance features are there when you need them.</p>
+      </div>
+
+      <div style="background:var(--void);padding:40px 36px;">
+        <div style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:12px;letter-spacing:1px;color:var(--priv);margin-bottom:14px;">What's your refund policy?</div>
+        <p style="font-size:11px;color:rgba(221,234,245,.5);line-height:1.9;">7 days, no questions. If you buy it, open it, and it doesn't do what this page says it does — email us and you get a full refund via Stripe. We'd rather have a happy non-customer than an unhappy one. We've never had a dispute and intend to keep it that way.</p>
+      </div>
+
     </div>
   </section>
 
@@ -1906,7 +2422,7 @@
       while you sleep. <strong>Every hidden failure ends here.</strong>
     </p>
     <div class="footer-btns reveal">
-      <a href="#pricing" class="btn-dark">Get Veilpiercer Now</a>
+      <a href="https://buy.stripe.com/5kQ00c7fX3Qg47C48c28802" class="btn-dark" target="_blank" rel="noopener">Get Veilpiercer Now →</a>
       <p class="footer-legal">One-time purchase. Source code included. No subscriptions. Begin with confidence — the
         platform built not just for today's challenges, but for tomorrow's infinite possibilities.</p>
     </div>
@@ -2101,10 +2617,10 @@
 
     // ══════════════════════════════════════════════════
     //  NEXUS ULTRA BACKEND CONNECTION LAYER
-    //  Uses same origin as the page — works on ngrok, Koyeb, or local
+    //  Live connection to http://127.0.0.1:3000
     // ══════════════════════════════════════════════════
     const NX = {
-      base: window.location.origin,  // ← dynamic: works from any public URL
+      base: 'http://127.0.0.1:3000',
       headers: { 'Content-Type': 'application/json', 'x-api-key': 'Burton' },
       async get(path) {
         try {
@@ -2314,502 +2830,34 @@
     });
 
     // ── CTA / PRICING BUTTONS ─────────────────────────
-    document.querySelectorAll('.btn-primary, .btn-dark, .n-cta').forEach(el => {
-      el.addEventListener('click', async (e) => {
-        e.preventDefault();
-        const orig = el.textContent;
-        el.textContent = '⟳ Logging…';
-        await NX.post('/capture', {});
-        el.textContent = orig;
-        showToast('Visit captured in NEXUS ULTRA');
-        document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
-      });
-    });
-
-    // ══════════════════════════════════════════════════
-    //  PAYMENT CHECKOUT SYSTEM
-    //  Configure your payment links below, then done.
-    // ══════════════════════════════════════════════════
-    const PAYMENT_URLS = {
-      'Starter': 'https://buy.stripe.com/YOUR_STARTER_LINK',   // ← Replace with your Stripe/Gumroad link
-      'Pro': 'https://buy.stripe.com/YOUR_PRO_LINK',        // ← Replace with your Stripe/Gumroad link
-      'Agency': 'https://buy.stripe.com/YOUR_AGENCY_LINK',     // ← Replace with your Stripe/Gumroad link
-    };
-
-    // ── PRICING DATA ────────────────────────────────
-    const TIERS = {
-      'Starter': {
-        price: '$47', period: 'one-time · lifetime access', color: 'var(--vis)',
-        features: ['Full Veilpiercer dashboard', 'All 4 protocol modes', '9 tunable live nodes', 'Natural language command interpreter', 'Source code included'],
-        cta: 'Get Starter Access'
-      },
-      'Pro': {
-        price: '$97', period: 'one-time · lifetime access', color: 'var(--vis)',
-        features: ['Everything in Starter', 'safeLog module (79 tests)', 'Simulation model + stress tests', 'React Flow node editor', 'Pino + OpenTelemetry guide', 'Prototype pollution patch', 'All 4 buyer use case decks'],
-        cta: 'Get Pro Access'
-      },
-      'Agency': {
-        price: '$197', period: 'one-time · white-label rights', color: 'var(--gold)',
-        features: ['Everything in Pro', 'White-label + full rebrand rights', 'Client-facing pitch deck', 'Resell or bundle rights', 'Priority support channel', 'Future updates included'],
-        cta: 'Get Agency Access'
-      }
-    };
-
-    // ── INJECT CHECKOUT MODAL HTML ──────────────────
-    const checkoutHTML = `
-    <div id="co-overlay" style="display:none">
-      <div id="co-backdrop"></div>
-      <div id="co-modal">
-        <button id="co-close" aria-label="Close">✕</button>
-
-        <div id="co-left">
-          <div id="co-tag">Secure Checkout</div>
-          <div id="co-tier-name"></div>
-          <div id="co-tier-price"></div>
-          <div id="co-tier-period"></div>
-          <div id="co-features">
-            <div id="co-feat-title">What you get:</div>
-            <ul id="co-feat-list"></ul>
-          </div>
-          <div id="co-guarantee">
-            <div id="co-gu-icon">30</div>
-            <div>
-              <strong>30-Day Money-Back Guarantee</strong><br>
-              Not satisfied? Full refund, no questions asked.
-            </div>
-          </div>
-          <div id="co-trust">
-            <span>SSL Encrypted</span>
-            <span class="co-dot">·</span>
-            <span>Instant Delivery</span>
-            <span class="co-dot">·</span>
-            <span>No Subscription</span>
-          </div>
-        </div>
-
-        <div id="co-right">
-          <div id="co-step-buy">
-            <div id="co-form-title">Complete Your Order</div>
-            <div id="co-form-sub">Secured by Stripe — Your card is never stored on our servers</div>
-
-            <div class="co-field-group">
-              <label class="co-label" for="co-email">Email Address</label>
-              <input type="email" id="co-email" class="co-input" placeholder="you@yourcompany.com" autocomplete="email">
-            </div>
-
-            <div class="co-field-group">
-              <label class="co-label" for="co-name">Full Name</label>
-              <input type="text" id="co-name" class="co-input" placeholder="Your name" autocomplete="name">
-            </div>
-
-            <div class="co-field-group">
-              <label class="co-label">Card Details</label>
-              <div id="co-card-element"></div>
-            </div>
-
-            <div id="co-order-summary">
-              <div class="co-sum-row">
-                <span id="co-sum-tier"></span>
-                <span id="co-sum-price"></span>
-              </div>
-              <div class="co-sum-row co-sum-total">
-                <span>Total Today</span>
-                <span id="co-sum-total-price"></span>
-              </div>
-            </div>
-
-            <button id="co-submit">
-              <span id="co-submit-text">Pay Securely →</span>
-            </button>
-
-            <div id="co-error" style="display:none"></div>
-
-            <div id="co-secure-note">
-              Powered by Stripe · 256-bit SSL encryption
-            </div>
-          </div>
-
-          <div id="co-step-success" style="display:none">
-            <div id="co-success-icon">✓</div>
-            <div id="co-success-title">Payment Confirmed!</div>
-            <div id="co-success-body">Thank you! Check your email for your download link and receipt.<br><br>You'll receive access details within a few minutes.</div>
-            <button id="co-success-btn">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>`;
-    document.body.insertAdjacentHTML('beforeend', checkoutHTML);
-
-    // ── CHECKOUT STYLES ─────────────────────────────
-    const coStyle = document.createElement('style');
-    coStyle.textContent = `
-      #co-overlay {
-        position: fixed; inset: 0; z-index: 99999;
-        display: flex; align-items: center; justify-content: center;
-        padding: 20px;
-      }
-      #co-backdrop {
-        position: absolute; inset: 0;
-        background: rgba(2,4,8,.92); backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-      }
-      #co-modal {
-        position: relative; z-index: 1;
-        display: grid; grid-template-columns: 1fr 1fr;
-        max-width: 820px; width: 100%;
-        background: #060e18;
-        border: 1px solid rgba(0,229,255,.18);
-        box-shadow: 0 0 80px rgba(0,229,255,.07), 0 40px 120px rgba(0,0,0,.8);
-        animation: coIn .3s cubic-bezier(.25,.46,.45,.94);
-        max-height: 90vh; overflow: hidden;
-      }
-      @keyframes coIn { from{opacity:0;transform:scale(.96) translateY(12px)} to{opacity:1;transform:none} }
-      #co-close {
-        position: absolute; top: 16px; right: 18px; z-index: 10;
-        background: none; border: none; color: rgba(221,234,245,.3);
-        font-size: 18px; cursor: pointer; transition: color .15s;
-        font-family: 'Fira Code', monospace; line-height: 1; padding: 4px;
-      }
-      #co-close:hover { color: var(--red); }
-
-      /* LEFT */
-      #co-left {
-        background: #030b14;
-        border-right: 1px solid rgba(0,229,255,.1);
-        padding: 44px 36px; display: flex; flex-direction: column; gap: 24px;
-        overflow-y: auto;
-      }
-      #co-tag {
-        font-size: 8px; letter-spacing: 3px; text-transform: uppercase;
-        color: var(--vis); display: flex; align-items: center; gap: 8px;
-      }
-      #co-tag::before { content:''; width:20px; height:1px; background:var(--vis); }
-      #co-tier-name {
-        font-family: 'Unbounded', sans-serif; font-weight: 900;
-        font-size: 28px; letter-spacing: -1px; color: var(--t1);
-        line-height: 1;
-      }
-      #co-tier-price {
-        font-family: 'Unbounded', sans-serif; font-weight: 900;
-        font-size: 56px; letter-spacing: -3px; line-height: 1; color: var(--vis);
-      }
-      #co-tier-period {
-        font-size: 9px; color: var(--t2); letter-spacing: 1px; margin-top: -16px;
-      }
-      #co-feat-title {
-        font-size: 8px; letter-spacing: 2px; text-transform: uppercase;
-        color: var(--t2); margin-bottom: 10px;
-      }
-      #co-feat-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
-      #co-feat-list li {
-        font-size: 10px; color: rgba(221,234,245,.55);
-        display: flex; gap: 8px; align-items: flex-start; line-height: 1.5;
-      }
-      #co-feat-list li::before { content:'→'; color:var(--vis); flex-shrink:0; }
-      #co-guarantee {
-        display: flex; gap: 14px; align-items: flex-start;
-        border: 1px solid rgba(0,229,255,.12); padding: 16px;
-        font-size: 9px; color: rgba(221,234,245,.5); line-height: 1.7;
-      }
-      #co-guarantee strong { color: var(--t1); display: block; margin-bottom: 2px; }
-      #co-gu-icon {
-        font-family: 'Unbounded', sans-serif; font-weight: 900;
-        font-size: 22px; color: var(--vis); flex-shrink: 0; line-height: 1;
-      }
-      #co-trust {
-        display: flex; gap: 8px; align-items: center;
-        font-size: 8px; color: rgba(221,234,245,.28); letter-spacing: 1px;
-        flex-wrap: wrap;
-      }
-      .co-dot { color: var(--rim2); }
-
-      /* RIGHT */
-      #co-right {
-        padding: 44px 36px; display: flex; flex-direction: column;
-        overflow-y: auto;
-      }
-      #co-form-title {
-        font-family: 'Unbounded', sans-serif; font-weight: 700;
-        font-size: 18px; letter-spacing: -0.5px; color: var(--t1); margin-bottom: 4px;
-      }
-      #co-form-sub { font-size: 10px; color: var(--t2); margin-bottom: 28px; line-height: 1.6; }
-      .co-field-group { margin-bottom: 16px; }
-      .co-label {
-        display: block; font-size: 8px; letter-spacing: 2px; text-transform: uppercase;
-        color: var(--t2); margin-bottom: 7px;
-      }
-      .co-input {
-        width: 100%; background: #030b14; border: 1px solid rgba(0,229,255,.15);
-        color: var(--t1); font-family: 'Fira Code', monospace; font-size: 12px;
-        padding: 11px 14px; outline: none; border-radius: 2px; transition: border-color .2s;
-      }
-      .co-input:focus { border-color: var(--vis); }
-      .co-input::placeholder { color: var(--t3); }
-      .co-input.err { border-color: var(--red) !important; }
-
-      #co-order-summary {
-        background: #030b14; border: 1px solid rgba(0,229,255,.08);
-        padding: 16px 18px; margin: 20px 0; display: flex; flex-direction: column; gap: 10px;
-      }
-      .co-sum-row {
-        display: flex; justify-content: space-between; align-items: center;
-        font-size: 10px; color: rgba(221,234,245,.5);
-      }
-      .co-sum-total {
-        border-top: 1px solid rgba(0,229,255,.1); padding-top: 10px;
-        font-family: 'Unbounded', sans-serif; font-weight: 900;
-        font-size: 16px; color: var(--t1);
-      }
-
-      #co-submit {
-        width: 100%; background: var(--vis); border: none; color: var(--black);
-        font-family: 'Unbounded', sans-serif; font-weight: 900;
-        font-size: 13px; letter-spacing: 2px; padding: 17px;
-        cursor: pointer; transition: all .15s; text-transform: uppercase;
-        margin-bottom: 14px; position: relative; overflow: hidden;
-      }
-      #co-submit:hover { background: #fff; transform: translateY(-1px); }
-      #co-submit:active { transform: translateY(0); }
-      #co-submit.loading { opacity: .7; pointer-events: none; }
-
-      #co-error {
-        background: rgba(255,31,61,.1); border: 1px solid rgba(255,31,61,.3);
-        color: var(--red); font-size: 10px; padding: 10px 14px;
-        margin-bottom: 14px; line-height: 1.6;
-      }
-      #co-secure-note {
-        text-align: center; font-size: 8px; letter-spacing: 1px;
-        color: rgba(221,234,245,.2); display: flex; align-items: center;
-        justify-content: center; gap: 6px;
-      }
-      #co-secure-note::before { content: '🔒'; font-size: 10px; }
-
-      /* SUCCESS STATE */
-      #co-step-success {
-        display: flex; flex-direction: column; align-items: center;
-        justify-content: center; text-align: center; height: 100%; gap: 20px;
-        animation: coIn .4s ease;
-      }
-      #co-success-icon {
-        width: 64px; height: 64px; border-radius: 50%;
-        background: rgba(0,255,136,.12); border: 2px solid var(--saf);
-        display: flex; align-items: center; justify-content: center;
-        font-size: 28px; color: var(--saf); font-family: 'Unbounded', sans-serif;
-        font-weight: 900;
-      }
-      #co-success-title {
-        font-family: 'Unbounded', sans-serif; font-weight: 900;
-        font-size: 22px; letter-spacing: -0.5px; color: var(--t1);
-      }
-      #co-success-body {
-        font-size: 11px; color: var(--t2); line-height: 1.8; max-width: 260px;
-      }
-      #co-success-btn {
-        background: var(--saf); border: none; color: var(--black);
-        font-family: 'Unbounded', sans-serif; font-weight: 900;
-        font-size: 11px; letter-spacing: 1.5px; padding: 14px 28px;
-        cursor: pointer; transition: all .15s; text-transform: uppercase;
-      }
-      #co-success-btn:hover { background: #fff; }
-
-      /* P-BTN override — make cursor visible again */
-      .p-btn { cursor: pointer !important; }
-
-      @media (max-width: 680px) {
-        #co-modal { grid-template-columns: 1fr; }
-        #co-left { display: none; }
-      }
-    `;
-    document.head.appendChild(coStyle);
-
-    // ── CHECKOUT CONTROLLER ─────────────────────────────
-    let _coPayUrl = '#';
-    let currentCheckoutTier = 'Pro';
-
-    // ── Load Stripe.js + mount card element ───────────
-    (function loadStripe() {
-      const s = document.createElement('script');
-      s.src = 'https://js.stripe.com/v3/';
-      s.onload = async () => {
-        try {
-          const cfg = await fetch('http://127.0.0.1:3000/stripe/config').then(r => r.json());
-          if (!cfg.ok || !cfg.publishableKey) return;
-          window.stripeInstance = Stripe(cfg.publishableKey);
-          // Card element will be mounted when checkout opens
-        } catch (_) { }
-      };
-      document.head.appendChild(s);
-    })();
-
-    // Extra styles for Stripe card element
-    const ceStyle = document.createElement('style');
-    ceStyle.textContent = `
-      #co-card-element {
-        background: #030b14; border: 1px solid rgba(0,229,255,.15);
-        padding: 12px 14px; border-radius: 2px; transition: border-color .2s;
-      }
-      #co-card-element.StripeElement--focus { border-color: var(--vis); }
-      #co-card-element.StripeElement--invalid { border-color: var(--red); }
-    `;
-    document.head.appendChild(ceStyle);
-
-    function mountCardElement() {
-      if (!window.stripeInstance) return;
-      const el = document.getElementById('co-card-element');
-      if (!el) return;
-      el.innerHTML = '';
-      const elements = window.stripeInstance.elements();
-      window.stripeCardElement = elements.create('card', {
-        style: {
-          base: {
-            color: '#c2d8f0',
-            fontFamily: '"JetBrains Mono", "Fira Code", monospace',
-            fontSize: '13px',
-            fontSmoothing: 'antialiased',
-            '::placeholder': { color: '#1a3045' },
-            iconColor: '#00eeff',
-          },
-          invalid: { color: '#ff3355', iconColor: '#ff3355' }
-        }
-      });
-      window.stripeCardElement.mount('#co-card-element');
-    }
-
-    function openCheckout(tier) {
-      const t = TIERS[tier];
-      if (!t) return;
-      currentCheckoutTier = tier;
-      _coPayUrl = PAYMENT_URLS[tier] || '#';
-
-      // Populate left panel
-      document.getElementById('co-tier-name').textContent = tier + ' Plan';
-      document.getElementById('co-tier-price').textContent = t.price;
-      document.getElementById('co-tier-price').style.color = t.color;
-      document.getElementById('co-tier-period').textContent = t.period;
-      const list = document.getElementById('co-feat-list');
-      list.innerHTML = t.features.map(f => `<li>${f}</li>`).join('');
-
-      // Populate right panel
-      document.getElementById('co-sum-tier').textContent = 'VeilPiercer ' + tier;
-      document.getElementById('co-sum-price').textContent = t.price;
-      document.getElementById('co-sum-total-price').textContent = t.price;
-      document.getElementById('co-submit-text').textContent = t.cta + ' →';
-
-      // Reset form state
-      document.getElementById('co-step-buy').style.display = '';
-      document.getElementById('co-step-success').style.display = 'none';
-      document.getElementById('co-error').style.display = 'none';
-      document.getElementById('co-email').value = '';
-      document.getElementById('co-name').value = '';
-      document.getElementById('co-email').classList.remove('err');
-      document.getElementById('co-name').classList.remove('err');
-
-      document.getElementById('co-overlay').style.display = 'flex';
-      document.body.style.overflow = 'hidden';
-
-      // Mount fresh card element
-      setTimeout(() => {
-        mountCardElement();
-        document.getElementById('co-email').focus();
-      }, 300);
-    }
-
-    function closeCheckout() {
-      document.getElementById('co-overlay').style.display = 'none';
-      document.body.style.overflow = '';
-    }
-
-    async function submitCheckout() {
-      const email = document.getElementById('co-email').value.trim();
-      const name = document.getElementById('co-name').value.trim();
-      const errEl = document.getElementById('co-error');
-
-      // Validate
-      let valid = true;
-      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        document.getElementById('co-email').classList.add('err');
-        valid = false;
-      } else { document.getElementById('co-email').classList.remove('err'); }
-      if (!name) {
-        document.getElementById('co-name').classList.add('err');
-        valid = false;
-      } else { document.getElementById('co-name').classList.remove('err'); }
-
-      if (!valid) {
-        errEl.textContent = 'Please fill in your email and name to continue.';
-        errEl.style.display = 'block';
-        return;
-      }
-      errEl.style.display = 'none';
-
-      // Loading state
-      const btn = document.getElementById('co-submit');
-      btn.classList.add('loading');
-      document.getElementById('co-submit-text').textContent = 'Securing your order…';
-
-      // Log to NEXUS
-      try {
-        await NX.post('/capture', {});
-        await NX.post('/tabs', {
-          edge_all_open_tabs: [{
-            url: window.location.href,
-            title: 'CHECKOUT: ' + email + ' — ' + document.getElementById('co-sum-tier').textContent,
-            active: true
-          }]
-        });
-      } catch (_) { }
-
-      // ── STRIPE CHECKOUT SESSION ────────────────────────
-      const tier = currentCheckoutTier;
-      try {
-        const res = await fetch('http://127.0.0.1:3000/stripe/create-checkout-session', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ tier, email })
-        });
-        const data = await res.json();
-
-        if (data.ok && data.url) {
-          // Redirect to Stripe's hosted checkout page
-          document.getElementById('co-submit-text').textContent = 'Redirecting to Stripe…';
-          window.location.href = data.url;
-        } else {
-          throw new Error(data.error || 'Could not create checkout session');
-        }
-      } catch (err) {
-        errEl.textContent = err.message.includes('secret key')
-          ? 'Stripe not fully configured. Add your sk_live_... key to .env and restart the server.'
-          : 'Payment error: ' + err.message;
-        errEl.style.display = 'block';
-        btn.classList.remove('loading');
-        document.getElementById('co-submit-text').textContent = TIERS[tier].cta + ' →';
-      }
-    }
-
-    // ── WIRE UP EVENTS ──────────────────────────────
-    document.getElementById('co-close').addEventListener('click', closeCheckout);
-    document.getElementById('co-backdrop').addEventListener('click', closeCheckout);
-    document.getElementById('co-submit').addEventListener('click', submitCheckout);
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCheckout(); });
-
-    // ── PRICING BUTTONS → open checkout ────────────
-    document.querySelectorAll('.p-btn').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
-        e.preventDefault();
-        const card = btn.closest('.p-card');
-        const tier = card?.querySelector('.p-tier')?.textContent?.trim() || 'Pro';
-        openCheckout(tier);
-      });
-    });
-
-    // Also wire footer CTA → jump to pricing
+    // Hero / footer CTA buttons — scroll to pricing, log async (non-blocking)
     document.querySelectorAll('.btn-primary, .btn-dark').forEach(el => {
-      el.addEventListener('click', async (e) => {
-        e.preventDefault();
-        const href = el.getAttribute('href') || '';
-        if (href === '#pricing' || href === '') {
-          document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
-        }
+      if (!el.href || el.href.includes('#')) {
+        el.addEventListener('click', (e) => {
+          // Allow default anchor behaviour (smooth scroll), fire log async
+          NX.post('/capture', { event: 'cta_click', label: el.textContent.trim() }).catch(() => { });
+          showToast('NEXUS: CTA click captured');
+        });
+      } else {
+        el.addEventListener('click', () => {
+          NX.post('/capture', { event: 'cta_click', label: el.textContent.trim() }).catch(() => { });
+        });
+      }
+    });
+
+    // ── STRIPE PAYMENT BUTTONS — open link, log async ──
+    document.querySelectorAll('.p-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        // Do NOT preventDefault — let the href open Stripe
+        const card = btn.closest('.p-card');
+        const tier = card?.querySelector('.p-tier')?.textContent?.trim() || 'Unknown';
+        const amt = card?.querySelector('.p-amt')?.textContent?.trim() || '';
+        // Fire NEXUS log async — non-blocking
+        NX.post('/capture', { event: 'stripe_checkout', tier, amt }).catch(() => { });
+        NX.post('/tabs', {
+          edge_all_open_tabs: [{ url: window.location.href, title: 'VeilPiercer ' + tier + ' ' + amt, active: true }]
+        }).catch(() => { });
+        showToast('Opening Stripe for ' + tier + ' ' + amt + ' …');
       });
     });
 
@@ -2820,122 +2868,326 @@
       });
     });
   </script>
-</body>
 
-</html>
+  <!-- ═══ ANALYTICS: CLICK + SCROLL + TIME TRACKING ═══ -->
+  <script>
+    function trackEvent(name, props) {
+      if (typeof gtag !== 'undefined') gtag('event', name, props);
+      if (window.NX) NX.post('/capture', { event: name, ...props }).catch(() => { });
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      // Stripe buttons: purely track — do NOT preventDefault (links must open)
+      document.querySelectorAll('.p-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const card = btn.closest('.p-card');
+          const tier = card?.querySelector('.p-tier')?.textContent?.trim() || 'Unknown';
+          const price = card?.querySelector('.p-amt')?.textContent?.trim() || '';
+          trackEvent('checkout_click', { tier, price });
+        });
+      });
+      // CTA scroll buttons — track only, allow default scroll behaviour
+      document.querySelectorAll('.btn-primary, .btn-dark, .n-cta').forEach(btn => {
+        btn.addEventListener('click', () => trackEvent('cta_click', { location: btn.closest('section')?.id || 'nav' }));
+      });
+      // Scroll depth tracking
+      const depths = [25, 50, 75, 90]; const fired = new Set();
+      window.addEventListener('scroll', () => {
+        const pct = Math.round((window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100);
+        depths.forEach(d => { if (pct >= d && !fired.has(d)) { fired.add(d); trackEvent('scroll_depth', { depth: d + '%' }); } });
+      }, { passive: true });
+      const startTime = Date.now();
+      window.addEventListener('beforeunload', () => trackEvent('time_on_page', { seconds: Math.round((Date.now() - startTime) / 1000) }));
+    });
+  </script>
 
+  <!-- ═══ EARLY ACCESS COUPON BANNER ═══ -->
+  <style>
+    #ea-banner {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(90deg, #ff1f3d, #cc0022);
+      color: #fff;
+      padding: 14px 48px 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      z-index: 9999;
+      font-family: 'Unbounded', sans-serif;
+      font-size: 11px;
+      letter-spacing: 1px;
+      flex-wrap: wrap;
+      animation: slideUp .4s ease
+    }
 
-// ── STRIPE.JS PAYMENT FLOW ──
-// 1. Fetch publishable key + create PaymentIntent from NEXUS
-const tier = currentCheckoutTier;
-let clientSecret = null;
+    @keyframes slideUp {
+      from {
+        transform: translateY(100%)
+      }
 
-// Try real Stripe via NEXUS backend
-try {
-const piRes = await fetch('http://127.0.0.1:3000/stripe/create-payment-intent', {
-method: 'POST',
-headers: { 'Content-Type': 'application/json' },
-body: JSON.stringify({ tier, email, name })
-});
-const piData = await piRes.json();
-if (piData.ok && piData.clientSecret) {
-clientSecret = piData.clientSecret;
-} else {
-throw new Error(piData.error || 'PaymentIntent failed');
-}
-} catch (stripeErr) {
-// Stripe not ready (no secret key yet) — show friendly fallback
-errEl.textContent = stripeErr.message.includes('secret key')
-? 'Payment backend not fully configured yet. Add your Stripe secret key to .env and restart the server.'
-: 'Payment error: ' + stripeErr.message;
-errEl.style.display = 'block';
-btn.classList.remove('loading');
-document.getElementById('co-submit-text').textContent = TIERS[tier].cta + ' →';
-return;
-}
+      to {
+        transform: translateY(0)
+      }
+    }
 
-// 2. Confirm card payment with Stripe.js
-if (!window.stripeInstance || !window.stripeCardElement) {
-errEl.textContent = 'Stripe.js not loaded. Please refresh and try again.';
-errEl.style.display = 'block';
-btn.classList.remove('loading');
-document.getElementById('co-submit-text').textContent = TIERS[tier].cta + ' →';
-return;
-}
+    .ea-badge {
+      background: rgba(255, 255, 255, .2);
+      padding: 4px 12px;
+      font-weight: 900;
+      letter-spacing: 2px
+    }
 
-const { error: confirmError, paymentIntent } = await window.stripeInstance.confirmCardPayment(clientSecret, {
-payment_method: {
-card: window.stripeCardElement,
-billing_details: { name, email },
-}
-});
+    .ea-code {
+      background: #fff;
+      color: #cc0022;
+      padding: 5px 16px;
+      font-weight: 900;
+      letter-spacing: 3px;
+      cursor: pointer;
+      border: none;
+      font-family: 'Unbounded', sans-serif;
+      font-size: 11px;
+      transition: background .15s
+    }
 
-if (confirmError) {
-errEl.textContent = confirmError.message;
-errEl.style.display = 'block';
-btn.classList.remove('loading');
-document.getElementById('co-submit-text').textContent = TIERS[tier].cta + ' →';
-return;
-}
+    .ea-code:hover {
+      background: #ffe0e4
+    }
 
-// 3. Payment succeeded!
-try {
-await NX.post('/capture', {});
-await NX.post('/tabs', {
-edge_all_open_tabs: [{ url: window.location.href, title: 'PAID: ' + tier + ' — ' + email, active: true }]
-});
-} catch (_) { }
+    .ea-timer {
+      opacity: .8;
+      font-size: 10px
+    }
 
-document.getElementById('co-step-buy').style.display = 'none';
-const suc = document.getElementById('co-step-success');
-suc.style.display = 'flex';
-document.getElementById('co-success-title').textContent = 'Payment Confirmed!';
-document.getElementById('co-success-body').innerHTML =
-'Thank you, ' + name + '!<br><br>A receipt and download link have been sent to <strong>' + email +
-  '</strong>.<br><br>Welcome to VeilPiercer.';
-document.getElementById('co-success-btn').textContent = 'Close →';
-document.getElementById('co-success-btn').onclick = closeCheckout;
+    .ea-close {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, .6);
+      font-size: 18px;
+      cursor: pointer;
+      padding: 4px 8px;
+      font-family: sans-serif;
+      line-height: 1
+    }
 
-showToast('Payment confirmed — ' + tier + ' — ' + email);
-btn.classList.remove('loading');
-await pollStatus(); await pollLogs();
-}
+    .ea-close:hover {
+      color: #fff
+    }
 
-// ── WIRE UP EVENTS ──────────────────────────────
-document.getElementById('co-close').addEventListener('click', closeCheckout);
-document.getElementById('co-backdrop').addEventListener('click', closeCheckout);
-document.getElementById('co-submit').addEventListener('click', submitCheckout);
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCheckout(); });
+    .p-btn {
+      cursor: pointer !important
+    }
+  </style>
+  <div id="ea-banner">
+    <span class="ea-badge">⚡ EARLY ACCESS</span>
+    <span>50% OFF — use code at checkout:</span>
+    <button class="ea-code" id="copy-code" onclick="copyCode()" title="Click to copy">LAUNCH50</button>
+    <span class="ea-timer">⏱ <span id="ea-countdown">47:59:59</span> left</span>
+    <button class="ea-close" onclick="document.getElementById('ea-banner').style.display='none'">✕</button>
+  </div>
+  <script>
+    function copyCode() {
+      navigator.clipboard.writeText('LAUNCH50').then(() => {
+        const b = document.getElementById('copy-code'), o = b.textContent;
+        b.textContent = '✓ COPIED!'; b.style.background = '#00ff88'; b.style.color = '#000';
+        setTimeout(() => { b.textContent = o; b.style.background = '#fff'; b.style.color = '#cc0022'; }, 2000);
+      });
+      document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
+      trackEvent('coupon_copy', { code: 'LAUNCH50' });
+    }
+    (function () {
+      const K = 'vp_ea_end';
+      if (!sessionStorage.getItem(K)) sessionStorage.setItem(K, Date.now() + 48 * 3600000);
+      function tick() {
+        const r = Math.max(0, sessionStorage.getItem(K) - Date.now()), el = document.getElementById('ea-countdown');
+        if (el) el.textContent = [Math.floor(r / 3600000), Math.floor(r % 3600000 / 60000), Math.floor(r % 60000 / 1000)].map(n => String(n).padStart(2, '0')).join(':');
+        if (r > 0) setTimeout(tick, 1000); else { const b = document.getElementById('ea-banner'); if (b) b.style.display = 'none'; }
+      }
+      tick();
+    })();
+  </script>
 
-// ── PRICING BUTTONS → open checkout ────────────
-document.querySelectorAll('.p-btn').forEach(btn => {
-btn.addEventListener('click', async (e) => {
-e.preventDefault();
-const card = btn.closest('.p-card');
-const tier = card?.querySelector('.p-tier')?.textContent?.trim() || 'Pro';
-openCheckout(tier);
-});
-});
+  <!-- Cloudflare Web Analytics (replace token after enabling in CF dashboard) -->
+  <script defer src='https://static.cloudflareinsights.com/beacon.min.js'
+    data-cf-beacon='{"token":"ANALYTICS_TOKEN_HERE"}'></script>
 
-// Also wire footer CTA → jump to checkout Pro
-document.querySelectorAll('.btn-primary, .btn-dark').forEach(el => {
-el.addEventListener('click', async (e) => {
-e.preventDefault();
-const href = el.getAttribute('href') || '';
-if (href === '#pricing' || href === '') {
-// scroll to pricing
-document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
-}
-});
-});
+  <!-- ── SLIME NEURAL BACKGROUND (hero) ─────────────────────────────────── -->
+  <script>
+    (function () {
+      const canvas = document.getElementById('hero-canvas');
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      const SENSOR_ANGLE = Math.PI / 4;
+      const SENSOR_DIST = 22;
+      const TURN_SPEED = 0.28;
+      const MOVE_SPEED = 1.9;
+      const PARTICLE_N = 3000;
+      let width, height, trailData, particles = [];
 
-// ── AUTO-REGISTER TAB ON LOAD ─────────────────────
-window.addEventListener('load', () => {
-NX.post('/tabs', {
-edge_all_open_tabs: [{ url: window.location.href, title: document.title, active: true }]
-});
-});
-</script>
+      function slimeInit() {
+        width = canvas.width = canvas.offsetWidth || window.innerWidth;
+        height = canvas.height = canvas.offsetHeight || window.innerHeight;
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0, 0, width, height);
+        particles = [];
+        for (let i = 0; i < PARTICLE_N; i++) {
+          particles.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            angle: Math.random() * Math.PI * 2
+          });
+        }
+      }
+
+      function getPixel(x, y) {
+        if (x < 0 || x >= width || y < 0 || y >= height) return 0;
+        const idx = (Math.floor(y) * width + Math.floor(x)) * 4;
+        return trailData[idx + 1]; // green channel = trail strength
+      }
+
+      function slimeLoop() {
+        trailData = ctx.getImageData(0, 0, width, height).data;
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+          const v1 = getPixel(p.x + Math.cos(p.angle - SENSOR_ANGLE) * SENSOR_DIST,
+            p.y + Math.sin(p.angle - SENSOR_ANGLE) * SENSOR_DIST);
+          const v2 = getPixel(p.x + Math.cos(p.angle) * SENSOR_DIST,
+            p.y + Math.sin(p.angle) * SENSOR_DIST);
+          const v3 = getPixel(p.x + Math.cos(p.angle + SENSOR_ANGLE) * SENSOR_DIST,
+            p.y + Math.sin(p.angle + SENSOR_ANGLE) * SENSOR_DIST);
+          if (v2 > v1 && v2 > v3) { /* keep going */ }
+          else if (v2 < v1 && v2 < v3) p.angle += (Math.random() - 0.5) * 2 * TURN_SPEED;
+          else if (v1 > v3) p.angle -= TURN_SPEED;
+          else if (v3 > v1) p.angle += TURN_SPEED;
+          p.x += Math.cos(p.angle) * MOVE_SPEED;
+          p.y += Math.sin(p.angle) * MOVE_SPEED;
+          if (p.x < 0 || p.x >= width) p.angle = Math.PI - p.angle;
+          if (p.y < 0 || p.y >= height) p.angle = -p.angle;
+          // VeilPiercer cyan trail deposit
+          ctx.fillStyle = 'rgba(0, 229, 255, 0.45)';
+          ctx.fillRect(p.x | 0, p.y | 0, 1, 1);
+        }
+        // biologic decay / diffuse
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.048)';
+        ctx.fillRect(0, 0, width, height);
+        requestAnimationFrame(slimeLoop);
+      }
+
+      window.addEventListener('resize', slimeInit);
+      slimeInit();
+      slimeLoop();
+    })();
+  </script>
+  <!-- ── NEXUS LIVE WebSocket BRIDGE ─────────────────────────────────────── -->
+  <script>
+    (function () {
+      const NEXUS_WS = 'ws://localhost:8000/ws';
+      const NEXUS_API = 'http://localhost:8000';
+      const bar = document.getElementById('nexus-bar');
+      const nbStatus = document.getElementById('nb-status');
+      const nbCpu = document.getElementById('nb-cpu');
+      const nbRam = document.getElementById('nb-ram');
+      const nbSignals = document.getElementById('nb-signals');
+      const nbAgents = document.getElementById('nb-agents');
+      const nbMode = document.getElementById('nb-mode');
+      const nbHealer = document.getElementById('nb-healer');
+
+      let ws, reconnectT, agentCount = 0;
+
+      function setMetric(el, label, val, warnThresh, alertThresh) {
+        const n = parseFloat(val);
+        el.className = 'nb-metric' + (n >= alertThresh ? ' alert' : n >= warnThresh ? ' warn' : '');
+        el.innerHTML = label + ' <b>' + val + '</b>';
+      }
+
+      function onData(d) {
+        if (d.system) {
+          const cpu = d.system.cpu_pct.toFixed(0);
+          const ram = d.system.ram_pct.toFixed(0);
+          setMetric(nbCpu, 'CPU', cpu + '%', 70, 88);
+          setMetric(nbRam, 'RAM', ram + '%', 80, 92);
+        }
+        if (d.bus) {
+          setMetric(nbSignals, 'SIGNALS', d.bus.live_signals, 20, 40);
+        }
+        if (d.agents && Array.isArray(d.agents)) {
+          agentCount = d.agents.length;
+        }
+        if (typeof d.agent === 'string' && d.event === 'agent_run') {
+          // count unique agents from runs
+        }
+        if (agentCount > 0) {
+          setMetric(nbAgents, 'AGENTS', agentCount, 10, 14);
+        }
+        if (d.mode) {
+          nbMode.textContent = '◈ ' + d.mode + ' MODE';
+        }
+        if (d.healer && d.healer.recent_repairs && d.healer.recent_repairs.length > 0) {
+          const r = d.healer.recent_repairs[0];
+          const ago = Math.round(r.ago_sec);
+          nbHealer.textContent = '⚡ HEALER: ' + r.action + ' ' + ago + 's ago';
+        } else {
+          nbHealer.textContent = '';
+        }
+      }
+
+      function connect() {
+        clearTimeout(reconnectT);
+        try {
+          ws = new WebSocket(NEXUS_WS);
+          ws.onopen = () => {
+            bar.className = 'connected';
+            nbStatus.textContent = 'NEXUS ANTIGRAVITY · LIVE';
+            // Also pull /agents count
+            fetch(NEXUS_API + '/agents').then(r => r.json()).then(d => {
+              if (d.agents) agentCount = Object.keys(d.agents).length;
+            }).catch(() => { });
+          };
+          ws.onmessage = (e) => {
+            try { onData(JSON.parse(e.data)); } catch (_) { }
+          };
+          ws.onclose = () => {
+            bar.className = 'error';
+            nbStatus.textContent = 'NEXUS · RECONNECTING…';
+            reconnectT = setTimeout(connect, 4000);
+          };
+          ws.onerror = () => {
+            bar.className = 'error';
+            nbStatus.textContent = 'NEXUS · OFFLINE';
+          };
+        } catch (e) {
+          bar.className = 'error';
+          nbStatus.textContent = 'NEXUS · OFFLINE';
+          reconnectT = setTimeout(connect, 8000);
+        }
+      }
+
+      // Fallback: poll /health if WS cant reach
+      function pollHealth() {
+        fetch(NEXUS_API + '/health').then(r => r.json()).then(d => {
+          if (bar.className !== 'connected') {
+            bar.className = 'connected';
+            nbStatus.textContent = 'NEXUS ANTIGRAVITY · POLL';
+          }
+          onData(d);
+        }).catch(() => {
+          if (bar.className !== 'connected') {
+            bar.className = 'error';
+            nbStatus.textContent = 'NEXUS · OFFLINE';
+          }
+        });
+      }
+
+      connect();
+      setInterval(pollHealth, 5000); // health poll as backup
+    })();
+  </script>
+
 </body>
 
 </html>

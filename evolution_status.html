@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#030310">
+<title>NEXUS EVOLUTION — Live Status</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#030310;--c:#00fff7;--p:#a855f7;--g:#00ff88;--orange:#ff6b35;--r:#ff3366;--gold:#ffd700;--bd:rgba(0,255,247,.1);--glass:rgba(255,255,255,.03)}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{min-height:100%;background:var(--bg);color:#ccc;font-family:'Inter',sans-serif;font-size:13px;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -20%,rgba(168,85,247,.15),transparent),radial-gradient(ellipse 50% 40% at 80% 100%,rgba(0,255,247,.06),transparent);pointer-events:none;z-index:0}
+
+#wrap{max-width:900px;margin:0 auto;padding:16px;position:relative;z-index:1}
+
+/* HEADER */
+#hdr{text-align:center;padding:20px 0 24px;border-bottom:1px solid var(--bd);margin-bottom:20px}
+#logo{font-family:'Orbitron',monospace;font-size:clamp(16px,4vw,28px);font-weight:900;background:linear-gradient(90deg,var(--c),var(--p),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:4px;background-clip:text;-webkit-background-clip:text}
+#logo-sub{font-size:10px;letter-spacing:3px;color:#333;margin-top:4px;font-family:'Orbitron',monospace}
+#live-badge{display:inline-flex;align-items:center;gap:6px;margin-top:10px;background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.2);border-radius:20px;padding:3px 12px;font-size:8px;letter-spacing:2px;color:var(--g);font-family:'Orbitron',monospace}
+#live-dot{width:7px;height:7px;border-radius:50%;background:var(--g);box-shadow:0 0 8px var(--g);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* STAT GRID */
+.stat-row{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+@media(min-width:500px){.stat-row{grid-template-columns:repeat(4,1fr)}}
+.stat{background:var(--glass);border:1px solid var(--bd);border-radius:12px;padding:16px 12px;text-align:center;transition:border-color .3s}
+.stat:hover{border-color:var(--c)}
+.stat-n{font-family:'Orbitron',monospace;font-size:28px;font-weight:900;color:var(--c);line-height:1}
+.stat-n.gold{color:var(--gold)}
+.stat-n.green{color:var(--g)}
+.stat-n.purple{color:var(--p)}
+.stat-l{font-size:7px;letter-spacing:2px;color:#333;margin-top:6px}
+
+/* QUALITY METER */
+.card{background:var(--glass);border:1px solid var(--bd);border-radius:12px;padding:16px;margin-bottom:14px}
+.card-title{font-family:'Orbitron',monospace;font-size:8px;letter-spacing:3px;color:var(--p);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card-title::after{content:'';flex:1;height:1px;background:rgba(168,85,247,.2)}
+
+/* quality bar */
+.q-bar-wrap{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.q-label{font-family:'Orbitron',monospace;font-size:8px;color:#555;width:40px;flex-shrink:0;text-align:right}
+.q-track{flex:1;height:8px;background:rgba(255,255,255,.04);border-radius:4px;overflow:hidden;border:1px solid var(--bd)}
+.q-fill{height:100%;border-radius:4px;transition:width 1s ease;background:linear-gradient(90deg,var(--c),var(--p))}
+.q-val{font-family:'Orbitron',monospace;font-size:8px;color:var(--c);width:32px;text-align:right;flex-shrink:0}
+
+/* GENERATION TABLE */
+.gen-table{width:100%;border-collapse:collapse}
+.gen-table th{font-family:'Orbitron',monospace;font-size:7px;letter-spacing:2px;color:#333;padding:6px 8px;border-bottom:1px solid var(--bd);text-align:left}
+.gen-table td{padding:7px 8px;border-bottom:1px solid rgba(255,255,255,.03);font-size:10px;vertical-align:top}
+.gen-table tr:last-child td{border-bottom:none}
+.gen-table tr:hover td{background:rgba(0,255,247,.02)}
+.gen-num{font-family:'Orbitron',monospace;font-size:11px;color:var(--c);font-weight:700}
+.badge-facts{background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.3);color:var(--p);border-radius:10px;padding:1px 7px;font-size:7px;letter-spacing:1px;font-family:'Orbitron',monospace}
+.qs-chip{border-radius:10px;padding:1px 7px;font-size:7px;letter-spacing:1px;font-family:'Orbitron',monospace}
+.imp-text{font-size:9px;color:#445;line-height:1.5}
+
+/* MEMORY FACTS */
+.fact-item{background:rgba(0,255,247,.03);border-left:2px solid var(--c);border-radius:0 6px 6px 0;padding:7px 10px;margin-bottom:5px;font-size:10px;line-height:1.5;color:#889}
+.fact-tag{font-size:7px;color:#334;letter-spacing:1px;margin-top:3px;font-family:'Orbitron',monospace}
+
+/* SCHEDULE INFO */
+.sched-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.sched-row:last-child{border-bottom:none}
+.sched-label{font-size:10px;color:#556}
+.sched-val{font-family:'Orbitron',monospace;font-size:9px;color:var(--c)}
+
+/* CHART */
+#chart-wrap{position:relative;height:80px;margin-top:4px}
+canvas#q-chart{width:100%;height:80px}
+
+/* REFRESH INDICATOR */
+#refresh-timer{position:fixed;top:12px;right:12px;font-family:'Orbitron',monospace;font-size:8px;color:#223;letter-spacing:1px;z-index:10}
+#last-updated{font-size:9px;color:#334;text-align:center;margin-top:8px;letter-spacing:1px}
+
+/* EVOLUTION ACTIVE BADGE */
+#evo-status{padding:10px 16px;border-radius:8px;text-align:center;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:2px;margin-bottom:14px}
+#evo-status.running{background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.25);color:var(--g)}
+#evo-status.idle{background:rgba(255,255,255,.03);border:1px solid var(--bd);color:#333}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <header id="hdr">
+    <div id="logo">NEXUS EVOLUTION</div>
+    <div id="logo-sub">SELF-IMPROVING AI — LIVE STATUS</div>
+    <div><span id="live-badge"><span id="live-dot"></span>LIVE · AUTO-REFRESH 30s</span></div>
+  </header>
+
+  <div id="evo-status" class="idle">CHECKING EVOLUTION STATUS...</div>
+
+  <!-- STAT GRID -->
+  <div class="stat-row">
+    <div class="stat"><div class="stat-n" id="s-gen">—</div><div class="stat-l">GENERATIONS</div></div>
+    <div class="stat"><div class="stat-n gold" id="s-facts">—</div><div class="stat-l">FACTS LEARNED</div></div>
+    <div class="stat"><div class="stat-n green" id="s-quality">—</div><div class="stat-l">QUALITY SCORE</div></div>
+    <div class="stat"><div class="stat-n purple" id="s-session">—</div><div class="stat-l">MEMORY ITEMS</div></div>
+  </div>
+
+  <!-- QUALITY CHART -->
+  <div class="card">
+    <div class="card-title">QUALITY PROGRESSION</div>
+    <div id="chart-wrap"><canvas id="q-chart"></canvas></div>
+    <div id="q-bars"></div>
+  </div>
+
+  <!-- GENERATION TABLE -->
+  <div class="card">
+    <div class="card-title">EVOLUTION GENERATIONS</div>
+    <table class="gen-table">
+      <thead>
+        <tr>
+          <th>GEN</th>
+          <th>TIMESTAMP</th>
+          <th>FACTS</th>
+          <th>QUALITY</th>
+          <th>TIME</th>
+          <th>IMPROVEMENTS</th>
+        </tr>
+      </thead>
+      <tbody id="gen-tbody"></tbody>
+    </table>
+  </div>
+
+  <!-- RECENT MEMORY FACTS -->
+  <div class="card">
+    <div class="card-title">LATEST LEARNED FACTS</div>
+    <div id="facts-list"></div>
+  </div>
+
+  <!-- SCHEDULE -->
+  <div class="card">
+    <div class="card-title">SCHEDULE & CONFIGURATION</div>
+    <div class="sched-row"><span class="sched-label">Nightly run time</span><span class="sched-val">02:00 AM DAILY</span></div>
+    <div class="sched-row"><span class="sched-label">Cycles per night</span><span class="sched-val">8 CYCLES × 1HR</span></div>
+    <div class="sched-row"><span class="sched-label">AI model</span><span class="sched-val">nexus-prime:latest</span></div>
+    <div class="sched-row"><span class="sched-label">Evolved model</span><span class="sched-val">nexus-evolved:latest</span></div>
+    <div class="sched-row"><span class="sched-label">Max facts/cycle</span><span class="sched-val">8 FACTS</span></div>
+    <div class="sched-row"><span class="sched-label">Google Drive sync</span><span class="sched-val" id="sched-sync">—</span></div>
+    <div class="sched-row"><span class="sched-label">Task Scheduler</span><span class="sched-val" style="color:var(--g)">REGISTERED ✓</span></div>
+    <div class="sched-row"><span class="sched-label">Startup autorun</span><span class="sched-val" style="color:var(--g)">ENABLED ✓</span></div>
+  </div>
+
+  <div id="last-updated">LAST UPDATED: —</div>
+</div>
+
+<div id="refresh-timer">REFRESH IN <span id="rtimer">30</span>s</div>
+
+<script>
+let _countdown = 30;
+
+function qColor(q) {
+  if (q >= 0.9) return '#00ff88';
+  if (q >= 0.7) return '#ffd700';
+  if (q >= 0.5) return '#ff6b35';
+  return '#ff3366';
+}
+
+function drawChart(gens) {
+  const canvas = document.getElementById('q-chart');
+  if (!canvas || !gens.length) return;
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth || 800;
+  canvas.height = 80;
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  // Grid lines
+  ctx.strokeStyle = 'rgba(0,255,247,.06)';
+  ctx.lineWidth = 1;
+  [0.25, 0.5, 0.75, 1.0].forEach(y => {
+    ctx.beginPath();ctx.moveTo(0, H - y*H);ctx.lineTo(W, H - y*H);ctx.stroke();
+  });
+
+  if (gens.length < 2) return;
+
+  // Line
+  const step = W / (gens.length - 1);
+  const grad = ctx.createLinearGradient(0, 0, W, 0);
+  grad.addColorStop(0, '#00fff7');grad.addColorStop(0.5, '#a855f7');grad.addColorStop(1, '#00ff88');
+  ctx.strokeStyle = grad;
+  ctx.lineWidth = 2;
+  ctx.shadowColor = '#00fff7';ctx.shadowBlur = 6;
+  ctx.beginPath();
+  gens.forEach((g, i) => {
+    const x = i * step;
+    const y = H - (g.quality_score * H * 0.9 + H * 0.05);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  // Fill
+  ctx.fillStyle = 'rgba(0,255,247,.04)';
+  ctx.lineTo(W, H);ctx.lineTo(0, H);ctx.closePath();ctx.fill();
+
+  // Dots
+  gens.forEach((g, i) => {
+    const x = i * step;
+    const y = H - (g.quality_score * H * 0.9 + H * 0.05);
+    ctx.fillStyle = qColor(g.quality_score);
+    ctx.shadowColor = qColor(g.quality_score);ctx.shadowBlur = 8;
+    ctx.beginPath();ctx.arc(x, y, 4, 0, Math.PI*2);ctx.fill();
+    ctx.shadowBlur = 0;
+    // label
+    ctx.fillStyle = '#556';ctx.font = '8px Orbitron,monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('G'+g.gen_num, x, H - 2);
+  });
+}
+
+const CACHE_KEY = 'nexus_evo_cache';
+
+function saveCache(data) {
+  try { localStorage.setItem(CACHE_KEY, JSON.stringify({ts: Date.now(), data})); } catch {}
+}
+function loadCache() {
+  try { const c = JSON.parse(localStorage.getItem(CACHE_KEY)||'null'); return c?.data || null; } catch { return null; }
+}
+
+async function loadData() {
+  // 1. Show cached data IMMEDIATELY (instant render on refresh)
+  const cached = loadCache();
+  if (cached) updateUI(cached, null, true);
+
+  // 2. Fetch fresh data from server in background
+  let fresh = null;
+  try {
+    const r = await fetch('/api/evolution-status');
+    if (r.ok) {
+      fresh = await r.json();
+      saveCache(fresh);  // Persist for next refresh
+    }
+  } catch {}
+
+  // 3. Update with fresh data (or keep cached if server offline)
+  if (fresh) updateUI(fresh, null, false);
+  else if (!cached) updateUI(null, null, false);
+}
+
+function updateUI(evo, _ignored, fromCache) {
+  document.getElementById('last-updated').textContent =
+    `LAST UPDATED: ${new Date().toLocaleString('en-US')}` + (fromCache ? ' (cached)' : '');
+
+  // Server returns { log:{...}, memory:{facts:[...],total:N} }
+  const log  = evo?.log  || {};
+  const mem  = evo?.memory || {};
+  const gens = log.generations || [];
+  const totalFacts = log.total_facts_added || 0;
+  const lastGen    = gens[gens.length - 1] || {};
+  const latestQ    = lastGen.quality_score || 0;
+
+  // Stats
+  document.getElementById('s-gen').textContent     = gens.length  || '—';
+  document.getElementById('s-facts').textContent   = totalFacts   || '—';
+  document.getElementById('s-quality').textContent = latestQ ? (latestQ*100).toFixed(0)+'%' : '—';
+  document.getElementById('s-session').textContent = mem.total     || '—';
+  document.getElementById('sched-sync').textContent= log.last_run ? log.last_run.split(' ')[0] : '—';
+
+  // Evolution status badge
+  const statusEl = document.getElementById('evo-status');
+  const now2 = Date.now();
+  const lastMs = lastGen.timestamp ? new Date(lastGen.timestamp).getTime() : 0;
+  const minsAgo = (now2 - lastMs) / 60000;
+  if (minsAgo < 5) {
+    statusEl.className = 'running';
+    statusEl.textContent = `🟢 EVOLUTION ACTIVE — Generation ${lastGen.gen_num || '?'} completed ${Math.round(minsAgo)}m ago`;
+  } else if (minsAgo < 70) {
+    statusEl.className = 'running';
+    statusEl.textContent = `⚡ EVOLUTION RUNNING — Last cycle ${Math.round(minsAgo)}m ago · Total: ${gens.length} generations`;
+  } else {
+    statusEl.className = 'idle';
+    statusEl.textContent = `💤 IDLE — Next run at 02:00 AM · ${gens.length} generations complete · ${totalFacts} facts learned`;
+  }
+
+  // Quality bars
+  const qBarsEl = document.getElementById('q-bars');
+  qBarsEl.innerHTML = gens.slice(-8).map(g => `
+    <div class="q-bar-wrap">
+      <span class="q-label">GEN ${g.gen_num}</span>
+      <div class="q-track"><div class="q-fill" style="width:${g.quality_score*100}%;background:linear-gradient(90deg,${qColor(g.quality_score)},var(--p))"></div></div>
+      <span class="q-val" style="color:${qColor(g.quality_score)}">${(g.quality_score*100).toFixed(0)}%</span>
+    </div>`).join('');
+
+  // Chart
+  drawChart(gens);
+
+  // Generation table
+  const tbody = document.getElementById('gen-tbody');
+  tbody.innerHTML = [...gens].reverse().map(g => {
+    const qc = qColor(g.quality_score);
+    const imps = (g.improvements || []).slice(0, 2).map(i => `<div>· ${i.slice(0,80)}</div>`).join('');
+    return `<tr>
+      <td><span class="gen-num">${g.gen_num}</span></td>
+      <td style="color:#445;font-size:9px">${(g.timestamp||'').replace(' ','<br>')}</td>
+      <td><span class="badge-facts">+${g.facts_added} facts</span></td>
+      <td><span class="qs-chip" style="background:${qc}22;border:1px solid ${qc}55;color:${qc}">${(g.quality_score*100).toFixed(0)}%</span></td>
+      <td style="color:#334;font-size:9px">${Math.round(g.cycle_time_s||0)}s</td>
+      <td><div class="imp-text">${imps}</div></td>
+    </tr>`;
+  }).join('');
+
+  // Memory facts from server response
+  const factsEl  = document.getElementById('facts-list');
+  const allFacts  = (mem.facts || []);
+  const evoFacts  = allFacts.filter(f => f.type === 'evolution').slice(-12).reverse();
+  const showFacts = evoFacts.length ? evoFacts : allFacts.slice(-10).reverse();
+  if (showFacts.length) {
+    factsEl.innerHTML = showFacts.map(f => `
+      <div class="fact-item">
+        ${f.content}
+        <div class="fact-tag">GEN ${f.generation||f.tags?.[1]||'?'} · ${(f.created_at||'').slice(0,16)} · IMP ${Math.round((f.importance||0)*100)}%</div>
+      </div>`).join('');
+  } else {
+    factsEl.innerHTML = '<div style="color:#333;text-align:center;padding:20px;font-size:10px">No facts yet — run EVOLVE_NOW.bat to populate</div>';
+  }
+}
+
+// Auto-refresh
+async function tick() {
+  await loadData();
+  _countdown = 30;
+}
+tick();
+
+setInterval(() => {
+  _countdown--;
+  document.getElementById('rtimer').textContent = _countdown;
+  if (_countdown <= 0) tick();
+}, 1000);
+
+window.addEventListener('resize', () => {
+  const gens = [];
+  document.querySelectorAll('#gen-tbody tr').forEach(tr => {
+    const q = parseFloat(tr.querySelector('.qs-chip')?.textContent) / 100 || 0;
+    const n = parseInt(tr.querySelector('.gen-num')?.textContent) || 0;
+    if (n) gens.push({gen_num: n, quality_score: q});
+  });
+  if (gens.length) drawChart(gens.reverse());
+});
+</script>
+</body>
+</html>

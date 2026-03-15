@@ -5,8 +5,10 @@
     "amount": 9700,
     "sessionId": "cs_test_DEMO",
     "createdAt": "2026-03-04T02:05:55.628Z",
-    "used": 1,
-    "lastAccessed": "2026-03-04T02:05:55.722Z"
+    "used": 10,
+    "lastAccessed": "2026-03-14T00:56:04.920Z",
+    "downloads": 11,
+    "lastDownload": "2026-03-13T23:26:39.114Z"
   },
   "97602284f5696ab4b090e8db8f162a8e31cccac89838966dda9e0dd700553dff": {
     "email": "test@veilpiercer.com",
@@ -59,5 +61,65 @@
     "createdAt": "2026-03-04T02:18:28.364Z",
     "used": 0,
     "welcomeEmail": "Subject: Welcome to VeilPiercing!\n\nDear Laurenflipo1388,\n\nWe hope this email finds you well. Thank you for choosing VeilPiercer Pro - your journey with us is just beginning! We're thrilled that you've chosen our service and are excited to help you achieve the veil piercing you desire.\n\nAs a valued customer, we want to assure you of the high quality products and exceptional service you can expect from us. To confirm, your order was placed for $97.00, which will be processed within 3-5 business days.\n\nBest regards,\nThe NEXUS ULTRA Team"
+  },
+  "2cc7179187065645b707c36fe75bf11d4e8bdca4bd3fb4bdd7425432703cdf5a": {
+    "email": "laurenflipo1388@gmail.com",
+    "tier": "Starter",
+    "amount": 4700,
+    "sessionId": "pi_3TAdHX6bVjep6IHC0TdJ4glo",
+    "createdAt": "2026-03-13T21:44:36.515Z",
+    "used": 4,
+    "welcomeEmail": "Here is a welcome email:\n\nSubject: Welcome to VeilPiercing - Your New Home in Piercing!\n\nDear Laurenflipo1388,\n\nA warm welcome to VeilPiercing! We're thrilled you've chosen us for your piercing needs. Thank you for trusting us with $47.00. Our team is here to help you achieve the piercings of your dreams. Please find your confirmation order details below:\n\n* Order Number: NV000001\n* Product Details: [Insert product details]\n* Shipping Information: [Insert shipping information]\n\nIf you have any questions or concerns, please don't hesitate to reach out. We're always here to help.\n\nThe NEXUS ULTRA Team",
+    "lastAccessed": "2026-03-13T23:03:35.803Z",
+    "downloads": 2,
+    "lastDownload": "2026-03-13T22:46:32.000Z"
+  },
+  "0849cc1aa302e8cd94e1bf68e1442d47c7e3b541a59e598c743e236ba83a2798": {
+    "email": "proof_a30edc24@test.veilpiercer.com",
+    "tier": "Starter",
+    "amount": 4700,
+    "sessionId": "manual",
+    "createdAt": "2026-03-13T23:20:10.092Z",
+    "used": 0
+  },
+  "e2bb7d86ce41dc0e24c8dd280142385a88b4bf3ccd47559d50798fe320275b8e": {
+    "email": "proof_eb561a64@test.veilpiercer.com",
+    "tier": "Starter",
+    "amount": 4700,
+    "sessionId": "manual",
+    "createdAt": "2026-03-13T23:20:51.995Z",
+    "used": 0
+  },
+  "e62e96b9069635120c16419178b27bef95c31308b58d3fb50d6bccb4cf927eb9": {
+    "email": "proof_2e034b83@test.veilpiercer.com",
+    "tier": "Starter",
+    "amount": 4700,
+    "sessionId": "manual",
+    "createdAt": "2026-03-13T23:22:37.048Z",
+    "used": 0
+  },
+  "a85bae9afb89bd97a6498626de679c983cb61e021dc1db535b1f00897459b9c0": {
+    "email": "proof_09dd04de@test.veilpiercer.com",
+    "tier": "Starter",
+    "amount": 4700,
+    "sessionId": "manual",
+    "createdAt": "2026-03-13T23:24:14.092Z",
+    "used": 0
+  },
+  "c168476feb18fc1d60ff9b7a597965e69da02ae9cb44ec49db2a251dc011be55": {
+    "email": "proof_8bb8fe11@test.veilpiercer.com",
+    "tier": "Starter",
+    "amount": 4700,
+    "sessionId": "manual",
+    "createdAt": "2026-03-13T23:26:03.338Z",
+    "used": 0
+  },
+  "daed63e4f6c20ae058c565b105993e747a172d7ee1cc9eab39fb07699c0ad8bb": {
+    "email": "proof_0e08c5ad@test.veilpiercer.com",
+    "tier": "Starter",
+    "amount": 4700,
+    "sessionId": "manual",
+    "createdAt": "2026-03-13T23:26:36.142Z",
+    "used": 0
   }
 }

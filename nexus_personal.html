@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#060616">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Nexus">
+<title>NEXUS PERSONAL — Unified AI Hub</title>
+<link rel="manifest" href="/nexus.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#060616;--bg1:#0a0a1e;--bg2:#0f0f2a;
+  --c:#00fff7;--p:#a855f7;--orange:#ff6b35;--green:#00ff88;--red:#ff3366;--gold:#ffd700;
+  --bd:rgba(0,255,247,.1);--bd2:rgba(168,85,247,.15);
+  --glass:rgba(255,255,255,.03);--glass2:rgba(0,255,247,.05);
+  --r:12px;--nav:56px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:#ccc;
+  font-family:'Inter',sans-serif;font-size:13px;}
+
+/* ── ANIMATED BG ── */
+body::before{content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 80% 50% at 20% 0%,rgba(168,85,247,.12),transparent),
+             radial-gradient(ellipse 60% 40% at 80% 100%,rgba(0,255,247,.08),transparent);
+  pointer-events:none;z-index:0;}
+
+/* ── SHELL ── */
+#shell{display:grid;grid-template-rows:52px 1fr var(--nav);height:100%;position:relative;z-index:1}
+
+/* ── HEADER ── */
+#hdr{display:flex;align-items:center;justify-content:space-between;padding:0 16px;
+  background:rgba(6,6,22,.9);border-bottom:1px solid var(--bd);
+  backdrop-filter:blur(20px);position:relative;z-index:10}
+#logo{font-family:'Orbitron',monospace;font-size:14px;font-weight:900;
+  background:linear-gradient(90deg,var(--c),var(--p));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:3px}
+#hdr-pills{display:flex;gap:6px;align-items:center;overflow-x:auto;max-width:65vw}
+#hdr-pills::-webkit-scrollbar{display:none}
+.hpill{font-size:6px;letter-spacing:1px;padding:2px 8px 2px 16px;border-radius:20px;
+  border:1px solid;cursor:pointer;position:relative;white-space:nowrap;
+  transition:all .3s;font-family:'Orbitron',monospace}
+.hpill::before{content:'';position:absolute;left:5px;top:50%;transform:translateY(-50%);
+  width:6px;height:6px;border-radius:50%}
+.hpill.on{border-color:var(--green);color:var(--green)}
+.hpill.on::before{background:var(--green);box-shadow:0 0 6px var(--green)}
+.hpill.off{border-color:var(--red);color:var(--red)}
+.hpill.off::before{background:var(--red)}
+#hdr-clock{font-family:'Orbitron',monospace;font-size:9px;color:var(--p);letter-spacing:2px;white-space:nowrap}
+
+/* ── PANELS ── */
+#panels{position:relative;overflow:hidden}
+.panel{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;
+  display:none;flex-direction:column;padding:12px;gap:10px;
+  -webkit-overflow-scrolling:touch}
+.panel.active{display:flex}
+.panel::-webkit-scrollbar{width:3px}
+.panel::-webkit-scrollbar-thumb{background:rgba(168,85,247,.3);border-radius:2px}
+
+/* ── CARD ── */
+.card{background:var(--glass);border:1px solid var(--bd);border-radius:var(--r);
+  padding:14px;backdrop-filter:blur(10px)}
+.card-title{font-family:'Orbitron',monospace;font-size:8px;letter-spacing:3px;
+  color:var(--p);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.card-title::after{content:'';flex:1;height:1px;background:var(--bd2)}
+
+/* ── BOTTOM NAV ── */
+#nav{display:flex;background:rgba(6,6,22,.97);border-top:1px solid var(--bd);
+  backdrop-filter:blur(30px);padding-bottom:env(safe-area-inset-bottom)}
+.ntab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;padding:6px 0;border:none;background:transparent;color:#333;
+  cursor:pointer;transition:all .25s;font-family:'Orbitron',monospace;font-size:5.5px;letter-spacing:1px}
+.ntab .ni{font-size:18px;transition:transform .25s}
+.ntab.active{color:var(--c)}
+.ntab.active .ni{transform:translateY(-2px)}
+.ntab:active{background:var(--glass2)}
+
+/* ── HOME PANEL ── */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat-box{background:var(--glass);border:1px solid var(--bd);border-radius:10px;
+  padding:12px;text-align:center;cursor:pointer;transition:all .3s}
+.stat-box:hover{border-color:var(--c);background:var(--glass2)}
+.stat-num{font-family:'Orbitron',monospace;font-size:22px;font-weight:900;color:var(--c)}
+.stat-lbl{font-size:8px;letter-spacing:2px;color:#444;margin-top:2px}
+.stat-sub{font-size:9px;color:#555;margin-top:4px}
+.quick-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.qbtn{background:var(--glass);border:1px solid var(--bd);border-radius:8px;
+  padding:10px 6px;text-align:center;cursor:pointer;transition:all .25s;
+  font-size:7px;letter-spacing:1px;color:#888;font-family:'Orbitron',monospace}
+.qbtn .qi{font-size:20px;display:block;margin-bottom:4px}
+.qbtn:hover{border-color:var(--p);color:var(--p);background:rgba(168,85,247,.08)}
+.qbtn:active{transform:scale(.96)}
+.mission-item{background:var(--glass);border-left:3px solid var(--p);border-radius:6px;
+  padding:8px 10px;font-size:10px;line-height:1.5}
+.mission-item .mt{font-size:7px;color:#444;letter-spacing:1px;margin-top:4px}
+.online-badge{display:inline-block;background:rgba(0,255,136,.1);color:var(--green);
+  border:1px solid rgba(0,255,136,.3);border-radius:20px;padding:1px 8px;font-size:7px;letter-spacing:1px}
+.offline-badge{display:inline-block;background:rgba(255,51,102,.1);color:var(--red);
+  border:1px solid rgba(255,51,102,.3);border-radius:20px;padding:1px 8px;font-size:7px;letter-spacing:1px}
+
+/* ── CHAT PANEL ── */
+#chat-panel{display:flex;flex-direction:column;padding:8px;gap:8px}
+#chat-panel.active{display:flex}
+#chat-win{flex:1;overflow-y:auto;background:rgba(0,0,0,.3);border:1px solid var(--bd);
+  border-radius:10px;padding:10px;min-height:0;max-height:calc(100vh - 52px - var(--nav) - 120px)}
+#chat-win::-webkit-scrollbar{width:2px}
+.bubble-wrap{display:flex;flex-direction:column;gap:8px}
+.msg-user{align-self:flex-end;background:linear-gradient(135deg,rgba(168,85,247,.2),rgba(0,255,247,.08));
+  border:1px solid rgba(168,85,247,.3);border-radius:12px 12px 2px 12px;
+  padding:8px 12px;max-width:85%;font-size:12px;line-height:1.6}
+.msg-ai{align-self:flex-start;background:rgba(0,0,0,.4);border:1px solid var(--bd);
+  border-radius:12px 12px 12px 2px;padding:8px 12px;max-width:92%;font-size:12px;line-height:1.6}
+.msg-head{font-size:7px;letter-spacing:2px;color:#444;margin-bottom:4px;font-family:'Orbitron',monospace}
+.msg-ai .msg-head{color:var(--c)}
+.msg-user .msg-head{color:var(--p)}
+#chat-input-area{display:flex;flex-direction:column;gap:6px;
+  background:rgba(0,0,0,.4);border:1px solid var(--bd);border-radius:10px;padding:8px}
+#chat-sel-row{display:flex;gap:6px;align-items:center}
+#model-sel{background:rgba(0,0,0,.5);border:1px solid var(--bd);color:#888;
+  border-radius:6px;padding:4px 8px;font-size:9px;font-family:'Orbitron',monospace;
+  flex:1;outline:none}
+#model-sel option{background:#0a0a1e}
+#agent-toggle{background:rgba(168,85,247,.1);border:1px solid var(--bd2);color:var(--p);
+  border-radius:6px;padding:4px 10px;font-size:7px;font-family:'Orbitron',monospace;
+  cursor:pointer;letter-spacing:1px;white-space:nowrap}
+#agent-toggle.on{background:rgba(255,107,53,.15);border-color:var(--orange);color:var(--orange)}
+#chat-row{display:flex;gap:6px}
+#chat-ta{flex:1;background:transparent;border:none;color:#ddd;font-size:13px;
+  font-family:'Inter',sans-serif;resize:none;outline:none;min-height:36px;max-height:120px;
+  line-height:1.5}
+#chat-ta::placeholder{color:#333}
+#send-btn{background:linear-gradient(135deg,var(--c),var(--p));color:#000;border:none;
+  border-radius:8px;width:40px;height:40px;font-size:16px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  transition:all .2s;font-weight:700}
+#send-btn:hover{transform:scale(1.05);box-shadow:0 0 20px rgba(0,255,247,.4)}
+#send-btn:active{transform:scale(.95)}
+#stop-btn{display:none;background:rgba(255,51,102,.15);border:1px solid var(--red);
+  color:var(--red);border-radius:8px;width:40px;height:40px;font-size:14px;
+  cursor:pointer;align-items:center;justify-content:center;flex-shrink:0}
+.thinking{display:flex;gap:4px;align-items:center;padding:4px 0}
+.dot-pulse{width:6px;height:6px;border-radius:50%;background:var(--c);animation:pulse 1.2s infinite}
+.dot-pulse:nth-child(2){animation-delay:.2s}
+.dot-pulse:nth-child(3){animation-delay:.4s}
+@keyframes pulse{0%,80%,100%{opacity:.2;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+#ai-status{font-size:8px;color:var(--c);letter-spacing:1px;height:14px;font-family:'Orbitron',monospace}
+
+/* ── MEMORY PANEL ── */
+.mem-fact{background:var(--glass);border:1px solid var(--bd);border-radius:8px;
+  padding:10px 12px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.mem-fact-text{font-size:11px;line-height:1.5;flex:1}
+.mem-fact-meta{font-size:7px;color:#444;letter-spacing:1px;margin-top:4px}
+.mem-del{background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;
+  flex-shrink:0;opacity:.5;transition:opacity .2s}
+.mem-del:hover{opacity:1}
+.imp-bar{height:2px;border-radius:1px;margin-top:6px}
+#mem-add-row{display:flex;gap:6px}
+#mem-input{flex:1;background:var(--glass);border:1px solid var(--bd);color:#ddd;
+  border-radius:8px;padding:8px 12px;font-size:12px;outline:none;font-family:'Inter',sans-serif}
+#mem-input:focus{border-color:var(--p)}
+.btn-sm{background:var(--glass2);border:1px solid var(--c);color:var(--c);
+  border-radius:8px;padding:8px 14px;font-size:8px;cursor:pointer;
+  font-family:'Orbitron',monospace;letter-spacing:1px;white-space:nowrap;transition:all .2s}
+.btn-sm:hover{background:rgba(0,255,247,.15)}
+.btn-sm.danger{border-color:var(--red);color:var(--red)}
+.btn-sm.danger:hover{background:rgba(255,51,102,.15)}
+.mem-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px}
+.mem-stat-box{background:var(--glass);border:1px solid var(--bd);border-radius:8px;padding:10px;text-align:center}
+.mem-stat-n{font-family:'Orbitron',monospace;font-size:18px;color:var(--c)}
+.mem-stat-l{font-size:7px;letter-spacing:1px;color:#444}
+
+/* ── SERVICES PANEL ── */
+.svc-card{background:var(--glass);border:1px solid var(--bd);border-radius:10px;padding:12px;
+  display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .3s}
+.svc-card:hover{border-color:var(--p)}
+.svc-icon{font-size:24px;flex-shrink:0}
+.svc-name{font-family:'Orbitron',monospace;font-size:9px;letter-spacing:2px;color:#ccc;margin-bottom:3px}
+.svc-url{font-size:9px;color:#445;letter-spacing:.5px}
+.svc-badge{margin-left:auto;flex-shrink:0}
+.svc-actions{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.svc-act{background:var(--glass);border:1px solid var(--bd);color:#777;
+  border-radius:6px;padding:4px 10px;font-size:7px;cursor:pointer;
+  font-family:'Orbitron',monospace;letter-spacing:1px;transition:all .2s}
+.svc-act:hover{border-color:var(--c);color:var(--c)}
+.model-chip{background:rgba(0,255,247,.06);border:1px solid var(--bd);
+  border-radius:20px;padding:3px 10px;font-size:8px;color:#777;
+  cursor:pointer;transition:all .2s;font-family:'Orbitron',monospace}
+.model-chip:hover{border-color:var(--c);color:var(--c)}
+.model-chip.sel{border-color:var(--c);color:var(--c);background:rgba(0,255,247,.1)}
+.models-grid{display:flex;flex-wrap:wrap;gap:5px}
+
+/* ── TOOLS PANEL ── */
+.tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tool-card{background:var(--glass);border:1px solid var(--bd);border-radius:10px;padding:14px;
+  cursor:pointer;transition:all .3s;text-align:center}
+.tool-card:hover{border-color:var(--p);background:rgba(168,85,247,.05);transform:translateY(-2px)}
+.tool-card:active{transform:scale(.97)}
+.tool-icon{font-size:28px;margin-bottom:8px}
+.tool-name{font-family:'Orbitron',monospace;font-size:8px;letter-spacing:2px;color:#ccc;margin-bottom:4px}
+.tool-desc{font-size:9px;color:#445;line-height:1.4}
+
+/* ── SYSTEM PANEL ── */
+.sys-gauge{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.sys-lbl{font-size:8px;color:#555;letter-spacing:1px;width:60px;flex-shrink:0}
+.sys-track{flex:1;height:6px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden;border:1px solid var(--bd)}
+.sys-fill{height:100%;border-radius:3px;transition:width .5s ease}
+.sys-val{font-family:'Orbitron',monospace;font-size:8px;width:36px;text-align:right;color:#888}
+.log-line{font-size:9px;font-family:monospace;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.03);
+  line-height:1.6;color:#556}
+.log-line.ok{color:#3a6}
+.log-line.err{color:#c35}
+.log-line.warn{color:#ca3}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:calc(var(--nav) + 12px);left:50%;transform:translateX(-50%);
+  background:rgba(0,255,247,.1);border:1px solid var(--c);border-radius:8px;
+  padding:8px 18px;font-size:10px;color:var(--c);z-index:9999;
+  display:none;white-space:nowrap;font-family:'Orbitron',monospace;letter-spacing:1px}
+
+/* ── INSTALL BANNER ── */
+#install-banner{display:none;background:linear-gradient(135deg,rgba(168,85,247,.15),rgba(0,255,247,.08));
+  border:1px solid var(--bd2);border-radius:10px;padding:12px;
+  align-items:center;gap:10px;margin-bottom:4px}
+#install-banner.show{display:flex}
+</style>
+</head>
+<body>
+<div id="shell">
+  <!-- HEADER -->
+  <header id="hdr">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span id="logo">NEXUS</span>
+      <div id="hdr-pills"></div>
+    </div>
+    <span id="hdr-clock"></span>
+  </header>
+
+  <!-- PANELS CONTAINER -->
+  <div id="panels">
+
+    <!-- HOME -->
+    <div class="panel active" id="p-home">
+      <div id="install-banner">
+        <span style="font-size:22px">📲</span>
+        <div style="flex:1">
+          <div style="font-family:'Orbitron',monospace;font-size:9px;letter-spacing:2px;margin-bottom:3px">INSTALL APP</div>
+          <div style="font-size:10px;color:#777">Add to home screen for full-screen access</div>
+        </div>
+        <button onclick="installApp()" class="btn-sm">INSTALL</button>
+        <button onclick="document.getElementById('install-banner').classList.remove('show')" style="background:none;border:none;color:#444;cursor:pointer;font-size:16px">✕</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">SYSTEM STATUS</div>
+        <div class="stat-grid" id="home-stats">
+          <div class="stat-box" onclick="goPanel('p-memory')">
+            <div class="stat-num" id="stat-mem">0</div>
+            <div class="stat-lbl">MEMORY FACTS</div>
+            <div class="stat-sub">Synced to Drive</div>
+          </div>
+          <div class="stat-box" onclick="goPanel('p-services')">
+            <div class="stat-num" id="stat-svc">0</div>
+            <div class="stat-lbl">SERVICES UP</div>
+            <div class="stat-sub">of 5 targets</div>
+          </div>
+          <div class="stat-box" onclick="goPanel('p-system')">
+            <div class="stat-num" id="stat-models">16</div>
+            <div class="stat-lbl">AI MODELS</div>
+            <div class="stat-sub">Ollama local</div>
+          </div>
+          <div class="stat-box" onclick="goPanel('p-chat')">
+            <div class="stat-num" id="stat-sess">1</div>
+            <div class="stat-lbl">SESSION</div>
+            <div class="stat-sub">Chat ready</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">QUICK LAUNCH</div>
+        <div class="quick-grid">
+          <div class="qbtn" onclick="goPanel('p-chat')"><span class="qi">💬</span>CHAT</div>
+          <div class="qbtn" onclick="startAgent()"><span class="qi">🤖</span>AGENT</div>
+          <div class="qbtn" onclick="goPanel('p-memory')"><span class="qi">🧠</span>MEMORY</div>
+          <div class="qbtn" onclick="openUrl('/nexus_hub.html')"><span class="qi">🚀</span>NEXUS HUB</div>
+          <div class="qbtn" onclick="syncMemory()"><span class="qi">☁️</span>SYNC DRIVE</div>
+          <div class="qbtn" onclick="openUrl('/pso-trainer.html')"><span class="qi">⚡</span>PSO BRAIN</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">RECENT MISSIONS</div>
+        <div id="missions-list"><div style="color:#333;font-size:10px;text-align:center;padding:20px">Loading missions...</div></div>
+      </div>
+    </div>
+
+    <!-- CHAT -->
+    <div class="panel" id="p-chat" style="padding:8px;gap:8px">
+      <div id="chat-win">
+        <div class="bubble-wrap" id="bubbles">
+          <div class="msg-ai">
+            <div class="msg-head">NEXUS · READY</div>
+            Nexus Personal is online. I have access to your memory, all services, and can run agent commands. What do you need?
+          </div>
+        </div>
+      </div>
+      <div id="chat-input-area">
+        <div id="chat-sel-row">
+          <select id="model-sel">
+            <option value="nexus-prime:latest">nexus-prime</option>
+            <option value="qwen2.5-coder:7b">qwen2.5-coder</option>
+            <option value="deepseek-r1:8b">deepseek-r1</option>
+            <option value="gemma3:4b">gemma3</option>
+            <option value="llama3.1:8b">llama3.1</option>
+            <option value="qwen3:8b">qwen3</option>
+          </select>
+          <button id="agent-toggle" onclick="toggleAgent()">🤖 AGENT</button>
+        </div>
+        <div id="ai-status"></div>
+        <div id="chat-row">
+          <textarea id="chat-ta" placeholder="Ask anything or give a command..." rows="2"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"></textarea>
+          <button id="send-btn" onclick="sendChat()">➤</button>
+          <button id="stop-btn" onclick="stopChat()">⬛</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MEMORY -->
+    <div class="panel" id="p-memory">
+      <div class="card">
+        <div class="card-title">MEMORY VAULT</div>
+        <div class="mem-stats" id="mem-stats">
+          <div class="mem-stat-box"><div class="mem-stat-n" id="mem-n-active">0</div><div class="mem-stat-l">ACTIVE</div></div>
+          <div class="mem-stat-box"><div class="mem-stat-n" id="mem-n-stale" style="color:var(--orange)">0</div><div class="mem-stat-l">STALE</div></div>
+          <div class="mem-stat-box"><div class="mem-stat-n" id="mem-n-sess" style="color:var(--p)">0</div><div class="mem-stat-l">SESSION</div></div>
+        </div>
+        <div id="mem-add-row" style="margin-bottom:8px">
+          <input id="mem-input" placeholder="Add a permanent memory fact..." onkeydown="if(event.key==='Enter')addMemory()">
+          <button class="btn-sm" onclick="addMemory()">SAVE</button>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+          <button class="btn-sm" onclick="syncMemory()">☁️ SYNC DRIVE</button>
+          <button class="btn-sm" onclick="consolidateMemory()">🧹 CONSOLIDATE</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">ACTIVE FACTS</div>
+        <div id="mem-facts-list"><div style="color:#333;text-align:center;padding:20px;font-size:10px">Loading memory...</div></div>
+      </div>
+    </div>
+
+    <!-- SERVICES -->
+    <div class="panel" id="p-services">
+      <div class="card">
+        <div class="card-title">LIVE SERVICES</div>
+        <div id="svc-list" style="display:flex;flex-direction:column;gap:8px">
+          <div style="color:#333;text-align:center;padding:20px;font-size:10px">Checking services...</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">LOCAL AI MODELS</div>
+        <div class="models-grid" id="models-grid">Loading models...</div>
+      </div>
+    </div>
+
+    <!-- SYSTEM -->
+    <div class="panel" id="p-system">
+      <div class="card">
+        <div class="card-title">RESOURCE MONITOR</div>
+        <div id="sys-gauges">
+          <div class="sys-gauge"><span class="sys-lbl">CPU</span><div class="sys-track"><div class="sys-fill" id="g-cpu" style="background:linear-gradient(90deg,var(--c),var(--p));width:0%"></div></div><span class="sys-val" id="v-cpu">—</span></div>
+          <div class="sys-gauge"><span class="sys-lbl">RAM</span><div class="sys-track"><div class="sys-fill" id="g-ram" style="background:linear-gradient(90deg,var(--p),var(--orange));width:0%"></div></div><span class="sys-val" id="v-ram">—</span></div>
+          <div class="sys-gauge"><span class="sys-lbl">DISK</span><div class="sys-track"><div class="sys-fill" id="g-disk" style="background:linear-gradient(90deg,var(--c),var(--green));width:0%"></div></div><span class="sys-val" id="v-disk">—</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">HUB LINKS</div>
+        <div class="tool-grid">
+          <div class="tool-card" onclick="openUrl('/nexus_hub.html')">
+            <div class="tool-icon">🚀</div>
+            <div class="tool-name">NEXUS HUB</div>
+            <div class="tool-desc">Main control panel</div>
+          </div>
+          <div class="tool-card" onclick="openUrl('/pso-trainer.html')">
+            <div class="tool-icon">⚡</div>
+            <div class="tool-name">PSO BRAIN</div>
+            <div class="tool-desc">Swarm intelligence engine</div>
+          </div>
+          <div class="tool-card" onclick="openUrl('http://127.0.0.1:9100/hub')">
+            <div class="tool-icon">🌌</div>
+            <div class="tool-name">COSMOS</div>
+            <div class="tool-desc">Cognitive orchestration</div>
+          </div>
+          <div class="tool-card" onclick="openUrl('http://127.0.0.1:7701')">
+            <div class="tool-icon">🔐</div>
+            <div class="tool-name">BACKDOOR</div>
+            <div class="tool-desc">Remote access panel</div>
+          </div>
+          <div class="tool-card" onclick="openUrl('https://fliptrigga13.github.io/VEIL-PIERCER/')">
+            <div class="tool-icon">👁️</div>
+            <div class="tool-name">VEILPIERCER</div>
+            <div class="tool-desc">AI agent observatory</div>
+          </div>
+          <div class="tool-card" onclick="openUrl('/nexus_ultra_dashboard.html')">
+            <div class="tool-icon">🎛️</div>
+            <div class="tool-name">DASHBOARD</div>
+            <div class="tool-desc">Ultra control panel</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">SERVER LOG</div>
+        <div id="sys-log" style="max-height:200px;overflow-y:auto">
+          <div class="log-line" style="color:#333">Loading log...</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav id="nav">
+    <button class="ntab active" id="tab-home" onclick="goPanel('p-home','tab-home')">
+      <span class="ni">🏠</span>HOME
+    </button>
+    <button class="ntab" id="tab-chat" onclick="goPanel('p-chat','tab-chat')">
+      <span class="ni">💬</span>CHAT
+    </button>
+    <button class="ntab" id="tab-memory" onclick="goPanel('p-memory','tab-memory')">
+      <span class="ni">🧠</span>MEMORY
+    </button>
+    <button class="ntab" id="tab-services" onclick="goPanel('p-services','tab-services')">
+      <span class="ni">⚡</span>SERVICES
+    </button>
+    <button class="ntab" id="tab-system" onclick="goPanel('p-system','tab-system')">
+      <span class="ni">🖥️</span>SYSTEM
+    </button>
+  </nav>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── NAV ──────────────────────────────────────────────────────────────────
+const PANELS={'p-home':'tab-home','p-chat':'tab-chat','p-memory':'tab-memory','p-services':'tab-services','p-system':'tab-system'};
+let curPanel='p-home';
+function goPanel(pid,tid){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('active'));
+  const p=document.getElementById(pid);if(p)p.classList.add('active');
+  const t=document.getElementById(tid||PANELS[pid]);if(t)t.classList.add('active');
+  curPanel=pid;
+  if(pid==='p-memory')loadMemory();
+  if(pid==='p-services')loadServices();
+  if(pid==='p-system')loadSystem();
+}
+
+// ── CLOCK ────────────────────────────────────────────────────────────────
+function clock(){
+  const n=new Date();
+  document.getElementById('hdr-clock').textContent=
+    n.toLocaleTimeString('en-US',{hour12:false})+' '+
+    ['SUN','MON','TUE','WED','THU','FRI','SAT'][n.getDay()];
+}
+clock();setInterval(clock,1000);
+
+// ── TOAST ────────────────────────────────────────────────────────────────
+let _toastT;
+function toast(msg,dur=2500){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.style.display='block';
+  clearTimeout(_toastT);_toastT=setTimeout(()=>el.style.display='none',dur);
+}
+
+// ── SERVICES ─────────────────────────────────────────────────────────────
+const SERVICES=[
+  {name:'OLLAMA',icon:'🤖',url:'http://127.0.0.1:11434',check:'/api/tags',color:'var(--c)',desc:'Local AI models'},
+  {name:'NEXUS HUB',icon:'🚀',url:'http://127.0.0.1:3000',check:'/api/status',color:'var(--p)',desc:'Hub server'},
+  {name:'COSMOS',icon:'🌌',url:'http://127.0.0.1:9100',check:'/health',color:'var(--gold)',desc:'Cognitive swarm'},
+  {name:'BACKDOOR',icon:'🔐',url:'http://127.0.0.1:7701',check:'/health',color:'var(--orange)',desc:'Remote access'},
+  {name:'OPENCLAW',icon:'🦾',url:'http://127.0.0.1:11435',check:'/status',color:'var(--green)',desc:'Agent executor'},
+];
+
+async function checkSvc(svc){
+  try{
+    const r=await fetch(svc.url+svc.check,{signal:AbortSignal.timeout(2000)});
+    return r.status<500;
+  }catch{return false;}
+}
+
+async function loadServices(){
+  const list=document.getElementById('svc-list');
+  list.innerHTML='';
+  let upCount=0;
+  for(const svc of SERVICES){
+    const el=document.createElement('div');
+    el.className='svc-card';
+    el.innerHTML=`<span class="svc-icon">${svc.icon}</span>
+      <div style="flex:1"><div class="svc-name">${svc.name}</div>
+      <div class="svc-url">${svc.url}</div>
+      <div class="svc-actions">
+        <button class="svc-act" onclick="openUrl('${svc.url}')">OPEN</button>
+        <button class="svc-act" onclick="window.location='${svc.url}'">LAUNCH</button>
+      </div></div>
+      <div class="svc-badge"><div id="badge-${svc.name}" class="offline-badge">CHECKING</div></div>`;
+    list.appendChild(el);
+    checkSvc(svc).then(ok=>{
+      const badge=document.getElementById(`badge-${svc.name}`);
+      if(badge){badge.className=ok?'online-badge':'offline-badge';badge.textContent=ok?'ONLINE':'OFFLINE';}
+      // Update pill in header
+      const pill=document.querySelector(`.hpill[data-svc="${svc.name}"]`);
+      if(pill){pill.className=`hpill ${ok?'on':'off'}`;}
+      if(ok)upCount++;
+      document.getElementById('stat-svc').textContent=upCount;
+    });
+  }
+  // Load models
+  try{
+    const r=await fetch('/api/models-list').catch(()=>fetch('http://127.0.0.1:11434/api/tags'));
+    const d=await r.json();
+    const models=(d.models||[]).map(m=>m.name);
+    document.getElementById('stat-models').textContent=models.length;
+    const grid=document.getElementById('models-grid');
+    grid.innerHTML=models.map(m=>`<div class="model-chip" onclick="selectModel('${m}')">${m.split(':')[0]}</div>`).join('');
+  }catch{document.getElementById('models-grid').innerHTML='<div style="color:#333;font-size:10px">Ollama offline</div>';}
+}
+
+function selectModel(m){
+  document.getElementById('model-sel').value=m;
+  toast(`Model: ${m}`);goPanel('p-chat');
+}
+
+// ── Pills in header ───────────────────────────────────────────────────────
+function buildPills(){
+  const c=document.getElementById('hdr-pills');
+  c.innerHTML=SERVICES.slice(0,4).map(s=>
+    `<div class="hpill off" data-svc="${s.name}">${s.name}</div>`
+  ).join('');
+}
+buildPills();
+
+async function pollPills(){
+  let up=0;
+  for(const svc of SERVICES){
+    const ok=await checkSvc(svc);
+    const pill=document.querySelector(`.hpill[data-svc="${svc.name}"]`);
+    if(pill){pill.className=`hpill ${ok?'on':'off'}`;}
+    if(ok)up++;
+  }
+  document.getElementById('stat-svc').textContent=up;
+}
+pollPills();setInterval(pollPills,30000);
+
+// ── MISSIONS ─────────────────────────────────────────────────────────────
+async function loadMissions(){
+  try{
+    const r=await fetch('/missions');
+    const d=await r.json();
+    const list=document.getElementById('missions-list');
+    const missions=(d.missions||[]).slice(0,5);
+    if(!missions.length){list.innerHTML='<div style="color:#333;font-size:10px;text-align:center;padding:16px">No missions yet</div>';return;}
+    list.innerHTML=missions.map(m=>`
+      <div class="mission-item">
+        ${m.task||m.description||JSON.stringify(m).slice(0,100)}
+        <div class="mt">${m.created_at||m.timestamp||''}</div>
+      </div>`).join('');
+  }catch{document.getElementById('missions-list').innerHTML='<div style="color:#333;font-size:10px;text-align:center;padding:16px">Hub offline</div>';}
+}
+loadMissions();
+
+// ── MEMORY ────────────────────────────────────────────────────────────────
+async function loadMemory(){
+  try{
+    const r=await fetch('/api/memory');
+    const d=await r.json();
+    document.getElementById('mem-n-active').textContent=d.active||0;
+    document.getElementById('mem-n-stale').textContent=d.stale||0;
+    document.getElementById('mem-n-sess').textContent=d.session_count||1;
+    document.getElementById('stat-mem').textContent=d.active||0;
+    document.getElementById('stat-sess').textContent=d.session_count||1;
+    const list=document.getElementById('mem-facts-list');
+    if(!d.facts||!d.facts.length){
+      list.innerHTML='<div style="color:#333;text-align:center;padding:20px;font-size:10px">No memories yet. Chat to build memory, or add facts manually.</div>';
+      return;
+    }
+    list.innerHTML=d.facts.map(f=>`
+      <div class="mem-fact" id="mf-${f.id}">
+        <div style="flex:1">
+          <div class="mem-fact-text">${f.content}</div>
+          <div class="mem-fact-meta">${f.type.toUpperCase()} · IMP ${Math.round(f.importance*100)}% · accessed ${f.access_count}×</div>
+          <div class="imp-bar" style="background:linear-gradient(90deg,var(--c),var(--p));width:${f.importance*100}%;opacity:.4"></div>
+        </div>
+        <button class="mem-del" onclick="deleteFact('${f.id}')">✕</button>
+      </div>`).join('');
+  }catch{document.getElementById('mem-facts-list').innerHTML='<div style="color:var(--red);font-size:10px;padding:10px">Memory API offline</div>';}
+}
+
+async function addMemory(){
+  const input=document.getElementById('mem-input');
+  const v=input.value.trim();if(!v)return;
+  await fetch('/api/memory',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:v,type:'manual',importance:.9})});
+  input.value='';toast('✓ Memory saved to Drive');loadMemory();
+}
+
+async function deleteFact(id){
+  await fetch(`/api/memory/${id}`,{method:'DELETE'});
+  document.getElementById(`mf-${id}`)?.remove();
+  toast('Removed');
+}
+
+async function syncMemory(){
+  toast('⏳ Syncing to Google Drive...',4000);
+  const r=await fetch('/api/memory/sync-now',{method:'POST'}).catch(()=>null);
+  if(r?.ok){const d=await r.json();toast(`☁️ Synced ${d.synced?.filter(x=>x.ok).length} files`);}
+  else toast('❌ Sync failed');
+}
+
+async function consolidateMemory(){
+  const r=await fetch('/api/memory/consolidate',{method:'POST'}).catch(()=>null);
+  if(r?.ok){const d=await r.json();toast(`🧹 Pruned ${d.pruned} stale facts`);loadMemory();}
+}
+
+// ── SYSTEM ────────────────────────────────────────────────────────────────
+async function loadSystem(){
+  try{
+    const r=await fetch('/api/system-status');
+    const d=await r.json();
+    if(d.cpu!==undefined){
+      const cpu=Math.min(d.cpu,100);
+      document.getElementById('g-cpu').style.width=cpu+'%';
+      document.getElementById('v-cpu').textContent=cpu+'%';
+    }
+    if(d.memory!==undefined){
+      const mem=Math.min(d.memory,100);
+      document.getElementById('g-ram').style.width=mem+'%';
+      document.getElementById('v-ram').textContent=mem+'%';
+    }
+    if(d.disk!==undefined){
+      const disk=Math.min(d.disk,100);
+      document.getElementById('g-disk').style.width=disk+'%';
+      document.getElementById('v-disk').textContent=disk+'%';
+    }
+  }catch{}
+  // Swarm queue for log
+  try{
+    const r=await fetch('/queue');
+    const d=await r.json();
+    const log=document.getElementById('sys-log');
+    const items=(d.queue||[]).slice(-8).reverse();
+    log.innerHTML=items.length
+      ?items.map(q=>`<div class="log-line ok">⚡ ${(q.task||'').slice(0,80)}</div>`).join('')
+      :'<div class="log-line">Queue empty</div>';
+  }catch{document.getElementById('sys-log').innerHTML='<div class="log-line err">Hub offline</div>';}
+}
+
+// ── CHAT ─────────────────────────────────────────────────────────────────
+let _abort=null,_agentOn=false;
+function toggleAgent(){
+  _agentOn=!_agentOn;
+  const btn=document.getElementById('agent-toggle');
+  btn.className=`${_agentOn?'on':''}`;
+  btn.textContent=_agentOn?'🟠 AGENT ON':'🤖 AGENT';
+  document.getElementById('chat-ta').placeholder=_agentOn
+    ?'Agent mode: tell AI what to DO on your PC...'
+    :'Ask anything or give a command...';
+  toast(_agentOn?'🤖 Agent mode ON — AI runs commands':'💬 Chat mode');
+}
+
+function startAgent(){_agentOn=true;const btn=document.getElementById('agent-toggle');btn.className='on';btn.textContent='🟠 AGENT ON';goPanel('p-chat');}
+
+function addBubble(role,text,isThinking=false){
+  const wrap=document.getElementById('bubbles');
+  const div=document.createElement('div');
+  div.className=role==='user'?'msg-user':'msg-ai';
+  if(!isThinking){
+    div.innerHTML=`<div class="msg-head">${role==='user'?'YOU':'NEXUS'} · ${new Date().toLocaleTimeString('en-US',{hour12:false})}</div>${text}`;
+  }else{
+    div.innerHTML=`<div class="msg-head">NEXUS · THINKING</div><div class="thinking"><div class="dot-pulse"></div><div class="dot-pulse"></div><div class="dot-pulse"></div></div>`;
+    div.id='thinking-bubble';
+  }
+  wrap.appendChild(div);
+  div.scrollIntoView({behavior:'smooth',block:'end'});
+  return div;
+}
+
+async function sendChat(){
+  const ta=document.getElementById('chat-ta');
+  const msg=ta.value.trim();if(!msg)return;
+  ta.value='';addBubble('user',msg);
+  const model=document.getElementById('model-sel').value||'nexus-prime:latest';
+  const st=document.getElementById('ai-status');
+  st.textContent='⚡ Generating...';
+  document.getElementById('send-btn').style.opacity='.4';
+  document.getElementById('stop-btn').style.display='flex';
+  const think=addBubble('ai','',true);
+  _abort=new AbortController();
+  let full='';
+  try{
+    const r=await fetch('/chat/stream',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({message:msg,model}),signal:_abort.signal
+    });
+    if(!r.ok){think.remove();addBubble('ai',`Error: server returned ${r.status}. Is Ollama running?`);return;}
+    const reader=r.body.getReader();const dec=new TextDecoder();let buf='';
+    think.remove();
+    const aiBub=addBubble('ai','');
+    const textNode=aiBub.childNodes[1]||aiBub;
+    aiBub.innerHTML=`<div class="msg-head">NEXUS · ${new Date().toLocaleTimeString('en-US',{hour12:false})}</div><span id="ai-out"></span>`;
+    const out=document.getElementById('ai-out');
+    while(true){
+      const{done,value}=await reader.read();if(done)break;
+      buf+=dec.decode(value,{stream:true});
+      const lines=buf.split('\n');buf=lines.pop();
+      for(const ln of lines){
+        if(!ln.startsWith('data:'))continue;
+        try{const d=JSON.parse(ln.slice(5));
+          if(d.token){full+=d.token;out.textContent=full;aiBub.scrollIntoView({block:'end'});}
+        }catch{}
+      }
+    }
+    if(!full)out.textContent='[No response — is Ollama running?]';
+  }catch(e){
+    think.remove();
+    if(e.name!=='AbortError')addBubble('ai','Error: '+e.message);
+  }finally{
+    _abort=null;st.textContent='';
+    document.getElementById('send-btn').style.opacity='';
+    document.getElementById('stop-btn').style.display='none';
+  }
+}
+
+function stopChat(){if(_abort){_abort.abort();_abort=null;}toast('⬛ Stopped');}
+function openUrl(u){window.open(u,'_blank');}
+
+// ── PWA INSTALL ───────────────────────────────────────────────────────────
+let _deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();_deferredPrompt=e;
+  document.getElementById('install-banner').classList.add('show');
+});
+async function installApp(){
+  if(!_deferredPrompt)return;
+  _deferredPrompt.prompt();
+  const r=await _deferredPrompt.userChoice;
+  _deferredPrompt=null;
+  document.getElementById('install-banner').classList.remove('show');
+  if(r.outcome==='accepted')toast('✓ App installed!');
+}
+window.addEventListener('appinstalled',()=>toast('✓ Nexus installed on home screen!'));
+
+// ── SWIPE NAV ─────────────────────────────────────────────────────────────
+const PANEL_ORDER=['p-home','p-chat','p-memory','p-services','p-system'];
+const TAB_ORDER=['tab-home','tab-chat','tab-memory','tab-services','tab-system'];
+let _sx=null;
+document.getElementById('panels').addEventListener('touchstart',e=>{_sx=e.touches[0].clientX;},{passive:true});
+document.getElementById('panels').addEventListener('touchend',e=>{
+  if(_sx===null)return;
+  const dx=e.changedTouches[0].clientX-_sx;
+  if(Math.abs(dx)<70){_sx=null;return;}
+  const ci=PANEL_ORDER.indexOf(curPanel);
+  const ni=dx<0?Math.min(ci+1,PANEL_ORDER.length-1):Math.max(ci-1,0);
+  if(ni!==ci)goPanel(PANEL_ORDER[ni],TAB_ORDER[ni]);
+  _sx=null;
+},{passive:true});
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+loadMemory();
+setInterval(loadMemory,60000);
+setInterval(loadSystem,10000);
+</script>
+</body>
+</html>
