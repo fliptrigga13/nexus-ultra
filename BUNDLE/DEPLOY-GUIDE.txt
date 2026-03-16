@@ -1,0 +1,16 @@
+VEILPIERCER — DEPLOYMENT GUIDE
+========================================
+
+Congratulations on your purchase of VeilPiercer.
+
+QUICK START:
+1. Open index.html in any modern browser.
+2. Enter your Personal Access Token when prompted.
+3. Point the connection to your NEXUS ULTRA server.
+
+INTEGRATION (Pro/Agency):
+- Drop 'veilpiercer.py' (Python) or 'veilpiercer.js' (Node.js) into your agent folder.
+- Follow the code examples in the SDK files to pipe real-time telemetry to your Hub.
+
+SUPPORT:
+Email support@veilpiercer.com for technical integration help.

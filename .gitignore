@@ -51,3 +51,10 @@ installer/Output/
 
 # ── Netlify ──────────────────────────────────────────────────────────────────
 .netlify
+
+access-tokens.json
+feedback.json
+*.modelfile
+*.log
+node_modules/
+.vercel/

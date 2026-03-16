@@ -724,12 +724,7 @@
 
     <!-- LEFT: USE CASES -->
     <div id="left-panel">
-      <div class="lp-title">Active Observatories</div>
-      <div id="active-agents-list">
-        <!-- populated live -->
-        <div style="padding:20px; color:#444; font-size:9px; text-align:center;">Listening for signals...</div>
-      </div>
-      <div style="display:none">
+      <div class="lp-title">What This Is Used For</div>
 
       <div class="uc-card active-vis" onclick="selectUseCase('ai-support')">
         <div class="uc-header">
@@ -1033,44 +1028,6 @@
     }
 
     verifyAndUnlock();
-
-    // ── LIVE POLLING ENGINE ───────────────────────────────────────
-    let seenAgents = new Set();
-    async function pollSignals() {
-      const token = new URLSearchParams(window.location.search).get('token');
-      if (!token) return;
-      try {
-        const r = await fetch(`${NEXUS}/veilpiercer/signals?token=${token}`);
-        const d = await r.json();
-        if (!d.ok || !d.events) return;
-        const agents = [...new Set(d.events.map(e => (e.data && e.data.agent) ? e.data.agent : null).filter(Boolean))];
-        if (agents.length > 0) {
-          const list = document.getElementById('active-agents-list');
-          let html = '';
-          agents.forEach(a => {
-            if (!seenAgents.has(a)) { seenAgents.add(a); addAI('VEILPIERCER', `New active agent: <strong>${a}</strong>`, 'system'); }
-            const isActive = document.getElementById('cb-use-case').textContent === a;
-            html += `<div class="uc-card ${isActive ? 'active-vis' : ''}" onclick="selectLiveAgent('${a}')">
-                <div class="uc-header"><div class="uc-icon">🤖</div><div class="uc-name" style="color:var(--vis)">${a}</div><span style="font-size:7px;color:#00ff99;margin-left:auto;animation:pulse 1s infinite">LIVE</span></div>
-                <div class="uc-desc">Connected node emitting telemetry.</div></div>`;
-          });
-          if (list) list.innerHTML = html;
-        }
-        d.events.slice(0, 1).forEach(e => {
-          if (e.ts > (window.lastSignalTs || "")) {
-            window.lastSignalTs = e.ts;
-            const ph = document.getElementById(`ph-${e.pillar}`);
-            if (ph) { ph.style.borderColor = 'white'; setTimeout(() => ph.style.borderColor = '', 200); }
-            emitEvent(e.msg, e.pillar);
-          }
-        });
-      } catch (e) { }
-    }
-    function selectLiveAgent(name) {
-      document.getElementById('cb-use-case').textContent = name;
-      addAI('VEILPIERCER', `Monitoring live feed: <strong>${name}</strong>`, 'agent');
-    }
-    setInterval(pollSignals, 3000);
 
     const bgC = document.getElementById('bg-canvas');
     const nc = document.getElementById('node-canvas');

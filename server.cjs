@@ -276,6 +276,8 @@ const HUB_PUBLIC_ROUTES = [
   '/api/result',          // live swarm result — polled by VeilPiercer frontend
   '/api/results',         // recent swarm outputs — polled by VeilPiercer frontend
   '/veilpiercer-command.html', // public for buyers (token-gated internally)
+  '/veilpiercer/command',    // Hub AI & signal endpoint
+  '/veilpiercer/signals',    // Hub telemetry polling
   '/public/stats',        // public social proof stats
 ];
 // Hub pages + new endpoints that need the password:
@@ -289,8 +291,9 @@ const HUB_PROTECTED_PAGES = [
 ];
 app.use((req, res, next) => {
   const p = req.path;
-  // Always allow public routes
-  if (HUB_PUBLIC_ROUTES.some(r => p.startsWith(r))) return next();
+  const isPublic = HUB_PUBLIC_ROUTES.some(r => p.startsWith(r));
+  if (isPublic) return next();
+  
   // Check if this is a protected hub route
   const needsAuth = HUB_PROTECTED_PAGES.some(r => p.startsWith(r))
     || p === '/' || p.match(/\.html$/);
@@ -528,15 +531,12 @@ app.get('/download', async (req, res) => {
   if (!entry) return res.status(403).json({ ok: false, error: 'Invalid or expired token' });
 
   const tier = entry.tier || 'Starter';
-  const VEIL_DIR = path.join('C:\\Users\\fyou1\\Desktop\\julia\\VEIL-PIERCER');
-
-  // What each tier gets
+  const VEIL_DIR = path.join(ROOT, 'BUNDLE');
   const TIER_FILES = {
     Starter: ['index.html', 'DEPLOY-GUIDE.txt', 'PROTOCOL-GUIDE.txt'],
-    Pro: ['index.html', 'DEPLOY-GUIDE.txt', 'PROTOCOL-GUIDE.txt', 'PRO-NEXUS-SETUP.txt'],
-    Agency: ['index.html', 'DEPLOY-GUIDE.txt', 'PROTOCOL-GUIDE.txt', 'PRO-NEXUS-SETUP.txt', 'AGENCY-RIGHTS.txt'],
+    Pro: ['index.html', 'DEPLOY-GUIDE.txt', 'PROTOCOL-GUIDE.txt', 'NEXUS-CONNECT.ps1', 'veilpiercer.py', 'veilpiercer.js'],
+    Agency: ['index.html', 'DEPLOY-GUIDE.txt', 'PROTOCOL-GUIDE.txt', 'NEXUS-CONNECT.ps1', 'veilpiercer.py', 'veilpiercer.js'],
   };
-
   const filesToZip = TIER_FILES[tier] || TIER_FILES.Starter;
   const zipName = `VeilPiercer-${tier}-Bundle.zip`;
 
@@ -2853,4 +2853,69 @@ app.get('/veilpiercer', (req, res) => {
 });
 
 // (server already started at line ~2142)
+
+// ── VEILPIERCER: COMMAND & TELEMETRY ENGINE ──────────────────────────────────
+// This connects the Buyer's Observatory to the NEXUS Core.
+
+app.post('/veilpiercer/command', async (req, res) => {
+  const { token, command, protocol, scores, useCase } = req.body || {};
+  if (!token) return res.status(403).json({ ok: false, error: 'Token required' });
+
+  // 1. Verify token
+  const db = loadAccessDB();
+  const entry = db[token];
+  if (!entry) return res.status(403).json({ ok: false, error: 'Invalid token' });
+
+  // 2. Log signal if provided
+  if (scores && useCase) {
+    agentEvent('telemetry', scores.saf < 50 ? 'saf' : scores.priv > 90 ? 'priv' : 'vis', 
+               `Signal received from ${useCase}: ${command || 'Periodic update'}`, 
+               { ...scores, ok: true, agent: useCase });
+  }
+
+  // 3. Handle Protocols (Optional: could trigger real system changes)
+  if (protocol) {
+    log(`VEILPIERCER [${entry.email}]: Protocol Shift → ${protocol}`);
+  }
+
+  // 4. AI Reasoning (if Pro/Agency)
+  const features = {
+    Starter: { aiAudit: false },
+    Pro: { aiAudit: true },
+    Agency: { aiAudit: true }
+  }[entry.tier] || { aiAudit: false };
+
+  let aiResponse = "";
+  if (features.aiAudit && command) {
+    try {
+      const payload = JSON.stringify({ 
+        model: 'llama3.2:1b', 
+        system: 'You are the VeilPiercer Security AI. Briefly explain the security implications of the users command or signal. Be professional and technical.', 
+        prompt: `User (${entry.tier}) sent command/signal: "${command}". Current Scores: ${JSON.stringify(scores)}. Protocol: ${protocol}.`, 
+        stream: false 
+      });
+      const http = require('http');
+      const result = await new Promise((resolve, reject) => {
+        const r = http.request({ hostname: 'localhost', port: 11434, path: '/api/generate', method: 'POST', headers: { 'Content-Type': 'application/json' } }, resp => { let b = ''; resp.on('data', d => b += d); resp.on('end', () => { try { resolve(JSON.parse(b)); } catch { resolve({}); } }); });
+        r.on('error', reject); r.write(payload); r.end();
+      });
+      aiResponse = result.response || "";
+    } catch (e) { log(`VP AI Error: ${e.message}`); }
+  }
+
+  res.json({ ok: true, response: aiResponse, scores: calcVPScores() });
+});
+
+app.get('/veilpiercer/signals', (req, res) => {
+  const { token } = req.query;
+  if (!token) return res.status(403).json({ ok: false, error: 'Token required' });
+  const db = loadAccessDB();
+  if (!db[token]) return res.status(403).json({ ok: false, error: 'Access denied' });
+
+  res.json({ 
+    ok: true, 
+    events: AGENT_EVENTS.slice(-20).reverse(), 
+    metrics: calcVPScores() 
+  });
+});
 

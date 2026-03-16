@@ -1,0 +1,18 @@
+VEILPIERCER — PROTOCOL GUIDE
+========================================
+
+OPERATIONAL MODES:
+
+◈ NOMINAL MODE
+The standard operating environment. All agents perform within 
+established baseline constraints. Focus: Stability and Accuracy.
+
+◈ LITE MODE
+Low-latency, lightweight reasoning. 30-40% faster response 
+times with slightly reduced complexity depth. 
+Best for: Chat and Basic Analysis.
+
+◈ GOD MODE (Restricted)
+Full agent autonomy and maximum reasoning depth. 
+Caution: High resource consumption.
+Best for: Scaling and Critical System Repair.
