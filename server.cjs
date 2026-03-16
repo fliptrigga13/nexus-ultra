@@ -275,6 +275,8 @@ const HUB_PUBLIC_ROUTES = [
   '/api/ping-services',  // health check — public so hub works unauthed
   '/api/result',          // live swarm result — polled by VeilPiercer frontend
   '/api/results',         // recent swarm outputs — polled by VeilPiercer frontend
+  '/veilpiercer-command.html', // public for buyers (token-gated internally)
+  '/public/stats',        // public social proof stats
 ];
 // Hub pages + new endpoints that need the password:
 const HUB_PROTECTED_PAGES = [
@@ -450,6 +452,15 @@ app.get('/status', (req, res) => {
     log_size_kb: (() => { try { return (fs.statSync(LOG_FILE).size / 1024).toFixed(1); } catch (_) { return 0; } })(),
     access_tokens: (() => { try { return Object.keys(loadAccessDB()).length; } catch { return 0; } })(),
     email_configured: !!(EMAIL_USER && EMAIL_PASS),
+  });
+});
+
+app.get('/public/stats', (req, res) => {
+  const db = loadAccessDB();
+  res.json({
+    ok: true,
+    deployments: Object.keys(db).length,
+    uptime_days: (process.uptime() / 86400).toFixed(1)
   });
 });
 
@@ -1738,7 +1749,7 @@ function buildWorldStatePrompt(db) {
       const sf = fs.existsSync(sfFile) ? JSON.parse(fs.readFileSync(sfFile, 'utf8')) : { facts: [] };
       const chatsDir = path.join(__dirname, 'chats');
       const chatFiles = fs.existsSync(chatsDir) ? fs.readdirSync(chatsDir).filter(f => f.endsWith('.json')) : [];
-      const tokFile = path.join(__dirname, '.EH API_token');
+      const tokFile = path.join(__dirname, '.eh_token');
       return {
         swarm_status: bb.status || 'UNKNOWN',
         swarm_task: (bb.task || '[none]').slice(0, 80),
@@ -1748,7 +1759,7 @@ function buildWorldStatePrompt(db) {
         memory_entries: Array.isArray(memEntries) ? memEntries.length : 0,
         session_facts: sf.facts.length,
         chat_files: chatFiles.length,
-        EH API_token: fs.existsSync(tokFile) ? 'PRESENT' : 'MISSING',
+        EH_API_token: fs.existsSync(tokFile) ? 'PRESENT' : 'MISSING',
         ts: new Date().toISOString(),
       };
     } catch (e) { return { error: e.message }; }
@@ -1759,12 +1770,11 @@ function buildWorldStatePrompt(db) {
   prompt += `  swarm.status=${liveState.swarm_status} | last_score=${liveState.swarm_last_score} | mvp=${liveState.swarm_last_mvp}\n`;
   prompt += `  swarm.current_task="${liveState.swarm_task}"\n`;
   prompt += `  memory.entries=${liveState.memory_entries} | session_facts=${liveState.session_facts}\n`;
-  prompt += `  chats.daily_files=${liveState.chat_files} | EH API_token=${liveState.EH API_token
-} \n`;
+  prompt += `  chats.daily_files=${liveState.chat_files} | EH_API_token=${liveState.EH_API_token}\n`;
   if (scored.length) {
     prompt += '\nVERIFIED FACTS (top by relevance):\n';
-    scored.forEach((f,i) => {
-      prompt += `${ i + 1 }.[imp: ${ f.importance }] ${ f.content } \n`;
+    scored.forEach((f, i) => {
+      prompt += `${i + 1}.[imp: ${f.importance}] ${f.content} \n`;
       f.last_accessed = new Date().toISOString();
       f.access_count = (f.access_count || 0) + 1;
     });
@@ -1781,7 +1791,7 @@ function detectStaleMemories(db) {
     const ageDays = (now - new Date(f.created_at).getTime()) / 86400000;
     if (ageDays > 30 && !f.stale) { f.stale = true; staleCount++; }
   });
-  if (staleCount) log(`MEMORY: ${ staleCount } facts marked stale(> 30 days)`);
+  if (staleCount) log(`MEMORY: ${staleCount} facts marked stale(> 30 days)`);
 }
 
 // ── Memory API endpoints ──────────────────────────────────────────────────
@@ -1789,23 +1799,25 @@ app.get('/api/memory', (req, res) => {
   const db = loadMemoryDB();
   detectStaleMemories(db);
   const active = db.facts.filter(f => !f.stale);
-  const stale  = db.facts.filter(f => f.stale);
-  res.json({ ok:true, total:db.facts.length, active:active.length, stale:stale.length,
-    facts: active, world_state: db.world_state, session_count: db.session_count });
+  const stale = db.facts.filter(f => f.stale);
+  res.json({
+    ok: true, total: db.facts.length, active: active.length, stale: stale.length,
+    facts: active, world_state: db.world_state, session_count: db.session_count
+  });
 });
 
 app.post('/api/memory', (req, res) => {
-  const { content, type='manual', importance=0.9, tags=[] } = req.body || {};
-  if (!content) return res.status(400).json({ ok:false, error:'content required' });
+  const { content, type = 'manual', importance = 0.9, tags = [] } = req.body || {};
+  if (!content) return res.status(400).json({ ok: false, error: 'content required' });
   const db = loadMemoryDB();
   const fact = {
-    id: `m_${ Date.now() } `, content, type, importance,
+    id: `m_${Date.now()} `, content, type, importance,
     created_at: new Date().toISOString(), last_accessed: new Date().toISOString(),
     access_count: 1, stale: false, tags
   };
   db.facts.push(fact);
   saveMemoryDB(db);
-  res.json({ ok:true, fact, total: db.facts.length });
+  res.json({ ok: true, fact, total: db.facts.length });
 });
 
 app.delete('/api/memory/:id', (req, res) => {
@@ -1813,7 +1825,7 @@ app.delete('/api/memory/:id', (req, res) => {
   const before = db.facts.length;
   db.facts = db.facts.filter(f => f.id !== req.params.id);
   saveMemoryDB(db);
-  res.json({ ok:true, removed: before - db.facts.length });
+  res.json({ ok: true, removed: before - db.facts.length });
 });
 
 app.post('/api/memory/consolidate', (req, res) => {
@@ -1827,12 +1839,12 @@ app.post('/api/memory/consolidate', (req, res) => {
   });
   db.last_consolidated = new Date().toISOString();
   saveMemoryDB(db);
-  res.json({ ok:true, before, after: db.facts.length, pruned: before - db.facts.length });
+  res.json({ ok: true, before, after: db.facts.length, pruned: before - db.facts.length });
 });
 
 app.post('/api/memory/sync-now', (req, res) => {
   // Force immediate sync of all memory files to Google Drive
-  const files = ['nexus_session_facts.json','nexus_memory.json','nexus_blackboard.json'];
+  const files = ['nexus_session_facts.json', 'nexus_memory.json', 'nexus_blackboard.json'];
   const results = [];
   for (const file of files) {
     const src = path.join(ROOT, file);
@@ -1843,9 +1855,9 @@ app.post('/api/memory/sync-now', (req, res) => {
         { timeout: 30000 }
       );
       results.push({ file, ok: true });
-    } catch(e) { results.push({ file, ok: false, error: e.message.slice(0,100) }); }
+    } catch (e) { results.push({ file, ok: false, error: e.message.slice(0, 100) }); }
   }
-  res.json({ ok:true, synced: results, remote: MEMORY_REMOTE });
+  res.json({ ok: true, synced: results, remote: MEMORY_REMOTE });
 });
 
 // Startup: increment session count, detect stale, sync
@@ -1855,21 +1867,21 @@ setImmediate(() => {
     db.session_count = (db.session_count || 0) + 1;
     detectStaleMemories(db);
     saveMemoryDB(db);
-    log(`MEMORY: Session #${ db.session_count } — ${ db.facts.filter(f => !f.stale).length } active facts loaded`);
-  } catch(e) { log(`MEMORY init error: ${ e.message } `); }
+    log(`MEMORY: Session #${db.session_count} — ${db.facts.filter(f => !f.stale).length} active facts loaded`);
+  } catch (e) { log(`MEMORY init error: ${e.message} `); }
 });
 
 // ── Schedule memory sync to Google Drive every 5 minutes ─────────────────
 setInterval(() => {
-  const files = ['nexus_session_facts.json','nexus_memory.json','nexus_blackboard.json','tabs.json'];
+  const files = ['nexus_session_facts.json', 'nexus_memory.json', 'nexus_blackboard.json', 'tabs.json'];
   for (const file of files) {
     const src = path.join(ROOT, file);
     if (!fs.existsSync(src)) continue;
     require('child_process').spawn(RCLONE_EXE, [
-      'copyto', src, `${ MEMORY_REMOTE }/${file}`, '--log-level', 'ERROR'
+      'copyto', src, `${MEMORY_REMOTE}/${file}`, '--log-level', 'ERROR'
     ], { detached: true, stdio: 'ignore' }).unref();
   }
-log('MEMORY: Auto-sync to Google Drive ✓');
+  log('MEMORY: Auto-sync to Google Drive ✓');
 }, 5 * 60 * 1000);
 
 // ── EH API WATCHDOG — always keep :7701 alive ───────────────────────────
@@ -1878,10 +1890,10 @@ const PYTHON_EXE = (() => {
   for (const c of candidates) { try { require('child_process').execSync(`"${c}" --version`, { timeout: 2000 }); return c; } catch { } }
   return 'python';
 })();
-const EH API_PY = path.join(__dirname, 'nexus_eh.py');
-let _EH APIProc = null;
+const EH_API_PY = path.join(__dirname, 'nexus_eh.py');
+let _EH_APIProc = null;
 
-function startEH API() {
+function startEH_API() {
   // First check if :7701 is already alive — don't conflict with existing process
   const http = require('http');
   const probe = http.get('http://127.0.0.1:7701/health', { timeout: 3000 }, (res) => {
@@ -1889,39 +1901,39 @@ function startEH API() {
   });
   probe.on('error', () => {
     // Not reachable — spawn it
-    if (_EH APIProc && !_EH APIProc.killed) return;
-  if (!fs.existsSync(EH API_PY)) { log('WATCHDOG: nexus_eh.py not found'); return; }
-  log('WATCHDOG: EH API unreachable — spawning...');
-    _EH APIProc = require('child_process').spawn(PYTHON_EXE, [EH API_PY], {
-    cwd: __dirname, detached: false, stdio: ['ignore', 'pipe', 'pipe']
-  });
-    _EH APIProc.stdout.on('data', d => log(`EH: ${d.toString().trim().slice(0, 120)}`));
-    _EH APIProc.stderr.on('data', d => log(`EH-ERR: ${d.toString().trim().slice(0, 120)}`));
-    _EH APIProc.on('exit', (code) => {
-    log(`WATCHDOG: EH API exited (code ${code}) — will check again in 30s`);
-      _EH APIProc = null;
-  });
-  log(`WATCHDOG: EH API spawned PID ${_EH APIProc.pid} `);
+    if (_EH_APIProc && !_EH_APIProc.killed) return;
+    if (!fs.existsSync(EH_API_PY)) { log('WATCHDOG: nexus_eh.py not found'); return; }
+    log('WATCHDOG: EH API unreachable — spawning...');
+    _EH_APIProc = require('child_process').spawn(PYTHON_EXE, [EH_API_PY], {
+      cwd: __dirname, detached: false, stdio: ['ignore', 'pipe', 'pipe']
+    });
+    _EH_APIProc.stdout.on('data', d => log(`EH: ${d.toString().trim().slice(0, 120)}`));
+    _EH_APIProc.stderr.on('data', d => log(`EH-ERR: ${d.toString().trim().slice(0, 120)}`));
+    _EH_APIProc.on('exit', (code) => {
+      log(`WATCHDOG: EH API exited (code ${code}) — will check again in 30s`);
+      _EH_APIProc = null;
+    });
+    log(`WATCHDOG: EH API spawned PID ${_EH_APIProc.pid} `);
   });
   probe.on('timeout', () => probe.destroy());
 }
 
-function checkEH API() {
+function checkEH_API() {
   const http = require('http');
-  const req = http.get('http://127.0.0.1:7701/health', {timeout:3000}, (res) => {
+  const req = http.get('http://127.0.0.1:7701/health', { timeout: 3000 }, (res) => {
     // alive — nothing to do
   });
   req.on('error', () => {
     log('WATCHDOG: EH API :7701 unreachable — restarting...');
-    if (_EH APIProc) { try { _EH APIProc.kill(); } catch {} _EH APIProc = null; }
-    setTimeout(startEH API, 1000);
+    if (_EH_APIProc) { try { _EH_APIProc.kill(); } catch { } _EH_APIProc = null; }
+    setTimeout(startEH_API, 1000);
   });
   req.on('timeout', () => { req.destroy(); });
 }
 
 // Start immediately on server boot, then check every 30 seconds
-startEH API();
-setInterval(checkEH API, 30 * 1000);
+startEH_API();
+setInterval(checkEH_API, 30 * 1000);
 log('WATCHDOG: EH API watchdog active — checks every 30s');
 
 // ── PERSISTENT CHAT LOGGING ───────────────────────────────────────────────
@@ -1932,8 +1944,8 @@ if (!fs.existsSync(CHATS_DIR)) fs.mkdirSync(CHATS_DIR, { recursive: true });
 
 function todayChatFile() {
   const d = new Date();
-  const key = `${ d.getFullYear() } -${ String(d.getMonth() + 1).padStart(2, '0') } -${ String(d.getDate()).padStart(2, '0') } `;
-  return path.join(CHATS_DIR, `chat_${ key }.json`);
+  const key = `${d.getFullYear()} -${String(d.getMonth() + 1).padStart(2, '0')} -${String(d.getDate()).padStart(2, '0')} `;
+  return path.join(CHATS_DIR, `chat_${key}.json`);
 }
 
 function saveChatEntry(userMsg, aiResponse, model, durationMs) {
@@ -1941,45 +1953,45 @@ function saveChatEntry(userMsg, aiResponse, model, durationMs) {
     const file = todayChatFile();
     let log = [];
     if (fs.existsSync(file)) {
-      try { log = JSON.parse(fs.readFileSync(file,'utf8')); } catch {}
+      try { log = JSON.parse(fs.readFileSync(file, 'utf8')); } catch { }
     }
     log.push({
-      id:       Date.now().toString(),
-      ts:       new Date().toISOString(),
-      model:    model || 'nexus-prime',
-      user:     userMsg,
-      ai:       aiResponse,
+      id: Date.now().toString(),
+      ts: new Date().toISOString(),
+      model: model || 'nexus-prime',
+      user: userMsg,
+      ai: aiResponse,
       duration: durationMs || 0,
-      chars:    aiResponse.length
+      chars: aiResponse.length
     });
     fs.writeFileSync(file, JSON.stringify(log, null, 2), 'utf8');
     // Async sync this day's file to Drive — fire & forget
-    syncFileToDrive(file, `googledrive: Nexus - Ultra - Backup / CHATS / ${ path.basename(file) } `);
-  } catch(e) { log(`CHAT SAVE ERROR: ${ e.message } `); }
+    syncFileToDrive(file, `googledrive: Nexus - Ultra - Backup / CHATS / ${path.basename(file)} `);
+  } catch (e) { log(`CHAT SAVE ERROR: ${e.message} `); }
 }
 
 function syncFileToDrive(localPath, remotePath) {
   try {
     const { spawn } = require('child_process');
-    spawn(RCLONE_EXE, ['copyto', localPath, remotePath, '--log-level','ERROR'],
+    spawn(RCLONE_EXE, ['copyto', localPath, remotePath, '--log-level', 'ERROR'],
       { detached: true, stdio: 'ignore' }).unref();
-  } catch {}
+  } catch { }
 }
 
 function syncAllToDrive() {
   const files = [
-    [path.join(__dirname,'nexus_session_facts.json'), 'googledrive:Nexus-Ultra-Backup/MEMORY/nexus_session_facts.json'],
-    [path.join(__dirname,'nexus_memory.json'),        'googledrive:Nexus-Ultra-Backup/MEMORY/nexus_memory.json'],
-    [path.join(__dirname,'nexus_blackboard.json'),    'googledrive:Nexus-Ultra-Backup/MEMORY/nexus_blackboard.json'],
-    [path.join(__dirname,'evolution_log.json'),       'googledrive:Nexus-Ultra-Backup/EVOLUTION/evolution_log.json'],
-    [path.join(__dirname,'evolution_report.md'),      'googledrive:Nexus-Ultra-Backup/EVOLUTION/evolution_report.md'],
+    [path.join(__dirname, 'nexus_session_facts.json'), 'googledrive:Nexus-Ultra-Backup/MEMORY/nexus_session_facts.json'],
+    [path.join(__dirname, 'nexus_memory.json'), 'googledrive:Nexus-Ultra-Backup/MEMORY/nexus_memory.json'],
+    [path.join(__dirname, 'nexus_blackboard.json'), 'googledrive:Nexus-Ultra-Backup/MEMORY/nexus_blackboard.json'],
+    [path.join(__dirname, 'evolution_log.json'), 'googledrive:Nexus-Ultra-Backup/EVOLUTION/evolution_log.json'],
+    [path.join(__dirname, 'evolution_report.md'), 'googledrive:Nexus-Ultra-Backup/EVOLUTION/evolution_report.md'],
   ];
   // Sync entire chats dir
   try {
     const { spawn } = require('child_process');
-    spawn(RCLONE_EXE, ['sync', CHATS_DIR, 'googledrive:Nexus-Ultra-Backup/CHATS', '--log-level','ERROR'],
+    spawn(RCLONE_EXE, ['sync', CHATS_DIR, 'googledrive:Nexus-Ultra-Backup/CHATS', '--log-level', 'ERROR'],
       { detached: true, stdio: 'ignore' }).unref();
-  } catch {}
+  } catch { }
   for (const [src, dst] of files) {
     if (fs.existsSync(src)) syncFileToDrive(src, dst);
   }
@@ -1988,7 +2000,7 @@ function syncAllToDrive() {
 
 // Auto-sync to Google Drive every 5 minutes — always running
 setInterval(syncAllToDrive, 5 * 60 * 1000);
-log(`CHAT LOGGER: Saving all chats to ${ CHATS_DIR } + Google Drive(sync every 5 min)`);
+log(`CHAT LOGGER: Saving all chats to ${CHATS_DIR} + Google Drive(sync every 5 min)`);
 
 // GET /api/chat-history — return saved chats for a given date (or today)
 app.get('/api/chat-history', (req, res) => {
@@ -1996,18 +2008,18 @@ app.get('/api/chat-history', (req, res) => {
     const date = req.query.date; // YYYY-MM-DD or omit for today
     let file;
     if (date) {
-      file = path.join(CHATS_DIR, `chat_${ date }.json`);
+      file = path.join(CHATS_DIR, `chat_${date}.json`);
     } else {
       file = todayChatFile();
     }
-    const history = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file,'utf8')) : [];
+    const history = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : [];
     // Also list available dates
     const dates = fs.readdirSync(CHATS_DIR)
       .filter(f => f.startsWith('chat_') && f.endsWith('.json'))
-      .map(f => f.replace('chat_','').replace('.json',''))
+      .map(f => f.replace('chat_', '').replace('.json', ''))
       .sort().reverse();
     res.json({ ok: true, date: date || 'today', history, available_dates: dates, total: history.length });
-  } catch(e) {
+  } catch (e) {
     res.json({ ok: false, error: e.message, history: [], available_dates: [] });
   }
 });
@@ -2040,8 +2052,9 @@ app.post('/chat/stream', async (req, res) => {
     const http = require('http');
     const body = JSON.stringify({ model: useModel, stream: true, messages: msgs });
     let fullResponse = ''; // accumulate for MEMORY_FLAG parsing
-  const _chatStart = Date.now();
-    const reqOll = http.request({ host: '127.0.0.1', port: 11434, path: '/api/chat', method: 'POST',
+    const _chatStart = Date.now();
+    const reqOll = http.request({
+      host: '127.0.0.1', port: 11434, path: '/api/chat', method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) }
     }, resp => {
       resp.on('data', chunk => {
@@ -2050,9 +2063,9 @@ app.post('/chat/stream', async (req, res) => {
           try {
             const obj = JSON.parse(line);
             const token = obj.message?.content || '';
-            if (token) { fullResponse += token; res.write(`data: ${ JSON.stringify({ token }) } \n\n`); }
+            if (token) { fullResponse += token; res.write(`data: ${JSON.stringify({ token })} \n\n`); }
             if (obj.done) {
-              res.write(`data: ${ JSON.stringify({ done: true }) } \n\n`);
+              res.write(`data: ${JSON.stringify({ done: true })} \n\n`);
               // ── SAVE CHAT ENTRY FOREVER ─────────────────────────────
               saveChatEntry(message || '', fullResponse, useModel, Date.now() - _chatStart);
               // ── MEMORY_FLAG PARSING on completion ──────────────────
@@ -2064,19 +2077,19 @@ app.post('/chat/stream', async (req, res) => {
                     saveMemoryDB(db);
                     log(`MEMORY: Flags parsed from response, saved to Google Drive`);
                   }
-                } catch(me) { log(`MEMORY parse error: ${ me.message } `); }
+                } catch (me) { log(`MEMORY parse error: ${me.message} `); }
               }
             }
-          } catch {}
+          } catch { }
         }
       });
-      resp.on('end', () => { try { res.write(`data: ${ JSON.stringify({ done: true }) } \n\n`); res.end(); } catch {} });
+      resp.on('end', () => { try { res.write(`data: ${JSON.stringify({ done: true })} \n\n`); res.end(); } catch { } });
     });
-    reqOll.on('error', e => { res.write(`data: ${ JSON.stringify({ error: e.message }) } \n\n`); res.end(); });
+    reqOll.on('error', e => { res.write(`data: ${JSON.stringify({ error: e.message })} \n\n`); res.end(); });
     reqOll.write(body);
     reqOll.end();
   } catch (e) {
-    res.write(`data: ${ JSON.stringify({ error: e.message }) } \n\n`);
+    res.write(`data: ${JSON.stringify({ error: e.message })} \n\n`);
     res.end();
   }
 });
@@ -2089,7 +2102,7 @@ app.post('/api/inject', (req, res) => {
   _taskQueue.push(item);
   sseBroadcast({ event: 'queue_update', depth: _taskQueue.length });
   sseBroadcast({ event: 'agent_spawn', source: 'user', task });
-  log(`INJECT: ${ task.slice(0, 60) } `);
+  log(`INJECT: ${task.slice(0, 60)} `);
   res.json({ ok: true, queued: _taskQueue.length });
 });
 
@@ -2112,9 +2125,9 @@ app.delete('/queue', (req, res) => { _taskQueue = []; res.json({ ok: true }); })
 // POST /loop
 app.post('/loop', (req, res) => {
   const { action } = req.body || {};
-  if (action === 'start')  _loopState = 'RUNNING';
-  if (action === 'pause')  _loopState = 'PAUSED';
-  if (action === 'stop')   _loopState = 'STOPPED';
+  if (action === 'start') _loopState = 'RUNNING';
+  if (action === 'pause') _loopState = 'PAUSED';
+  if (action === 'stop') _loopState = 'STOPPED';
   sseBroadcast({ event: 'loop_control', new_state: _loopState, action });
   res.json({ ok: true, state: _loopState });
 });
@@ -2124,7 +2137,7 @@ app.get('/autonomy', (req, res) => res.json({ ok: true, level: _autonomyLevel })
 app.post('/autonomy', (req, res) => {
   const { level } = req.body || {};
   _autonomyLevel = Math.max(0, Math.min(2, level || 0));
-  sseBroadcast({ event: 'autonomy_change', level: _autonomyLevel, label: ['supervised','assisted','full'][_autonomyLevel] });
+  sseBroadcast({ event: 'autonomy_change', level: _autonomyLevel, label: ['supervised', 'assisted', 'full'][_autonomyLevel] });
   res.json({ ok: true, level: _autonomyLevel });
 });
 
@@ -2167,9 +2180,9 @@ app.get('/missions', async (req, res) => {
 
 // ── OpenClaw Local Proxy ─────────────────────────────────────────────────────
 // All OpenClaw calls go through here — auth token stays server-side, never exposed
-const OC_BASE   = 'http://127.0.0.1:18789';
-const OC_TOKEN  = '85046be7b4ea57313277de72567ed40d043d8537472e8af0';
-const OC_HDR    = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + OC_TOKEN };
+const OC_BASE = 'http://127.0.0.1:18789';
+const OC_TOKEN = '85046be7b4ea57313277de72567ed40d043d8537472e8af0';
+const OC_HDR = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + OC_TOKEN };
 
 // GET /api/openclaw/status
 app.get('/api/openclaw/status', async (req, res) => {
@@ -2186,7 +2199,7 @@ app.get('/api/openclaw/status', async (req, res) => {
       r.setTimeout(2500, () => { r.destroy(); reject(new Error('timeout')); });
     });
     const online = data.status < 500;
-    log(`OPENCLAW STATUS: ${ online ? 'ONLINE' : 'DOWN' } (${ data.status })`);
+    log(`OPENCLAW STATUS: ${online ? 'ONLINE' : 'DOWN'} (${data.status})`);
     res.json({ ok: true, online, status: data.status, data: data.body });
   } catch (e) {
     res.json({ ok: false, online: false, error: e.message });
@@ -2220,8 +2233,8 @@ app.post('/api/openclaw/dispatch', async (req, res) => {
   const { model = 'ollama/nexus-prime:latest', message, pipeline = 'research' } = req.body || {};
   if (!message) return res.status(400).json({ ok: false, error: 'message required' });
   const payload = JSON.stringify({ model, message, pipeline, local: true });
-  log(`OPENCLAW DISPATCH: model = ${ model } pipeline = ${ pipeline } msg = "${message.substring(0, 60)}"`);
-  agentEvent('openclaw_dispatch', 'vis', `openclaw dispatch → ${ model } `, { ok: true, local: true });
+  log(`OPENCLAW DISPATCH: model = ${model} pipeline = ${pipeline} msg = "${message.substring(0, 60)}"`);
+  agentEvent('openclaw_dispatch', 'vis', `openclaw dispatch → ${model} `, { ok: true, local: true });
   agentEvent('openclaw_dispatch', 'priv', `local openclaw dispatch — zero cloud`, { local: true });
   try {
     const data = await new Promise((resolve, reject) => {
@@ -2240,8 +2253,8 @@ app.post('/api/openclaw/dispatch', async (req, res) => {
     });
     res.json({ ok: data.status < 400, status: data.status, result: data.body });
   } catch (e) {
-    log(`OPENCLAW DISPATCH ERR: ${ e.message } `);
-    agentEvent('openclaw_error', 'saf', `openclaw dispatch failed: ${ e.message } `, { ok: false });
+    log(`OPENCLAW DISPATCH ERR: ${e.message} `);
+    agentEvent('openclaw_error', 'saf', `openclaw dispatch failed: ${e.message} `, { ok: false });
     res.status(502).json({ ok: false, error: e.message });
   }
 });
@@ -2252,48 +2265,48 @@ app.listen(PORT, HOST, async () => {
   log('║      NEXUS ULTRA v2 // ONLINE            ║');
   log('╚══════════════════════════════════════════╝');
   log(`Dashboard   → http://${HOST}:${PORT}`);
-log(`Stripe cfg  → ${STRIPE_PK ? 'pk loaded (' + (STRIPE_PK.startsWith('pk_live') ? 'LIVE' : 'TEST') + ')' : 'NOT SET'}`);
-log(`Stripe sk   → ${stripe ? 'ACTIVE' : 'NOT SET'}`);
-log(`Ollama      → ${OLLAMA_URL} (model: ${OLLAMA_MODEL})`);
-log(`n8n         → ${N8N_URL}`);
-log(`Email       → ${EMAIL_USER || 'NOT SET'}`);
-log(`Scheduled   → ${Object.keys(jobs).length} job(s) active`);
+  log(`Stripe cfg  → ${STRIPE_PK ? 'pk loaded (' + (STRIPE_PK.startsWith('pk_live') ? 'LIVE' : 'TEST') + ')' : 'NOT SET'}`);
+  log(`Stripe sk   → ${stripe ? 'ACTIVE' : 'NOT SET'}`);
+  log(`Ollama      → ${OLLAMA_URL} (model: ${OLLAMA_MODEL})`);
+  log(`n8n         → ${N8N_URL}`);
+  log(`Email       → ${EMAIL_USER || 'NOT SET'}`);
+  log(`Scheduled   → ${Object.keys(jobs).length} job(s) active`);
 
-// ── Auto-detect ngrok public URL + resend broken links ──
-setTimeout(async () => {
-  try {
-    const http = require('http');
-    const ngrokData = await new Promise((resolve, reject) => {
-      const r = http.get('http://localhost:4040/api/tunnels', resp => {
-        let body = ''; resp.on('data', d => body += d); resp.on('end', () => { try { resolve(JSON.parse(body)); } catch { reject(); } });
+  // ── Auto-detect ngrok public URL + resend broken links ──
+  setTimeout(async () => {
+    try {
+      const http = require('http');
+      const ngrokData = await new Promise((resolve, reject) => {
+        const r = http.get('http://localhost:4040/api/tunnels', resp => {
+          let body = ''; resp.on('data', d => body += d); resp.on('end', () => { try { resolve(JSON.parse(body)); } catch { reject(); } });
+        });
+        r.on('error', reject); r.setTimeout(2000, () => { r.destroy(); reject(); });
       });
-      r.on('error', reject); r.setTimeout(2000, () => { r.destroy(); reject(); });
-    });
-    const tunnel = ngrokData.tunnels?.find(t => t.proto === 'https');
-    if (tunnel) {
-      PUBLIC_URL = tunnel.public_url;
-      log(`PUBLIC URL  → ${PUBLIC_URL} (ngrok live)`);
+      const tunnel = ngrokData.tunnels?.find(t => t.proto === 'https');
+      if (tunnel) {
+        PUBLIC_URL = tunnel.public_url;
+        log(`PUBLIC URL  → ${PUBLIC_URL} (ngrok live)`);
 
-      // Save to Desktop
-      const desktopFile = require('path').join(require('os').homedir(), 'Desktop', 'VEILPIERCER-LIVE-URL.txt');
-      require('fs').writeFileSync(desktopFile,
-        `NEXUS PUBLIC URL\n${PUBLIC_URL}\n\nAccess Portal: ${PUBLIC_URL}/access.html\nDashboard: ${PUBLIC_URL}\n\nUpdated: ${new Date().toISOString()}`);
-      log(`URL saved   → Desktop/VEILPIERCER-LIVE-URL.txt`);
+        // Save to Desktop
+        const desktopFile = require('path').join(require('os').homedir(), 'Desktop', 'VEILPIERCER-LIVE-URL.txt');
+        require('fs').writeFileSync(desktopFile,
+          `NEXUS PUBLIC URL\n${PUBLIC_URL}\n\nAccess Portal: ${PUBLIC_URL}/access.html\nDashboard: ${PUBLIC_URL}\n\nUpdated: ${new Date().toISOString()}`);
+        log(`URL saved   → Desktop/VEILPIERCER-LIVE-URL.txt`);
 
-      // ── Resend fresh links to buyers who haven't opened their portal yet ──
-      if (transporter) {
-        const db = loadAccessDB();
-        const RESEND_COOLDOWN_MS = 24 * 60 * 60 * 1000; // 24 hours
-        const now = Date.now();
-        const unseen = Object.entries(db).filter(([, d]) =>
-          (d.used || 0) < 2 && d.email && (now - (d.lastResent || 0)) > RESEND_COOLDOWN_MS
-        );
-        if (unseen.length > 0) {
-          log(`RESEND: ${unseen.length} buyer(s) with unvisited portals — refreshing links...`);
-          for (const [token, d] of unseen) {
-            const accessUrl = `${PUBLIC_URL}/access.html?token=${token}`;
-            const subject = `Your VeilPiercer ${d.tier} Access Link (Updated)`;
-            const html = `
+        // ── Resend fresh links to buyers who haven't opened their portal yet ──
+        if (transporter) {
+          const db = loadAccessDB();
+          const RESEND_COOLDOWN_MS = 24 * 60 * 60 * 1000; // 24 hours
+          const now = Date.now();
+          const unseen = Object.entries(db).filter(([, d]) =>
+            (d.used || 0) < 2 && d.email && (now - (d.lastResent || 0)) > RESEND_COOLDOWN_MS
+          );
+          if (unseen.length > 0) {
+            log(`RESEND: ${unseen.length} buyer(s) with unvisited portals — refreshing links...`);
+            for (const [token, d] of unseen) {
+              const accessUrl = `${PUBLIC_URL}/access.html?token=${token}`;
+              const subject = `Your VeilPiercer ${d.tier} Access Link (Updated)`;
+              const html = `
                 <div style="font-family:Inter,sans-serif;max-width:560px;margin:0 auto;background:#050508;color:#e2e8f0;padding:40px;border-radius:16px;">
                   <p style="font-size:12px;letter-spacing:0.2em;color:#7c3aed;text-transform:uppercase;font-weight:700;text-align:center;">NEXUS ULTRA</p>
                   <h2 style="text-align:center;margin:16px 0 8px;">Your access link has been refreshed</h2>
@@ -2303,25 +2316,25 @@ setTimeout(async () => {
                   </div>
                   <p style="text-align:center;color:#64748b;font-size:12px;margin-top:24px;">Tier: ${d.tier} — this link is unique to you</p>
                 </div>`;
-            try {
-              await transporter.sendMail({ from: EMAIL_FROM, to: d.email, subject, html, text: `Your updated VeilPiercer ${d.tier} portal: ${accessUrl}` });
-              d.lastResent = now;
-              log(`RESEND OK → ${d.email} [${d.tier}]`);
-            } catch (e) { log(`RESEND FAIL → ${d.email}: ${e.message}`); }
-            await new Promise(r => setTimeout(r, 1000)); // 1s delay between emails
+              try {
+                await transporter.sendMail({ from: EMAIL_FROM, to: d.email, subject, html, text: `Your updated VeilPiercer ${d.tier} portal: ${accessUrl}` });
+                d.lastResent = now;
+                log(`RESEND OK → ${d.email} [${d.tier}]`);
+              } catch (e) { log(`RESEND FAIL → ${d.email}: ${e.message}`); }
+              await new Promise(r => setTimeout(r, 1000)); // 1s delay between emails
+            }
+            saveAccessDB(db); // persist lastResent timestamps
+          } else {
+            log(`RESEND: all buyers visited or re-emailed within 24h — skipping`);
           }
-          saveAccessDB(db); // persist lastResent timestamps
-        } else {
-          log(`RESEND: all buyers visited or re-emailed within 24h — skipping`);
         }
+      } else {
+        log(`PUBLIC URL  → ${PUBLIC_URL} (ngrok not detected, using local)`);
       }
-    } else {
-      log(`PUBLIC URL  → ${PUBLIC_URL} (ngrok not detected, using local)`);
+    } catch {
+      log(`PUBLIC URL  → ${PUBLIC_URL} (ngrok offline, using local)`);
     }
-  } catch {
-    log(`PUBLIC URL  → ${PUBLIC_URL} (ngrok offline, using local)`);
-  }
-}, 3000);
+  }, 3000);
 });
 
 // ── System Monitor & Backup Status ───────────────────────────────
@@ -2341,7 +2354,7 @@ app.get('/api/system-status', (req, res) => {
 app.get('/api/ping-services', async (req, res) => {
   const http = require('http');
   const bdToken = (() => {
-    try { return require('fs').readFileSync(require('path').join(__dirname, '.EH API_token'), 'utf8').trim(); } catch { return ''; }
+    try { return require('fs').readFileSync(require('path').join(__dirname, '.eh_token'), 'utf8').trim(); } catch { return ''; }
   })();
 
   function pingPort(host, port, path, timeoutMs) {

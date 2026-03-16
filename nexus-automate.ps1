@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Nexus-Ultra local setup & stabilization script
 .DESCRIPTION
@@ -35,7 +35,8 @@ function Write-Log {
 try {
     Set-Location $ProjectDir -ErrorAction Stop
     Write-Log "Working directory: $ProjectDir"
-} catch {
+}
+catch {
     Write-Log "Failed to change directory: $($_.Exception.Message)" "Red"
     exit 1
 }
@@ -52,10 +53,10 @@ Write-Log "Patching index.html..."
 $content = Get-Content -Path $indexPath -Raw -Encoding UTF8
 
 $content = $content -replace '(?i)<button\s+[^>]*onclick\s*=\s*"execute\(\)"[^>]*>[\s\S]*?Execute</button>',
-                           '<button onclick="triggerN8n()">Trigger n8n</button>'
+'<button onclick="triggerN8n()">Trigger n8n</button>'
 
 $content = $content -replace '(?i)function\s+execute\s*\(\)\s*\{\s*sendAction\s*\(\s*"execute"\s*,\s*"EXECUTE"\s*\)\s*;\s*\}',
-                           'function triggerN8n() { sendAction("trigger-n8n", "TRIGGER N8N"); }'
+'function triggerN8n() { sendAction("trigger-n8n", "TRIGGER N8N"); }'
 
 Set-Content -Path $indexPath -Value $content -Encoding UTF8 -NoNewline
 Write-Log "index.html patched"
@@ -67,9 +68,9 @@ Get-Process -Name "node" -ErrorAction SilentlyContinue | Stop-Process -Force -Er
 # Start server.cjs
 Write-Log "Launching node server.cjs ..."
 Start-Process -FilePath "node" `
-              -ArgumentList "server.cjs" `
-              -WorkingDirectory $ProjectDir `
-              -WindowStyle Hidden
+    -ArgumentList "server.cjs" `
+    -WorkingDirectory $ProjectDir `
+    -WindowStyle Hidden
 
 Start-Sleep -Seconds 1.5
 
@@ -104,13 +105,14 @@ Write-Log "Sending tabs (secret: $BotSecret)..."
 
 try {
     $resp = Invoke-RestMethod -Uri "http://127.0.0.1:3000/tabs" `
-                              -Method Post `
-                              -Headers @{ "x-api-key" = $BotSecret } `
-                              -Body $payload `
-                              -ContentType "application/json" `
-                              -TimeoutSec 10
+        -Method Post `
+        -Headers @{ "x-api-key" = $BotSecret } `
+        -Body $payload `
+        -ContentType "application/json" `
+        -TimeoutSec 10
     Write-Log "POST /tabs OK: $($resp | ConvertTo-Json -Depth 2 -Compress)" "Green"
-} catch {
+}
+catch {
     Write-Log "POST /tabs failed: $($_.Exception.Message)" "Red"
 }
 
@@ -121,13 +123,14 @@ Write-Log "Sending action: $Action (secret: $BotSecret)..."
 
 try {
     $resp = Invoke-RestMethod -Uri "http://127.0.0.1:3000/run" `
-                              -Method Post `
-                              -Headers @{ "x-api-key" = "Burton" }  
-                              -Body $body `
-                              -ContentType "application/json" `
-                              -TimeoutSec 15
+        -Method Post `
+        -Headers @{ "x-api-key" = "Burton" }  
+    -Body $body `
+        -ContentType "application/json" `
+        -TimeoutSec 15
     Write-Log "POST /run OK: $($resp | ConvertTo-Json -Depth 2 -Compress)" "Green"
-} catch {
+}
+catch {
     Write-Log "POST /run failed: $($_.Exception.Message)" "Red"
 }
 

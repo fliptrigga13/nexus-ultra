@@ -696,9 +696,11 @@
       border-radius: 2px;
     }
   </style>
-  <meta name="description" content="Unlock the power of AI security with VeilPiercer. Dive into its command protocol to protect your data and systems.">
+  <meta name="description"
+    content="Unlock the power of AI security with VeilPiercer. Dive into its command protocol to protect your data and systems.">
   <meta property="og:title" content="VeilPiercer — Command Protocol">
-  <meta property="og:description" content="Explore VeilPiercer's advanced command protocol for secure and efficient data protection. Utilize the power of local CUDA AI.">
+  <meta property="og:description"
+    content="Explore VeilPiercer's advanced command protocol for secure and efficient data protection. Utilize the power of local CUDA AI.">
 </head>
 
 <body>
@@ -872,8 +874,10 @@
             sentinel: clear fault</button>
           <button class="qc-btn" style="border-color:#ffaa00;color:#ffaa00" onclick="sentinelCmd('reset')">↺ sentinel:
             reset swarm</button>
-          <button class="qc-btn" style="border-color:#00f5e4;color:#00f5e4;margin-top:6px;font-weight:700" onclick="psoCmd('start')">🚀 pso: train swarm</button>
-          <button class="qc-btn" style="border-color:#ff3b5c;color:#ff3b5c" onclick="psoCmd('stop')">🛑 pso: stop training</button>
+          <button class="qc-btn" style="border-color:#00f5e4;color:#00f5e4;margin-top:6px;font-weight:700"
+            onclick="psoCmd('start')">🚀 pso: train swarm</button>
+          <button class="qc-btn" style="border-color:#ff3b5c;color:#ff3b5c" onclick="psoCmd('stop')">🛑 pso: stop
+            training</button>
         </div>
       </div>
 
@@ -905,19 +909,29 @@
   </div>
 
   <!-- Token gate overlay -->
-  <div id="gate" style="position:fixed;inset:0;background:#020a14;display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:16px;font-family:'JetBrains Mono',monospace;">
+  <div id="gate"
+    style="position:fixed;inset:0;background:#020a14;display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:16px;font-family:'JetBrains Mono',monospace;">
     <div style="font-size:11px;letter-spacing:4px;color:#00eeff;text-transform:uppercase;">Verifying Access</div>
     <div style="display:flex;gap:6px;">
-      <div style="width:6px;height:6px;border-radius:50%;background:#00eeff;animation:dotPulse 1.2s ease infinite;"></div>
-      <div style="width:6px;height:6px;border-radius:50%;background:#00eeff;animation:dotPulse 1.2s ease infinite;animation-delay:0.2s;"></div>
-      <div style="width:6px;height:6px;border-radius:50%;background:#00eeff;animation:dotPulse 1.2s ease infinite;animation-delay:0.4s;"></div>
+      <div style="width:6px;height:6px;border-radius:50%;background:#00eeff;animation:dotPulse 1.2s ease infinite;">
+      </div>
+      <div
+        style="width:6px;height:6px;border-radius:50%;background:#00eeff;animation:dotPulse 1.2s ease infinite;animation-delay:0.2s;">
+      </div>
+      <div
+        style="width:6px;height:6px;border-radius:50%;background:#00eeff;animation:dotPulse 1.2s ease infinite;animation-delay:0.4s;">
+      </div>
     </div>
   </div>
-  <div id="denied" style="position:fixed;inset:0;background:#0f0208;display:none;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:20px;font-family:'JetBrains Mono',monospace;text-align:center;padding:40px;">
+  <div id="denied"
+    style="position:fixed;inset:0;background:#0f0208;display:none;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:20px;font-family:'JetBrains Mono',monospace;text-align:center;padding:40px;">
     <div style="font-size:48px;">🔒</div>
     <div style="font-size:13px;letter-spacing:3px;color:#ff3355;text-transform:uppercase;">Access Denied</div>
-    <div style="font-size:10px;color:#456070;line-height:1.8;max-width:400px;">Invalid or expired access token.<br>Purchase VeilPiercer to get your access link.</div>
-    <a href="https://fliptrigga13.github.io/VEIL-PIERCER/" style="padding:12px 32px;background:#00eeff;color:#020a14;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:2px;text-decoration:none;text-transform:uppercase;">Get Access →</a>
+    <div style="font-size:10px;color:#456070;line-height:1.8;max-width:400px;">Invalid or expired access
+      token.<br>Purchase VeilPiercer to get your access link.</div>
+    <a href="https://fliptrigga13.github.io/VEIL-PIERCER/"
+      style="padding:12px 32px;background:#00eeff;color:#020a14;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:2px;text-decoration:none;text-transform:uppercase;">Get
+      Access →</a>
   </div>
 
   <script>
@@ -934,8 +948,8 @@
     // ── TIER FEATURE MAP ─────────────────────────────────────────
     const TIER_FEATURES = {
       Starter: { aiCommands: false, sentinelLive: false, exportData: false, label: '⚡ STARTER' },
-      Pro:     { aiCommands: true,  sentinelLive: true,  exportData: false, label: '🔥 PRO' },
-      Agency:  { aiCommands: true,  sentinelLive: true,  exportData: true,  label: '🏆 AGENCY' },
+      Pro: { aiCommands: true, sentinelLive: true, exportData: false, label: '🔥 PRO' },
+      Agency: { aiCommands: true, sentinelLive: true, exportData: true, label: '🏆 AGENCY' },
     };
 
     async function verifyAndUnlock() {
@@ -1099,8 +1113,8 @@
     function initPositions() {
       const cw = W(), ch = H();
       const CL = {
-        vis:  { cx: cw * 0.22, cy: ch * 0.52 },
-        saf:  { cx: cw * 0.50, cy: ch * 0.30 },
+        vis: { cx: cw * 0.22, cy: ch * 0.52 },
+        saf: { cx: cw * 0.50, cy: ch * 0.30 },
         priv: { cx: cw * 0.78, cy: ch * 0.52 },
       };
       const orbitR = Math.min(cw, ch) * 0.20; // 20% — large and visible
@@ -1118,7 +1132,7 @@
       });
       // Sentinel at bottom center
       const sentCx = cw * 0.50, sentCy = ch * 0.78;
-      const sentR  = Math.min(cw, ch) * 0.13;
+      const sentR = Math.min(cw, ch) * 0.13;
       NODES.filter(n => n.pillar === 'sentinel').forEach((nd, idx) => {
         const angle = (idx / 3) * Math.PI * 2 - Math.PI / 2;
         nd.cx = sentCx; nd.cy = sentCy; nd.orbitR = sentR;
@@ -2040,7 +2054,7 @@ Run an AI call or trigger a payment to watch nodes respond in real-time.`, 'syst
         const dot = document.getElementById('cb-sentinel-dot');
         const txt = document.getElementById('cb-sentinel');
         if (dot) { dot.style.background = '#00ff99'; }
-        if (txt)  { txt.textContent = 'SENTINEL + PSO ONLINE'; txt.style.color = '#00ff99'; }
+        if (txt) { txt.textContent = 'SENTINEL + PSO ONLINE'; txt.style.color = '#00ff99'; }
         addAI('PSO·BRAIN', '🧠 <strong>PSO SWARM BRAIN CONNECTED</strong><br>Julia/CUDA engine on port 7700.<br>ECHO · FLUX · SWARM nodes now driven by live GPU optimization.', 'system');
       };
 
@@ -2068,15 +2082,15 @@ Run an AI call or trigger a payment to watch nodes respond in real-time.`, 'syst
 
           // ECHO = convergence health (how close to solved?)
           // Map fitness log10 from [8, -4] range → [0, 1]
-          const logFit   = Math.log10(Math.max(d.g_fit, 1e-10));
-          const echo     = Math.max(0, Math.min(1, (8 - logFit) / 12));
+          const logFit = Math.log10(Math.max(d.g_fit, 1e-10));
+          const echo = Math.max(0, Math.min(1, (8 - logFit) / 12));
 
           // FLUX = movement entropy = stddev of recent fitness log history
           let flux = 0.2;
           if (psoBestHistory.length > 3) {
-            const logs  = psoBestHistory.map(v => Math.log10(Math.max(v, 1e-10)));
-            const mean  = logs.reduce((a, b) => a + b, 0) / logs.length;
-            const std   = Math.sqrt(logs.reduce((a, v) => a + (v - mean) ** 2, 0) / logs.length);
+            const logs = psoBestHistory.map(v => Math.log10(Math.max(v, 1e-10)));
+            const mean = logs.reduce((a, b) => a + b, 0) / logs.length;
+            const std = Math.sqrt(logs.reduce((a, v) => a + (v - mean) ** 2, 0) / logs.length);
             flux = Math.max(0, Math.min(1, std / 4));
           }
 
@@ -2094,10 +2108,10 @@ Run an AI call or trigger a payment to watch nodes respond in real-time.`, 'syst
 
           // Update topbar SWARM stat
           const swarmPct = (efs * 100).toFixed(1);
-          const fitFmt   = d.g_fit < 0.001 ? d.g_fit.toExponential(2) : d.g_fit.toFixed(4);
+          const fitFmt = d.g_fit < 0.001 ? d.g_fit.toExponential(2) : d.g_fit.toFixed(4);
           document.getElementById('tb-swarm').textContent =
             d.running ? `${swarmPct}% · iter ${d.iter}` :
-            d.converged ? `✅ ${swarmPct}%` : `${swarmPct}%`;
+              d.converged ? `✅ ${swarmPct}%` : `${swarmPct}%`;
 
           // Convergence event
           if (d.converged) {
@@ -2118,7 +2132,7 @@ Run an AI call or trigger a payment to watch nodes respond in real-time.`, 'syst
         setTimeout(connectPSO, 5000);
       };
 
-      psoWS.onerror = () => {};
+      psoWS.onerror = () => { };
     }
 
     // ── PSO quick commands (wired to existing qc-btn buttons) ────
@@ -2128,17 +2142,17 @@ Run an AI call or trigger a payment to watch nodes respond in real-time.`, 'syst
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action })
       })
-      .then(r => r.json())
-      .then(j => {
-        const msg = action === 'start'
-          ? '🚀 <strong>PSO TRAINING STARTED</strong><br>128 particles × 10 dims launching on GPU.<br>ECHO · FLUX · SWARM nodes now live.'
-          : '🛑 <strong>PSO TRAINING STOPPED</strong><br>Swarm halted. Nodes returning to idle state.';
-        addAI('PSO·BRAIN', msg, 'system');
-        if (action === 'start') psoBestHistory = [];
-      })
-      .catch(() => {
-        addAI('PSO·BRAIN', '⚠ PSO engine offline — run <strong>START_PSO_BRAIN.bat</strong> first.', 'system');
-      });
+        .then(r => r.json())
+        .then(j => {
+          const msg = action === 'start'
+            ? '🚀 <strong>PSO TRAINING STARTED</strong><br>128 particles × 10 dims launching on GPU.<br>ECHO · FLUX · SWARM nodes now live.'
+            : '🛑 <strong>PSO TRAINING STOPPED</strong><br>Swarm halted. Nodes returning to idle state.';
+          addAI('PSO·BRAIN', msg, 'system');
+          if (action === 'start') psoBestHistory = [];
+        })
+        .catch(() => {
+          addAI('PSO·BRAIN', '⚠ PSO engine offline — run <strong>START_PSO_BRAIN.bat</strong> first.', 'system');
+        });
     }
 
     // Connect to Sentinel on load

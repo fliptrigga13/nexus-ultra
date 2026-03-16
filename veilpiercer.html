@@ -1700,8 +1700,8 @@
           <div class="l">Average drift<br>goes undetected</div>
         </div>
         <div class="hs">
-          <div class="n" style="color:var(--gold)">67%</div>
-          <div class="l">Enterprises on AI<br>agents by 2026</div>
+          <div class="n" id="live-deployments" style="color:var(--gold)">14</div>
+          <div class="l">Active VeilPiercer<br>observatory nodes</div>
         </div>
       </div>
       <div class="hero-ctas reveal">
@@ -2312,22 +2312,28 @@
     <div class="reveal" style="margin:0 0 48px;display:flex;gap:40px;align-items:center;flex-wrap:wrap;">
       <div style="display:flex;align-items:center;gap:12px;">
         <div style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:32px;color:var(--vis)">14</div>
-        <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--t2);line-height:1.6;">teams<br>deployed</div>
+        <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--t2);line-height:1.6;">
+          teams<br>deployed</div>
       </div>
       <div style="width:1px;height:40px;background:var(--rim);"></div>
       <div style="display:flex;align-items:center;gap:12px;">
         <div style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:32px;color:var(--saf)">100%</div>
-        <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--t2);line-height:1.6;">offline<br>capable</div>
+        <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--t2);line-height:1.6;">
+          offline<br>capable</div>
       </div>
       <div style="width:1px;height:40px;background:var(--rim);"></div>
       <div style="display:flex;align-items:center;gap:12px;">
         <div style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:32px;color:var(--priv)">$0</div>
-        <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--t2);line-height:1.6;">monthly<br>fees ever</div>
+        <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--t2);line-height:1.6;">
+          monthly<br>fees ever</div>
       </div>
       <div style="width:1px;height:40px;background:var(--rim);"></div>
-      <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;color:var(--t2);max-width:320px;line-height:1.7;">
-        &ldquo;Exactly what I needed &mdash; finally I can see what my agents are doing without burning $400/mo on Datadog.&rdquo;
-        <div style="font-size:9px;margin-top:6px;color:var(--t3);letter-spacing:1px;">— NEXUS Ultra early access buyer</div>
+      <div
+        style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;color:var(--t2);max-width:320px;line-height:1.7;">
+        &ldquo;Exactly what I needed &mdash; finally I can see what my agents are doing without burning $400/mo on
+        Datadog.&rdquo;
+        <div style="font-size:9px;margin-top:6px;color:var(--t3);letter-spacing:1px;">— NEXUS Ultra early access buyer
+        </div>
       </div>
     </div>
 
@@ -2384,27 +2390,49 @@
   <!-- ═══════════════════ FAQ ═══════════════════ -->
   <section class="sec" id="faq" style="background:var(--black);">
     <div class="sec-tag">Before You Buy</div>
-    <h2 style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(32px,5vw,60px);letter-spacing:-2px;line-height:.95;margin-bottom:48px;" class="reveal">Straight<br><span style="color:var(--vis)">answers.</span></h2>
+    <h2
+      style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(32px,5vw,60px);letter-spacing:-2px;line-height:.95;margin-bottom:48px;"
+      class="reveal">Straight<br><span style="color:var(--vis)">answers.</span></h2>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--rim);" class="reveal">
 
       <div style="background:var(--void);padding:40px 36px;">
-        <div style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:12px;letter-spacing:1px;color:var(--vis);margin-bottom:14px;">What exactly do I get?</div>
-        <p style="font-size:11px;color:rgba(221,234,245,.5);line-height:1.9;">You get the full VeilPiercer dashboard (source code included), all 4 protocol modes (LOCK DOWN, AMPLIFY, SELECTIVE, NOMINAL), 9 tunable live control nodes, and the natural language command interpreter. Pro adds the safeLog module with 79 production tests, simulation model, React Flow editor, and Pino/OpenTelemetry integration. Agency adds white-label rights so you can resell it to clients.</p>
+        <div
+          style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:12px;letter-spacing:1px;color:var(--vis);margin-bottom:14px;">
+          What exactly do I get?</div>
+        <p style="font-size:11px;color:rgba(221,234,245,.5);line-height:1.9;">You get the full VeilPiercer dashboard
+          (source code included), all 4 protocol modes (LOCK DOWN, AMPLIFY, SELECTIVE, NOMINAL), 9 tunable live control
+          nodes, and the natural language command interpreter. Pro adds the safeLog module with 79 production tests,
+          simulation model, React Flow editor, and Pino/OpenTelemetry integration. Agency adds white-label rights so you
+          can resell it to clients.</p>
       </div>
 
       <div style="background:var(--void);padding:40px 36px;">
-        <div style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:12px;letter-spacing:1px;color:var(--saf);margin-bottom:14px;">How hard is setup?</div>
-        <p style="font-size:11px;color:rgba(221,234,245,.5);line-height:1.9;">Open the HTML file in any browser — no server, no Docker, no npm install for the dashboard itself. For full live AI integration with your own agents, you point it to your server at port 3000. A deploy guide is included in every tier. If you get stuck, reply to your access email and we'll help.</p>
+        <div
+          style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:12px;letter-spacing:1px;color:var(--saf);margin-bottom:14px;">
+          How hard is setup?</div>
+        <p style="font-size:11px;color:rgba(221,234,245,.5);line-height:1.9;">Open the HTML file in any browser — no
+          server, no Docker, no npm install for the dashboard itself. For full live AI integration with your own agents,
+          you point it to your server at port 3000. A deploy guide is included in every tier. If you get stuck, reply to
+          your access email and we'll help.</p>
       </div>
 
       <div style="background:var(--void);padding:40px 36px;">
-        <div style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:12px;letter-spacing:1px;color:var(--warn);margin-bottom:14px;">Does this work for solo devs, not just enterprise teams?</div>
-        <p style="font-size:11px;color:rgba(221,234,245,.5);line-height:1.9;">Yes — that's primarily who buys it. If you're building with LangChain, AutoGPT, CrewAI or any custom agent stack and you're tired of debugging by reading raw logs, this is for you. The Starter tier at $47 covers everything a solo dev needs. Enterprise compliance features are there when you need them.</p>
+        <div
+          style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:12px;letter-spacing:1px;color:var(--warn);margin-bottom:14px;">
+          Does this work for solo devs, not just enterprise teams?</div>
+        <p style="font-size:11px;color:rgba(221,234,245,.5);line-height:1.9;">Yes — that's primarily who buys it. If
+          you're building with LangChain, AutoGPT, CrewAI or any custom agent stack and you're tired of debugging by
+          reading raw logs, this is for you. The Starter tier at $47 covers everything a solo dev needs. Enterprise
+          compliance features are there when you need them.</p>
       </div>
 
       <div style="background:var(--void);padding:40px 36px;">
-        <div style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:12px;letter-spacing:1px;color:var(--priv);margin-bottom:14px;">What's your refund policy?</div>
-        <p style="font-size:11px;color:rgba(221,234,245,.5);line-height:1.9;">7 days, no questions. If you buy it, open it, and it doesn't do what this page says it does — email us and you get a full refund via Stripe. We'd rather have a happy non-customer than an unhappy one. We've never had a dispute and intend to keep it that way.</p>
+        <div
+          style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:12px;letter-spacing:1px;color:var(--priv);margin-bottom:14px;">
+          What's your refund policy?</div>
+        <p style="font-size:11px;color:rgba(221,234,245,.5);line-height:1.9;">7 days, no questions. If you buy it, open
+          it, and it doesn't do what this page says it does — email us and you get a full refund via Stripe. We'd rather
+          have a happy non-customer than an unhappy one. We've never had a dispute and intend to keep it that way.</p>
       </div>
 
     </div>
@@ -2422,7 +2450,8 @@
       while you sleep. <strong>Every hidden failure ends here.</strong>
     </p>
     <div class="footer-btns reveal">
-      <a href="https://buy.stripe.com/5kQ00c7fX3Qg47C48c28802" class="btn-dark" target="_blank" rel="noopener">Get Veilpiercer Now →</a>
+      <a href="https://buy.stripe.com/5kQ00c7fX3Qg47C48c28802" class="btn-dark" target="_blank" rel="noopener">Get
+        Veilpiercer Now →</a>
       <p class="footer-legal">One-time purchase. Source code included. No subscriptions. Begin with confidence — the
         platform built not just for today's challenges, but for tomorrow's infinite possibilities.</p>
     </div>
@@ -3188,6 +3217,30 @@
     })();
   </script>
 
+  <script>
+    (function () {
+      async function getNexusApi() {
+        // 1. Check local fallback
+        try {
+          const r = await fetch('http://127.0.0.1:3000/status', { signal: AbortSignal.timeout(1000) });
+          if (r.ok) return 'http://127.0.0.1:3000';
+        } catch (e) {}
+        // 2. Public ngrok
+        return 'https://aggregatory-unrumored-elidia.ngrok-free.dev';
+      }
+
+      async function updateStats() {
+        try {
+          const base = await getNexusApi();
+          const r = await fetch(`${base}/public/stats`);
+          const d = await r.json();
+          if (d.ok) document.getElementById('live-deployments').textContent = d.deployments;
+        } catch (e) {}
+      }
+      updateStats();
+      setInterval(updateStats, 60000);
+    })();
+  </script>
 </body>
 
 </html>

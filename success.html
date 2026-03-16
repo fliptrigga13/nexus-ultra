@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Confirmed â€” VeilPiercer</title>
+    <title>Payment Confirmed — VeilPiercer</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link
         href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap"
@@ -200,26 +200,26 @@
     <canvas id="bg"></canvas>
 
     <div class="card">
-        <div class="tag">â€” Transaction Complete â€”</div>
+        <div class="tag">— Transaction Complete —</div>
         <div class="check-ring">
-            <div class="check-mark">âœ“</div>
+            <div class="check-mark">✓</div>
         </div>
         <h1>Payment<br>Confirmed</h1>
         <p class="sub" id="msg">Verifying your payment with Stripe...</p>
 
         <div class="detail-box" id="details" style="display:none">
-            <div class="detail-row"><strong>Plan</strong><span class="val" id="d-tier">â€”</span></div>
-            <div class="detail-row"><strong>Email</strong><span id="d-email">â€”</span></div>
-            <div class="detail-row"><strong>Amount</strong><span class="val" id="d-amount">â€”</span></div>
-            <div class="detail-row"><strong>Status</strong><span class="val">PAID âœ“</span></div>
+            <div class="detail-row"><strong>Plan</strong><span class="val" id="d-tier">—</span></div>
+            <div class="detail-row"><strong>Email</strong><span id="d-email">—</span></div>
+            <div class="detail-row"><strong>Amount</strong><span class="val" id="d-amount">—</span></div>
+            <div class="detail-row"><strong>Status</strong><span class="val">PAID ✓</span></div>
         </div>
 
-        <a href="/veilpiercer-pitch.html" class="btn-back">â† Back to VeilPiercer</a>
+        <a href="/veilpiercer-pitch.html" class="btn-back">← Back to VeilPiercer</a>
         <p class="note">Check your email for your receipt and download link.</p>
     </div>
 
     <script>
-        // â”€â”€ Background particles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Background particles ─────────────
         const canvas = document.getElementById('bg');
         const ctx = canvas.getContext('2d');
         let W, H, pts = [];
@@ -237,24 +237,10 @@
             requestAnimationFrame(tick);
         })();
 
-        // â”€â”€ Discovery: Get the right API base â”€â”€â”€â”€â”€â”€â”€â”€
-        async function getNexusApi() {
-            const candidates = [
-                window.location.origin, // Try current domain (works if proxied or tunneled)
-                'http://127.0.0.1:3000' // Local fallback
-            ];
-            
-            // If we're on Vercel, we can't easily know the backend without a config.
-            // But we can check if current origin has /status
-            for (const c of candidates) {
-                try {
-                    const r = await fetch(`${c}/status`, { signal: AbortSignal.timeout(2000) });
-                    if (r.ok) return c;
-                } catch (_) {}
-            }
-            // Fallback to current ngrok URL (Hardcoded for this deployment instance)
-            return 'https://nexus-ultra-ten.vercel.app';
-        }
+        // ── Verify payment with NEXUS ────────
+        const params = new URLSearchParams(location.search);
+        const sessionId = params.get('session_id');
+        const tier = params.get('tier') || '';
 
         async function verify() {
             if (!sessionId) {
@@ -262,20 +248,19 @@
                 return;
             }
             try {
-                const apiBase = await getNexusApi();
-                const r = await fetch(`${apiBase}/stripe/confirm-session?session_id=${sessionId}`);
+                const r = await fetch(`http://127.0.0.1:3000/stripe/confirm-session?session_id=${sessionId}`);
                 const data = await r.json();
                 if (data.ok && data.paid) {
                     document.getElementById('msg').innerHTML =
                         `Welcome to VeilPiercer, <strong style="color:var(--vis)">${data.email || 'valued customer'}</strong>!<br>Your access is being provisioned now.`;
                     document.getElementById('d-tier').textContent = data.tier || tier;
-                    document.getElementById('d-email').textContent = data.email || 'â€”';
-                    document.getElementById('d-amount').textContent = data.amount ? '$' + (data.amount / 100).toFixed(2) : 'â€”';
+                    document.getElementById('d-email').textContent = data.email || '—';
+                    document.getElementById('d-amount').textContent = data.amount ? '$' + (data.amount / 100).toFixed(2) : '—';
                     document.getElementById('details').style.display = '';
                     // Log to NEXUS
-                    await fetch(`${apiBase}/capture`, {
+                    await fetch('http://127.0.0.1:3000/capture', {
                         method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': 'Burton' },
-                        body: JSON.stringify({ note: 'PAID: ' + data.tier + ' â€” ' + data.email })
+                        body: JSON.stringify({ note: 'PAID: ' + data.tier + ' — ' + data.email })
                     }).catch(() => { });
                 } else {
                     document.getElementById('msg').textContent = 'Payment is being processed. You will receive a confirmation email shortly.';

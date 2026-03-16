@@ -5,10 +5,10 @@
     "amount": 9700,
     "sessionId": "cs_test_DEMO",
     "createdAt": "2026-03-04T02:05:55.628Z",
-    "used": 10,
-    "lastAccessed": "2026-03-14T00:56:04.920Z",
-    "downloads": 11,
-    "lastDownload": "2026-03-13T23:26:39.114Z"
+    "used": 11,
+    "lastAccessed": "2026-03-16T02:57:35.480Z",
+    "downloads": 12,
+    "lastDownload": "2026-03-16T02:58:00.133Z"
   },
   "97602284f5696ab4b090e8db8f162a8e31cccac89838966dda9e0dd700553dff": {
     "email": "test@veilpiercer.com",
@@ -120,6 +120,14 @@
     "amount": 4700,
     "sessionId": "manual",
     "createdAt": "2026-03-13T23:26:36.142Z",
+    "used": 0
+  },
+  "ced0009750743c89769a813a459fda0df046933ffa8e822c0fb7a7926560fc97": {
+    "email": "proof_b6dbf626@test.veilpiercer.com",
+    "tier": "Starter",
+    "amount": 4700,
+    "sessionId": "manual",
+    "createdAt": "2026-03-16T02:57:35.460Z",
     "used": 0
   }
 }
