@@ -4,6 +4,7 @@
   "trailingSlash": false,
   "routes": [
     { "src": "/", "dest": "/index.html" },
+    { "src": "/veilpiercer", "dest": "/veilpiercer-sales.html" },
     { "src": "/command", "dest": "/command.html" },
     { "src": "/internal", "dest": "/internal-panel.html" }
   ]
