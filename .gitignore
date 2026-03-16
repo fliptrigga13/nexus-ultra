@@ -58,3 +58,5 @@ feedback.json
 *.log
 node_modules/
 .vercel/
+.vercel
+.env*.local
