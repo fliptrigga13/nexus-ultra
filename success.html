@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -242,13 +242,22 @@
         const sessionId = params.get('session_id');
         const tier = params.get('tier') || '';
 
+        async function getNexusApi() {
+            try {
+                const r = await fetch('http://127.0.0.1:3000/status', { signal: AbortSignal.timeout(1000) });
+                if (r.ok) return 'http://127.0.0.1:3000';
+            } catch (e) { }
+            return 'https://aggregatory-unrumored-elidia.ngrok-free.dev';
+        }
+
         async function verify() {
             if (!sessionId) {
                 document.getElementById('msg').textContent = 'No session ID found. If you completed payment, check your email for confirmation.';
                 return;
             }
             try {
-                const r = await fetch(`http://127.0.0.1:3000/stripe/confirm-session?session_id=${sessionId}`);
+                const apiBase = await getNexusApi();
+                const r = await fetch(`${apiBase}/stripe/confirm-session?session_id=${sessionId}`);
                 const data = await r.json();
                 if (data.ok && data.paid) {
                     document.getElementById('msg').innerHTML =
@@ -258,7 +267,7 @@
                     document.getElementById('d-amount').textContent = data.amount ? '$' + (data.amount / 100).toFixed(2) : '—';
                     document.getElementById('details').style.display = '';
                     // Log to NEXUS
-                    await fetch('http://127.0.0.1:3000/capture', {
+                    await fetch(`${apiBase}/capture`, {
                         method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': 'Burton' },
                         body: JSON.stringify({ note: 'PAID: ' + data.tier + ' — ' + data.email })
                     }).catch(() => { });
