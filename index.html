@@ -87,10 +87,43 @@
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E");
     }
 
+    /* ── SALE TICKER ── */
+    #sale-ticker {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 38px;
+      background: linear-gradient(90deg, #ff1f3d, #ff9500);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 900;
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: #fff;
+      text-transform: uppercase;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(255, 31, 61, 0.3);
+    }
+
+    #sale-ticker span {
+      animation: ticker-slide 15s linear infinite;
+      white-space: nowrap;
+      padding: 0 40px;
+    }
+
+    @keyframes ticker-slide {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
     /* ── NAV ── */
     #nav {
       position: fixed;
-      top: 0;
+      top: 38px; /* Offset for ticker */
       left: 0;
       right: 0;
       z-index: 100;
@@ -101,6 +134,7 @@
       background: rgba(4, 6, 8, .92);
       border-bottom: 1px solid var(--rim);
       backdrop-filter: blur(24px);
+      transition: top 0.3s;
     }
 
     .n-logo {
@@ -1349,63 +1383,59 @@
     }
 
     @media(max-width:960px) {
+      /* --- NAV --- */
+      #nav { padding: 0 20px !important; }
+      .n-logo { letter-spacing: 2px !important; font-size: 10px !important; }
+      .n-right a:not(.n-cta) { display: none !important; }
 
-      .three-col,
-      .feat-grid {
-        grid-template-columns: 1fr;
+      /* --- HERO --- */
+      #hero { padding: 100px 20px 50px !important; height: auto !important; min-height: 0 !important; }
+      .hero-content { 
+        display: flex !important; 
+        flex-direction: column !important; 
+        gap: 40px !important;
+        text-align: center !important;
+        width: 100% !important;
+      }
+      .hero-col { 
+        height: auto !important; 
+        flex-direction: row !important; 
+        justify-content: center !important; 
+        gap: 30px !important;
+        width: 100% !important;
+      }
+      .h-stat-box { margin-bottom: 0 !important; text-align: center !important; }
+      .hero-col.R { display: none !important; } /* Hide right column for mobile simplicity */
+      
+      .hero-center { width: 100% !important; padding: 0 !important; }
+      .hero-h1 { 
+        font-size: clamp(40px, 15vw, 68px) !important; 
+        letter-spacing: -2px !important;
+        line-height: 0.9 !important;
+        margin-bottom: 16px !important;
+      }
+      .hero-sub { margin: 0 auto 40px !important; font-size: 18px !important; line-height: 1.4 !important; }
+      .hero-ctas { justify-content: center !important; width: 100% !important; }
+      .btn-primary { width: 100% !important; text-align: center !important; }
+
+      /* --- GRIDS --- */
+      .three-col, .feat-grid, .proto-grid, .price-cards, .pricing-grid, .protocol-cols {
+        grid-template-columns: 1fr !important;
+        gap: 20px !important;
       }
 
-      .feat-grid {
-        grid-template-columns: 1fr 1fr;
+      /* --- PRICING SPECIFIC --- */
+      #pricing [style*="grid-template-columns:1fr 1.85fr"],
+      #pricing [style*="grid-template-columns: 1fr 1.85fr"] {
+        grid-template-columns: 1fr !important;
+      }
+      #pricing ul[style*="grid-template-columns:1fr 1fr"] {
+        grid-template-columns: 1fr !important;
       }
 
-      .proto-grid,
-      .price-cards {
-        grid-template-columns: 1fr;
-      }
-
-      .buyer-row {
-        grid-template-columns: 56px 1fr;
-      }
-
-      .br-right {
-        display: none;
-      }
-
-      .statband-inner {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .feat-intro {
-        grid-template-columns: 1fr;
-      }
-
-      .inc-top {
-        flex-direction: column;
-        gap: 16px;
-      }
-
-      .inc-note {
-        text-align: left;
-      }
-
-      .sec,
-      .vision-content {
-        padding: 70px 24px;
-      }
-
-      #hero {
-        padding: 90px 24px 50px;
-      }
-
-      .hero-stats {
-        flex-wrap: wrap;
-        gap: 28px;
-      }
-
-      .n-right a {
-        display: none;
-      }
+      .sec, .vision-content { padding: 80px 20px !important; }
+      .sec-tag { font-size: 8px !important; letter-spacing: 3px !important; }
+      .sec-tag::after { max-width: 80px !important; }
     }
 
     /* ══════════ AGENT FLOW OBSERVATORY ══════════ */
@@ -1419,28 +1449,60 @@
     #obs-canvas-wrap {
       position: relative;
       width: 100%;
-      height: 72vh;
-      min-height: 520px;
+      height: 94vh;
+      min-height: 600px;
     }
 
     #obs-canvas {
       display: block;
-      width: 100%;
-      height: 100%;
+      width: 100% !important;
+      height: 100% !important;
       filter: contrast(1.6) saturate(1.15);
     }
 
-    #obs-ui {
+    #obs-hud {
       position: absolute;
       top: 24px;
       left: 24px;
       width: 300px;
-      background: rgba(2, 2, 8, 0.96);
-      padding: 24px;
+      background: rgba(2, 2, 8, 0.94);
       border: 1px solid var(--vis);
       border-radius: 4px;
-      backdrop-filter: blur(20px);
-      z-index: 10;
+      backdrop-filter: blur(28px);
+      z-index: 100;
+      transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+      max-height: 600px;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    }
+
+    #obs-hud.collapsed {
+      max-height: 44px;
+      background: rgba(2, 2, 8, 0.7);
+      border-color: rgba(0, 229, 255, 0.3);
+    }
+
+    .hud-title-bar {
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(0, 229, 255, 0.15);
+      background: rgba(255,255,255,0.03);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .hud-title-bar:hover { background: rgba(0, 229, 255, 0.08); }
+
+    .hud-body {
+      padding: 24px;
+      transition: opacity 0.3s ease;
+    }
+
+    #obs-hud.collapsed .hud-body {
+      opacity: 0;
+      pointer-events: none;
     }
 
     .obs-title {
@@ -2022,6 +2084,10 @@
   <div id="cur-r"></div>
 
   <!-- NAV -->
+  <div id="sale-ticker">
+    <span>🚨 24-HOUR EARLY ACCESS SALE: $197 (SAVE 20% BEFORE NEURAL SWARM PHASE 2) &middot; SOURCE INCLUDED &middot; DEPLOY NOW &rarr; &nbsp; &nbsp; &nbsp; 🚨 24-HOUR EARLY ACCESS SALE: $197 (SAVE 20% BEFORE NEURAL SWARM PHASE 2) &middot; SOURCE INCLUDED &middot; DEPLOY NOW &rarr;</span>
+  </div>
+
   <nav id="nav">
     <div class="n-logo">VEILPIERCER</div>
     <div class="n-right">
@@ -2165,35 +2231,73 @@
   </section>
 
   <!-- ═══════════════════ [ MOD 3 ] THE SOLUTION ═══════════════════ -->
-  <section class="sec" id="solution">
+  <style>
+    @media (max-width: 768px) {
+      .protocol-cols { grid-template-columns: 1fr !important; }
+      .protocol-card { padding: 30px 20px !important; clip-path: polygon(0 0, 90% 0, 100% 10%, 100% 100%, 0 100%) !important; }
+      .protocol-card h2 { font-size: 32px !important; }
+    }
+    .protocol-card:hover { background: rgba(0,229,255,0.05) !important; transform: translateY(-4px); border-color: var(--vis) !important; }
+    .protocol-icon-wrap { filter: drop-shadow(0 0 8px currentColor); transition: transform 0.3s ease; }
+    .protocol-card:hover .protocol-icon-wrap { transform: scale(1.1) rotate(5deg); }
+  </style>
+  <section class="sec" id="solution" style="background: linear-gradient(180deg, var(--black), var(--void));">
     <div class="sec-inner">
-      <div class="sec-tag">Modern Infrastructure & Protocols</div>
+      <div class="sec-tag">Infrastructure & Protocols</div>
       
-      <div style="grid-column: span 4;">
-        <h2 style="font-family: 'Unbounded', sans-serif; font-size: 32px; line-height: 1; letter-spacing: -1px; margin-bottom: 24px;">Built for the<br><span style="color: var(--vis)">2026 Era.</span></h2>
-        <p style="font-size: 12px; color: var(--t2); line-height: 1.8;">OPTIMIZED FOR NVIDIA VERA RUBIN NVL72 + NEMOCLAW AGENTIC OS. ZERO-LATENCY INTERVENTION ACROSS EVERY FRAMEWORK.</p>
+      <div style="grid-column: span 12; margin-bottom: 60px;">
+        <h2 style="font-family: 'Unbounded', sans-serif; font-size: clamp(32px, 5vw, 64px); line-height: 0.9; letter-spacing: -2px; margin: 0;">Built for the<br><span style="color: var(--vis); text-shadow: 0 0 20px rgba(0,229,255,0.4);">2026 Tensor Era.</span></h2>
+        <p style="font-size: 13px; color: var(--t2); letter-spacing: 2px; margin-top: 20px; max-width: 800px;">OPTIMIZED FOR NVIDIA VERA RUBIN NVL72 + NEMOCLAW AGENTIC OS. ZERO-LATENCY INTERVENTION ACROSS EVERY FRAMEWORK.</p>
       </div>
 
-      <div style="grid-column: span 8; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--rim); border: 1px solid var(--rim);">
-        <div style="background: var(--void); padding: 30px;">
-          <div style="font-size: 18px; margin-bottom: 10px;">🚀</div>
-          <div style="font-family: 'Unbounded', sans-serif; font-size: 11px; font-weight: 700; margin-bottom: 10px;">RUBIN OPTIMIZED</div>
-          <p style="font-size: 10px; color: var(--t2);">1.2TB/s memory throughput. Built-in tensor mesh observability.</p>
+      <div class="protocol-cols" style="grid-column: span 12; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px;">
+        <!-- P1: Rubin -->
+        <div class="protocol-card" style="position:relative; background: rgba(255,255,255,0.02); border: 1px solid var(--rim); padding: 40px; clip-path: polygon(0 0, 85% 0, 100% 15%, 100% 100%, 0 100%); transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); border-left: 3px solid var(--vis);">
+          <div class="protocol-icon-wrap" style="color: var(--vis); margin-bottom: 24px;">
+            <svg viewBox="0 0 24 24" width="40" height="40">
+              <defs><linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:var(--vis);stop-opacity:1" /><stop offset="100%" style="stop-color:#0088ff;stop-opacity:1" /></linearGradient></defs>
+              <path fill="url(#grad1)" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
+            </svg>
+          </div>
+          <div style="font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 1px; margin-bottom: 12px; color:#fff;">RUBIN OPTIMIZED</div>
+          <p style="font-size: 11px; color: var(--t2); line-height: 1.7; opacity: 0.8;">1.2TB/s memory throughput. Built-in tensor mesh observability for NVL72 arrays.</p>
+          <div style="position:absolute; bottom:20px; right:20px; font-size:9px; color:var(--vis); font-family:monospace; font-weight:bold; opacity:0.3;">01_CORE</div>
         </div>
-        <div style="background: var(--void); padding: 30px;">
-          <div style="font-size: 18px; margin-bottom: 10px;">🧠</div>
-          <div style="font-family: 'Unbounded', sans-serif; font-size: 11px; font-weight: 700; margin-bottom: 10px;">NEMOCLAW READY</div>
-          <p style="font-size: 10px; color: var(--t2);">Kernel-level preemption for rogue agent mitigation.</p>
+        <!-- P2: NemoClaw -->
+        <div class="protocol-card" style="position:relative; background: rgba(255,255,255,0.02); border: 1px solid var(--rim); padding: 40px; clip-path: polygon(0 0, 85% 0, 100% 15%, 100% 100%, 0 100%); transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); border-left: 3px solid var(--saf);">
+          <div class="protocol-icon-wrap" style="color: var(--saf); margin-bottom: 24px;">
+            <svg viewBox="0 0 24 24" width="40" height="40">
+              <defs><linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:var(--saf);stop-opacity:1" /><stop offset="100%" style="stop-color:#00cc66;stop-opacity:1" /></linearGradient></defs>
+              <path fill="url(#grad2)" d="M15 9H9v6h6V9zm-2 4h-2v-2h2v2zm8-2V9h-2V7c0-1.1-.9-2-2-2h-2V3h-2v2h-2V3H9v2H7c-1.1 0-2 .9-2 2v2H3v2h2v2H3v2h2v2c0 1.1.9 2 2 2h2v2h2v-2h2v2h2v-2h2c1.1 0 2-.9 2-2v-2h2v-2h-2v-2h2zm-4 6H7V7h10v10z"/>
+            </svg>
+          </div>
+          <div style="font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 1px; margin-bottom: 12px; color:#fff;">NEMOCLAW READY</div>
+          <p style="font-size: 11px; color: var(--t2); line-height: 1.7; opacity: 0.8;">Kernel-level preemption for rogue agent mitigation and safe-state anchoring across swarm loops.</p>
+          <div style="position:absolute; bottom:20px; right:20px; font-size:9px; color:var(--saf); font-family:monospace; font-weight:bold; opacity:0.3;">02_SAFE</div>
         </div>
-        <div style="background: var(--void); padding: 30px;">
-          <div style="font-size: 18px; margin-bottom: 10px;">🌐</div>
-          <div style="font-family: 'Unbounded', sans-serif; font-size: 11px; font-weight: 700; margin-bottom: 10px;">UNIVERSAL FLOW</div>
-          <p style="font-size: 10px; color: var(--t2);">Support for LangChain, AutoGPT, CrewAI, and Custom Stacks.</p>
+        <!-- P3: Flow -->
+        <div class="protocol-card" style="position:relative; background: rgba(255,255,255,0.02); border: 1px solid var(--rim); padding: 40px; clip-path: polygon(0 0, 85% 0, 100% 15%, 100% 100%, 0 100%); transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); border-left: 3px solid var(--priv);">
+          <div class="protocol-icon-wrap" style="color: var(--priv); margin-bottom: 24px;">
+            <svg viewBox="0 0 24 24" width="40" height="40">
+              <defs><linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:var(--priv);stop-opacity:1" /><stop offset="100%" style="stop-color:#ff00ff;stop-opacity:1" /></linearGradient></defs>
+              <path fill="url(#grad3)" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-2.5-7.5l5 2.5-5 2.5v-5z"/>
+            </svg>
+          </div>
+          <div style="font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 1px; margin-bottom: 12px; color:#fff;">UNIVERSAL FLOW</div>
+          <p style="font-size: 11px; color: var(--t2); line-height: 1.7; opacity: 0.8;">Reactive observability that hooks directly into LangChain, AutoGPT, and CrewAI frameworks.</p>
+          <div style="position:absolute; bottom:20px; right:20px; font-size:9px; color:var(--priv); font-family:monospace; font-weight:bold; opacity:0.3;">03_SYNC</div>
         </div>
-        <div style="background: var(--void); padding: 30px;">
-          <div style="font-size: 18px; margin-bottom: 10px;">⚡</div>
-          <div style="font-family: 'Unbounded', sans-serif; font-size: 11px; font-weight: 700; margin-bottom: 10px;">SUB-MS LATENCY</div>
-          <p style="font-size: 10px; color: var(--t2);">Reactive observability that doesn't slow down your agents.</p>
+        <!-- P4: Bolt -->
+        <div class="protocol-card" style="position:relative; background: rgba(255,255,255,0.02); border: 1px solid var(--rim); padding: 40px; clip-path: polygon(0 0, 85% 0, 100% 15%, 100% 100%, 0 100%); transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); border-left: 3px solid var(--warn);">
+          <div class="protocol-icon-wrap" style="color: var(--warn); margin-bottom: 24px;">
+            <svg viewBox="0 0 24 24" width="40" height="40">
+              <defs><linearGradient id="grad4" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:var(--warn);stop-opacity:1" /><stop offset="100%" style="stop-color:#ffbb00;stop-opacity:1" /></linearGradient></defs>
+              <path fill="url(#grad4)" d="M7 2v11h3v9l7-12h-4l4-8H7z"/>
+            </svg>
+          </div>
+          <div style="font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 1px; margin-bottom: 12px; color:#fff;">SUB-MS LATENCY</div>
+          <p style="font-size: 11px; color: var(--t2); line-height: 1.7; opacity: 0.8;">Inference-aware anomaly detection that zero-points faults under 0.8ms without overhead.</p>
+          <div style="position:absolute; bottom:20px; right:20px; font-size:9px; color:var(--warn); font-family:monospace; font-weight:bold; opacity:0.3;">04_FAST</div>
         </div>
       </div>
     </div>
@@ -2226,22 +2330,24 @@
     <div id="obs-canvas-wrap">
       <canvas id="obs-canvas"></canvas>
 
-      <div id="obs-hud">
+      <div id="obs-hud" onclick="this.classList.toggle('collapsed')">
         <div class="hud-title-bar">
           <div class="hud-dot hud-dot-r"></div>
           <div class="hud-dot hud-dot-y"></div>
           <div class="hud-dot hud-dot-g"></div>
-          <span class="hud-brand">VEILPIERCER &middot; VERA RUBIN</span>
+          <span class="hud-brand">SYSTEM STATUS &middot; INTERACTIVE</span>
+          <span style="margin-left:auto; font-size:10px; color:var(--vis); opacity:0.6;">▼</span>
         </div>
         <div class="hud-body">
+          <div style="font-family:'Unbounded',sans-serif; font-size:9px; letter-spacing:3px; color:var(--vis); margin-bottom:20px; border-bottom:1px solid rgba(0,229,255,0.1); padding-bottom:10px;">VERA RUBIN OBSERVATORY</div>
           <div class="hud-row">THROUGHPUT/SEC<span class="hud-val" id="obs-cap">0</span></div>
           <div class="hud-row">SURVIVABILITY<span class="hud-val safe" id="obs-surv">100%</span></div>
           <div class="hud-row">ACTIVE AGENTS<span class="hud-val" id="obs-count">0</span></div>
           <div class="hud-row">TENSOR CORES<span class="hud-val" id="obs-tensors">0</span></div>
           <div class="hud-row">FAULT ZONES<span class="hud-val crit" id="obs-faults">0</span></div>
           <div class="hud-row">FRAME<span class="hud-val" id="obs-frame">0</span></div>
+          <div id="obs-status-bar" style="border-top:1px solid rgba(0,229,255,0.1); margin-top:15px; padding-top:15px; font-size:9px; color:var(--t2); line-height:1.6">VEILPIERCER: Ready for tactical audit.</div>
         </div>
-        <div id="obs-status-bar">VEILPIERCER: Awaiting Slime Flow deployment.</div>
       </div>
 
       <div id="obs-speed-wrap">
@@ -3325,7 +3431,7 @@ function obsReset(){if(window.__obsResetFn)window.__obsResetFn();}
   rend.setClearColor(0,0);
 
   /* === NODES === */
-  var N=320;
+  var N=600; // DOUBLED DENSITY
   var nodes=[];
   var CYAN=new THREE.Color(0x00e5ff);
   var PURP=new THREE.Color(0xbf00ff);
@@ -3334,15 +3440,36 @@ function obsReset(){if(window.__obsResetFn)window.__obsResetFn();}
   for(var i=0;i<N;i++){
     var t=Math.random();
     nodes.push({
-      x:rr(-W*.6,W*.6),y:rr(-H*.6,H*.6),z:rr(-250,80),
-      vx:rr(-.22,.22),vy:rr(-.22,.22),vz:rr(-.05,.05),
+      x:rr(-W*0.9,W*0.9),y:rr(-H*0.9,H*0.9),z:rr(-350,150),
+      vx:rr(-.18,.18),vy:rr(-.18,.18),vz:rr(-.05,.05),
       col:t>.88?PURP:(t>.76?GRN:CYAN),
-      sz:t>.88?5.2:(t>.76?3.8:2.4),
+      sz:t>.88?4.8:(t>.76?3.2:1.8),
       pulse:Math.random()*Math.PI*2,
       ps:rr(.5,1.3),
       isTensor:t>.88
     });
   }
+
+  // ── Inject tiny background particles (from Stripe logic) ──
+  var ptGeo = new THREE.BufferGeometry();
+  var ptCount = 900; 
+  var ptPos = new Float32Array(ptCount * 3);
+  for(var i=0; i<ptCount*3; i+=3){
+      ptPos[i] = rr(-W*1.8, W*1.8);
+      ptPos[i+1] = rr(-H*1.8, H*1.8);
+      ptPos[i+2] = rr(-600, 100); 
+  }
+  ptGeo.setAttribute('position', new THREE.BufferAttribute(ptPos, 3));
+  var ptMat = new THREE.PointsMaterial({
+      size: 1.6,
+      color: 0x00e5ff,
+      transparent: true,
+      opacity: 0.28,
+      blending: THREE.AdditiveBlending,
+      sizeAttenuation: true
+  });
+  var ptSystem = new THREE.Points(ptGeo, ptMat);
+  scene.add(ptSystem);
 
   /* POINT BUFFERS */
   var pPos=new Float32Array(N*3),pCol=new Float32Array(N*3),pSz=new Float32Array(N),pSh=new Float32Array(N);
@@ -3377,7 +3504,7 @@ function obsReset(){if(window.__obsResetFn)window.__obsResetFn();}
   var pts=new THREE.Points(pGeo,pMat);scene.add(pts);
 
   /* LINE BUFFERS */
-  var CDIST=180,MAXL=N*12;
+  var CDIST=230,MAXL=N*12; // INCREASED CONNECTION RADIUS
   var lPos=new Float32Array(MAXL*6),lCol=new Float32Array(MAXL*6);
   var lGeo=new THREE.BufferGeometry();
   var lPA=new THREE.BufferAttribute(lPos,3);lPA.setUsage(THREE.DynamicDrawUsage);
@@ -3406,15 +3533,28 @@ function obsReset(){if(window.__obsResetFn)window.__obsResetFn();}
     cam.position.y+=(-cy-cam.position.y)*.04;
     cam.lookAt(scene.position);
 
+    /* Flux rotation (Stripe) */
+    ptSystem.rotation.y += 0.0004;
+    ptSystem.rotation.x += 0.0002;
+
     for(var i=0;i<N;i++){
       var nd=nodes[i];
       nd.pulse+=nd.ps*.016;
       nd.x+=nd.vx;nd.y+=nd.vy;nd.z+=nd.vz;
-      /* mouse gravity */
+      
+      /* breathing loop force (out and in) */
+      var dist = Math.sqrt(nd.x*nd.x + nd.y*nd.y + nd.z*nd.z) || 1;
+      var breathe = Math.sin(t * 0.8) * 0.12; // Adjusted for smooth rhythm
+      nd.vx += (nd.x / dist) * breathe;
+      nd.vy += (nd.y / dist) * breathe;
+      nd.vz += (nd.z / dist) * breathe;
+
+      /* mouse gravity (toned down to allow breathing) */
       var dx=mx-nd.x,dy=my-nd.y,d2=dx*dx+dy*dy,R2=350*350;
-      if(d2<R2&&d2>1){var s=.03*(1-Math.sqrt(d2)/350);nd.vx+=dx*s;nd.vy+=dy*s;}
-      nd.vx*=.987;nd.vy*=.987;nd.vz*=.992;
-      var sp=Math.sqrt(nd.vx*nd.vx+nd.vy*nd.vy);if(sp>.85){nd.vx*=.85/sp;nd.vy*=.85/sp;}
+      if(d2<R2&&d2>1){var s=.015*(1-Math.sqrt(d2)/350);nd.vx+=dx*s;nd.vy+=dy*s;}
+      
+      nd.vx*=.98;nd.vy*=.98;nd.vz*=.985; // Slightly more friction for control
+      var sp=Math.sqrt(nd.vx*nd.vx+nd.vy*nd.vy);if(sp>1.2){nd.vx*=1.2/sp;nd.vy*=1.2/sp;}
       var BX=W*.65,BY=H*.65;
       if(nd.x<-BX){nd.x=-BX;nd.vx=Math.abs(nd.vx);}if(nd.x>BX){nd.x=BX;nd.vx=-Math.abs(nd.vx);}
       if(nd.y<-BY){nd.y=-BY;nd.vy=Math.abs(nd.vy);}if(nd.y>BY){nd.y=BY;nd.vy=-Math.abs(nd.vy);}

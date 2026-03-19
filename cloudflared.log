@@ -1,57 +1,25 @@
-{"level":"info","time":"2026-03-14T10:18:49Z","message":"Thank you for trying Cloudflare Tunnel. Doing so, without a Cloudflare account, is a quick way to experiment and try it out. However, be aware that these account-less Tunnels have no uptime guarantee, are subject to the Cloudflare Online Services Terms of Use (https://www.cloudflare.com/website-terms/), and Cloudflare reserves the right to investigate your use of Tunnels for violations of such terms. If you intend to use Tunnels in production you should use a pre-created named tunnel by following: https://developers.cloudflare.com/cloudflare-one/connections/connect-apps"}
-{"level":"info","time":"2026-03-14T10:18:49Z","message":"Requesting new quick Tunnel on trycloudflare.com..."}
-{"level":"info","time":"2026-03-14T10:18:53Z","message":"+--------------------------------------------------------------------------------------------+"}
-{"level":"info","time":"2026-03-14T10:18:53Z","message":"|  Your quick Tunnel has been created! Visit it at (it may take some time to be reachable):  |"}
-{"level":"info","time":"2026-03-14T10:18:53Z","message":"|  https://employees-creatures-lawn-hayes.trycloudflare.com                                  |"}
-{"level":"info","time":"2026-03-14T10:18:53Z","message":"+--------------------------------------------------------------------------------------------+"}
-{"level":"info","time":"2026-03-14T10:18:53Z","message":"Cannot determine default configuration path. No file [config.yml config.yaml] in [~/.cloudflared ~/.cloudflare-warp ~/cloudflare-warp]"}
-{"level":"info","time":"2026-03-14T10:18:53Z","message":"Version 2025.8.1 (Checksum b5d598b00cc3a28cabc5812d9f762819334614bae452db4e7f23eefe7b081556)"}
-{"level":"info","time":"2026-03-14T10:18:53Z","message":"GOOS: windows, GOVersion: go1.24.2, GoArch: amd64"}
-{"level":"info","time":"2026-03-14T10:18:53Z","message":"Settings: map[ha-connections:1 logfile:cloudflared.log protocol:quic url:http://localhost:3000]"}
-{"level":"info","time":"2026-03-14T10:18:53Z","message":"cloudflared will not automatically update on Windows systems."}
-{"level":"info","time":"2026-03-14T10:18:53Z","message":"Generated Connector ID: f971a275-c46e-4c90-b3a4-f5813f975459"}
-{"level":"info","time":"2026-03-14T10:18:53Z","message":"Initial protocol quic"}
-{"level":"info","time":"2026-03-14T10:18:53Z","message":"ICMP proxy will use 192.168.0.188 as source for IPv4"}
-{"level":"info","time":"2026-03-14T10:18:53Z","message":"ICMP proxy will use fe80::6f6:711a:f864:7c52 in zone Wi-Fi as source for IPv6"}
-{"level":"error","originCertPath":"","time":"2026-03-14T10:18:53Z","message":"Cannot determine default origin certificate path. No file cert.pem in [~/.cloudflared ~/.cloudflare-warp ~/cloudflare-warp]. You need to specify the origin certificate path by specifying the origincert option in the configuration file, or set TUNNEL_ORIGIN_CERT environment variable"}
-{"level":"info","time":"2026-03-14T10:18:53Z","message":"cloudflared does not support loading the system root certificate pool on Windows. Please use --origin-ca-pool <PATH> to specify the path to the certificate pool"}
-{"level":"info","time":"2026-03-14T10:18:53Z","message":"ICMP proxy will use 192.168.0.188 as source for IPv4"}
-{"level":"info","event":0,"ip":"198.41.200.63","connIndex":0,"time":"2026-03-14T10:18:53Z","message":"Tunnel connection curve preferences: [X25519MLKEM768 CurveP256]"}
-{"level":"info","time":"2026-03-14T10:18:53Z","message":"ICMP proxy will use fe80::6f6:711a:f864:7c52 in zone Wi-Fi as source for IPv6"}
-{"level":"info","time":"2026-03-14T10:18:53Z","message":"Starting metrics server on 127.0.0.1:20241/metrics"}
-{"level":"info","event":0,"connection":"5adcf358-71d3-4692-a2f6-e30de3d315e6","connIndex":0,"location":"yyz04","ip":"198.41.200.63","protocol":"quic","time":"2026-03-14T10:18:53Z","message":"Registered tunnel connection"}
-{"level":"error","error":"lookup region1.v2.argotunnel.com: i/o timeout","time":"2026-03-14T10:18:58Z","message":"Failed to initialize DNS local resolver"}
-{"level":"error","event":1,"connIndex":0,"originService":"http://localhost:3000","ingressRule":0,"error":"Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connectex: No connection could be made because the target machine actively refused it.","time":"2026-03-14T10:21:44Z"}
-{"level":"error","event":0,"ip":"198.41.200.63","connIndex":0,"error":"Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connectex: No connection could be made because the target machine actively refused it.","type":"http","dest":"https://employees-creatures-lawn-hayes.trycloudflare.com/","time":"2026-03-14T10:21:44Z","message":"Request failed"}
-{"level":"error","event":1,"connIndex":0,"originService":"http://localhost:3000","ingressRule":0,"error":"Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connectex: No connection could be made because the target machine actively refused it.","time":"2026-03-14T10:21:45Z"}
-{"level":"error","event":0,"ip":"198.41.200.63","connIndex":0,"error":"Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connectex: No connection could be made because the target machine actively refused it.","type":"http","dest":"https://employees-creatures-lawn-hayes.trycloudflare.com/favicon.ico","time":"2026-03-14T10:21:45Z","message":"Request failed"}
-{"level":"error","error":"lookup region1.v2.argotunnel.com: i/o timeout","time":"2026-03-14T10:24:03Z","message":"Failed to refresh DNS local resolver"}
-{"level":"error","error":"lookup region1.v2.argotunnel.com: i/o timeout","time":"2026-03-14T10:29:08Z","message":"Failed to refresh DNS local resolver"}
-{"level":"error","error":"lookup region1.v2.argotunnel.com: i/o timeout","time":"2026-03-14T10:34:13Z","message":"Failed to refresh DNS local resolver"}
-{"level":"error","error":"lookup region1.v2.argotunnel.com: i/o timeout","time":"2026-03-14T10:39:18Z","message":"Failed to refresh DNS local resolver"}
-{"level":"error","error":"lookup region1.v2.argotunnel.com: i/o timeout","time":"2026-03-14T10:44:23Z","message":"Failed to refresh DNS local resolver"}
-{"level":"error","error":"lookup region1.v2.argotunnel.com: i/o timeout","time":"2026-03-14T10:49:28Z","message":"Failed to refresh DNS local resolver"}
-{"level":"error","error":"lookup region1.v2.argotunnel.com: i/o timeout","time":"2026-03-14T10:54:33Z","message":"Failed to refresh DNS local resolver"}
-{"level":"error","error":"lookup region1.v2.argotunnel.com: i/o timeout","time":"2026-03-14T10:59:38Z","message":"Failed to refresh DNS local resolver"}
-{"level":"error","error":"lookup region1.v2.argotunnel.com: i/o timeout","time":"2026-03-14T11:04:43Z","message":"Failed to refresh DNS local resolver"}
-{"level":"error","error":"lookup region1.v2.argotunnel.com: i/o timeout","time":"2026-03-14T11:09:48Z","message":"Failed to refresh DNS local resolver"}
-{"level":"error","event":1,"connIndex":0,"originService":"http://localhost:3000","ingressRule":0,"error":"read tcp 127.0.0.1:49690->127.0.0.1:3000: wsarecv: An existing connection was forcibly closed by the remote host.","time":"2026-03-14T11:11:47Z"}
-{"level":"error","event":0,"ip":"198.41.200.63","connIndex":0,"error":"read tcp 127.0.0.1:49690->127.0.0.1:3000: wsarecv: An existing connection was forcibly closed by the remote host.","type":"http","dest":"https://employees-creatures-lawn-hayes.trycloudflare.com/stream","time":"2026-03-14T11:11:47Z","message":"Request failed"}
-{"level":"error","error":"lookup region1.v2.argotunnel.com: i/o timeout","time":"2026-03-14T11:14:55Z","message":"Failed to refresh DNS local resolver"}
-{"level":"error","error":"lookup region1.v2.argotunnel.com: i/o timeout","time":"2026-03-14T11:20:00Z","message":"Failed to refresh DNS local resolver"}
-{"level":"error","error":"lookup region1.v2.argotunnel.com: i/o timeout","time":"2026-03-14T11:25:05Z","message":"Failed to refresh DNS local resolver"}
-{"level":"error","error":"lookup region1.v2.argotunnel.com: i/o timeout","time":"2026-03-14T11:30:10Z","message":"Failed to refresh DNS local resolver"}
-{"level":"error","error":"lookup region1.v2.argotunnel.com: i/o timeout","time":"2026-03-14T11:35:15Z","message":"Failed to refresh DNS local resolver"}
-{"level":"error","error":"lookup region1.v2.argotunnel.com: i/o timeout","time":"2026-03-14T11:40:20Z","message":"Failed to refresh DNS local resolver"}
-{"level":"error","error":"lookup region1.v2.argotunnel.com: i/o timeout","time":"2026-03-14T11:45:25Z","message":"Failed to refresh DNS local resolver"}
-{"level":"error","error":"lookup region1.v2.argotunnel.com: i/o timeout","time":"2026-03-14T11:50:30Z","message":"Failed to refresh DNS local resolver"}
-{"level":"error","error":"lookup region1.v2.argotunnel.com: i/o timeout","time":"2026-03-14T11:55:35Z","message":"Failed to refresh DNS local resolver"}
-{"level":"error","error":"lookup region1.v2.argotunnel.com: i/o timeout","time":"2026-03-14T12:00:40Z","message":"Failed to refresh DNS local resolver"}
-{"level":"error","error":"lookup region1.v2.argotunnel.com: i/o timeout","time":"2026-03-14T12:05:45Z","message":"Failed to refresh DNS local resolver"}
-{"level":"error","error":"lookup region1.v2.argotunnel.com: i/o timeout","time":"2026-03-14T12:10:50Z","message":"Failed to refresh DNS local resolver"}
-{"level":"error","error":"lookup region1.v2.argotunnel.com: i/o timeout","time":"2026-03-14T12:15:56Z","message":"Failed to refresh DNS local resolver"}
-{"level":"error","error":"lookup region1.v2.argotunnel.com: i/o timeout","time":"2026-03-14T12:21:01Z","message":"Failed to refresh DNS local resolver"}
-{"level":"error","error":"lookup region1.v2.argotunnel.com: i/o timeout","time":"2026-03-14T12:26:06Z","message":"Failed to refresh DNS local resolver"}
-{"level":"error","error":"lookup region1.v2.argotunnel.com: i/o timeout","time":"2026-03-14T12:31:11Z","message":"Failed to refresh DNS local resolver"}
-{"level":"error","error":"lookup region1.v2.argotunnel.com: i/o timeout","time":"2026-03-14T12:36:16Z","message":"Failed to refresh DNS local resolver"}
-{"level":"error","error":"lookup region1.v2.argotunnel.com: i/o timeout","time":"2026-03-14T12:41:21Z","message":"Failed to refresh DNS local resolver"}
+2026-03-19T01:32:59Z INF Starting tunnel tunnelID=5a7a7ebd-4dc4-49df-b683-5b8521fda23e
+2026-03-19T01:32:59Z INF Version 2025.8.1 (Checksum b5d598b00cc3a28cabc5812d9f762819334614bae452db4e7f23eefe7b081556)
+2026-03-19T01:32:59Z INF GOOS: windows, GOVersion: go1.24.2, GoArch: amd64
+2026-03-19T01:32:59Z INF Settings: map[cred-file:C:\Users\fyou1\.cloudflared\5a7a7ebd-4dc4-49df-b683-5b8521fda23e.json credentials-file:C:\Users\fyou1\.cloudflared\5a7a7ebd-4dc4-49df-b683-5b8521fda23e.json]
+2026-03-19T01:32:59Z INF cloudflared will not automatically update on Windows systems.
+2026-03-19T01:32:59Z INF Generated Connector ID: 4e196eda-4d4b-49e7-9265-5dbd4c88a5ce
+2026-03-19T01:32:59Z INF Initial protocol quic
+2026-03-19T01:32:59Z INF ICMP proxy will use 192.168.0.188 as source for IPv4
+2026-03-19T01:32:59Z INF ICMP proxy will use fe80::6f6:711a:f864:7c52 in zone Wi-Fi as source for IPv6
+2026-03-19T01:32:59Z INF cloudflared does not support loading the system root certificate pool on Windows. Please use --origin-ca-pool <PATH> to specify the path to the certificate pool
+2026-03-19T01:32:59Z INF cloudflared does not support loading the system root certificate pool on Windows. Please use --origin-ca-pool <PATH> to specify the path to the certificate pool
+2026-03-19T01:32:59Z INF cloudflared does not support loading the system root certificate pool on Windows. Please use --origin-ca-pool <PATH> to specify the path to the certificate pool
+2026-03-19T01:32:59Z INF cloudflared does not support loading the system root certificate pool on Windows. Please use --origin-ca-pool <PATH> to specify the path to the certificate pool
+2026-03-19T01:32:59Z INF cloudflared does not support loading the system root certificate pool on Windows. Please use --origin-ca-pool <PATH> to specify the path to the certificate pool
+2026-03-19T01:32:59Z INF ICMP proxy will use 192.168.0.188 as source for IPv4
+2026-03-19T01:32:59Z INF Tunnel connection curve preferences: [X25519MLKEM768 CurveP256] connIndex=0 event=0 ip=198.41.192.27
+2026-03-19T01:32:59Z INF ICMP proxy will use fe80::6f6:711a:f864:7c52 in zone Wi-Fi as source for IPv6
+2026-03-19T01:32:59Z INF Starting metrics server on 127.0.0.1:20241/metrics
+2026-03-19T01:32:59Z INF Registered tunnel connection connIndex=0 connection=93d45061-6cf7-433b-8707-b781350e5222 event=0 ip=198.41.192.27 location=yul01 protocol=quic
+2026-03-19T01:32:59Z INF Tunnel connection curve preferences: [X25519MLKEM768 CurveP256] connIndex=1 event=0 ip=198.41.200.233
+2026-03-19T01:32:59Z INF Registered tunnel connection connIndex=1 connection=7367af88-5110-42fb-8090-126753bd5adb event=0 ip=198.41.200.233 location=yyz06 protocol=quic
+2026-03-19T01:33:00Z INF Tunnel connection curve preferences: [X25519MLKEM768 CurveP256] connIndex=2 event=0 ip=198.41.192.107
+2026-03-19T01:33:00Z INF Registered tunnel connection connIndex=2 connection=4ec8c56a-f60f-470f-bdae-9a408438e46c event=0 ip=198.41.192.107 location=yul01 protocol=quic
+2026-03-19T01:33:01Z INF Tunnel connection curve preferences: [X25519MLKEM768 CurveP256] connIndex=3 event=0 ip=198.41.200.193
+2026-03-19T01:33:01Z INF Registered tunnel connection connIndex=3 connection=9ffc7496-4869-4618-bb76-75528863a685 event=0 ip=198.41.200.193 location=yyz04 protocol=quic
