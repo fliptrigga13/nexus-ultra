@@ -29,10 +29,6 @@ ANTHROPIC_KEY = os.environ.get("ANTHROPIC_API_KEY")
 
 HTML_FILES = [
     "index.html",
-    "veilpiercer-command.html",
-    "veilpiercer-pitch.html",
-    "veilpiercer-ad.html",
-    "access.html",
 ]
 
 SEO_PROMPT = """You are an SEO expert agent. Analyze this HTML file and return a JSON object with:

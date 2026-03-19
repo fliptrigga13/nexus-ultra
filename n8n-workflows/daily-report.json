@@ -59,8 +59,8 @@
         },
         {
             "parameters": {
-                "fromEmail": "nexus@veilpiercer.com",
-                "toEmail": "you@youremail.com",
+                "fromEmail": "laurenflipo1388@gmail.com",
+                "toEmail": "laurenflipo1388@gmail.com",
                 "subject": "VeilPiercer Daily Report — {{ $now.format('MMM D, YYYY') }}",
                 "text": "=== NEXUS ULTRA DAILY REPORT ===\nDate: {{ $now.format('MMMM D, YYYY') }}\n\nSYSTEM STATUS\n- Uptime: {{ $('Fetch NEXUS Status').item.json.uptime }}s\n- Total Captures: {{ $('Fetch NEXUS Status').item.json.captures }}\n\nRECENT ACTIVITY (last 20 log lines)\n{{ $('Fetch NEXUS Logs').item.json.lines.slice(-20).join('\\n') }}\n\n— NEXUS ULTRA AUTO-REPORT",
                 "options": {}

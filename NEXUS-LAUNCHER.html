@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NEXUS LAUNCHER</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0a; color: #e0e0e0;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 28px 32px; min-height: 100vh;
+    }
+    h1 { font-size: 20px; font-weight: 800; color: #00fff7; letter-spacing: 4px; margin-bottom: 3px; }
+    .subtitle { font-size: 11px; color: #444; margin-bottom: 32px; letter-spacing: 1px; }
+
+    .section { margin-bottom: 32px; }
+    .section-title {
+      font-size: 9px; font-weight: 700; letter-spacing: 3px; color: #333;
+      text-transform: uppercase; padding-bottom: 8px;
+      border-bottom: 1px solid #161616; margin-bottom: 14px;
+    }
+
+    /* ── EMERGENCY BANNER ── */
+    #alert-bar {
+      display: none; background: #1a0a00; border: 1px solid #ff6600;
+      border-radius: 8px; padding: 14px 18px; margin-bottom: 20px;
+      font-size: 12px; color: #ff9944; line-height: 1.6;
+    }
+    #alert-bar.show { display: block; }
+    #alert-bar strong { color: #ffcc00; }
+
+    /* ── SERVICE CARDS ── */
+    .services { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
+    .svc {
+      background: #0f0f0f; border: 1px solid #1a1a1a; border-radius: 8px;
+      padding: 12px 14px; display: flex; align-items: flex-start; gap: 10px;
+      cursor: pointer; transition: border-color 0.2s;
+    }
+    .svc:hover { border-color: #2a2a2a; }
+    .svc.is-down { border-color: #3a0808; background: #0f0808; }
+    .dot {
+      width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0;
+      margin-top: 4px; background: #222;
+      transition: background 0.4s, box-shadow 0.4s;
+    }
+    .dot.up   { background: #00e676; box-shadow: 0 0 7px #00e676aa; }
+    .dot.down { background: #ff1744; box-shadow: 0 0 7px #ff1744aa; animation: pulse-red 1.5s infinite; }
+    .dot.spin { background: #ffcc00; box-shadow: 0 0 7px #ffcc00aa; animation: blink 1s infinite; }
+    @keyframes blink    { 0%,100%{opacity:1} 50%{opacity:0.2} }
+    @keyframes pulse-red{ 0%,100%{box-shadow:0 0 7px #ff1744aa} 50%{box-shadow:0 0 16px #ff1744} }
+    .svc-name { font-size: 12px; font-weight: 700; color: #ddd; margin-bottom: 2px; }
+    .svc-port { font-size: 10px; color: #555; margin-bottom: 3px; }
+    .svc-what { font-size: 10px; color: #3a3a3a; line-height: 1.4; }
+    .svc-fix  { display: none; font-size: 10px; color: #ff6600; margin-top: 6px; line-height: 1.5; }
+    .svc.is-down .svc-fix { display: block; }
+    .svc.is-down .svc-what { display: none; }
+
+    /* ── FIX MODAL ── */
+    #fix-modal {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.85); z-index: 999;
+      align-items: center; justify-content: center;
+    }
+    #fix-modal.show { display: flex; }
+    .fix-box {
+      background: #0f0f0f; border: 1px solid #ff6600;
+      border-radius: 12px; padding: 28px 32px;
+      max-width: 560px; width: 90%;
+    }
+    .fix-title { font-size: 16px; font-weight: 800; color: #ff6600; margin-bottom: 6px; }
+    .fix-sub   { font-size: 11px; color: #555; margin-bottom: 20px; }
+    .fix-step  {
+      background: #161616; border-radius: 6px;
+      padding: 12px 16px; margin-bottom: 10px;
+      font-size: 12px; color: #ccc; line-height: 1.7;
+      border-left: 3px solid #333;
+    }
+    .fix-step.primary { border-left-color: #ff6600; }
+    .fix-step code {
+      display: block; margin-top: 6px;
+      font-family: 'Consolas', monospace; font-size: 11px;
+      color: #00fff7; background: #0a0a0a;
+      padding: 6px 10px; border-radius: 4px;
+      cursor: pointer; user-select: all;
+    }
+    .fix-step code:hover { background: #111; }
+    .fix-close {
+      display: block; width: 100%; margin-top: 16px;
+      background: none; border: 1px solid #333; color: #555;
+      padding: 10px; border-radius: 6px; cursor: pointer;
+      font-family: inherit; font-size: 12px; transition: all 0.2s;
+    }
+    .fix-close:hover { border-color: #555; color: #ccc; }
+
+    /* ── HUB BUTTONS ── */
+    .hubs { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+    .hub {
+      background: #0f0f0f; border: 1px solid #1a1a1a; border-radius: 10px;
+      padding: 16px 18px; text-decoration: none; display: block;
+      transition: all 0.18s; position: relative;
+    }
+    .hub:hover { transform: translateY(-2px); }
+    .hub-label { font-size: 9px; font-weight: 700; letter-spacing: 2px; color: #2a2a2a; margin-bottom: 4px; }
+    .hub-name  { font-size: 14px; font-weight: 800; margin-bottom: 5px; letter-spacing: 1px; }
+    .hub-desc  { font-size: 11px; color: #555; line-height: 1.5; margin-bottom: 6px; }
+    .hub-use   { font-size: 10px; color: #2e2e2e; font-style: italic; }
+    .hub-arrow { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); font-size: 20px; color: #1e1e1e; transition: color 0.18s; }
+
+    .cyan   { border-color: #0d2626; } .cyan .hub-name   { color: #00fff7; } .cyan:hover   { border-color: #00fff7; background: #050f0f; } .cyan:hover .hub-arrow   { color: #00fff7; }
+    .purple { border-color: #1a0d26; } .purple .hub-name { color: #bf00ff; } .purple:hover { border-color: #bf00ff; background: #0a0010; } .purple:hover .hub-arrow { color: #bf00ff; }
+    .green  { border-color: #0d2617; } .green .hub-name  { color: #00e676; } .green:hover  { border-color: #00e676; background: #050f08; } .green:hover .hub-arrow  { color: #00e676; }
+    .gold   { border-color: #261f0d; } .gold .hub-name   { color: #ffcc00; } .gold:hover   { border-color: #ffcc00; background: #0f0d00; } .gold:hover .hub-arrow   { color: #ffcc00; }
+    .pink   { border-color: #26000f; } .pink .hub-name   { color: #ff0099; } .pink:hover   { border-color: #ff0099; background: #0f0008; } .pink:hover .hub-arrow   { color: #ff0099; }
+    .orange { border-color: #261500; } .orange .hub-name { color: #ff6600; } .orange:hover { border-color: #ff6600; background: #0f0800; } .orange:hover .hub-arrow { color: #ff6600; }
+
+    /* ── NOTES ── */
+    .notes { display: flex; flex-direction: column; gap: 8px; }
+    .note {
+      background: #0f0f0f; border: 1px solid #1a1a1a; border-left: 3px solid #222;
+      border-radius: 6px; padding: 12px 16px;
+    }
+    .note.hot  { border-left-color: #ff6600; }
+    .note.med  { border-left-color: #ffcc00; }
+    .note.low  { border-left-color: #334; }
+    .note-title { font-size: 12px; font-weight: 700; color: #ccc; margin-bottom: 4px; }
+    .note-body  { font-size: 11px; color: #444; line-height: 1.6; }
+    .note-body strong { color: #666; }
+
+    /* ── FOOTER ── */
+    .footer { display: flex; align-items: center; justify-content: space-between; font-size: 10px; color: #2a2a2a; margin-top: 8px; }
+    #refresh-btn {
+      background: none; border: 1px solid #1e1e1e; color: #333;
+      padding: 5px 14px; border-radius: 5px; cursor: pointer;
+      font-size: 10px; font-family: inherit; transition: all 0.18s;
+    }
+    #refresh-btn:hover { border-color: #00fff7; color: #00fff7; }
+  </style>
+</head>
+<body>
+
+<!-- ── FIX MODAL (pops up when you click a red service) ── -->
+<div id="fix-modal">
+  <div class="fix-box">
+    <div class="fix-title" id="modal-title">SERVICE DOWN</div>
+    <div class="fix-sub" id="modal-sub">Here's how to fix it:</div>
+    <div id="modal-steps"></div>
+    <button class="fix-close" onclick="document.getElementById('fix-modal').classList.remove('show')">Close</button>
+  </div>
+</div>
+
+<h1>◈ NEXUS LAUNCHER</h1>
+<div class="subtitle">Click anything green to open it · click anything red to see how to fix it · auto-checks every 15 seconds</div>
+
+<!-- ── ALERT BAR (shows when multiple services down) ── -->
+<div id="alert-bar">
+  <strong>Multiple services are down.</strong> Run <strong>START_ULTIMATE_GOD_MODE.bat</strong> on your desktop to restart everything at once.
+  <br>Path: <code style="font-family:monospace;color:#ffcc00">C:\Users\fyou1\Desktop\New folder\nexus-ultra\START_ULTIMATE_GOD_MODE.bat</code>
+</div>
+
+<!-- ── SERVICE STATUS ── -->
+<div class="section">
+  <div class="section-title">What's Running Right Now — Click Red to Fix</div>
+  <div class="services">
+
+    <div class="svc" id="svc-hub" onclick="showFix('hub')">
+      <div class="dot spin" id="dot-hub"></div>
+      <div style="flex:1">
+        <div class="svc-name">NODE HUB</div>
+        <div class="svc-port">localhost:3000</div>
+        <div class="svc-what">Main server. All hub pages route through here.</div>
+        <div class="svc-fix">Click for fix instructions</div>
+      </div>
+    </div>
+
+    <div class="svc" id="svc-ollama" onclick="showFix('ollama')">
+      <div class="dot spin" id="dot-ollama"></div>
+      <div style="flex:1">
+        <div class="svc-name">OLLAMA</div>
+        <div class="svc-port">localhost:11434</div>
+        <div class="svc-what">Runs local AI models — nexus-prime, llama3, deepseek, etc.</div>
+        <div class="svc-fix">Click for fix instructions</div>
+      </div>
+    </div>
+
+    <div class="svc" id="svc-cosmos" onclick="showFix('cosmos')">
+      <div class="dot spin" id="dot-cosmos"></div>
+      <div style="flex:1">
+        <div class="svc-name">COSMOS</div>
+        <div class="svc-port">localhost:9100</div>
+        <div class="svc-what">14-node AI swarm brain. Routes tasks between all agents.</div>
+        <div class="svc-fix">Click for fix instructions</div>
+      </div>
+    </div>
+
+    <div class="svc" id="svc-pso" onclick="showFix('pso')">
+      <div class="dot spin" id="dot-pso"></div>
+      <div style="flex:1">
+        <div class="svc-name">PSO GPU BRAIN</div>
+        <div class="svc-port">localhost:7700</div>
+        <div class="svc-what">Julia + RTX 4060 particle swarm optimizer.</div>
+        <div class="svc-fix">Click for fix instructions</div>
+      </div>
+    </div>
+
+    <div class="svc" id="svc-eh" onclick="showFix('eh')">
+      <div class="dot spin" id="dot-eh"></div>
+      <div style="flex:1">
+        <div class="svc-name">EH API</div>
+        <div class="svc-port">localhost:7701</div>
+        <div class="svc-what">Task injection endpoint. Sends commands into the swarm.</div>
+        <div class="svc-fix">Click for fix instructions</div>
+      </div>
+    </div>
+
+    <div class="svc" id="svc-hubpy" onclick="showFix('hubpy')">
+      <div class="dot spin" id="dot-hubpy"></div>
+      <div style="flex:1">
+        <div class="svc-name">HUB SERVER</div>
+        <div class="svc-port">localhost:7702</div>
+        <div class="svc-what">Python backend for memory, agent data, and hub APIs.</div>
+        <div class="svc-fix">Click for fix instructions</div>
+      </div>
+    </div>
+
+    <div class="svc" id="svc-n8n" onclick="showFix('n8n')">
+      <div class="dot spin" id="dot-n8n"></div>
+      <div style="flex:1">
+        <div class="svc-name">n8n AUTOMATION</div>
+        <div class="svc-port">localhost:5678</div>
+        <div class="svc-what">Visual workflow builder. Connects COSMOS to external services.</div>
+        <div class="svc-fix">Click for fix instructions</div>
+      </div>
+    </div>
+
+    <div class="svc" id="svc-claw" onclick="showFix('claw')">
+      <div class="dot spin" id="dot-claw"></div>
+      <div style="flex:1">
+        <div class="svc-name">OPENCLAW</div>
+        <div class="svc-port">localhost:18789</div>
+        <div class="svc-what">Watchdog monitor. Bridges Discord to COSMOS.</div>
+        <div class="svc-fix">Click for fix instructions</div>
+      </div>
+    </div>
+
+    <div class="svc" id="svc-tunnel" onclick="showFix('tunnel')">
+      <div class="dot spin" id="dot-tunnel"></div>
+      <div style="flex:1">
+        <div class="svc-name">VEILPIERCER TUNNEL</div>
+        <div class="svc-port">veilpiercer.com → :3000</div>
+        <div class="svc-what">Cloudflare tunnel. Makes veilpiercer.com work for buyers.</div>
+        <div class="svc-fix">Click for fix instructions</div>
+      </div>
+    </div>
+
+    <!-- Aggregate Status Box -->
+    <div class="svc" id="svc-all">
+      <div class="dot spin" id="dot-all"></div>
+      <div style="flex:1">
+        <div class="svc-name" id="name-all" style="color: #00fff7;">SYSTEM HEALTH</div>
+        <div class="svc-port">Aggregate Status</div>
+        <div class="svc-what" id="what-all">Evaluating...</div>
+        <div class="svc-fix" id="fix-all" style="color: #ff1744; font-weight: bold;"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── HUB LINKS ── -->
+<div class="section">
+  <div class="section-title">Open a Hub — Click to Launch</div>
+  <div class="hubs">
+
+    <a class="hub cyan" href="http://127.0.0.1:3000/nexus_hub.html" target="_blank">
+      <div class="hub-label">PRIMARY COMMAND CENTER</div>
+      <div class="hub-name">NEXUS HUB</div>
+      <div class="hub-desc">Full command center — chat, agents, memory, 700+ capabilities.</div>
+      <div class="hub-use">Use this for: day-to-day control, sending tasks, reading agent output</div>
+      <span class="hub-arrow">→</span>
+    </a>
+
+    <a class="hub purple" href="nexus_hub_ultra.html" target="_blank">
+      <div class="hub-label">ULTIMATE GOD MODE HUB</div>
+      <div class="hub-name">GOD MODE HUB</div>
+      <div class="hub-desc">NEXUS ULTRA PREMIUM — 700+ capabilities, live swarm observatory & deep memory pulse.</div>
+      <div class="hub-use">Use this for: Full God Mode control, real-time swarm visualizer</div>
+      <span class="hub-arrow">→</span>
+    </a>
+
+    <a class="hub green" href="http://127.0.0.1:3000/internal-panel.html" target="_blank">
+      <div class="hub-label">INTERNAL ADMIN</div>
+      <div class="hub-name">INTERNAL PANEL</div>
+      <div class="hub-desc">Token management, access control, admin-level settings.</div>
+      <div class="hub-use">Use this for: managing access tokens, internal admin tasks</div>
+      <span class="hub-arrow">→</span>
+    </a>
+
+    <a class="hub cyan" href="http://127.0.0.1:3000/nexus_prime_command.html" target="_blank">
+      <div class="hub-label">PRIME COMMAND</div>
+      <div class="hub-name">NEXUS PRIME COMMAND</div>
+      <div class="hub-desc">Nexus Prime direct interface. LangGraph + ChromaDB memory view.</div>
+      <div class="hub-use">Use this for: Nexus Prime direct access, memory queries</div>
+      <span class="hub-arrow">→</span>
+    </a>
+
+    <a class="hub orange" href="http://127.0.0.1:3000/nexus_ultra_dashboard.html" target="_blank">
+      <div class="hub-label">ANALYTICS DASHBOARD</div>
+      <div class="hub-name">ULTRA DASHBOARD</div>
+      <div class="hub-desc">System-wide analytics and metrics overview for the full stack.</div>
+      <div class="hub-use">Use this for: performance overview, system-wide metrics</div>
+      <span class="hub-arrow">→</span>
+    </a>
+
+    <a class="hub green" href="http://127.0.0.1:3000/pso-trainer.html" target="_blank">
+      <div class="hub-label">GPU TRAINING</div>
+      <div class="hub-name">PSO TRAINER</div>
+      <div class="hub-desc">Configure and run GPU optimization sessions on your RTX 4060.</div>
+      <div class="hub-use">Use this for: tuning the PSO swarm, running training sessions</div>
+      <span class="hub-arrow">→</span>
+    </a>
+
+    <a class="hub pink" href="http://127.0.0.1:7701" target="_blank">
+      <div class="hub-label">DIRECT TASK INJECTION</div>
+      <div class="hub-name">EH DASHBOARD</div>
+      <div class="hub-desc">Inject tasks bypassing the Node hub. Runs on its own Python server.</div>
+      <div class="hub-use">Use this for: direct swarm commands, bypassing Node layer</div>
+      <span class="hub-arrow">→</span>
+    </a>
+
+    <a class="hub gold" href="http://127.0.0.1:5678" target="_blank">
+      <div class="hub-label">AUTOMATION BUILDER</div>
+      <div class="hub-name">n8n WORKFLOWS</div>
+      <div class="hub-desc">Visual drag-and-drop automation. Build pipelines between services.</div>
+      <div class="hub-use">Use this for: building automations, connecting services visually</div>
+      <span class="hub-arrow">→</span>
+    </a>
+
+    <a class="hub pink" href="http://127.0.0.1:3000/veilpiercer-command.html" target="_blank">
+      <div class="hub-label">PRODUCT DASHBOARD</div>
+      <div class="hub-name">VEILPIERCER COMMAND</div>
+      <div class="hub-desc">Buyer intel, live social proof, agent events, pitch tools.</div>
+      <div class="hub-use">Use this for: sales activity, monitoring buyers, VeilPiercer ops</div>
+      <span class="hub-arrow">→</span>
+    </a>
+
+    <a class="hub gold" href="https://veil-piercer.com" target="_blank">
+      <div class="hub-label">LIVE PRODUCT SITE (CLOUDFLARE/STRIPE)</div>
+      <div class="hub-name">CLOUDFLARE TUNNEL PREVIEW</div>
+      <div class="hub-desc">Your public domain. What buyers see. Hooked directly into Stripe webhooks.</div>
+      <div class="hub-use">Use this for: testing live stripe checkouts, sharing with buyers</div>
+      <span class="hub-arrow">→</span>
+    </a>
+
+  </div>
+</div>
+
+<!-- ── WHAT'S NOT YET CONNECTED ── -->
+<div class="section">
+  <div class="section-title">Found on Your Machine — Not Yet Connected to VeilPiercer</div>
+  <div class="notes">
+    <div class="note hot">
+      <div class="note-title">WhatsApp Integration (whatsapp-mcp + whatsapp-mcp-n8n)</div>
+      <div class="note-body">Full WhatsApp bridge at <strong>C:\Users\fyou1\whatsapp-mcp\</strong> with n8n connector. Could send buyer alerts and intel reports straight to WhatsApp automatically.</div>
+    </div>
+    <div class="note hot">
+      <div class="note-title">ComfyUI + RTX 4060 Image Generation</div>
+      <div class="note-body">ComfyUI installed at <strong>Downloads\ComfyUI_windows_portable_nvidia</strong>. Could auto-generate VeilPiercer ad creatives and social posts on demand using your GPU.</div>
+    </div>
+    <div class="note med">
+      <div class="note-title">Redis Bridge (nexus_redis_bridge.py)</div>
+      <div class="note-body">Found at <strong>C:\Users\fyou1\nexus_redis_bridge.py</strong> — not in the project. Redis would replace slow JSON file reads with fast in-memory lookups for the swarm.</div>
+    </div>
+    <div class="note med">
+      <div class="note-title">support@veilpiercer.com Email</div>
+      <div class="note-body">Domain is on Cloudflare. Email routing can be set up in the Cloudflare dashboard — free, forwards to your Gmail instantly.</div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <span id="last-check">Checking services...</span>
+  <button id="refresh-btn" onclick="checkAll()">↻ Refresh Now</button>
+</div>
+
+<script>
+// ── FIX INSTRUCTIONS DATABASE ─────────────────────────────────────────────
+const fixes = {
+  hub: {
+    title: 'NODE HUB is down (:3000)',
+    sub: 'The main Node.js server crashed or was never started.',
+    steps: [
+      { primary: true, text: 'Run the startup bat — this fixes everything at once:', cmd: 'C:\\Users\\fyou1\\Desktop\\New folder\\nexus-ultra\\START_ULTIMATE_GOD_MODE.bat' },
+      { text: 'Or start just the Node Hub manually — open a terminal and run:', cmd: 'cd "C:\\Users\\fyou1\\Desktop\\New folder\\nexus-ultra" && node server.cjs' },
+      { text: 'If node isn\'t found, it means Node.js isn\'t in PATH. Run:', cmd: 'where node' }
+    ]
+  },
+  ollama: {
+    title: 'OLLAMA is down (:11434)',
+    sub: 'The local AI model engine isn\'t running. No AI responses will work.',
+    steps: [
+      { primary: true, text: 'Start Ollama — open a terminal and run:', cmd: 'ollama serve' },
+      { text: 'Or double-click the Ollama icon in the system tray (bottom right of taskbar).' },
+      { text: 'If Ollama isn\'t installed, download it from ollama.com' }
+    ]
+  },
+  cosmos: {
+    title: 'COSMOS is down (:9100)',
+    sub: 'The 14-node AI swarm orchestrator crashed. Tasks will queue but not run.',
+    steps: [
+      { primary: true, text: 'Restart COSMOS — open a terminal and run:', cmd: 'cd "C:\\Users\\fyou1\\.gemini\\antigravity\\scratch\\aistudio-agent" && python cosmos_server.py' },
+      { text: 'Or run the full startup bat to restart everything:', cmd: 'C:\\Users\\fyou1\\Desktop\\New folder\\nexus-ultra\\START_ULTIMATE_GOD_MODE.bat' }
+    ]
+  },
+  pso: {
+    title: 'PSO GPU BRAIN is down (:7700)',
+    sub: 'The Julia particle swarm optimizer isn\'t running.',
+    steps: [
+      { primary: true, text: 'Start the PSO brain — open a terminal and run:', cmd: 'cd "C:\\Users\\fyou1\\Desktop\\New folder\\nexus-ultra\\local-scripts" && julia pso_swarm.jl' },
+      { text: 'If Julia isn\'t found: it\'s installed, check PATH or run:', cmd: '"C:\\Users\\fyou1\\AppData\\Local\\Programs\\Julia\\bin\\julia.exe" pso_swarm.jl' }
+    ]
+  },
+  eh: {
+    title: 'EH API is down (:7701)',
+    sub: 'The task injection endpoint isn\'t running.',
+    steps: [
+      { primary: true, text: 'Start EH API — open a terminal and run:', cmd: 'cd "C:\\Users\\fyou1\\Desktop\\New folder\\nexus-ultra" && python nexus_eh.py' },
+      { text: 'Or run the full startup bat to restart everything:', cmd: 'C:\\Users\\fyou1\\Desktop\\New folder\\nexus-ultra\\START_ULTIMATE_GOD_MODE.bat' }
+    ]
+  },
+  hubpy: {
+    title: 'HUB SERVER (Python) is down (:7702)',
+    sub: 'The Python backend server crashed.',
+    steps: [
+      { primary: true, text: 'Restart it — open a terminal and run:', cmd: 'cd "C:\\Users\\fyou1\\Desktop\\New folder\\nexus-ultra" && python nexus_hub_server.py' },
+      { text: 'Or run the full startup bat:', cmd: 'C:\\Users\\fyou1\\Desktop\\New folder\\nexus-ultra\\START_ULTIMATE_GOD_MODE.bat' }
+    ]
+  },
+  n8n: {
+    title: 'n8n AUTOMATION is down (:5678)',
+    sub: 'The workflow automation engine isn\'t running.',
+    steps: [
+      { primary: true, text: 'Start n8n — open a terminal and run:', cmd: 'n8n start' },
+      { text: 'If n8n isn\'t found globally, try:', cmd: 'npx n8n start' },
+      { text: 'n8n is optional — your swarm works without it. Only needed for automations.' }
+    ]
+  },
+  claw: {
+    title: 'OPENCLAW is down (:18789)',
+    sub: 'The Discord/Termux bridge isn\'t running.',
+    steps: [
+      { primary: true, text: 'Start OpenClaw from its startup script:', cmd: 'C:\\Users\\fyou1\\.openclaw\\gateway.cmd' },
+      { text: 'OpenClaw is optional — your swarm works without it. Only needed for Discord commands.' }
+    ]
+  },
+  tunnel: {
+    title: 'VEILPIERCER TUNNEL is down',
+    sub: 'Buyers can\'t reach veilpiercer.com. The Cloudflare tunnel isn\'t running.',
+    steps: [
+      { primary: true, text: 'Start the tunnel — open a terminal and run:', cmd: 'cloudflared tunnel run veilpiercer' },
+      { text: 'Or run the full startup bat (it starts the tunnel automatically):', cmd: 'C:\\Users\\fyou1\\Desktop\\New folder\\nexus-ultra\\START_ULTIMATE_GOD_MODE.bat' },
+      { text: 'The tunnel also auto-starts on Windows login via the watchdog. If it\'s down after a restart, check that the watchdog is running.' }
+    ]
+  }
+};
+
+function showFix(id) {
+  const svc = document.getElementById('svc-' + id);
+  if (!svc || !svc.classList.contains('is-down')) return; // only show for down services
+  const fix = fixes[id];
+  if (!fix) return;
+  document.getElementById('modal-title').textContent = fix.title;
+  document.getElementById('modal-sub').textContent = fix.sub;
+  const stepsEl = document.getElementById('modal-steps');
+  stepsEl.innerHTML = '';
+  fix.steps.forEach(s => {
+    const div = document.createElement('div');
+    div.className = 'fix-step' + (s.primary ? ' primary' : '');
+    div.textContent = s.text;
+    if (s.cmd) {
+      const code = document.createElement('code');
+      code.textContent = s.cmd;
+      code.title = 'Click to select all';
+      div.appendChild(code);
+    }
+    stepsEl.appendChild(div);
+  });
+  document.getElementById('fix-modal').classList.add('show');
+}
+
+document.getElementById('fix-modal').addEventListener('click', function(e) {
+  if (e.target === this) this.classList.remove('show');
+});
+
+// ── SERVICE STATE TRACKER ─────────────────────────────────────────────────
+const downServices = new Set();
+
+function setDot(id, state) {
+  const d = document.getElementById('dot-' + id);
+  const s = document.getElementById('svc-' + id);
+  if (d) d.className = 'dot ' + state;
+  if (s) {
+    if (state === 'down') {
+      s.classList.add('is-down');
+      if (id !== 'all') downServices.add(id);
+    } else {
+      s.classList.remove('is-down');
+      downServices.delete(id);
+    }
+  }
+  // Show alert bar if 3+ services down
+  const bar = document.getElementById('alert-bar');
+  if (downServices.size >= 3) bar.classList.add('show');
+  else bar.classList.remove('show');
+}
+
+async function ping(url, timeout = 2500) {
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), timeout);
+    await fetch(url, { signal: ctrl.signal, mode: 'no-cors' });
+    clearTimeout(t);
+    return true;
+  } catch { return false; }
+}
+
+async function checkAll() {
+  ['hub','ollama','cosmos','pso','eh','hubpy','n8n','claw','tunnel', 'all'].forEach(id => setDot(id, 'spin'));
+
+  // Try to get status from hub API first (use relative path if possible)
+  let svc = null;
+  const hubOrigin = window.location.origin.includes('http') ? '' : 'http://127.0.0.1:3000';
+  
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 4000);
+    const r = await fetch(hubOrigin + '/api/ping-services', { signal: ctrl.signal });
+    clearTimeout(t);
+    if (r.ok) {
+      const data = await r.json();
+      svc = data.svc;
+    }
+  } catch {}
+
+  if (svc) {
+    setDot('hub',    'up');
+    setDot('ollama', svc.ollama ? 'up' : 'down');
+    setDot('cosmos', svc.cosmos ? 'up' : 'down');
+    setDot('pso',    svc.pso    ? 'up' : 'down');
+    setDot('eh',     svc.bd     ? 'up' : 'down');
+    setDot('hubpy',  svc.hubpy  ? 'up' : 'down');
+    setDot('n8n',    svc.n8n    ? 'up' : 'down');
+    setDot('claw',   svc.claw   ? 'up' : 'down');
+    setDot('tunnel', svc.tunnel ? 'up' : 'down');
+  } else {
+    // Fallback if Hub is down (direct pings)
+    setDot('hub', 'down');
+    const [ollama, cosmos, pso, eh, hubpy, n8n, claw, tunnel] = await Promise.all([
+      ping('http://127.0.0.1:11434/api/tags'),
+      ping('http://127.0.0.1:9100/health'),
+      ping('http://127.0.0.1:7700/health'),
+      ping('http://127.0.0.1:7701/health'),
+      ping('http://127.0.0.1:7702/health'),
+      ping('http://127.0.0.1:5678/healthz'),
+      ping('http://127.0.0.1:18789/'),
+      ping('http://127.0.0.1:20241/')
+    ]);
+    setDot('ollama', ollama ? 'up' : 'down');
+    setDot('cosmos', cosmos ? 'up' : 'down');
+    setDot('pso',    pso    ? 'up' : 'down');
+    setDot('eh',     eh     ? 'up' : 'down');
+    setDot('hubpy',  hubpy  ? 'up' : 'down');
+    setDot('n8n',    n8n    ? 'up' : 'down');
+    setDot('claw',   claw   ? 'up' : 'down');
+    setDot('tunnel', tunnel ? 'up' : 'down');
+  }
+
+  // UPDATE AGGREGATE STATUS BOX
+  if (downServices.size === 0) {
+    setDot('all', 'up');
+    document.getElementById('name-all').textContent = 'ALL SYSTEMS GO';
+    document.getElementById('name-all').style.color = '#00e676';
+    document.getElementById('what-all').textContent = 'All 9 engines are online and functioning nominally.';
+  } else {
+    setDot('all', 'down');
+    document.getElementById('name-all').textContent = 'SYSTEM ERRORS DETECTED';
+    document.getElementById('name-all').style.color = '#ff1744';
+    const names = Array.from(downServices).map(id => {
+      const el = document.querySelector('#svc-' + id + ' .svc-name');
+      return el ? el.textContent : id;
+    }).join(', ');
+    document.getElementById('fix-all').textContent = 'Offline: ' + names;
+  }
+
+  document.getElementById('last-check').textContent =
+    'Last checked: ' + new Date().toLocaleTimeString();
+}
+
+checkAll();
+setInterval(checkAll, 15000);
+</script>
+</body>
+</html>

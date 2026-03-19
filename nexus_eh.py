@@ -1,4 +1,4 @@
-﻿"""
+"""
 â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
 â•‘  NEXUS EH â€” LOCAL COMMAND INJECTION API                   â•‘
 â•‘  Port: 7701  â€¢  127.0.0.1 ONLY  â€¢  No auth needed locally      â•‘
@@ -35,13 +35,23 @@ from datetime import datetime
 from http.server import BaseHTTPRequestHandler
 import urllib.parse
 import httpx
+import subprocess
 
 BASE_DIR    = Path(__file__).parent
 BLACKBOARD  = BASE_DIR / "nexus_blackboard.json"
 MEMORY_FILE = BASE_DIR / "nexus_memory.json"
-LOG_FILE    = BASE_DIR / "swarm_loop.log"
-EH_PORT = 7701
+LOG_FILE    = BASE_DIR / "swarm_active.log"
+EH_PORT     = 7701
 OLLAMA      = "http://127.0.0.1:11434"
+
+# -- TOKEN LOADING --
+def get_eh_token():
+    token_file = BASE_DIR / ".eh_token"
+    if token_file.exists():
+        return token_file.read_text(encoding="utf-8").strip()
+    return None
+
+EH_TOKEN = get_eh_token()
 
 log = logging.getLogger("EH")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(message)s")
@@ -56,8 +66,8 @@ def check_ip_allowed(ip: str, path: str = "/") -> bool:
         return True
     if path in LOCALHOST_ONLY:
         return False
-    # Allow home LAN ranges
-    if ip.startswith("192.168.") or ip.startswith("10."):
+    # Allow home LAN and Tailscale ranges
+    if ip.startswith("192.168.") or ip.startswith("10.") or ip.startswith("100."):
         return True
     return False
 
@@ -90,26 +100,64 @@ def read_log(n: int = 50) -> list:
     if not LOG_FILE.exists():
         return ["[No log file yet â€” start nexus_swarm_loop.py first]"]
     lines = LOG_FILE.read_text(encoding="utf-8", errors="replace").splitlines()
-    return lines[-n:]
+    if not lines:
+        return []
+    return lines[max(0, len(lines)-n):]
 
-def inject_task(task: str) -> dict:
-    bb = read_json(BLACKBOARD)
-    queue = bb.get("task_queue", [])
-    queue.append(task)
-    bb["task_queue"] = queue
-    write_json(BLACKBOARD, bb)
-    return {"ok": True, "queued": task, "queue_depth": len(queue)}
+# --- IN-MEMORY HOT PATH ---
+TASK_QUEUE = []  # Hot queue for sub-millisecond response
+BB_CACHE   = {}  # In-memory blackboard snapshot
+
+def load_initial_bb():
+    global BB_CACHE, TASK_QUEUE
+    BB_CACHE = read_json(BLACKBOARD)
+    # Ensure task_queue exists and is a list
+    raw_queue = BB_CACHE.get("task_queue", [])
+    if not isinstance(raw_queue, list):
+        raw_queue = []
+    
+    # Convert old string-only queue to prioritized dicts if needed
+    TASK_QUEUE = []
+    for i, t in enumerate(raw_queue):
+        if isinstance(t, str):
+            TASK_QUEUE.append({"task": t, "priority": 1, "id": f"task_{int(time.time())}_{i}"})
+        else:
+            TASK_QUEUE.append(t)
+
+load_initial_bb()
+
+def sync_bb_to_disk():
+    """Asynchronous/Background persistence."""
+    BB_CACHE["task_queue"] = TASK_QUEUE
+    write_json(BLACKBOARD, BB_CACHE)
+
+def inject_task(task: str, priority: int = 1) -> dict:
+    """Prioritized queue injection."""
+    entry = {
+        "task": task,
+        "priority": priority,
+        "id": f"task_{int(time.time()*1000)}",
+        "timestamp": datetime.now().isoformat()
+    }
+    
+    if priority > 5: # High priority inserts at the front
+        TASK_QUEUE.insert(0, entry)
+    else:
+        TASK_QUEUE.append(entry)
+    
+    # Prune queue if it gets too long
+    if len(TASK_QUEUE) > 100:
+        TASK_QUEUE.pop(-1)
+        
+    sync_bb_to_disk()
+    return {"ok": True, "queued": task, "priority": priority, "queue_depth": len(TASK_QUEUE)}
 
 def force_cycle(task: str = "") -> dict:
-    bb = read_json(BLACKBOARD)
-    queue = bb.get("task_queue", [])
     if task:
-        queue.insert(0, task)  # front of queue = immediate next
+        inject_task(task, priority=10) # Auto-priority for forced cycles
     else:
-        queue.insert(0, "__FORCE_CYCLE__")
-    bb["task_queue"] = queue
-    write_json(BLACKBOARD, bb)
-    return {"ok": True, "message": "Cycle will trigger on next interval check"}
+        inject_task("__FORCE_CYCLE__", priority=10)
+    return {"ok": True, "message": "High-priority cycle injected into hot-path"}
 
 def flush_all() -> dict:
     write_json(BLACKBOARD, {"outputs": [], "task_queue": [], "status": "FLUSHED"})
@@ -125,8 +173,10 @@ async def direct_inference(model: str, prompt: str) -> str:
                 "messages": [{"role": "user", "content": prompt}],
                 "options": {"temperature": 0.7, "num_predict": 512}
             }, timeout=60.0)
-            return r.json().get("message", {}).get("content", "[NO OUTPUT]")
+            data = r.json()
+            return data.get("message", {}).get("content", "[NO OUTPUT]")
         except Exception as e:
+            log.warning(f"Ollama error: {e}")
             return f"[ERROR: {e}]"
 
 # â”€â”€ MOBILE DASHBOARD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -161,7 +211,7 @@ button{{width:100%;background:none;border:2px solid #00ff41;color:#00ff41;font-f
 button:active{{background:#00ff4120}}
 .ll{{font-size:10px;color:#2a5a2a;padding:1px 0;border-bottom:1px solid #0a1a0a}}
 </style></head><body>
-<h1>âš¡ NEXUS</h1>
+<h1>⚡ NEXUS</h1>
 <div class="badge">{status}</div>
 
 <div class="card">
@@ -211,10 +261,11 @@ def build_dashboard_html() -> str:
     cycle_id = bb.get("cycle_id", "â€”")
     outputs  = bb.get("outputs", [])
 
+    subset = outputs[max(0, len(outputs)-8):]
     agents_html = "".join(
         f'<div class="agent"><span class="ag-name">{o["agent"]}</span>'
         f'<span class="ag-out">{o["text"][:200].replace("<","&lt;")}â€¦</span></div>'
-        for o in outputs[-8:]
+        for o in subset
     )
     mem_html = "".join(
         f'<div class="mem-entry"><span class="mem-score">{e.get("score","?"):.2f}</span>'
@@ -254,7 +305,7 @@ button.c{{border-color:var(--cya);color:var(--cya)}}
 .grid{{display:grid;grid-template-columns:1fr 1fr;gap:12px}}
 @media(max-width:700px){{.grid{{grid-template-columns:1fr}}}}
 </style></head><body>
-<h1>âš¡ NEXUS EH // 127.0.0.1:7701</h1>
+<h1>⚡ NEXUS EH // 127.0.0.1:7701</h1>
 
 <div style="margin-bottom:10px">
   <span class="badge {'g' if status == 'RUNNING' else 'y' if status == 'DONE' else 'r'}">{status}</span>
@@ -344,12 +395,31 @@ async def handle(reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
         method = first[0]
         path   = first[1].split("?")[0]
 
-        # â”€â”€ IP ALLOWLIST CHECK â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        # ── AUTH & IP CHECK ─────────────────────────────────────────────────────
         peer = writer.get_extra_info('peername', ('0.0.0.0', 0))
         client_ip = peer[0] if peer else '0.0.0.0'
-        if path != '/health' and not check_ip_allowed(client_ip, path):
-            deny = b'HTTP/1.1 403 Forbidden\r\nContent-Type: application/json\r\n\r\n{"error":"IP not allowed"}'
-            writer.write(deny); await writer.drain(); writer.close(); return
+        
+        # Parse headers
+        headers_dict = {}
+        for h_line in text.split('\r\n')[1:]:
+            if ': ' in h_line:
+                k, v = h_line.split(': ', 1)
+                headers_dict[k.lower()] = v.strip()
+        
+        auth_token = headers_dict.get('x-eh-token')
+        
+        is_health = path == '/health'
+        is_authed = (auth_token == EH_TOKEN) if (auth_token and EH_TOKEN) else False
+        
+        # Security Logic: 
+        # 1. Health is always public.
+        # 2. If Token matches, it's allowed (trusted app).
+        # 3. If NO token, strictly only allow Localhost/LAN for non-destructive.
+        if not is_health and not is_authed:
+            if not check_ip_allowed(client_ip, path):
+                 deny = b'HTTP/1.1 401 Unauthorized\r\nContent-Type: application/json\r\n\r\n{"error":"EH Token Required for remote access"}'
+                 writer.write(deny); await writer.drain(); writer.close(); return
+        # ──────────────────────────────────────────────────────────────────────────
         # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         body = {}
         if method == "POST":
@@ -360,6 +430,14 @@ async def handle(reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
                     body = json.loads(raw_body)
                 except Exception:
                     body = dict(urllib.parse.parse_qsl(raw_body))
+
+        if method == "OPTIONS":
+            writer.write(b"HTTP/1.1 200 OK\r\n"
+                         b"Access-Control-Allow-Origin: *\r\n"
+                         b"Access-Control-Allow-Methods: POST, GET, OPTIONS\r\n"
+                         b"Access-Control-Allow-Headers: Content-Type, x-eh-token\r\n"
+                         b"Connection: close\r\n\r\n")
+            await writer.drain(); writer.close(); return
 
         # Route
         status = 200
@@ -435,6 +513,129 @@ async def handle(reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
                 status = 400
                 response_body = json.dumps({"ok": False, "error": "No prompt"})
 
+        # ── HUMAN APPROVAL GATE ENDPOINTS ────────────────────────────────────
+        elif path == "/pending" and method == "GET":
+            content_type = "application/json"
+            pf = BASE_DIR / "nexus_pending_approvals.json"
+            pending = []
+            if pf.exists():
+                try:
+                    pending = json.loads(pf.read_text(encoding="utf-8"))
+                except Exception:
+                    pending = []
+            waiting = [p for p in pending if p.get("status") == "PENDING"]
+            response_body = json.dumps({"ok": True, "pending_count": len(waiting), "items": waiting})
+            log.info(f"[EH] /pending → {len(waiting)} items awaiting approval")
+
+        elif path == "/approve" and method == "POST":
+            content_type = "application/json"
+            bb = read_json(BLACKBOARD)
+            if bb.get("membrane_lock"):
+                status = 403
+                response_body = json.dumps({"ok": False, "error": "MEMBRANE LOCK: " + str(bb.get("membrane_reason"))})
+            else:
+                entry_id = body.get("id", "").strip()
+                pf = BASE_DIR / "nexus_pending_approvals.json"
+                if not entry_id:
+                    status = 400
+                    response_body = json.dumps({"ok": False, "error": "No id provided"})
+                elif not pf.exists():
+                    status = 404
+                    response_body = json.dumps({"ok": False, "error": "No pending approvals file"})
+                else:
+                    pending = json.loads(pf.read_text(encoding="utf-8"))
+                    matched = next((p for p in pending if p["id"] == entry_id), None)
+                    if not matched:
+                        status = 404
+                        response_body = json.dumps({"ok": False, "error": f"ID {entry_id} not found"})
+                    else:
+                        matched["status"] = "APPROVED"
+                        matched["approved_at"] = datetime.now().isoformat()
+                        pf.write_text(json.dumps(pending, indent=2, ensure_ascii=False), encoding="utf-8")
+                        
+                        # Trigger execution if it's code
+                        if matched.get("type") == "code_execution":
+                            async def run_one_bg(code):
+                                try:
+                                    await asyncio.to_thread(subprocess.run, ["python", "-c", code], timeout=10)
+                                except Exception as e:
+                                    log.warning(f"Individual Approval Error: {e}")
+                            asyncio.create_task(run_one_bg(matched["code"]))
+                        
+                        response_body = json.dumps({"ok": True, "id": entry_id, "approved": True})
+                        log.info(f"[EH] APPROVED: {entry_id}")
+
+        elif path == "/approve_all" and method == "POST":
+            content_type = "application/json"
+            pf = BASE_DIR / "nexus_pending_approvals.json"
+            if not pf.exists():
+                response_body = json.dumps({"ok": True, "approved_count": 0, "message": "No pending file"})
+            else:
+                try:
+                    pending = json.loads(pf.read_text(encoding="utf-8"))
+                    waiting = [p for p in pending if p.get("status") == "PENDING"]
+                    count = len(waiting)
+                    
+                    # 1. Update status in-memory immediately
+                    for item in waiting:
+                        item["status"] = "APPROVED"
+                        item["approved_at"] = datetime.now().isoformat()
+                    
+                    # 2. Save the file immediately so UI shows them as approved/processed
+                    pf.write_text(json.dumps(pending, indent=2, ensure_ascii=False), encoding="utf-8")
+                    
+                    # 3. Trigger execution in background to avoid blocking the event loop
+                    async def run_approvals_bg(items_to_run):
+                        for item in items_to_run:
+                            if item.get("type") == "code_execution":
+                                try:
+                                    # Use asyncio.create_subprocess_exec or run in thread pool
+                                    # For simplicity and reliability in this specific stack, we'll use a thread-safe approach
+                                    # but yield control between each run
+                                    await asyncio.to_thread(subprocess.run, ["python", "-c", item["code"]], timeout=10)
+                                    await asyncio.sleep(0.01) # Yield to other tasks
+                                except Exception as e:
+                                    log.warning(f"BG Approval Error: {e}")
+                    
+                    asyncio.create_task(run_approvals_bg(waiting))
+                    
+                    response_body = json.dumps({"ok": True, "approved_count": count, "message": "Mass approval triggered in background"})
+                    log.info(f"[EH] MASS APPROVAL STARTED: {count} items")
+                except Exception as e:
+                    status = 500
+                    response_body = json.dumps({"ok": False, "error": str(e)})
+
+        elif path == "/clear_blocked" and method == "POST":
+            content_type = "application/json"
+            pf = BASE_DIR / "nexus_pending_approvals.json"
+            if pf.exists():
+                pf.write_text("[]", encoding="utf-8")
+            response_body = json.dumps({"ok": True, "message": "Blocked queue purged"})
+            log.info(f"[EH] BLOCKED QUEUE CLEARED")
+
+        elif path == "/reject" and method == "POST":
+            content_type = "application/json"
+            entry_id = body.get("id", "").strip()
+            pf = BASE_DIR / "nexus_pending_approvals.json"
+            if not entry_id:
+                status = 400
+                response_body = json.dumps({"ok": False, "error": "No id provided"})
+            elif not pf.exists():
+                status = 404
+                response_body = json.dumps({"ok": False, "error": "No pending approvals file"})
+            else:
+                pending = json.loads(pf.read_text(encoding="utf-8"))
+                matched = next((p for p in pending if p["id"] == entry_id), None)
+                if not matched:
+                    status = 404
+                    response_body = json.dumps({"ok": False, "error": f"ID {entry_id} not found"})
+                else:
+                    matched["status"] = "REJECTED"
+                    matched["rejected_at"] = datetime.now().isoformat()
+                    pf.write_text(json.dumps(pending, indent=2, ensure_ascii=False), encoding="utf-8")
+                    response_body = json.dumps({"ok": True, "id": entry_id, "rejected": True})
+                    log.info(f"[EH] REJECTED: {entry_id}")
+
         else:
             status = 404
             content_type = "application/json"
@@ -470,5 +671,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-
 

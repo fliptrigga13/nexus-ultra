@@ -323,26 +323,50 @@ async def run_evolution_cycle(gene_pool: GenePool, generation: int, client: http
         
         agent_weakness = next((w for w in weaknesses if agent_name in w), weaknesses[0] if weaknesses else "improve quality")
         
+        # ── HUMAN APPROVAL GATE ──────────────────────────────────────────────
+        # LOCKDOWN: Prompt mutations/crossovers are QUEUED, not applied.
+        # Review at: GET  http://127.0.0.1:7701/pending
+        # Approve:   POST http://127.0.0.1:7701/approve {"id": "<id>"}
+        # Reject:    POST http://127.0.0.1:7701/reject  {"id": "<id>"}
+        PENDING_FILE = BASE_DIR / "nexus_pending_approvals.json"
+
+        def _queue_prompt_change(ptype, agent, prompt, fitness, gen):
+            pending = []
+            if PENDING_FILE.exists():
+                try:
+                    pending = json.loads(PENDING_FILE.read_text(encoding="utf-8"))
+                except Exception:
+                    pending = []
+            entry_id = f"prompt_{int(time.time()*1000)}_{len(pending)}"
+            pending.append({
+                "id": entry_id,
+                "type": f"prompt_{ptype}",
+                "agent": agent,
+                "proposed_prompt": prompt,
+                "fitness": fitness,
+                "generation": gen,
+                "queued_at": datetime.utcnow().isoformat(),
+                "status": "PENDING"
+            })
+            PENDING_FILE.write_text(json.dumps(pending, indent=2, ensure_ascii=False), encoding="utf-8")
+            log.info(f"   [APPROVAL REQUIRED] {ptype} for {agent} queued (id={entry_id}) — approve via EH /approve")
+            return entry_id
+
         if random.random() < MUTATION_RATE:
-            # MUTATION: Evolve prompt based on weakness
-            log.info(f"[MUTATE] {agent_name} (fitness={best_fitness:.2f})")
+            log.info(f"[MUTATE→QUEUED] {agent_name} (fitness={best_fitness:.2f})")
             new_prompt = await mutate_prompt(agent_name, best_prompt, agent_weakness, client)
             if len(new_prompt) > 50 and "ERROR" not in new_prompt:
-                gene_pool.add_variant(agent_name, new_prompt, best_fitness, generation)
+                _queue_prompt_change("mutation", agent_name, new_prompt, best_fitness, generation)
                 new_variants_created += 1
-                log.info(f"   → New variant created: {new_prompt[:80]}...")
         else:
-            # CROSSOVER: Combine two parents if multiple variants exist
             variants = gene_pool.pool.get(agent_name, [])
             if len(variants) >= 2:
                 parents = random.sample(variants, 2)
-                log.info(f"[CROSSOVER] {agent_name} parents with fitness {parents[0]['fitness']:.2f} × {parents[1]['fitness']:.2f}")
+                log.info(f"[CROSSOVER→QUEUED] {agent_name}")
                 child = await crossover_prompts(agent_name, parents[0]["prompt"], parents[1]["prompt"], client)
                 if len(child) > 50 and "ERROR" not in child:
                     avg_fitness = (parents[0]["fitness"] + parents[1]["fitness"]) / 2
-                    gene_pool.add_variant(agent_name, child, avg_fitness, generation)
-                    new_variants_created += 1
-                    log.info(f"   → Child created: {child[:80]}...")
+                    _queue_prompt_change("crossover", agent_name, child, avg_fitness, generation)
 
     # 4. FORGE CURRICULUM — generate self-training tasks
     log.info(f"[CURRICULUM] Forging new training tasks from weaknesses...")

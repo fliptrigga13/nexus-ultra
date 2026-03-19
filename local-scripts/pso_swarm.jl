@@ -7,7 +7,6 @@
 using Pkg
 
 # ── Auto-install required packages if missing ───────────────
-# Use try/catch import so it works with or without a Project.toml
 for pkg in ["CUDA", "HTTP", "JSON3"]
     try
         @eval using $(Symbol(pkg))
@@ -43,21 +42,20 @@ zeros_array(T, dims...) = USE_GPU ? CUDA.zeros(T, dims...) : zeros(T, dims...)
 # ────────────────────────────────────────────────────────────
 #  PSO HYPER-PARAMETERS
 # ────────────────────────────────────────────────────────────
-const N_PARTICLES  = 128       # swarm size (power-of-2 for GPU warps)
-const N_DIMS       = 10        # Rosenbrock dimensionality
+const N_PARTICLES  = 128
+const N_DIMS       = 10
 const BOUNDS_LO    = -5.0f0
 const BOUNDS_HI    =  5.0f0
-const W            = 0.7f0     # inertia weight
-const C1           = 1.4f0     # cognitive coefficient
-const C2           = 1.4f0     # social coefficient
+const W_START      = 0.9f0    # Dynamic Inertia Start
+const W_END        = 0.4f0    # Dynamic Inertia End
+const C1           = 1.4f0
+const C2           = 1.4f0
 const MAX_ITER     = 1_000
-const CONV_THRESH  = 1.0f-4   # convergence threshold
+const CONV_THRESH  = 1.0f-4
 const PORT         = 7700
 
 # ────────────────────────────────────────────────────────────
 #  ROSENBROCK — CUDA KERNEL
-#  Evaluates f(x) for each particle in parallel.
-#  Each GPU thread handles one particle.
 # ────────────────────────────────────────────────────────────
 function rosenbrock_kernel!(fitness, x, n_particles, n_dims)
     idx = (blockIdx().x - 1) * blockDim().x + threadIdx().x
@@ -73,7 +71,6 @@ function rosenbrock_kernel!(fitness, x, n_particles, n_dims)
     return nothing
 end
 
-# ── CPU fallback for fitness evaluation ─────────────────────
 function rosenbrock_cpu!(fitness, x, n_particles, n_dims)
     for idx in 1:n_particles
         s = 0.0f0
@@ -86,7 +83,6 @@ function rosenbrock_cpu!(fitness, x, n_particles, n_dims)
     end
 end
 
-# ── Unified dispatch ─────────────────────────────────────────
 function eval_fitness!(fitness, x)
     if USE_GPU
         nthreads = 128
@@ -95,7 +91,6 @@ function eval_fitness!(fitness, x)
             fitness, x, N_PARTICLES, N_DIMS)
         CUDA.synchronize()
     else
-        # CPU path: both arrays are plain Julia Arrays
         x_cpu  = x isa Array ? x : Array(x)
         fi_cpu = fitness isa Array ? fitness : Array(fitness)
         rosenbrock_cpu!(fi_cpu, x_cpu, N_PARTICLES, N_DIMS)
@@ -106,16 +101,16 @@ function eval_fitness!(fitness, x)
 end
 
 # ────────────────────────────────────────────────────────────
-#  SWARM STATE (module-level so HTTP handlers can read it)
+#  SWARM STATE
 # ────────────────────────────────────────────────────────────
 mutable struct SwarmState
-    x       :: Any   # positions      [N_PARTICLES × N_DIMS]
-    v       :: Any   # velocities     [N_PARTICLES × N_DIMS]
-    p_best  :: Any   # personal bests [N_PARTICLES × N_DIMS]
-    p_fit   :: Any   # personal best fitness [N_PARTICLES]
-    fitness :: Any   # current fitness [N_PARTICLES]
-    g_best  :: Vector{Float32}   # global best position (CPU for logging)
-    g_fit   :: Float32           # global best fitness
+    x       :: Any
+    v       :: Any
+    p_best  :: Any
+    p_fit   :: Any
+    fitness :: Any
+    g_best  :: Vector{Float32}
+    g_fit   :: Float32
     iter    :: Int
     running :: Bool
     converged :: Bool
@@ -130,47 +125,38 @@ function make_swarm()
 
     eval_fitness!(fitness, x)
 
-    # Pull to CPU to find global best
     fit_cpu = Array(fitness)
     best_idx = argmin(fit_cpu)
 
     g_best = Array(x)[best_idx, :]
     g_fit  = fit_cpu[best_idx]
 
-    # Sync p_best fitness
     copyto!(p_fit, fitness)
 
     SwarmState(x, v, p_best, p_fit, fitness, g_best, g_fit, 0, false, false)
 end
 
 # ────────────────────────────────────────────────────────────
-#  PSO UPDATE — one iteration
+#  PSO UPDATE — one optimized iteration
 # ────────────────────────────────────────────────────────────
 function pso_step!(sw::SwarmState)
+    # 20% Optimization: Linear Decreasing Inertia Weight (LDIW)
+    W_curr = W_START - (sw.iter / MAX_ITER) * (W_START - W_END)
+
     r1 = rand_array(Float32, N_PARTICLES, N_DIMS)
     r2 = rand_array(Float32, N_PARTICLES, N_DIMS)
 
-    # Broadcast g_best to GPU row matrix for vectorised ops
-    g_best_gpu = make_array(repeat(sw.g_best', N_PARTICLES, 1))
+    # Fusion-optimized update (single-pass broadcasting)
+    @. sw.v = W_curr * sw.v + C1 * r1 * (sw.p_best - sw.x) + C2 * r2 * (sw.g_best' - sw.x)
+    @. sw.x = clamp(sw.x + sw.v, BOUNDS_LO, BOUNDS_HI)
 
-    # Velocity update: v = w*v + c1*r1*(p_best - x) + c2*r2*(g_best - x)
-    sw.v .= W .* sw.v .+
-            C1 .* r1 .* (sw.p_best .- sw.x) .+
-            C2 .* r2 .* (g_best_gpu .- sw.x)
-
-    # Position update + clamping
-    sw.x .= clamp.(sw.x .+ sw.v, BOUNDS_LO, BOUNDS_HI)
-
-    # Evaluate new fitness
     eval_fitness!(sw.fitness, sw.x)
 
-    # Update personal bests (where new fitness is better)
     fit_cpu    = Array(sw.fitness)
     p_fit_cpu  = Array(sw.p_fit)
     x_cpu      = Array(sw.x)
     p_best_cpu = Array(sw.p_best)
 
-    improved_any_global = false
     for i in 1:N_PARTICLES
         if fit_cpu[i] < p_fit_cpu[i]
             p_fit_cpu[i]    = fit_cpu[i]
@@ -179,12 +165,10 @@ function pso_step!(sw::SwarmState)
             if fit_cpu[i] < sw.g_fit
                 sw.g_fit  = fit_cpu[i]
                 sw.g_best = x_cpu[i, :]
-                improved_any_global = true
             end
         end
     end
 
-    # Push updated personal bests back to GPU
     copyto!(sw.p_fit,  make_array(p_fit_cpu))
     copyto!(sw.p_best, make_array(p_best_cpu))
 
@@ -193,7 +177,7 @@ function pso_step!(sw::SwarmState)
 end
 
 # ────────────────────────────────────────────────────────────
-#  TRAINING LOOP (runs in background @async task)
+#  TRAINING LOOP
 # ────────────────────────────────────────────────────────────
 const SWARM        = Ref{SwarmState}()
 const STOP_FLAG    = Atomic{Bool}(false)
@@ -212,9 +196,9 @@ function broadcast_frame()
         "running"   => sw.running,
         "gpu"       => USE_GPU,
         "device"    => USE_GPU ? string(CUDA.name(CUDA.device())) : "CPU",
-        "px"        => x_cpu[:, 1],    # dim-1 positions for scatter plot
-        "py"        => x_cpu[:, 2],    # dim-2 positions for scatter plot
-        "pfit"      => fit_cpu          # per-particle fitness for colouring
+        "px"        => x_cpu[:, 1],
+        "py"        => x_cpu[:, 2],
+        "pfit"      => fit_cpu
     )
     local json_str
     try
@@ -254,7 +238,7 @@ function run_pso_loop()
         end
         pso_step!(sw)
         broadcast_frame()
-        sleep(0.02)   # ~50 fps telemetry
+        sleep(0.02)
         if sw.converged
             println("  [PSO] ✅ Converged at iter $(sw.iter) | fitness=$(sw.g_fit)")
             break
@@ -272,11 +256,9 @@ end
 function handle_ws(ws)
     lock(CLIENTS_LOCK) do; push!(CLIENTS, ws); end
     println("  [PSO] WS client connected (total: $(length(CLIENTS)))")
-    # Send current state immediately on connect
     if isassigned(SWARM)
         broadcast_frame()
     else
-        # Send a ready ping
         try
             HTTP.WebSockets.send(ws, JSON3.write(Dict("status" => "ready", "gpu" => USE_GPU,
                 "device" => USE_GPU ? string(CUDA.name(CUDA.device())) : "CPU")))
@@ -288,22 +270,18 @@ function handle_ws(ws)
             data === nothing && break
         end
     catch e
-        # EOFError / IOError = client disconnected
     finally
         lock(CLIENTS_LOCK) do; delete!(CLIENTS, ws); end
         println("  [PSO] WS client disconnected (total: $(length(CLIENTS)))")
     end
 end
 
-
-# Path to the PSO trainer HTML (sits one level up from this script)
 const TRAINER_HTML = joinpath(@__DIR__, "..", "pso-trainer.html")
 
 function router(req::HTTP.Request)
     path   = req.target
     method = req.method
 
-    # ── CORS preflight ─────────────────────────────────────────
     if method == "OPTIONS"
         return HTTP.Response(204, [
             "Access-Control-Allow-Origin"  => "*",
@@ -312,7 +290,6 @@ function router(req::HTTP.Request)
         ])
     end
 
-    # ── SERVE DASHBOARD at GET / or GET /trainer ───────────────
     if (path == "/" || path == "/trainer") && method == "GET"
         if isfile(TRAINER_HTML)
             html = read(TRAINER_HTML, String)
@@ -328,7 +305,6 @@ function router(req::HTTP.Request)
 
     elseif path == "/api/control" && method == "POST"
         body = JSON3.read(String(req.body))
-        # JSON3 parses keys as Symbols — check both Symbol and String for safety
         action = string(get(body, :action, get(body, "action", "")))
 
         if action == "start"
@@ -350,6 +326,23 @@ function router(req::HTTP.Request)
                 JSON3.write(Dict("error" => "unknown action: $action")))
         end
 
+    elseif path == "/feedback" && method == "POST"
+        # Receive SCORE and Agent metadata from the Python loop
+        try
+            body = JSON3.read(String(req.body))
+            agent_name = string(get(body, :agent, "UNKNOWN"))
+            score = Float32(get(body, :score, 0.0f0))
+            
+            # Use the score to 'nudge' the global best or adjust a specific weight
+            # For now, we log it and use it to maintain a 'trust' moving average across the swarm
+            println("  [PSO] Feedback received: Agent=$agent_name | Score=$score")
+            
+            return HTTP.Response(200, ["Content-Type" => "application/json"],
+                JSON3.write(Dict("status" => "acknowledged", "agent" => agent_name)))
+        catch e
+            return HTTP.Response(400, JSON3.write(Dict("error" => "Invalid feedback body: $e")))
+        end
+
     elseif path == "/api/state"
         if isassigned(SWARM)
             sw = SWARM[]
@@ -360,15 +353,11 @@ function router(req::HTTP.Request)
         else
             return HTTP.Response(200, JSON3.write(Dict("status" => "idle")))
         end
-
     else
         return HTTP.Response(404, "Not Found")
     end
 end
 
-# ────────────────────────────────────────────────────────────
-#  MAIN ENTRY POINT
-# ────────────────────────────────────────────────────────────
 println("""
 ╔══════════════════════════════════════════════════╗
 ║   NEXUS ULTRA — PSO SWARM BRAIN  (Julia/CUDA)   ║
@@ -378,7 +367,6 @@ println("""
 ╚══════════════════════════════════════════════════╝
 """)
 
-# Initialise SWARM to idle state so /api/state works immediately
 SWARM[] = make_swarm()
 SWARM[].running = false
 
@@ -389,14 +377,11 @@ server = HTTP.listen!("0.0.0.0", PORT) do http::HTTP.Stream
         end
     else
         req      = http.message
-        req.body = read(http)        # buffer full body from stream (fixes empty POST body)
+        req.body = read(http)
         resp     = router(req)
-
-        # CORS headers for the HTML dashboard
         push!(resp.headers, "Access-Control-Allow-Origin" => "*")
         push!(resp.headers, "Access-Control-Allow-Methods" => "GET, POST, OPTIONS")
         push!(resp.headers, "Access-Control-Allow-Headers" => "Content-Type")
-
         HTTP.setstatus(http, resp.status)
         for (k, v) in resp.headers
             HTTP.setheader(http, k => v)

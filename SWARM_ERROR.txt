@@ -1,0 +1,19 @@
+2026-03-16 14:37:03,480 [MEMORY] \u2705 MemoryCore online ù DB: C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_mind.db
+2026-03-16 14:37:03,480 [MEMORY]    \U0001f4da 875 memories loaded from previous sessions (no wipe)
+Traceback (most recent call last):
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_swarm_loop.py", line 601, in <module>
+    asyncio.run(main())
+    ~~~~~~~~~~~^^^^^^^^
+  File "C:\Python314\Lib\asyncio\runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "C:\Python314\Lib\asyncio\runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Python314\Lib\asyncio\base_events.py", line 719, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_swarm_loop.py", line 543, in main
+    log.info("="*60)
+    ^^^
+NameError: name 'log' is not defined

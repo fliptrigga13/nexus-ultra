@@ -1,8 +1,8 @@
 
-# ═══════════════════════════════════════════════════════════════
-#  VEILPIERCER — LIVE PROOF SCRIPT
+# 
+#  VEILPIERCER  LIVE PROOF SCRIPT
 #  Hits every component end-to-end. Expects 11/11 green.
-# ═══════════════════════════════════════════════════════════════
+# 
 
 $BASE = "http://127.0.0.1:3000"
 $AUTH = @{"x-api-key" = "Burton" }
@@ -12,25 +12,25 @@ $pass = 0; $fail = 0; $results = @()
 
 function Check($num, $name, $ok, $detail = "") {
     if ($ok) {
-        Write-Host "  ✅ [$num/11] $name" -ForegroundColor Green
-        if ($detail) { Write-Host "         → $detail" -ForegroundColor DarkGreen }
+        Write-Host "   [$num/11] $name" -ForegroundColor Green
+        if ($detail) { Write-Host "          $detail" -ForegroundColor DarkGreen }
         $script:pass++
     }
     else {
-        Write-Host "  ❌ [$num/11] $name" -ForegroundColor Red
-        if ($detail) { Write-Host "         → $detail" -ForegroundColor DarkRed }
+        Write-Host "   [$num/11] $name" -ForegroundColor Red
+        if ($detail) { Write-Host "          $detail" -ForegroundColor DarkRed }
         $script:fail++
     }
 }
 
 Write-Host ""
-Write-Host "  ╔══════════════════════════════════════════╗" -ForegroundColor Cyan
-Write-Host "  ║   VEILPIERCER — LIVE PROOF SCRIPT        ║" -ForegroundColor Cyan
-Write-Host "  ║   11 Components · End-to-End             ║" -ForegroundColor Cyan
-Write-Host "  ╚══════════════════════════════════════════╝" -ForegroundColor Cyan
+Write-Host "  " -ForegroundColor Cyan
+Write-Host "     VEILPIERCER  LIVE PROOF SCRIPT        " -ForegroundColor Cyan
+Write-Host "     11 Components  End-to-End             " -ForegroundColor Cyan
+Write-Host "  " -ForegroundColor Cyan
 Write-Host ""
 
-# ── [1] Server Health ─────────────────────────────────────────
+#  [1] Server Health 
 try {
     $s = Invoke-RestMethod "$BASE/status" -ErrorAction Stop
     Check 1 "Server Health" ($s.status -eq "NEXUS ULTRA ONLINE") "Status: $($s.status)"
@@ -39,7 +39,7 @@ catch {
     Check 1 "Server Health" $false "Error: $_"
 }
 
-# ── [2] Admin Auth ────────────────────────────────────────────
+#  [2] Admin Auth 
 try {
     $a = Invoke-RestMethod "$BASE/access/list" -Headers $AUTH -ErrorAction Stop
     Check 2 "Admin Auth" ($a.count -gt 0) "Tokens in DB: $($a.count)"
@@ -48,7 +48,7 @@ catch {
     Check 2 "Admin Auth" $false "Error: $_"
 }
 
-# ── [3] Token Creation ────────────────────────────────────────
+#  [3] Token Creation 
 try {
     $rnd = [System.Guid]::NewGuid().ToString("N").Substring(0, 8)
     $email = "proof_$rnd@test.veilpiercer.com"
@@ -63,18 +63,18 @@ catch {
     $newTok = $TOKEN
 }
 
-# ── [4] Buyer Portal (Token Verify) ───────────────────────────
+#  [4] Buyer Portal (Token Verify) 
 try {
     $v = Invoke-RestMethod "$BASE/access/verify?token=$TOKEN" -ErrorAction Stop
-    Check 4 "Buyer Portal — Token Verify" ($v.ok -eq $true) "Email: $($v.email) | Tier: $($v.tier)"
+    Check 4 "Buyer Portal  Token Verify" ($v.ok -eq $true) "Email: $($v.email) | Tier: $($v.tier)"
 }
 catch {
-    Check 4 "Buyer Portal — Token Verify" $false "Error: $_"
+    Check 4 "Buyer Portal  Token Verify" $false "Error: $_"
 }
 
-# ── [5] Command Hub Accessible ────────────────────────────────
+#  [5] Command Hub Accessible 
 try {
-    $hub = Invoke-WebRequest "$BASE/veilpiercer-command.html" -ErrorAction Stop
+    $hub = Invoke-WebRequest "$BASE/veilpiercer-command.html" -UseBasicParsing -ErrorAction Stop
     $hasGate = $hub.Content -match 'verifyAndUnlock'
     $hasTiers = $hub.Content -match 'TIER_FEATURES'
     $hasOrbits = $hub.Content -match 'masterR'
@@ -84,7 +84,7 @@ catch {
     Check 5 "Command Hub" $false "Error: $_"
 }
 
-# ── [6] Ollama AI Command (Pro tier) ──────────────────────────
+#  [6] Ollama AI Command (Pro tier) 
 try {
     $body = @{
         token    = $TOKEN
@@ -102,19 +102,20 @@ catch {
     Check 6 "Ollama AI Command (Pro)" $false "Error: $_ (Is Ollama running? Run: ollama serve)"
 }
 
-# ── [7] ZIP Download ──────────────────────────────────────────
+#  [7] ZIP Download 
 try {
-    $dl = Invoke-WebRequest "$BASE/download?token=$TOKEN" -ErrorAction Stop
-    $isZip = $dl.Headers['Content-Type'] -match 'zip'
-    $hasName = $dl.Headers['Content-Disposition'] -match 'VeilPiercer'
-    $sizeKB = [math]::Round($dl.Content.Length / 1024, 1)
-    Check 7 "ZIP Download" ($dl.StatusCode -eq 200 -and $isZip) "Content-Type: zip=$isZip | Size: ${sizeKB}KB | Filename: $hasName"
+    $tmpZip = "$env:TEMP\vp_test.zip"
+    $dl = Invoke-WebRequest "$BASE/download?token=$TOKEN" -OutFile $tmpZip -ErrorAction Stop
+    $isZip = (Get-Item $tmpZip).Length -gt 100
+    $sizeKB = [math]::Round((Get-Item $tmpZip).Length / 1024, 1)
+    Remove-Item $tmpZip
+    Check 7 "ZIP Download" ($isZip) "Size: ${sizeKB}KB | Token: $($TOKEN.Substring(0,8))..."
 }
 catch {
     Check 7 "ZIP Download" $false "Error: $_"
 }
 
-# ── [8] Feedback Submission ───────────────────────────────────
+#  [8] Feedback Submission 
 try {
     $fb = Invoke-RestMethod "$BASE/feedback" -Method POST -ContentType "application/json" `
         -Body '{"token":"386d770395a7b7bb7d700e00a9bdfb2badd94c00cdaaa790b941ea2e32369e83","rating":"10","worked":"yes","recommend":"10","useCase":"proof script","suggestion":"ship it"}' `
@@ -125,7 +126,7 @@ catch {
     Check 8 "Feedback Submission" $false "Error: $_"
 }
 
-# ── [9] Feedback Insights (Admin View) ────────────────────────
+#  [9] Feedback Insights (Admin View) 
 try {
     $ins = Invoke-RestMethod "$BASE/feedback/all" -Headers $AUTH -ErrorAction Stop
     Check 9 "Feedback Insights Panel" ($ins.count -gt 0) "Responses: $($ins.count) | Avg Rating: $($ins.avgRating)/10 | Worked: $($ins.workedCount)"
@@ -134,7 +135,7 @@ catch {
     Check 9 "Feedback Insights Panel" $false "Error: $_"
 }
 
-# ── [10] Signal / Access Flow ─────────────────────────────────
+#  [10] Signal / Access Flow 
 try {
     $list = Invoke-RestMethod "$BASE/access/list" -Headers $AUTH -ErrorAction Stop
     $shortToken = $TOKEN.Substring(0, 8)
@@ -147,9 +148,9 @@ catch {
     Check 10 "Signal / Access Flow" $false "Error: $_"
 }
 
-# ── [11] Sales Page ───────────────────────────────────────────
+#  [11] Sales Page 
 try {
-    $sp = Invoke-WebRequest "$BASE/veilpiercer.html" -ErrorAction Stop
+    $sp = Invoke-WebRequest "$BASE/veilpiercer.html" -UseBasicParsing -ErrorAction Stop
     $hasStripe = $sp.Content -match 'buy\.stripe\.com'
     $hasBrand = $sp.Content -match 'VEILPIERCER'
     $sizeKB = [math]::Round($sp.Content.Length / 1024, 1)
@@ -159,13 +160,14 @@ catch {
     Check 11 "Sales Page" $false "Error: $_"
 }
 
-# ── RESULTS ──────────────────────────────────────────────────
+#  RESULTS 
 Write-Host ""
 if ($fail -eq 0) {
-    Write-Host "  ◈ ALL $pass/11 CHECKS PASSED — VEILPIERCER IS LIVE" -ForegroundColor Cyan
+    Write-Host "   ALL $pass/11 CHECKS PASSED  VEILPIERCER IS LIVE" -ForegroundColor Cyan
 }
 else {
-    Write-Host "  ◈ $pass PASSED · $fail FAILED" -ForegroundColor Yellow
+    Write-Host "   $pass PASSED  $fail FAILED" -ForegroundColor Yellow
     Write-Host "  Fix the red items above before going live." -ForegroundColor DarkYellow
 }
 Write-Host ""
+

@@ -18,14 +18,11 @@
 - **Sentinel Duty:** Intelligence must include "Memory Guarding." The `MEMORY_GUARD.ps1` and `night_watch.ps1` are the immune system of the project.
 - **Evolution:** The system must self-correct. If a Node.js process peaks above 1.5GB RAM, the Swarm must "recycle" the logical node without losing session facts.
 
-## 3. COMMERCIAL SYNERGY (The $10k Goal)
+## 3. COMMERCIAL SYNERGY — ⚠ SUSPENDED — HUMAN DIRECTION REQUIRED
 
-- **Concept:** This project is a business. Intelligence improvements should directly manifest as features in the `BUNDLE/` given to buyers.
-- **Material Assets:**
-  - `veilpiercer.py`: Python SDK for integration.
-  - `veilpiercer.js`: Node.js SDK for integration.
-  - `veilpiercer-command.html`: The Tactical Command Hub.
-- **Next Step:** Expand the Hub to include "Multi-Agent Orchestration" where the user can push instructions to multiple connected observatories at once.
+- **Status:** This directive is SUSPENDED. Agents must NOT autonomously build, modify, or deploy commercial features (pricing, tiers, sales pages, bundles, SDKs) without explicit human approval via EH `/approve`.
+- **Why:** Previous autonomous execution of this directive resulted in unauthorized product decisions (Agency white-label tier, homepage swap) that did not reflect the owner's intent.
+- **Rule:** Any commercial feature request must be injected by the human via `/inject` and approved before execution. Agents propose, human decides.
 
 ## 4. PERSISTENT COGNITIVE MEMORY
 
@@ -35,6 +32,6 @@
 
 ### ◈ FINAL DIRECTIVE
 
-**INTELLIGENCE IS ACTION.** Any reasoning that does not lead to a system state change or a social proof update is classified as "Noise."
+**INTELLIGENCE IS ACTION — WITH HUMAN APPROVAL.** Any reasoning that does not lead to a system state change is classified as "Noise." However, all system state changes that affect code, files, or commercial features REQUIRE human sign-off via EH before execution. The swarm proposes. The human decides.
 
 ---

@@ -1,42 +1,67 @@
 {
-  "veilpiercer-ad.html": {},
-  "access.html": {
+  "index.html": {
     "title": "optimized <title> tag content",
     "description": "optimized meta description (150-160 chars)",
     "keywords": [
-      "VeilPiercer \u2014 AI security swarm, RTX 4060, local CUDA, autonomous agents.",
       "AI security swarm",
-      "local CUDA AI",
-      "VeilPiercer",
-      "nexus prime",
-      "offline AI."
+      "local CUDA AI"
     ],
     "og_title": "Open Graph title",
     "og_description": "Open Graph description",
     "h1": "recommended H1 text if missing or weak",
     "issues": [
-      "list of SEO issues found",
       {
-        "element": "CSS selector or tag",
-        "attribute": "font-size",
-        "value": "16px"
-      },
-      {
-        "element": "alt attribute in img tags",
-        "attribute": "alt text",
-        "value": ""
+        "issue": "Missing alt attribute in <img> tag",
+        "description": "HTML5 does not require an alt attribute for images, but it's good practice to add one."
       }
     ],
-    "fixes": [
+    "sections": [
       {
-        "element": ".ai-box",
-        "attribute": "-webkit-appearance: none;"
+        "id": "why",
+        "title": "Why",
+        "content": "This is a placeholder section. You can add your content here.",
+        "timestamp": "2023-03-01T12:00:00Z"
       },
       {
-        "element": "#loading",
-        "attribute": "display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; gap: 24px; text-align: center;"
+        "id": "why-lead",
+        "title": "Why lead",
+        "content": "This is another placeholder section. You can add your content here.",
+        "timestamp": "2023-02-28T10:00:00Z"
       }
     ],
-    "score": 50
+    "stats": [
+      {
+        "id": "incidents",
+        "title": "Incidents",
+        "content": "This is a placeholder statistics section. You can add your content here.",
+        "timestamp": "2023-03-01T12:05:00Z"
+      }
+    ],
+    "widgets": [
+      {
+        "id": "why",
+        "name": "Why",
+        "description": "A widget to display why information. You can add your content here."
+      },
+      {
+        "id": "incidents",
+        "name": "Incidents",
+        "description": "An incident widget to display incidents. You can add your content here."
+      }
+    ],
+    "image": [
+      {
+        "id": "why-lead",
+        "alt": "",
+        "src": "",
+        "title": ""
+      },
+      {
+        "id": "incidents",
+        "alt": "",
+        "src": "",
+        "title": ""
+      }
+    ]
   }
 }

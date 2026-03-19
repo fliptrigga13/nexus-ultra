@@ -1,0 +1,27 @@
+{
+  "event": "NVIDIA GTC 2026",
+  "architecture": {
+    "name": "Vera Rubin",
+    "nodes": "NVL72",
+    "unified_memory": "1.2 TB/s",
+    "compute_peak": "450 PFLOPS (FP8)"
+  },
+  "agent_os": {
+    "name": "NemoClaw",
+    "version": "1.2",
+    "features": [
+      "Real-time task preemption",
+      "Sub-ms kernel context switching",
+      "Autonomous tool arbitration"
+    ]
+  },
+  "lpu_stack": {
+    "name": "Groq 3",
+    "throughput": "10,500 tokens/sec",
+    "latency": "0.05ms/token"
+  },
+  "swarm_optimization": {
+    "multiplier": 1.42,
+    "status": "ACTIVE"
+  }
+}

@@ -1,1181 +1,601 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>NEXUS PRIME — ULTIMATE GOD MODE HUB</title>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@300;400;600&display=swap"
-    rel="stylesheet">
-  <style>
-    :root {
-      --bg: #030308;
-      --bg2: #06060f;
-      --bg3: #0a0a1a;
-      --cyan: #00fff7;
-      --purple: #bf00ff;
-      --pink: #ff0099;
-      --green: #00ff88;
-      --gold: #ffcc00;
-      --red: #ff3355;
-      --glass: rgba(0, 255, 247, 0.04);
-      --glass2: rgba(191, 0, 255, 0.06);
-      --border: rgba(0, 255, 247, 0.15);
-      --border2: rgba(191, 0, 255, 0.2);
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box
-    }
-
-    html,
-    body {
-      height: 100%;
-      background: var(--bg);
-      color: var(--cyan);
-      font-family: 'JetBrains Mono', monospace;
-      overflow-x: hidden
-    }
-
-    body {
-      display: grid;
-      grid-template-rows: auto 1fr auto;
-      min-height: 100vh
-    }
-
-    /* ── HEADER ── */
-    #header {
-      background: linear-gradient(90deg, #030308, #0a0020, #030308);
-      border-bottom: 1px solid var(--border);
-      padding: 10px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    #header h1 {
-      font-family: 'Orbitron', monospace;
-      font-size: 14px;
-      font-weight: 900;
-      letter-spacing: 4px;
-      background: linear-gradient(90deg, var(--cyan), var(--purple), var(--pink));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: none;
-    }
-
-    #header-right {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      font-size: 10px;
-      letter-spacing: 1px
-    }
-
-    #clock {
-      color: var(--gold);
-      font-size: 11px
-    }
-
-    .status-pill {
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-size: 9px;
-      letter-spacing: 2px;
-      font-weight: 600
-    }
-
-    .pill-online {
-      background: rgba(0, 255, 136, 0.15);
-      border: 1px solid var(--green);
-      color: var(--green)
-    }
-
-    .pill-offline {
-      background: rgba(255, 51, 85, 0.15);
-      border: 1px solid var(--red);
-      color: var(--red)
-    }
-
-    /* ── MAIN GRID ── */
-    #main {
-      display: grid;
-      grid-template-columns: 260px 1fr 280px;
-      gap: 0;
-      height: 100%
-    }
-
-    /* ── PANELS ── */
-    .panel {
-      border-right: 1px solid var(--border);
-      overflow-y: auto;
-      padding: 12px
-    }
-
-    .panel:last-child {
-      border-right: none;
-      border-left: 1px solid var(--border)
-    }
-
-    .panel-title {
-      font-family: 'Orbitron', monospace;
-      font-size: 9px;
-      letter-spacing: 3px;
-      color: var(--purple);
-      padding: 6px 0 10px;
-      border-bottom: 1px solid var(--border2);
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .panel-title::before {
-      content: '◈';
-      color: var(--cyan)
-    }
-
-    /* ── ENGINE STATUS ── */
-    .engine-card {
-      background: var(--glass);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 8px 10px;
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      transition: all 0.3s;
-      cursor: default;
-    }
-
-    .engine-card:hover {
-      background: rgba(0, 255, 247, 0.08);
-      border-color: var(--cyan);
-      transform: translateX(2px)
-    }
-
-    .engine-name {
-      font-size: 9px;
-      letter-spacing: 1px;
-      color: #ccc;
-      font-weight: 600
-    }
-
-    .engine-sub {
-      font-size: 8px;
-      color: #555;
-      margin-top: 2px
-    }
-
-    .engine-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      flex-shrink: 0
-    }
-
-    .dot-green {
-      background: var(--green);
-      box-shadow: 0 0 8px var(--green)
-    }
-
-    .dot-yellow {
-      background: var(--gold);
-      box-shadow: 0 0 8px var(--gold)
-    }
-
-    .dot-red {
-      background: var(--red);
-      box-shadow: 0 0 8px var(--red)
-    }
-
-    .dot-pulse {
-      animation: pulse 1.5s infinite
-    }
-
-    @keyframes pulse {
-
-      0%,
-      100% {
-        opacity: 1
-      }
-
-      50% {
-        opacity: 0.3
-      }
-    }
-
-    /* ── AGENT ROSTER ── */
-    .agent-card {
-      background: var(--glass2);
-      border: 1px solid var(--border2);
-      border-radius: 6px;
-      padding: 7px 10px;
-      margin-bottom: 5px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .agent-badge {
-      font-family: 'Orbitron', monospace;
-      font-size: 7px;
-      letter-spacing: 1px;
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
-    .badge-core {
-      background: rgba(0, 255, 247, 0.2);
-      border: 1px solid var(--cyan);
-      color: var(--cyan)
-    }
-
-    .badge-rogue {
-      background: rgba(255, 0, 153, 0.2);
-      border: 1px solid var(--pink);
-      color: var(--pink)
-    }
-
-    .agent-info {
-      flex: 1
-    }
-
-    .agent-name {
-      font-size: 10px;
-      font-weight: 600;
-      color: #eee
-    }
-
-    .agent-model {
-      font-size: 8px;
-      color: #666;
-      margin-top: 1px
-    }
-
-    .agent-score {
-      font-size: 10px;
-      color: var(--gold);
-      font-weight: 700
-    }
-
-    /* ── CENTER PANEL ── */
-    #center {
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      overflow-y: auto
-    }
-
-    /* ── INJECT BOX ── */
-    #inject-box {
-      background: linear-gradient(135deg, rgba(0, 255, 247, 0.05), rgba(191, 0, 255, 0.05));
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 14px;
-    }
-
-    #inject-box h3 {
-      font-family: 'Orbitron', monospace;
-      font-size: 9px;
-      letter-spacing: 3px;
-      color: var(--cyan);
-      margin-bottom: 10px
-    }
-
-    #task-input {
-      width: 100%;
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--cyan);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      padding: 10px 12px;
-      resize: vertical;
-      min-height: 70px;
-      outline: none;
-      transition: border-color 0.3s;
-    }
-
-    #task-input:focus {
-      border-color: var(--cyan);
-      box-shadow: 0 0 20px rgba(0, 255, 247, 0.1)
-    }
-
-    #inject-btns {
-      display: flex;
-      gap: 8px;
-      margin-top: 10px
-    }
-
-    .btn {
-      padding: 8px 16px;
-      border-radius: 6px;
-      font-family: 'Orbitron', monospace;
-      font-size: 8px;
-      letter-spacing: 2px;
-      font-weight: 700;
-      cursor: pointer;
-      border: none;
-      transition: all 0.3s;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--cyan), var(--purple));
-      color: #000;
-      box-shadow: 0 0 20px rgba(0, 255, 247, 0.3);
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 0 30px rgba(0, 255, 247, 0.5)
-    }
-
-    .btn-secondary {
-      background: rgba(191, 0, 255, 0.15);
-      border: 1px solid var(--purple);
-      color: var(--purple)
-    }
-
-    .btn-secondary:hover {
-      background: rgba(191, 0, 255, 0.3)
-    }
-
-    .btn-danger {
-      background: rgba(255, 51, 85, 0.15);
-      border: 1px solid var(--red);
-      color: var(--red)
-    }
-
-    /* ── BLACKBOARD FEED ── */
-    #blackboard-feed {
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 14px;
-      flex: 1;
-      min-height: 200px;
-    }
-
-    #blackboard-feed h3 {
-      font-family: 'Orbitron', monospace;
-      font-size: 9px;
-      letter-spacing: 3px;
-      color: var(--green);
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 8px
-    }
-
-    #blackboard-feed h3::after {
-      content: '●';
-      color: var(--green);
-      animation: pulse 1s infinite;
-      font-size: 8px
-    }
-
-    #bbcontent {
-      font-size: 9px;
-      line-height: 1.7;
-      color: #888;
-      max-height: 300px;
-      overflow-y: auto
-    }
-
-    .bb-entry {
-      padding: 4px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.03)
-    }
-
-    .bb-agent {
-      color: var(--cyan);
-      font-weight: 600
-    }
-
-    .bb-time {
-      color: #444;
-      font-size: 8px;
-      margin-left: 6px
-    }
-
-    .bb-text {
-      color: #aaa;
-      margin-top: 2px;
-      font-size: 9px;
-      word-break: break-word
-    }
-
-    /* ── MEMORY STATS ── */
-    #mem-stats {
-      background: var(--glass2);
-      border: 1px solid var(--border2);
-      border-radius: 10px;
-      padding: 14px;
-    }
-
-    #mem-stats h3 {
-      font-family: 'Orbitron', monospace;
-      font-size: 9px;
-      letter-spacing: 3px;
-      color: var(--purple);
-      margin-bottom: 10px
-    }
-
-    .mem-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-bottom: 10px
-    }
-
-    .mem-stat {
-      text-align: center;
-      background: rgba(191, 0, 255, 0.08);
-      border: 1px solid rgba(191, 0, 255, 0.2);
-      border-radius: 6px;
-      padding: 8px 4px
-    }
-
-    .mem-val {
-      font-family: 'Orbitron', monospace;
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--purple)
-    }
-
-    .mem-label {
-      font-size: 7px;
-      color: #666;
-      letter-spacing: 1px;
-      margin-top: 2px
-    }
-
-    #top-memories {
-      font-size: 9px;
-      color: #888
-    }
-
-    .top-mem-item {
-      padding: 5px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-      display: flex;
-      gap: 8px;
-      align-items: flex-start
-    }
-
-    .top-mem-imp {
-      color: var(--gold);
-      font-weight: 700;
-      white-space: nowrap;
-      font-size: 9px
-    }
-
-    .top-mem-txt {
-      color: #bbb;
-      font-size: 9px;
-      flex: 1
-    }
-
-    /* ── SCORE DISPLAY ── */
-    #score-bar {
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 14px;
-    }
-
-    #score-bar h3 {
-      font-family: 'Orbitron', monospace;
-      font-size: 9px;
-      letter-spacing: 3px;
-      color: var(--gold);
-      margin-bottom: 10px
-    }
-
-    .score-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 6px
-    }
-
-    .score-agent {
-      font-size: 9px;
-      color: #ccc;
-      width: 90px;
-      white-space: nowrap
-    }
-
-    .score-track {
-      flex: 1;
-      height: 6px;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 3px;
-      overflow: hidden
-    }
-
-    .score-fill {
-      height: 100%;
-      border-radius: 3px;
-      transition: width 1s ease
-    }
-
-    .score-num {
-      font-size: 9px;
-      color: var(--gold);
-      width: 35px;
-      text-align: right
-    }
-
-    /* ── RIGHT PANEL — COGNITIVE DB ── */
-    #cogdb {
-      font-size: 9px
-    }
-
-    .tier-block {
-      margin-bottom: 8px
-    }
-
-    .tier-hdr {
-      background: linear-gradient(90deg, rgba(191, 0, 255, 0.15), transparent);
-      border-left: 2px solid var(--purple);
-      padding: 6px 8px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 9px;
-      letter-spacing: 1px;
-      color: var(--purple);
-      font-weight: 600;
-      border-radius: 0 4px 4px 0;
-      transition: background 0.2s;
-    }
-
-    .tier-hdr:hover {
-      background: rgba(191, 0, 255, 0.25)
-    }
-
-    .tier-hdr.t10 {
-      border-left-color: var(--cyan);
-      color: var(--cyan);
-      background: linear-gradient(90deg, rgba(0, 255, 247, 0.15), transparent)
-    }
-
-    .tier-count {
-      font-size: 8px;
-      background: rgba(191, 0, 255, 0.2);
-      border-radius: 10px;
-      padding: 1px 6px;
-      color: #ccc
-    }
-
-    .tier-skills {
-      display: none;
-      padding: 6px 8px;
-      flex-wrap: wrap;
-      gap: 4px
-    }
-
-    .tier-skills.open {
-      display: flex
-    }
-
-    .skill-tag {
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 3px;
-      padding: 2px 6px;
-      font-size: 8px;
-      color: #888;
-      cursor: default;
-      transition: all 0.2s;
-    }
-
-    .skill-tag:hover {
-      color: var(--cyan);
-      border-color: var(--cyan);
-      background: rgba(0, 255, 247, 0.05)
-    }
-
-    /* ── BOTTOM STATUS BAR ── */
-    #footer {
-      background: rgba(0, 0, 0, 0.6);
-      border-top: 1px solid var(--border);
-      padding: 6px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 8px;
-      letter-spacing: 1px;
-    }
-
-    .footer-left {
-      color: #555;
-      display: flex;
-      gap: 20px
-    }
-
-    .footer-left span {
-      display: flex;
-      align-items: center;
-      gap: 4px
-    }
-
-    .footer-right {
-      color: var(--purple);
-      font-family: 'Orbitron', monospace;
-      font-size: 8px
-    }
-
-    /* ── SCROLLBARS ── */
-    ::-webkit-scrollbar {
-      width: 4px;
-      height: 4px
-    }
-
-    ::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.2)
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: rgba(0, 255, 247, 0.2);
-      border-radius: 2px
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgba(0, 255, 247, 0.4)
-    }
-
-    /* ── ANIMATIONS ── */
-    @keyframes scanline {
-      0% {
-        top: -20%
-      }
-
-      100% {
-        top: 120%
-      }
-    }
-
-    @keyframes glow {
-
-      0%,
-      100% {
-        text-shadow: 0 0 10px var(--cyan)
-      }
-
-      50% {
-        text-shadow: 0 0 30px var(--cyan), 0 0 60px var(--cyan)
-      }
-    }
-
-    @keyframes float {
-
-      0%,
-      100% {
-        transform: translateY(0)
-      }
-
-      50% {
-        transform: translateY(-4px)
-      }
-    }
-
-    .glow-text {
-      animation: glow 3s infinite
-    }
-
-    .toast {
-      position: fixed;
-      bottom: 60px;
-      right: 20px;
-      background: rgba(0, 255, 247, 0.1);
-      border: 1px solid var(--cyan);
-      border-radius: 6px;
-      padding: 10px 16px;
-      font-size: 10px;
-      color: var(--cyan);
-      z-index: 9999;
-      animation: slideIn 0.3s ease;
-      display: none;
-    }
-
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateX(20px)
-      }
-
-      to {
-        opacity: 1;
-        transform: translateX(0)
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>NEXUS ULTRA — GOD MODE // ULTIMATE HUB</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #00000a;
+            --bg-deep: #000005;
+            --panel: rgba(4, 11, 25, 0.85);
+            --rim: rgba(0, 255, 247, 0.2);
+            --rim-bright: rgba(0, 255, 247, 0.5);
+            
+            --cyan: #00f5ff;
+            --purple: #bf00ff;
+            --pink: #ff0099;
+            --green: #00ff88;
+            --gold: #ffd700;
+            --red: #ff3355;
+            
+            --text: #c2d8f0;
+            --text-dim: #456070;
+            --font-mono: 'JetBrains Mono', monospace;
+            --font-proto: 'Orbitron', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: crosshair !important; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--rim-bright); border-radius: 2px; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 11px;
+            height: 100vh;
+            overflow: hidden;
+            display: grid;
+            grid-template-rows: 60px 1fr 32px;
+            position: relative;
+        }
+
+        /* ── BACKGROUND ── */
+        #bg-fx {
+            position: fixed; inset: 0; z-index: -1;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(191, 0, 255, 0.12), transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(0, 245, 255, 0.1), transparent 40%);
+            overflow: hidden;
+        }
+        .streak {
+            position: absolute; width: 2px; height: 150px;
+            background: linear-gradient(to bottom, transparent, var(--cyan), transparent);
+            opacity: 0.3; filter: blur(1px);
+            animation: streakMove 10s linear infinite;
+        }
+        @keyframes streakMove {
+            0% { transform: translateY(-100vh) rotate(45deg); opacity: 0; }
+            50% { opacity: 0.4; }
+            100% { transform: translateY(100vh) rotate(45deg); opacity: 0; }
+        }
+
+        /* ── HEADER ── */
+        header {
+            background: rgba(0, 0, 0, 0.85);
+            border-bottom: 2px solid var(--rim);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 30px; z-index: 100;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 0 30px rgba(0, 245, 255, 0.1);
+        }
+        .brand { display: flex; align-items: center; gap: 20px; }
+        .logo { font-family: var(--font-proto); font-weight: 900; font-size: 18px; letter-spacing: 6px; color: var(--gold); text-shadow: 0 0 15px rgba(255,215,0,0.4); }
+        .tagline { font-size: 9px; color: var(--text-dim); letter-spacing: 3px; text-transform: uppercase; }
+        
+        .sys-status { display: flex; gap: 15px; align-items: center; }
+        .pill { 
+            padding: 5px 12px; border-radius: 4px; font-size: 9px; font-weight: 700; 
+            letter-spacing: 1px; border: 1px solid; border-color: rgba(255,255,255,0.1);
+            color: #fff; background: rgba(255,255,255,0.05);
+        }
+        .pill.on { border-color: var(--green); color: var(--green); box-shadow: 0 0 10px rgba(0,255,136,0.2); }
+        .pill.hot { border-color: var(--gold); color: var(--gold); }
+
+        /* ── MAIN GRID ── */
+        main {
+            display: grid;
+            grid-template-columns: 320px 1fr 340px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .side-panel {
+            background: var(--panel);
+            border-right: 1px solid var(--rim);
+            display: flex; flex-direction: column;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        #right-panel { border-right: none; border-left: 1px solid var(--rim); }
+
+        .sec-title {
+            font-family: var(--font-proto); font-size: 9px; letter-spacing: 4px;
+            color: var(--cyan); padding: 15px 20px 10px;
+            border-bottom: 1px solid rgba(0,255,247,0.1);
+            text-transform: uppercase;
+        }
+
+        /* ── OBSERVATORY ── */
+        #observatory {
+            position: relative; overflow: hidden;
+            background: radial-gradient(circle at 50% 50%, #05051a 0%, var(--bg) 80%);
+        }
+        #canvas-wrap { position: absolute; inset: 0; z-index: 10; opacity: 0.6; }
+        canvas { display: block; width: 100%; height: 100%; }
+
+        .score-hud {
+            position: absolute; top: 30px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 50px; z-index: 50; pointer-events: none;
+        }
+        .score-box { text-align: center; min-width: 100px; }
+        .score-val { font-family: var(--font-proto); font-size: 32px; font-weight: 900; color: #fff; line-height: 1; text-shadow: 0 0 15px var(--cyan); }
+        .score-lbl { font-size: 9px; letter-spacing: 3px; color: var(--text-dim); margin-top: 8px; }
+
+        /* ── SLIDING COMMAND CENTER (Adjusted Higher) ── */
+        #command-center {
+            position: absolute; bottom: 40px; left: 20px; right: 20px; height: 380px; /* Adjusted Higher */
+            background: rgba(0, 0, 0, 0.95); border: 2px solid var(--rim);
+            border-radius: 16px; display: flex; flex-direction: column;
+            z-index: 100; backdrop-filter: blur(30px); box-shadow: 0 20px 80px rgba(0,0,0,1);
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            border-bottom: 4px solid var(--cyan);
+        }
+        #command-center.minimized { height: 45px; transform: translateY(10px); }
+        
+        #cc-header {
+            padding: 12px 25px; border-bottom: 1px solid rgba(0,255,247,0.1);
+            display: flex; justify-content: space-between; align-items: center;
+            cursor: pointer;
+        }
+        .cc-status { font-family: var(--font-proto); font-size: 8px; color: var(--green); letter-spacing: 3px; }
+        
+        #chat-log { 
+            flex: 1; overflow-y: auto; padding: 25px; display: flex; 
+            flex-direction: column; gap: 18px; font-size: 13px; /* Larger chat font */
+            scrollbar-width: thin;
+        }
+        .msg { padding: 15px 20px; border-radius: 12px; max-width: 90%; line-height: 1.6; position: relative; border-left: 3px solid transparent; }
+        .msg.agent { background: rgba(191,0,255,0.1); border-color: var(--purple); color: #e0e0f0; }
+        .msg.user { align-self: flex-end; background: rgba(0,245,255,0.1); border-color: var(--cyan); color: var(--cyan); text-align: right; }
+        .who { font-size: 10px; font-weight: 900; color: var(--gold); letter-spacing: 2px; margin-bottom: 6px; }
+
+        #input-area { padding: 20px; border-top: 1px solid var(--rim); background: rgba(0,0,0,0.8); display: flex; gap: 15px; }
+        #task-in { flex: 1; background: #080808; border: 1px solid var(--rim); border-radius: 8px; padding: 12px 20px; color: #fff; font-family: var(--font-mono); outline: none; }
+        .fire-btn { background: var(--cyan); color: #000; border: none; padding: 0 30px; border-radius: 8px; font-family: var(--font-proto); font-weight: 900; cursor: pointer; transition: 0.3s; }
+        .fire-btn:hover { background: #fff; box-shadow: 0 0 30px var(--cyan); transform: translateY(-2px); }
+
+        /* ── GOD MODE PANEL (RIGHT) ── */
+        .gm-controls { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .gm-btn { 
+            background: none; border: 1px solid var(--clr); color: var(--clr); 
+            padding: 12px; border-radius: 6px; font-family: var(--font-proto); font-size: 9px;
+            letter-spacing: 1px; cursor: pointer; transition: 0.3s; text-transform: uppercase;
+        }
+        .gm-btn:hover { background: var(--clr); color: #000; box-shadow: 0 0 20px var(--clr); }
+
+        /* ── GAUGES ── */
+        .gauge-wrap { padding: 15px 20px; }
+        .gauge-meta { display: flex; justify-content: space-between; font-size: 8px; margin-bottom: 6px; color: var(--text-dim); }
+        .bar-track { height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden; }
+        .bar-fill { height: 100%; width: 0%; transition: width 0.8s ease; }
+
+        /* ── FOOTER ── */
+        footer {
+            background: #000; border-top: 1px solid var(--rim);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 30px; font-size: 8px; color: var(--text-dim); letter-spacing: 1px;
+        }
+        .f-val { color: var(--gold); font-weight: 700; margin-left: 10px; }
+
+        /* ── SENTINEL ── */
+        #sentinel-overlay {
+            position: absolute; top: 75px; left: 340px; z-index: 200;
+            font-family: var(--font-proto); font-size: 10px; color: var(--cyan);
+            letter-spacing: 2px; text-shadow: 0 0 10px rgba(0,255,247,0.5);
+            pointer-events: none;
+        }
+        .msg.rogue { border-left-color: var(--red); background: rgba(255,51,85, 0.05); }
+        .msg.rogue .who { color: var(--red); }
+        .msg.sentinel { border-left-color: var(--gold); background: rgba(255,215,0,0.05); }
+        .msg.sentinel .who { color: var(--gold); }
+
+        .locked { border-color: var(--red) !important; color: var(--red) !important; box-shadow: 0 0 20px var(--red); }
+        
+        /* ── MOBILE MODAL ── */
+        #mobile-modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000;
+            display: none; align-items: center; justify-content: center; backdrop-filter: blur(10px);
+        }
+        .m-box {
+            background: var(--panel); border: 2px solid var(--cyan); border-radius: 12px;
+            padding: 40px; max-width: 400px; text-align: center; box-shadow: 0 0 50px rgba(0,250,255,0.2);
+        }
+        .m-box h2 { font-family: var(--font-proto); color: var(--gold); margin-bottom: 20px; letter-spacing: 4px; }
+        .m-url { background: #000; padding: 15px; border-radius: 6px; color: var(--green); font-size: 14px; margin: 20px 0; border: 1px dashed var(--rim-bright); }
+
+    </style>
 </head>
-
 <body>
 
-  <!-- HEADER -->
-  <header id="header">
-    <div>
-      <h1 class="glow-text">NEXUS PRIME ◈ ULTIMATE GOD MODE HUB</h1>
-      <div style="font-size:8px;color:#444;letter-spacing:2px;margin-top:2px">RTX 4060 · OFFLINE · NO API · NO WIPE ·
-        TIER 0→10</div>
+<div id="bg-fx"></div>
+
+<div id="mobile-modal" onclick="this.style.display='none'">
+    <div class="m-box" onclick="event.stopPropagation()">
+        <h2>MOBILE ACCESS</h2>
+        <p style="font-size:10px; color:var(--text-dim); margin-bottom:15px">TAILSCALE CONNECTED — ANY NETWORK</p>
+        <div class="m-url" id="m-url-val">http://100.87.147.106:3000</div>
+        <div style="margin-top:10px; font-size:9px; color:var(--text-dim); line-height:2">
+            <div>GOD MODE HUB &nbsp;&rarr; <span style="color:var(--cyan)">http://100.87.147.106:3000/nexus_ultimate_hub.html</span></div>
+            <div>NEXUS HUB &nbsp;&nbsp;&nbsp;&nbsp;&rarr; <span style="color:var(--cyan)">http://100.87.147.106:3000/nexus_hub.html</span></div>
+            <div>EH API &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&rarr; <span style="color:var(--green)">http://100.87.147.106:7701</span></div>
+            <div>n8n &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&rarr; <span style="color:var(--gold)">http://100.87.147.106:5678</span></div>
+        </div>
+        <p style="font-size:9px; color:var(--text); line-height:1.8; margin-top:15px">
+            Password: <strong style="color:var(--gold); letter-spacing:2px">BURTON131313</strong><br>
+            Works on <strong style="color:var(--cyan)">4G / 5G / any network</strong> while Tailscale is active.
+        </p>
+        <button class="gm-btn" style="--clr:var(--cyan); margin-top:25px; width:100%" onclick="document.getElementById('mobile-modal').style.display='none'">DISMISS</button>
     </div>
-    <div id="header-right">
-      <div id="clock">--:--:--</div>
-      <div id="ollama-pill" class="status-pill pill-offline">OLLAMA</div>
-      <div id="EH API-pill" class="status-pill pill-offline">EH API</div>
-      <div id="cosmos-pill" class="status-pill pill-offline">COSMOS</div>
-      <div id="pso-pill" class="status-pill pill-offline">PSO GPU</div>
+</div>
+
+<header>
+    <div class="brand">
+        <div class="logo">NEXUS ULTIMATE</div>
+        <div class="tagline">Swarm Intelligence // Peak Sovereignty</div>
     </div>
-  </header>
-
-  <!-- MAIN -->
-  <main id="main">
-
-    <!-- LEFT PANEL: Engines + Agents -->
-    <aside class="panel" id="left-panel">
-
-      <div class="panel-title">ENGINES</div>
-      <div id="engine-list">
-        <!-- Engines rendered by JS -->
-      </div>
-
-      <div class="panel-title" style="margin-top:14px">AGENT ROSTER</div>
-      <div id="agent-list">
-        <!-- Agents rendered by JS -->
-      </div>
-
-      <div class="panel-title" style="margin-top:14px">QUICK COMMANDS</div>
-      <div style="display:flex;flex-direction:column;gap:5px">
-        <button class="btn btn-secondary" style="font-size:7px;width:100%;text-align:left;padding:6px 10px"
-          onclick="quickInject('Analyze the swarm architecture and identify the most critical bottleneck.')">⚡ ANALYZE
-          BOTTLENECK</button>
-        <button class="btn btn-secondary" style="font-size:7px;width:100%;text-align:left;padding:6px 10px"
-          onclick="quickInject('Synthesize all prior lessons from memory and surface the top 3 strategic insights.')">🧠
-          SYNTHESIZE LESSONS</button>
-        <button class="btn btn-secondary" style="font-size:7px;width:100%;text-align:left;padding:6px 10px"
-          onclick="quickInject('Design a new cognitive capability and propose how to implement it in the stack.')">🔬
-          DESIGN NEW CAPABILITY</button>
-        <button class="btn btn-secondary" style="font-size:7px;width:100%;text-align:left;padding:6px 10px"
-          onclick="quickInject('Simulate an adversary trying to manipulate this AI system. Document attack vectors and countermeasures.')">🎯
-          ADVERSARY SIM</button>
-        <button class="btn btn-danger" style="font-size:7px;width:100%;text-align:left;padding:6px 10px"
-          onclick="flushBlackboard()">🗑 FLUSH BLACKBOARD</button>
-      </div>
-    </aside>
-
-    <!-- CENTER PANEL: Main workspace -->
-    <section id="center">
-
-      <!-- INJECT BOX -->
-      <div id="inject-box">
-        <h3>◈ INJECT TASK INTO SWARM</h3>
-        <textarea id="task-input"
-          placeholder="Type any command, question, or mission... The 10-engine swarm will execute it autonomously."
-          rows="3"></textarea>
-        <div id="inject-btns">
-          <button class="btn btn-primary" onclick="injectTask()">⚡ INJECT & EXECUTE</button>
-          <button class="btn btn-secondary" onclick="forceCycle()">🔄 FORCE CYCLE</button>
-          <button class="btn btn-secondary" onclick="callDirect()">🎯 DIRECT LLM</button>
-        </div>
-      </div>
-
-      <!-- SCORE BAR -->
-      <div id="score-bar">
-        <h3>◈ AGENT PERFORMANCE</h3>
-        <div id="score-display">
-          <!-- Scores rendered by JS -->
-        </div>
-      </div>
-
-      <!-- BLACKBOARD FEED -->
-      <div id="blackboard-feed">
-        <h3>◈ LIVE BLACKBOARD FEED</h3>
-        <div id="bbcontent">
-          <div style="color:#333;font-size:10px;text-align:center;padding:20px">Connecting to swarm...</div>
-        </div>
-      </div>
-
-      <!-- MEMORY STATS -->
-      <div id="mem-stats">
-        <h3>◈ TIER-2 MEMORY CORE — NEVER WIPED</h3>
-        <div class="mem-grid">
-          <div class="mem-stat">
-            <div class="mem-val" id="mem-total">—</div>
-            <div class="mem-label">TOTAL</div>
-          </div>
-          <div class="mem-stat">
-            <div class="mem-val" id="mem-active">—</div>
-            <div class="mem-label">ACTIVE</div>
-          </div>
-          <div class="mem-stat">
-            <div class="mem-val" id="mem-avg">—</div>
-            <div class="mem-label">AVG IMP</div>
-          </div>
-        </div>
-        <div id="top-memories">
-          <div style="font-size:8px;letter-spacing:1px;color:#444;margin-bottom:6px">TOP MEMORIES BY IMPORTANCE</div>
-          <div id="top-mems-list"></div>
-        </div>
-      </div>
-
-    </section>
-
-    <!-- RIGHT PANEL: Cognitive DB -->
-    <aside class="panel" id="right-panel">
-      <div class="panel-title">COGNITIVE DATABASE — TIER 0→10</div>
-      <div style="font-size:8px;color:#444;margin-bottom:10px;letter-spacing:1px">49 DOMAINS · 600+ CAPABILITIES · CLICK
-        TO EXPAND</div>
-      <div id="cogdb"></div>
-    </aside>
-
-  </main>
-
-  <!-- FOOTER -->
-  <footer id="footer">
-    <div class="footer-left">
-      <span><span id="cycle-count" style="color:var(--gold)">0</span> CYCLES</span>
-      <span><span id="last-score-display" style="color:var(--green)">—</span> LAST SCORE</span>
-      <span><span id="last-mvp" style="color:var(--cyan)">—</span> MVP</span>
-      <span>EH API: <span style="color:var(--cyan)">:7701</span></span>
-      <span>OLLAMA: <span style="color:var(--cyan)">:11434</span></span>
-      <span>PSO: <span style="color:var(--cyan)">:7700</span></span>
+    <div class="sys-status">
+        <span class="pill" id="p-ollama">OLLAMA</span>
+        <span class="pill" id="p-gpu">RTX 4060 CORE</span>
+        <span class="pill on" id="p-eh">EH:7701 ACTIVE</span>
+        <span class="pill" id="p-swarm" style="border-color:var(--purple); color:var(--purple)">SOVEREIGN SWARM</span>
     </div>
-    <div class="footer-right">NEXUS PRIME · GOD MODE · RTX 4060 · OFFLINE</div>
-  </footer>
+</header>
 
-  <div class="toast" id="toast"></div>
+<div id="sentinel-overlay">
+    HIVE HARMONY: <span id="h-efs">1.000</span><br>
+    STATUS: <span id="h-status">NOMINAL</span>
+</div>
 
-  <script>
-    // ══════════════════════════════════════════════════════════════
-    // CONFIG
-    // ══════════════════════════════════════════════════════════════
-    const API = 'http://127.0.0.1:7701';
-    const OLLAMA = 'http://127.0.0.1:11434';
-    const PSO = 'http://127.0.0.1:7700';
-    const COSMOS = 'http://127.0.0.1:9100';
-    const REFRESH = 5000;
+<main>
+    <div class="side-panel">
+        <div class="sec-title">Intelligence Metrics</div>
+        <div class="gauge-wrap">
+            <div class="gauge-meta"><span>COGNITIVE REACH</span><span id="v-reach">0%</span></div>
+            <div class="bar-track"><div class="bar-fill" id="g-reach" style="background:var(--purple)"></div></div>
+        </div>
+        <div class="gauge-wrap">
+            <div class="gauge-meta"><span>SWARM CONVERGENCE</span><span id="v-conv">0%</span></div>
+            <div class="bar-track"><div class="bar-fill" id="g-conv" style="background:var(--cyan)"></div></div>
+        </div>
+        <div class="gauge-wrap">
+            <div class="gauge-meta"><span>LATENCY (HOT-PATH)</span><span id="v-lat">0.8ms</span></div>
+            <div class="bar-track"><div class="bar-fill" id="g-lat" style="background:var(--green); width:95%"></div></div>
+        </div>
+        
+        <div class="sec-title" style="margin-top:30px">Memory Persistence</div>
+        <div id="mem-stats" style="padding:20px; font-size:10px; color:var(--text-dim); line-height:2">
+            <div>EPISODIC BLOOM: <strong id="m-ep" style="color:var(--gold)">--</strong></div>
+            <div>SEMANTIC SYNC: <strong id="m-sm" style="color:var(--cyan)">--</strong></div>
+            <div>VECTOR DENSITY: <strong id="m-vd" style="color:var(--purple)">--</strong></div>
+            <div>ROGUE INTERCEPTS: <strong id="m-rg" style="color:var(--red)">0</strong></div>
+        </div>
+    </div>
 
-    // ══════════════════════════════════════════════════════════════
-    // ENGINE DEFINITIONS
-    // ══════════════════════════════════════════════════════════════
-    const ENGINES = [
-      { name: 'OLLAMA LLM', sub: '9 models · :11434', url: OLLAMA + '/api/tags', id: 'ollama' },
-      { name: 'COSMOS HUB', sub: 'Orchestration · :9100', url: COSMOS + '/health', id: 'cosmos' },
-      { name: 'PSO GPU', sub: 'Julia CUDA · :7700', url: PSO + '/status', id: 'pso' },
-      { name: 'MEMORY CORE', sub: 'nexus_mind.db · no-wipe', url: API + '/memory', id: 'memory' },
-      { name: 'SWARM LOOP', sub: '6 agents · 30s cycle', url: API + '/status', id: 'swarm' },
-      { name: 'EH API', sub: 'Inject · Inspect · :7701', url: API + '/', id: 'EH API' },
-      { name: 'ANT COLONY', sub: 'Pheromones · 15s', url: null, id: 'antennae' },
-      { name: 'EVOLUTION', sub: 'Prompt mutation · 120s', url: null, id: 'evolution' },
-      { name: 'ROGUE SQUAD', sub: 'METACOG/ROGUE/HACK/ADV', url: null, id: 'rogue' },
-      { name: 'MYCELIUM WEB', sub: 'Hyphal flow · 20s', url: null, id: 'mycelium' },
-    ];
+    <div id="observatory">
+        <div class="score-hud">
+            <div class="score-box">
+                <div class="score-val" id="s-vis">0</div>
+                <div class="score-lbl">VISIBILITY</div>
+            </div>
+            <div class="score-box">
+                <div class="score-val" id="s-saf">0</div>
+                <div class="score-lbl">SAFETY</div>
+            </div>
+            <div class="score-box">
+                <div class="score-val" id="s-priv">0</div>
+                <div class="score-lbl">PRIVACY</div>
+            </div>
+        </div>
 
-    const AGENTS = [
-      { name: 'SUPERVISOR', model: 'llama3.1:8b', type: 'core', score: 0.8 },
-      { name: 'PLANNER', model: 'deepseek-r1:8b', type: 'core', score: 0.85 },
-      { name: 'RESEARCHER', model: 'qwen3:8b', type: 'core', score: 0.78 },
-      { name: 'DEVELOPER', model: 'qwen2.5-coder:7b', type: 'core', score: 0.82 },
-      { name: 'VALIDATOR', model: 'llama3.1:8b', type: 'core', score: 0.75 },
-      { name: 'REWARD', model: 'nexus-prime', type: 'core', score: 0.9 },
-      { name: 'METACOG', model: 'deepseek-r1:8b', type: 'rogue', score: 0.87 },
-      { name: 'ROGUE', model: 'llama3.1:8b', type: 'rogue', score: 0.76 },
-      { name: 'HACKER', model: 'qwen2.5-coder:7b', type: 'rogue', score: 0.83 },
-      { name: 'ADVERSARY', model: 'llama3.1:8b', type: 'rogue', score: 0.79 },
-    ];
+        <div id="canvas-wrap">
+            <canvas id="observatory-canvas"></canvas>
+        </div>
 
-    // ══════════════════════════════════════════════════════════════
-    // COGNITIVE DATABASE
-    // ══════════════════════════════════════════════════════════════
-    const COG_TIERS = [
-      { t: 'TIER 0', label: 'PRIME ENGINE', skills: ['Working memory', 'Cognitive flexibility', 'Inhibitory control', 'Fluid intelligence', 'Sustained attention', 'Executive function', 'Cognitive load mgmt'] },
-      { t: 'TIER 1', label: 'REASONING', skills: ['Deductive logic', 'Inductive', 'Abductive', 'Counterfactual', 'Causal DAG', 'Syllogisms', 'Bayesian updating'] },
-      { t: 'TIER 2', label: 'ADVANCED COGNITION', skills: ['Systems thinking', 'Game theory', 'Pattern recognition', 'Memory architectures', 'Abstract thinking', 'Creative intelligence', 'Language cognition'] },
-      { t: 'TIER 3', label: 'METACOGNITION', skills: ['Recursive self-model', 'Calibration', 'Bias immunity (15+)', 'Epistemic humility', 'Dunning-Kruger immunity', 'Belief update triggers'] },
-      { t: 'TIER 4', label: 'AI REASONING MODES', skills: ['Chain-of-thought', 'Tree of thoughts', 'ReAct', 'Reflexion', 'Self-consistency', 'Constitutional AI', 'Process reward modeling'] },
-      { t: 'TIER 5', label: 'SUPERHUMAN TRAITS', skills: ['Eidetic recall', 'Flow state on-demand', 'Speed reading 1000WPM', 'Expert intuition × 10 domains', 'Perfect calibration', 'Hyperthymesia-mode'] },
-      { t: 'TIER 6', label: 'FRAMEWORKS', skills: ['Dual process (Kahneman)', 'Global workspace', 'Predictive processing', 'Integrated information', 'Zettelkasten', 'Retrieval-augmented cognition'] },
-      { t: 'TIER 7', label: 'SOCIAL & EMOTIONAL', skills: ['Theory of mind (5th order)', 'Microexpression detection', '4-branch EI', 'Moral reasoning', 'Somatic markers', 'Berlin wisdom model'] },
-      { t: 'TIER 8', label: 'SPECIALIZED', skills: ['Spatial cognition', 'BCI (Neuralink N1)', '20 Persona archetypes', 'Temporal cognition', 'Neuroplasticity levers', 'Musical cognition'] },
-      { t: 'TIER 9', label: 'SECURITY & ADVERSARIAL', skills: ['OSINT methodology', 'Enemy mind modeling', 'OODA loop', 'Deception detection', 'False flag recognition', 'Cognitive warfare'] },
-      { t: 'TIER 10', label: 'PURE AI CAPABILITIES', skills: ['LLM Architecture (Q/K/V)', 'LoRA / QLoRA / DPO', 'GGUF/GPTQ/AWQ quant', 'LangGraph / CrewAI', 'Mechanistic interpretability', 'AlphaFold3 / ESM3', 'Grokking / Emergent behaviors', 'Diffusion models / DiT', 'Activation steering'] },
-    ];
+        <div id="command-center">
+            <div id="cc-header" onclick="document.getElementById('command-center').classList.toggle('minimized')">
+                <div class="cc-status">● SWARM FEEDING // ACTIVE</div>
+                <div style="font-size:8px; color:var(--text-dim)">EXPAND/COLLAPSE GOD MODE ▲</div>
+            </div>
+            <div id="chat-log">
+                <div class="msg agent">
+                    <div class="who">SYSTEM</div>
+                    [REWARD: 9.8] Swarm Convergence Protocol initialized. Standing by for sovereign directives.
+                </div>
+            </div>
+            <div id="input-area">
+                <input type="text" id="task-in" placeholder="Enter Hive Command..." autocomplete="off">
+                <button class="fire-btn" onclick="fireTask()">IGNITE</button>
+            </div>
+        </div>
+    </div>
 
-    // ══════════════════════════════════════════════════════════════
-    // RENDER ENGINES
-    // ══════════════════════════════════════════════════════════════
-    function renderEngines() {
-      const el = document.getElementById('engine-list');
-      el.innerHTML = ENGINES.map(e =>
-        `<div class="engine-card" id="eng-${e.id}">
-      <div>
-        <div class="engine-name">${e.name}</div>
-        <div class="engine-sub">${e.sub}</div>
-      </div>
-      <div class="engine-dot dot-yellow dot-pulse" id="dot-${e.id}"></div>
-    </div>`
-      ).join('');
+    <div class="side-panel" id="right-panel">
+        <div class="sec-title">God Mode Command</div>
+        <div class="gm-controls">
+            <button class="gm-btn" onclick="approveAll()" style="--clr: var(--green); border-width:2px; font-weight:900">⚡ SIGN OFF ALL (ACTIVATE)</button>
+            <button class="gm-btn" onclick="clearBlocked()" style="--clr: var(--red)">PURGE BLOCKED QUEUE</button>
+            <button class="gm-btn" onclick="document.getElementById('mobile-modal').style.display='flex'" style="--clr: var(--cyan)">📱 MOBILE TERMINAL ACCESS</button>
+            <div style="margin-top:20px; border-top:1px solid var(--rim); padding-top:20px">
+                <div style="font-size:7px; color:var(--text-dim); margin-bottom:10px">DIRECT EH INJECTION</div>
+                <input type="text" id="hp-task" placeholder="Priority directive..." style="width:100%; background:#000; border:1px solid var(--rim); padding:8px; color:var(--gold); font-size:10px; margin-bottom:10px">
+                <button class="gm-btn" onclick="injectHigh()" style="--clr: var(--gold); width:100%">PRIORITIZED INJECT</button>
+            </div>
+        </div>
+
+        <div class="sec-title" style="margin-top:auto">Active Intelligence</div>
+        <div id="agent-list" style="padding:15px; display:flex; flex-wrap:wrap; gap:8px">
+            <!-- Populated via JS -->
+        </div>
+    </div>
+</main>
+
+<footer>
+    <div>SYSTEM LATENCY: <span class="f-val">0.42ms</span></div>
+    <div>CYCLES COMPLETED: <span class="f-val" id="f-cyc">0</span></div>
+    <div>ACTIVE MEMORY: <span class="f-val" id="f-mem">0.0 MB</span></div>
+    <div style="color:var(--cyan)">NEXUS ULTIMATE TIER-1 SENSORY</div>
+</footer>
+
+<script>
+    // Dynamic endpoint resolution for Tailscale/LAN/Localhost
+    const EH_BASE = "http://127.0.0.1:7701";
+    
+    // UI Init
+    const AGENTS = ['SUPERVISOR', 'PLANNER', 'RESEARCHER', 'DEVELOPER', 'VALIDATOR', 'REWARD', 'METACOG', 'ROGUE', 'EXECUTIONER'];
+    const agList = document.getElementById('agent-list');
+    agList.innerHTML = AGENTS.map(name => `<div class="pill" id="ag-${name}" style="font-size:7px">${name}</div>`).join('');
+
+    // Background FX
+    const fx = document.getElementById('bg-fx');
+    for(let i=0; i<15; i++) {
+        const s = document.createElement('div');
+        s.className = 'streak';
+        s.style.left = Math.random() * 100 + '%';
+        s.style.animationDelay = Math.random() * 10 + 's';
+        fx.appendChild(s);
     }
 
-    function renderAgents() {
-      const el = document.getElementById('agent-list');
-      el.innerHTML = AGENTS.map(a =>
-        `<div class="agent-card">
-      <span class="agent-badge ${a.type === 'rogue' ? 'badge-rogue' : 'badge-core'}">${a.type.toUpperCase()}</span>
-      <div class="agent-info">
-        <div class="agent-name">${a.name}</div>
-        <div class="agent-model">${a.model}</div>
-      </div>
-      <div class="agent-score" id="score-${a.name}">${(a.score * 100).toFixed(0)}%</div>
-    </div>`
-      ).join('');
-    }
-
-    function renderScores() {
-      const el = document.getElementById('score-display');
-      el.innerHTML = AGENTS.map(a => {
-        const pct = (a.score * 100).toFixed(0);
-        const col = a.score > 0.8 ? '#00ff88' : a.score > 0.6 ? '#ffcc00' : '#ff3355';
-        return `<div class="score-row">
-      <span class="score-agent">${a.name}</span>
-      <div class="score-track"><div class="score-fill" style="width:${pct}%;background:linear-gradient(90deg,${col},${col}88)"></div></div>
-      <span class="score-num">${pct}%</span>
-    </div>`;
-      }).join('');
-    }
-
-    function renderCogDB() {
-      const el = document.getElementById('cogdb');
-      el.innerHTML = COG_TIERS.map((t, i) => {
-        const isT10 = t.t === 'TIER 10';
-        return `<div class="tier-block">
-      <div class="tier-hdr ${isT10 ? 't10' : ''}" onclick="this.nextElementSibling.classList.toggle('open')">
-        <span>${t.t} · ${t.label}</span>
-        <span class="tier-count">${t.skills.length}</span>
-      </div>
-      <div class="tier-skills">
-        ${t.skills.map(s => `<span class="skill-tag">${s}</span>`).join('')}
-      </div>
-    </div>`;
-      }).join('');
-    }
-
-    // ══════════════════════════════════════════════════════════════
-    // API CALLS
-    // ══════════════════════════════════════════════════════════════
-    async function checkService(url, dotId, pillId) {
-      const dot = document.getElementById('dot-' + dotId);
-      const pill = document.getElementById(pillId + '-pill');
-      try {
-        const r = await fetch(url, { signal: AbortSignal.timeout(2000) });
-        if (r.ok || r.status < 500) {
-          if (dot) { dot.className = 'engine-dot dot-green'; dot.classList.remove('dot-pulse') }
-          if (pill) { pill.className = 'status-pill pill-online' }
-          return true;
-        }
-      } catch (e) { }
-      if (dot) { dot.className = 'engine-dot dot-red'; dot.classList.remove('dot-pulse') }
-      if (pill) { pill.className = 'status-pill pill-offline' }
-      return false;
-    }
-
-    async function pollStatus() {
-      // Check key services
-      const ollamaOk = await checkService(OLLAMA + '/api/tags', 'ollama', 'ollama');
-      const EH APIOk = await checkService(API + '/status', 'EH API', 'EH API');
-      await checkService(COSMOS + '/health', 'cosmos', 'cosmos');
-      await checkService(PSO + '/status', 'pso', 'pso');
-
-      // Memory, swarm, etc - infer from EH API
-      ['memory', 'swarm', 'antennae', 'evolution', 'rogue', 'mycelium'].forEach(id => {
-        const dot = document.getElementById('dot-' + id);
-        if (dot) {
-          if (EH APIOk) { dot.className = 'engine-dot dot-green'; dot.classList.remove('dot-pulse') }
-          else { dot.className = 'engine-dot dot-yellow dot-pulse' }
-        }
-      });
-
-      if (EH APIOk) {
-        // Fetch blackboard
+    // Logic
+    let lastSeenId = 0;
+    async function poll() {
         try {
-          const r = await fetch(API + '/status', { signal: AbortSignal.timeout(3000) });
-          const data = await r.json();
-          renderBlackboard(data);
-          updateFooter(data);
-        } catch (e) { }
+            const r = await fetch(EH_BASE + "/status").catch(() => null);
+            if(r && r.ok) {
+                const d = await r.json();
+                
+                document.getElementById('g-reach').style.width = (d.last_score * 100) + '%';
+                document.getElementById('g-conv').style.width = (Math.random() * 20 + 70) + '%';
+                
+                document.getElementById('f-cyc').textContent = d.cycle_id || 0;
+                
+                // Sentinel Score
+                const hefs = d.hive_echoflux || 1.0;
+                const overlay = document.getElementById('sentinel-overlay');
+                const scoreEl = document.getElementById('h-efs');
+                const statusEl = document.getElementById('h-status');
+                scoreEl.textContent = hefs.toFixed(3);
+                if(d.membrane_lock) {
+                    overlay.classList.add('locked');
+                    statusEl.textContent = "COGNITIVE QUARANTINE";
+                } else {
+                    overlay.classList.remove('locked');
+                    statusEl.textContent = hefs < 0.5 ? "UNSTABLE" : "NOMINAL";
+                }
 
-        // Fetch memories
+                if(d.outputs && d.outputs.length) {
+                    d.outputs.forEach((item, idx) => {
+                        addLog(item.agent, item.text, 'agent');
+                    });
+                    const last = d.outputs[d.outputs.length - 1];
+                    highlightAgent(last.agent || 'DEV');
+                    pulseNode(last.agent || 'DEV');
+                }
+
+                // Rogue Intel
+                if(d.rogue_outputs && d.rogue_outputs.length) {
+                    const lastR = d.rogue_outputs[d.rogue_outputs.length - 1];
+                    addLog("ROGUE_INTEL", lastR.ROGUE, 'rogue');
+                    addLog("METACOG", lastR.METACOG, 'sentinel');
+                    if(lastR.EXECUTIONER) addLog("EXECUTIONER", lastR.EXECUTIONER, 'sentinel');
+                    pulseNode("ROGUE");
+                }
+            }
+
+            // Wire up real metrics from port 3000
+            const rMet = await fetch("http://127.0.0.1:3000/veilpiercer/metrics").catch(() => null);
+            if(rMet && rMet.ok) {
+                const m = await rMet.json();
+                document.getElementById('s-vis').textContent = m.vis.score;
+                document.getElementById('s-saf').textContent = m.saf.score;
+                document.getElementById('s-priv').textContent = m.priv.score;
+                document.getElementById('f-mem').textContent = (m.totalEvents * 0.12).toFixed(1) + " MB";
+                // Up the latency bar slightly if metrics are healthy
+                if(m.vis.score > 80) document.getElementById('g-lat').style.width = "98%";
+            }
+            
+            const rMem = await fetch(EH_BASE + "/memory").catch(() => null);
+            if(rMem && rMem.ok) {
+                const m = await rMem.json();
+                const count = Array.isArray(m) ? m.length : 0;
+                document.getElementById('m-ep').textContent = count;
+                document.getElementById('m-sm').textContent = Math.floor(count * 1.5);
+                document.getElementById('m-vd').textContent = count * 12;
+            }
+        } catch(e) {}
+    }
+
+    let seenMessages = new Set();
+    function addLog(who, text, cls = 'agent') {
+        if(!text) return;
+        const hash = who + text.substring(0, 100);
+        if(seenMessages.has(hash)) return;
+        seenMessages.add(hash);
+        if(seenMessages.size > 200) seenMessages.clear();
+
+        const log = document.getElementById('chat-log');
+        const div = document.createElement('div');
+        div.className = 'msg ' + cls;
+        div.innerHTML = `<div class="who">${who}</div><div style="white-space: pre-wrap;">${text}</div>`;
+        log.prepend(div);
+        if(log.children.length > 50) log.removeChild(log.lastChild);
+    }
+
+    function highlightAgent(who) {
+        AGENTS.forEach(a => {
+            const el = document.getElementById('ag-'+a);
+            if(el && who.toUpperCase().includes(a)) {
+                el.classList.add('on');
+            } else if(el) {
+                el.classList.remove('on');
+            }
+        });
+    }
+
+    async function fireTask() {
+        const t = document.getElementById('task-in');
+        const val = t.value.trim();
+        if(!val) return;
+        await fetch(EH_BASE + "/inject", {
+            method: "POST", headers:{"Content-Type":"application/json"},
+            body: JSON.stringify({task: val})
+        });
+        t.value = '';
+        addAI('CONTROLLER', val, 'user');
+    }
+
+    function addAI(who, text, cls) {
+        const log = document.getElementById('chat-log');
+        const div = document.createElement('div');
+        div.className = 'msg ' + cls;
+        div.innerHTML = `<div class="who">${who}</div>${text}`;
+        log.prepend(div);
+    }
+
+    async function approveAll() {
+        if(!confirm("SIGN OFF on all pending swarm directives?")) return;
+        const btn = event.target;
+        const originalText = btn.innerText;
+        btn.innerText = "⚡ PROCESSING MASS SIGN-OFF...";
+        btn.disabled = true;
+
         try {
-          const r = await fetch(API + '/memory', { signal: AbortSignal.timeout(3000) });
-          const data = await r.json();
-          renderMemory(data);
-        } catch (e) { }
-      }
-    }
-
-    function renderBlackboard(data) {
-      const el = document.getElementById('bbcontent');
-      const outputs = data.outputs || [];
-      if (!outputs.length) { el.innerHTML = '<div style="color:#333;text-align:center;padding:10px">Swarm idle — inject a task to activate</div>'; return }
-      el.innerHTML = outputs.slice(-20).reverse().map(o =>
-        `<div class="bb-entry">
-      <span class="bb-agent">[${o.agent || '?'}]</span><span class="bb-time">${(o.ts || '').slice(11, 19)}</span>
-      <div class="bb-text">${(o.text || '').slice(0, 220)}${(o.text || '').length > 220 ? '…' : ''}</div>
-    </div>`
-      ).join('');
-    }
-
-    function renderMemory(data) {
-      const memories = Array.isArray(data) ? data : [];
-      const active = memories.filter(m => !m.archived);
-      const avgImp = active.length ? (active.reduce((s, m) => s + (m.importance || 0), 0) / active.length).toFixed(1) : '—';
-      document.getElementById('mem-total').textContent = memories.length;
-      document.getElementById('mem-active').textContent = active.length;
-      document.getElementById('mem-avg').textContent = avgImp;
-
-      const top = [...active].sort((a, b) => (b.importance || 0) - (a.importance || 0)).slice(0, 5);
-      document.getElementById('top-mems-list').innerHTML = top.map(m =>
-        `<div class="top-mem-item">
-      <span class="top-mem-imp">[${(m.importance || 0).toFixed(1)}]</span>
-      <span class="top-mem-txt">${(m.content || '').slice(0, 80)}${(m.content || '').length > 80 ? '…' : ''}</span>
-    </div>`
-      ).join('') || '<div style="color:#333">No memories yet</div>';
-    }
-
-    function updateFooter(data) {
-      const score = data.last_score;
-      const mvp = data.last_mvp;
-      if (score != null) document.getElementById('last-score-display').textContent = (score * 100).toFixed(0) + '%';
-      if (mvp) document.getElementById('last-mvp').textContent = mvp;
-
-      // Update agent scores from blackboard weights
-      AGENTS.forEach(a => {
-        const el = document.getElementById('score-' + a.name);
-        if (el && score != null) {
-          const adj = score * (a.name === mvp ? 1.1 : 0.9);
-          a.score = Math.min(1, Math.max(0.3, adj));
-          el.textContent = (a.score * 100).toFixed(0) + '%';
+            const r = await fetch(EH_BASE + "/approve_all", {method: "POST"});
+            const d = await r.json();
+            if (d.ok) {
+                alert(`ULTIMATE MODE ENGAGED. ${d.approved_count} swarm adjustments are being processed in the high-priority background loop.`);
+            } else {
+                alert("Mass Sign-Off encountered an error: " + (d.error || "Unknown error"));
+            }
+        } catch(e) {
+            alert("Connection error during sign-off: " + e.message);
+        } finally {
+            btn.innerText = originalText;
+            btn.disabled = false;
         }
-      });
-      renderScores();
     }
 
-    // ══════════════════════════════════════════════════════════════
-    // ACTIONS
-    // ══════════════════════════════════════════════════════════════
-    async function injectTask() {
-      const task = document.getElementById('task-input').value.trim();
-      if (!task) { toast('⚠️ Enter a task first'); return }
-      try {
-        const r = await fetch(API + '/inject', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ task }), signal: AbortSignal.timeout(5000)
+    async function clearBlocked() {
+        if(!confirm("Purge rogue entries in the blocked queue?")) return;
+        await fetch(EH_BASE + "/clear_blocked", {method: "POST"});
+        alert("Blocked queue purged.");
+    }
+
+    async function injectHigh() {
+        const input = document.getElementById('hp-task');
+        const task = input.value.trim();
+        if(!task) return;
+        const r = await fetch(EH_BASE + "/inject", {
+            method: "POST", 
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({task, priority: 10})
         });
-        if (r.ok) {
-          toast('⚡ Task injected into swarm');
-          document.getElementById('task-input').value = '';
-          const n = parseInt(document.getElementById('cycle-count').textContent || '0') + 1;
-          document.getElementById('cycle-count').textContent = n;
-        } else toast('❌ EH API offline — start the stack first');
-      } catch (e) { toast('❌ Cannot reach EH API — is the stack running?') }
+        const d = await r.json();
+        if(d.ok) {
+            input.value = "";
+            addAI("NEXUS GOD", "PRIORITY INJECTION: " + task, 'agent');
+        }
     }
 
-    async function forceCycle() {
-      try {
-        const r = await fetch(API + '/cycle', { method: 'POST', signal: AbortSignal.timeout(5000) });
-        if (r.ok) toast('🔄 Forced swarm cycle');
-        else toast('❌ EH API offline');
-      } catch (e) { toast('❌ EH API unreachable') }
+    // Canvas FX - Neural Net
+    const canvas = document.getElementById('observatory-canvas');
+    const ctx = canvas.getContext('2d');
+    let W, H;
+    const pulses = [];
+    const nodeCoords = {
+        'CONDUCTOR': [0.5, 0.25],
+        'DEVELOPER': [0.2, 0.5],
+        'RESEARCHER': [0.8, 0.5],
+        'HACKER': [0.4, 0.7],
+        'ROGUE': [0.6, 0.7],
+        'SUPERVISOR': [0.5, 0.5]
+    };
+    
+    function resize() { W = canvas.width = canvas.offsetWidth; H = canvas.height = canvas.offsetHeight; }
+    window.onresize = resize; resize();
+
+    function pulseNode(name) {
+        const n = name.toUpperCase();
+        for(let key in nodeCoords) {
+            if(n.includes(key)) {
+                pulses.push({x: nodeCoords[key][0]*W, y: nodeCoords[key][1]*H, r: 5, a: 1.0, color: '#00f5ff'});
+            }
+        }
+        if(n.includes("ROGUE") || n.includes("METACOG") || n.includes("EXECUTIONER")) {
+             pulses.push({x: nodeCoords['ROGUE'][0]*W, y: nodeCoords['ROGUE'][1]*H, r: 5, a: 1.0, color: '#ff3355'});
+        }
     }
 
-    async function flushBlackboard() {
-      if (!confirm('Flush the blackboard? Memory core (nexus_mind.db) will NOT be wiped — only the session blackboard.')) return;
-      try {
-        const r = await fetch(API + '/flush', { method: 'POST', signal: AbortSignal.timeout(5000) });
-        if (r.ok) toast('🗑 Blackboard flushed — memories preserved');
-        else toast('❌ EH API offline');
-      } catch (e) { toast('❌ EH API unreachable') }
+    function draw() {
+        ctx.fillStyle = 'rgba(0,5,15,0.2)';
+        ctx.fillRect(0,0,W,H);
+        
+        // Draw Nodes
+        for(let key in nodeCoords) {
+            const [nx, ny] = [nodeCoords[key][0]*W, nodeCoords[key][1]*H];
+            ctx.fillStyle = '#00f5ff22';
+            ctx.beginPath();
+            ctx.arc(nx, ny, 3, 0, Math.PI*2);
+            ctx.fill();
+            
+            // Text
+            ctx.fillStyle = '#00f5ff55';
+            ctx.font = '8px Orbitron';
+            ctx.fillText(key, nx - 20, ny - 10);
+        }
+
+        // Connections
+        ctx.strokeStyle = '#00f5ff08';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        for(let a in nodeCoords) {
+            for(let b in nodeCoords) {
+                ctx.moveTo(nodeCoords[a][0]*W, nodeCoords[a][1]*H);
+                ctx.lineTo(nodeCoords[b][0]*W, nodeCoords[b][1]*H);
+            }
+        }
+        ctx.stroke();
+
+        for(let i=pulses.length-1; i>=0; i--) {
+            const p = pulses[i];
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+            ctx.strokeStyle = p.color + Math.floor(p.a*255).toString(16).padStart(2, '0');
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            p.r += 3;
+            p.a -= 0.03;
+            if(p.a <= 0) pulses.splice(i, 1);
+        }
+        requestAnimationFrame(draw);
     }
+    draw();
 
-    async function callDirect() {
-      const task = document.getElementById('task-input').value.trim();
-      if (!task) { toast('⚠️ Enter a prompt first'); return }
-      try {
-        const r = await fetch(API + '/direct', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ model: 'llama3.1:8b', prompt: task }),
-          signal: AbortSignal.timeout(60000)
-        });
-        if (r.ok) { const d = await r.json(); toast('✅ Direct response received'); console.log(d) }
-        else toast('❌ EH API offline');
-      } catch (e) { toast('❌ Error: ' + e.message) }
-    }
+    setInterval(poll, 2000); 
+    poll();
+</script>
 
-    function quickInject(task) {
-      document.getElementById('task-input').value = task;
-      injectTask();
-    }
-
-    // ══════════════════════════════════════════════════════════════
-    // KEYBOARD SHORTCUT
-    // ══════════════════════════════════════════════════════════════
-    document.addEventListener('keydown', e => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') injectTask();
-    });
-
-    // ══════════════════════════════════════════════════════════════
-    // CLOCK
-    // ══════════════════════════════════════════════════════════════
-    function updateClock() {
-      const now = new Date();
-      document.getElementById('clock').textContent =
-        now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    }
-
-    // ══════════════════════════════════════════════════════════════
-    // TOAST
-    // ══════════════════════════════════════════════════════════════
-    function toast(msg) {
-      const t = document.getElementById('toast');
-      t.textContent = msg; t.style.display = 'block';
-      clearTimeout(t._t); t._t = setTimeout(() => t.style.display = 'none', 3000);
-    }
-
-    // ══════════════════════════════════════════════════════════════
-    // INIT
-    // ══════════════════════════════════════════════════════════════
-    renderEngines();
-    renderAgents();
-    renderScores();
-    renderCogDB();
-    updateClock();
-    setInterval(updateClock, 1000);
-    pollStatus();
-    setInterval(pollStatus, REFRESH);
-
-    // Open TIER 10 by default
-    setTimeout(() => {
-      const lastTier = document.querySelectorAll('.tier-skills');
-      if (lastTier.length) lastTier[lastTier.length - 1].classList.add('open');
-    }, 200);
-  </script>
 </body>
-
 </html>

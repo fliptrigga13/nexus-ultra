@@ -1,4 +1,4 @@
-﻿"""
+"""
 ╔══════════════════════════════════════════════════════════════════════════╗
 ║  NEXUS MEMORY CORE — TIER 2 NO-WIPE PERSISTENT MEMORY                  ║
 ║                                                                          ║
@@ -374,9 +374,9 @@ if __name__ == "__main__":
 
     print()
     print("GOD MODE PROMPT (inject into SUPERVISOR + PLANNER):")
-    print("─"*60)
-    print(GOD_MODE_PROMPT.strip())
-    print("─"*60)
+    print("-" * 60)
+    print(GOD_MODE_PROMPT.strip().replace("\u2192", "->"))
+    print("-" * 60)
     print()
     print("USAGE IN nexus_swarm_loop.py:")
     print("  from nexus_memory_core import get_core, GOD_MODE_PROMPT")

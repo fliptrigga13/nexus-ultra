@@ -1,0 +1,132 @@
+{
+  "nodes": {
+    "SUPERVISOR": {
+      "nutrient": 0.75,
+      "sink_strength": 0.75
+    },
+    "PLANNER": {
+      "nutrient": 0.75,
+      "sink_strength": 0.75
+    },
+    "RESEARCHER": {
+      "nutrient": 0.75,
+      "sink_strength": 0.75
+    },
+    "DEVELOPER": {
+      "nutrient": 0.75,
+      "sink_strength": 0.75
+    },
+    "VALIDATOR": {
+      "nutrient": 0.75,
+      "sink_strength": 0.75
+    },
+    "REWARD": {
+      "nutrient": 0.75,
+      "sink_strength": 0.75
+    }
+  },
+  "edges": {
+    "PLANNER↔SUPERVISOR": {
+      "radius": 0.225,
+      "flow": 0.0,
+      "age": 5
+    },
+    "RESEARCHER↔SUPERVISOR": {
+      "radius": 0.225,
+      "flow": 0.0,
+      "age": 5
+    },
+    "DEVELOPER↔SUPERVISOR": {
+      "radius": 0.225,
+      "flow": 0.0,
+      "age": 5
+    },
+    "SUPERVISOR↔VALIDATOR": {
+      "radius": 0.225,
+      "flow": 0.0,
+      "age": 5
+    },
+    "REWARD↔SUPERVISOR": {
+      "radius": 0.225,
+      "flow": 0.0,
+      "age": 5
+    },
+    "PLANNER↔RESEARCHER": {
+      "radius": 0.225,
+      "flow": 0.0,
+      "age": 5
+    },
+    "DEVELOPER↔PLANNER": {
+      "radius": 0.225,
+      "flow": 0.0,
+      "age": 5
+    },
+    "PLANNER↔VALIDATOR": {
+      "radius": 0.225,
+      "flow": 0.0,
+      "age": 5
+    },
+    "PLANNER↔REWARD": {
+      "radius": 0.225,
+      "flow": 0.0,
+      "age": 5
+    },
+    "DEVELOPER↔RESEARCHER": {
+      "radius": 0.225,
+      "flow": 0.0,
+      "age": 5
+    },
+    "RESEARCHER↔VALIDATOR": {
+      "radius": 0.225,
+      "flow": 0.0,
+      "age": 5
+    },
+    "RESEARCHER↔REWARD": {
+      "radius": 0.225,
+      "flow": 0.0,
+      "age": 5
+    },
+    "DEVELOPER↔VALIDATOR": {
+      "radius": 0.225,
+      "flow": 0.0,
+      "age": 5
+    },
+    "DEVELOPER↔REWARD": {
+      "radius": 0.225,
+      "flow": 0.0,
+      "age": 5
+    },
+    "REWARD↔VALIDATOR": {
+      "radius": 0.225,
+      "flow": 0.0,
+      "age": 5
+    }
+  },
+  "bridges": [],
+  "total_nodes": 6,
+  "total_edges": 15,
+  "tick": 5,
+  "ts": "2026-03-18T22:28:19.855451",
+  "strongest_paths": [
+    {
+      "edge": "PLANNER↔SUPERVISOR",
+      "radius": 0.225
+    },
+    {
+      "edge": "RESEARCHER↔SUPERVISOR",
+      "radius": 0.225
+    },
+    {
+      "edge": "DEVELOPER↔SUPERVISOR",
+      "radius": 0.225
+    },
+    {
+      "edge": "SUPERVISOR↔VALIDATOR",
+      "radius": 0.225
+    },
+    {
+      "edge": "REWARD↔SUPERVISOR",
+      "radius": 0.225
+    }
+  ]
+}

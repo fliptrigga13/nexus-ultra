@@ -368,7 +368,7 @@ select.ctx-sel:focus{border-color:rgba(0,255,247,.3);color:var(--c)}
 <header id="hdr">
   <div>
     <div id="logo">NEXUS PRIME ◈ ULTIMATE GOD MODE</div>
-    <div id="logo-sub">RTX 4060 · 11 ENGINES · 10 AGENTS · TIER 0→10 · 600+ CAPABILITIES · OFFLINE · :7702</div>
+    <div id="logo-sub">RTX 4060 · 11 ENGINES · 10 AGENTS · TIER 0→10 · 700+ CAPABILITIES · OFFLINE · :7702</div>
   </div>
   <div id="hdr-right">
     <div class="sse-dot" id="sse-dot" title="SSE Live"></div>
@@ -475,7 +475,7 @@ select.ctx-sel:focus{border-color:rgba(0,255,247,.3);color:var(--c)}
 <!-- RIGHT — COGNITIVE DB -->
 <div class="col" id="right">
   <div class="sec-title">COGNITIVE DATABASE — TIER 0→10</div>
-  <div id="cog-total">Loading 600+ capabilities...</div>
+  <div id="cog-total">Loading 700+ capabilities...</div>
   <div id="cog-db"></div>
 </div>
 
@@ -535,7 +535,7 @@ const QUICK=[
 ];
 
 // ═══════════════════════════════════════════
-// FULL 600+ COGNITIVE DATABASE — ALL TIERS
+// FULL 700+ COGNITIVE DATABASE — ALL TIERS
 // ═══════════════════════════════════════════
 const COG=[
 {t:'TIER 0 · PRIME COGNITIVE ENGINE',sk:['Working memory expansion','Cognitive flexibility','Inhibitory control','Fluid intelligence (Gf)','Crystallized intelligence (Gc)','Processing speed (Ps)','Divided attention','Sustained attention','Selective attention','Alternating attention','Executive function (EF)','Metacognition','Cognitive load management','Mental bandwidth allocation','Prefrontal cortex dominance','Default mode network control','Task-positive network','Central executive network','Phonological loop','Visuospatial sketchpad','Episodic buffer','Attentional blink override','Dual-task coordination','Proactive interference resistance','Retroactive interference resistance']},
@@ -628,7 +628,7 @@ function renderCogDB(){
       <div class="tier-skills">${tier.sk.map(s=>`<span class="sk">${s}</span>`).join('')}</div>
     </div>`;
   }).join('');
-  document.getElementById('cog-total').textContent=`${COG.length} DOMAINS · ${total}+ CAPABILITIES · TIER 0→10`;
+  document.getElementById('cog-total').textContent=`${COG.length} DOMAINS · ${Math.ceil(total/100)*100}+ CAPABILITIES · TIER 0→10`;
 }
 
 function toggleTier(hdr){

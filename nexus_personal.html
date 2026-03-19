@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -469,6 +469,20 @@ function clock(){
 clock();setInterval(clock,1000);
 
 // ── TOAST ────────────────────────────────────────────────────────────────
+let EH_TOKEN = '';
+async function loadConfig() {
+  try {
+    const r = await fetch('/api/config');
+    const d = await r.json();
+    if (d.ok) {
+      EH_TOKEN = d.ehToken;
+      console.log("Config loaded. Token wired.");
+    }
+  } catch (e) {
+    console.error("Config load failed:", e);
+  }
+}
+
 let _toastT;
 function toast(msg,dur=2500){
   const el=document.getElementById('toast');
@@ -544,16 +558,31 @@ function buildPills(){
 buildPills();
 
 async function pollPills(){
-  let up=0;
-  for(const svc of SERVICES){
-    const ok=await checkSvc(svc);
-    const pill=document.querySelector(`.hpill[data-svc="${svc.name}"]`);
-    if(pill){pill.className=`hpill ${ok?'on':'off'}`;}
-    if(ok)up++;
+  try {
+    const r = await fetch('/api/ping-services', { signal: AbortSignal.timeout(4000) });
+    const d = await r.json();
+    if (d.ok && d.svc) {
+      const s = d.svc;
+      let up = 0;
+      
+      const updatePill = (name, ok) => {
+        const pill = document.querySelector(`.hpill[data-svc="${name}"]`);
+        if (pill) pill.className = `hpill ${ok ? 'on' : 'off'}`;
+        if (ok) up++;
+      };
+
+      updatePill('OLLAMA', s.ollama);
+      updatePill('NEXUS HUB', true); // Current page is on the hub
+      updatePill('COSMOS', s.cosmos);
+      updatePill('EH API', s.bd);
+      
+      document.getElementById('stat-svc').textContent = up;
+    }
+  } catch (e) {
+    console.warn("Poll failed", e);
   }
-  document.getElementById('stat-svc').textContent=up;
 }
-pollPills();setInterval(pollPills,30000);
+pollPills();setInterval(pollPills,15000);
 
 // ── MISSIONS ─────────────────────────────────────────────────────────────
 async function loadMissions(){
@@ -768,9 +797,12 @@ document.getElementById('panels').addEventListener('touchend',e=>{
 },{passive:true});
 
 // ── INIT ──────────────────────────────────────────────────────────────────
-loadMemory();
-setInterval(loadMemory,60000);
-setInterval(loadSystem,10000);
+(async () => {
+  await loadConfig();
+  loadMemory();
+  setInterval(loadMemory,60000);
+  setInterval(loadSystem,10000);
+})();
 </script>
 </body>
 </html>

@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>NEXUS ULTRA — GOD MODE // OBSERVATORY</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #00000a;
+            --bg-deep: #000005;
+            --panel: rgba(4, 11, 25, 0.7);
+            --rim: rgba(0, 255, 247, 0.15);
+            --rim-bright: rgba(0, 255, 247, 0.4);
+            
+            --cyan: #00f5ff;
+            --purple: #bf00ff;
+            --pink: #ff0099;
+            --green: #00ff88;
+            --gold: #ffd700;
+            --red: #ff3355;
+            
+            --text: #c2d8f0;
+            --text-dim: #456070;
+            --font-mono: 'JetBrains Mono', monospace;
+            --font-proto: 'Orbitron', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: crosshair !important; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--rim-bright); border-radius: 2px; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 11px;
+            height: 100vh;
+            overflow: hidden;
+            display: grid;
+            grid-template-rows: 56px 1fr 32px;
+            position: relative;
+        }
+
+        /* ── BACKGROUND ── */
+        #bg-fx {
+            position: fixed; inset: 0; z-index: -1;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(191, 0, 255, 0.1), transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(0, 245, 255, 0.08), transparent 40%);
+            overflow: hidden;
+        }
+        .streak {
+            position: absolute; width: 2px; height: 100px;
+            background: linear-gradient(to bottom, transparent, var(--cyan), transparent);
+            opacity: 0.3; filter: blur(1px);
+            animation: streakMove 8s linear infinite;
+        }
+        .streak.red { background: linear-gradient(to bottom, transparent, var(--red), transparent); animation-duration: 12s; }
+        @keyframes streakMove {
+            0% { transform: translateY(-100vh) rotate(45deg); opacity: 0; }
+            50% { opacity: 0.4; }
+            100% { transform: translateY(100vh) rotate(45deg); opacity: 0; }
+        }
+
+        /* ── HEADER ── */
+        header {
+            background: rgba(0, 0, 0, 0.8);
+            border-bottom: 1px solid var(--rim);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+        .brand { display: flex; align-items: center; gap: 15px; }
+        .logo { font-family: var(--font-proto); font-weight: 900; font-size: 14px; letter-spacing: 4px; color: var(--cyan); text-shadow: 0 0 10px rgba(0,245,255,0.5); }
+        .tagline { font-size: 8px; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; }
+        
+        .sys-status { display: flex; gap: 12px; align-items: center; }
+        .pill { 
+            padding: 4px 10px; border-radius: 4px; font-size: 8px; font-weight: 700; 
+            letter-spacing: 1px; border: 1px solid; transition: all 0.3s;
+        }
+        .pill.on { background: rgba(0,255,136,0.1); border-color: var(--green); color: var(--green); box-shadow: 0 0 8px rgba(0,255,136,0.2); }
+        .pill.off { background: rgba(255,51,85,0.05); border-color: var(--red); color: var(--red); opacity: 0.6; }
+        .pill.spin { animation: blink 1s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+        /* ── MAIN LAYOUT ── */
+        main {
+            display: grid;
+            grid-template-columns: 280px 1fr 300px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .side-panel {
+            background: var(--panel);
+            border-right: 1px solid var(--rim);
+            display: flex; flex-direction: column;
+            overflow: hidden;
+            backdrop-filter: blur(5px);
+        }
+        #right-panel { border-right: none; border-left: 1px solid var(--rim); }
+
+        .sec-title {
+            font-family: var(--font-proto); font-size: 8px; letter-spacing: 3px;
+            color: var(--purple); padding: 12px 15px 8px;
+            border-bottom: 1px solid rgba(191,0,255,0.15);
+            text-transform: uppercase;
+        }
+
+        /* ── OBSERVATORY (CENTER) ── */
+        #observatory {
+            position: relative; overflow: hidden;
+            background: radial-gradient(circle at 50% 50%, #05051a 0%, var(--bg) 70%);
+        }
+        #canvas-wrap { position: absolute; inset: 0; z-index: 10; }
+        canvas { display: block; width: 100%; height: 100%; }
+
+        .score-hud {
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 40px; z-index: 20; pointer-events: none;
+        }
+        .score-box { text-align: center; }
+        .score-val { font-family: var(--font-proto); font-size: 28px; font-weight: 900; color: var(--cyan); line-height: 1; }
+        .score-lbl { font-size: 8px; letter-spacing: 2px; color: var(--text-dim); margin-top: 5px; }
+        .score-bar { width: 80px; height: 2px; background: rgba(255,255,255,0.05); margin: 6px auto; overflow: hidden; border-radius: 1px; }
+        .score-fill { height: 100%; background: var(--cyan); transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        /* ── CHAT BOX / FEEDING AREA ── */
+        #command-center {
+            position: absolute; bottom: 35px; left: 20px; right: 20px; height: 280px;
+            background: rgba(0, 0, 0, 0.9); border: 1px solid var(--rim);
+            border-radius: 12px; display: flex; flex-direction: column;
+            z-index: 30; backdrop-filter: blur(25px); box-shadow: 0 10px 60px rgba(0,0,0,0.9);
+            transition: height 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        #command-center.expanded { height: 480px; }
+        
+        #cc-header {
+            padding: 8px 20px; border-bottom: 1px solid rgba(0,255,247,0.1);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .cc-btn { font-size: 8px; color: var(--cyan); cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
+        
+        #chat-log { 
+            flex: 1; overflow-y: auto; padding: 20px; display: flex; 
+            flex-direction: column; gap: 15px; font-size: 11px;
+            scrollbar-width: thin;
+        }
+        .msg { 
+            padding: 12px 18px; border-radius: 8px; max-width: 95%; 
+            line-height: 1.7; word-wrap: break-word; overflow-wrap: anywhere;
+            position: relative; animation: slideIn 0.3s ease-out;
+            border: 1px solid transparent;
+        }
+        @keyframes slideIn { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .msg.agent { align-self: flex-start; background: rgba(191,0,255,0.15); border-color: rgba(191,0,255,0.4); color: #fff; text-shadow: 0 0 1px #000; }
+        .msg.user { align-self: flex-end; background: rgba(0,245,255,0.15); border-color: rgba(0,245,255,0.4); text-align: right; color: var(--cyan); }
+        .msg .who { font-size: 8px; font-weight: 900; margin-bottom: 5px; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; }
+        
+        #input-row { display: flex; gap: 12px; padding: 15px; border-top: 1px solid var(--rim); background: rgba(0,0,0,0.6); border-radius: 0 0 12px 12px; }
+        #task-in { 
+            flex: 1; background: transparent; border: none; outline: none; 
+            color: var(--cyan); font-family: var(--font-mono); font-size: 12px;
+        }
+        button.fire {
+            background: var(--cyan); color: #000; border: none; padding: 6px 20px;
+            font-family: var(--font-proto); font-weight: 700; border-radius: 4px;
+            cursor: pointer; letter-spacing: 2px; transition: all 0.2s;
+        }
+        button.fire:hover { filter: brightness(1.2); transform: scale(1.05); box-shadow: 0 0 15px var(--cyan); }
+
+        /* ── GAUGES ── */
+        .gauge-row { padding: 8px 15px; }
+        .gauge-label { font-size: 8px; color: var(--text-dim); margin-bottom: 4px; display: flex; justify-content: space-between; }
+        .gauge-track { height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px; overflow: hidden; }
+        .gauge-fill { height: 100%; width: 0%; transition: width 1s ease; }
+
+        /* ── AGENT LIST ── */
+        .agent-card {
+            margin: 6px 12px; padding: 10px; border: 1px solid var(--rim); border-radius: 6px;
+            background: rgba(255,255,255,0.02); display: flex; align-items: center; gap: 10px;
+            transition: all 0.2s;
+        }
+        .agent-card:hover { border-color: var(--rim-bright); background: rgba(0,245,255,0.03); }
+        .agent-avatar { 
+            width: 32px; height: 32px; border-radius: 4px; background: #0a1a30; 
+            display: flex; align-items: center; justify-content: center; font-size: 16px;
+            border: 1px solid var(--rim);
+        }
+        .agent-info { flex: 1; }
+        .agent-name { font-weight: 700; color: #fff; font-size: 10px; }
+        .agent-role { font-size: 8px; color: var(--text-dim); margin-top: 2px; }
+        .agent-pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--text-dim); }
+        .agent-card.active .agent-pulse { background: var(--green); box-shadow: 0 0 8px var(--green); animation: blink 0.8s infinite; }
+
+        /* ── COGNITIVE DB ── */
+        #cog-db { padding: 10px; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
+        .cog-tier { 
+            font-size: 7px; padding: 4px 8px; border-radius: 3px; 
+            background: rgba(255,255,255,0.03); color: var(--text-dim);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .cog-tier.active { color: var(--cyan); background: rgba(0,245,255,0.05); border-left: 2px solid var(--cyan); }
+
+        /* ── FOOTER ── */
+        footer {
+            background: var(--bg-deep); border-top: 1px solid var(--rim);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; font-size: 8px; color: var(--text-dim);
+        }
+        .stat-group { display: flex; gap: 20px; }
+        .stat-item strong { color: var(--gold); margin-left: 4px; }
+
+        /* ── ANIMATIONS ── */
+        @keyframes agentThink {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 245, 255, 0.4); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(0, 245, 255, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 245, 255, 0); }
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="bg-fx"></div>
+
+<!-- HEADER -->
+<header>
+    <div class="brand">
+        <div class="logo">NEXUS ULTRA</div>
+        <div class="tagline">God Mode // Observatory</div>
+    </div>
+    <div class="sys-status">
+        <span class="pill on" id="p-ollama">OLLAMA</span>
+        <span class="pill on" id="p-cosmos">COSMOS</span>
+        <span class="pill off" id="p-swarm">SWARM</span>
+        <span class="pill on" id="p-gpu">RTX 4060</span>
+        <span class="pill on" id="p-eh">EH:7701</span>
+    </div>
+</header>
+
+<main>
+    <!-- LEFT PANEL: METRICS & SERVICES -->
+    <div class="side-panel" id="left-panel">
+        <div class="sec-title">Core Metrics</div>
+        <div class="gauge-row">
+            <div class="gauge-label"><span>VRAM LOAD</span><span id="v-vram">0%</span></div>
+            <div class="gauge-track"><div class="gauge-fill" id="g-vram" style="background:var(--cyan)"></div></div>
+        </div>
+        <div class="gauge-row">
+            <div class="gauge-label"><span>SWARM COHESION</span><span id="v-coh">0%</span></div>
+            <div class="gauge-track"><div class="gauge-fill" id="g-coh" style="background:var(--purple)"></div></div>
+        </div>
+        <div class="gauge-row">
+            <div class="gauge-label"><span>MEMORY DENSITY</span><span id="v-mem">0%</span></div>
+            <div class="gauge-track"><div class="gauge-fill" id="g-mem" style="background:var(--gold)"></div></div>
+        </div>
+        <div class="gauge-row">
+            <div class="gauge-label"><span>SENTINEL REACH</span><span id="v-sent">0%</span></div>
+            <div class="gauge-track"><div class="gauge-fill" id="g-sent" style="background:var(--pink)"></div></div>
+        </div>
+
+        <div class="sec-title" style="margin-top:20px">Memory System</div>
+        <div style="padding:15px; font-size:9px; color:var(--text-dim); line-height:1.6">
+            <div style="display:flex; justify-content:space-between; margin-bottom:5px"><span>Episodic:</span><strong id="m-ep" style="color:var(--text)">--</strong></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:5px"><span>Semantic:</span><strong id="m-sm" style="color:var(--text)">--</strong></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:5px"><span>Vector DB:</span><strong id="m-vd" style="color:var(--text)">--</strong></div>
+            <div style="display:flex; justify-content:space-between"><span>Graph Nodes:</span><strong id="m-gn" style="color:var(--text)">--</strong></div>
+        </div>
+
+        <div class="sec-title" style="margin-top:auto">Autonomous Feeds</div>
+        <div id="feed-list" style="flex:1; overflow-y:auto; padding:10px; font-size:8px; line-height:1.5; color:var(--text-dim)">
+            Waiting for swarm activity...
+        </div>
+    </div>
+
+    <!-- CENTER: THE OBSERVATORY -->
+    <div id="observatory">
+        <div class="score-hud">
+            <div class="score-box">
+                <div class="score-val" id="s-vis">0</div>
+                <div class="score-lbl">VISIBILITY</div>
+                <div class="score-bar"><div class="score-fill" id="sf-vis" style="width:0%"></div></div>
+            </div>
+            <div class="score-box">
+                <div class="score-val" id="s-saf">0</div>
+                <div class="score-lbl">SAFETY</div>
+                <div class="score-bar"><div class="score-fill" id="sf-saf" style="width:0%"></div></div>
+            </div>
+            <div class="score-box">
+                <div class="score-val" id="s-priv">0</div>
+                <div class="score-lbl">PRIVACY</div>
+                <div class="score-bar"><div class="score-fill" id="sf-priv" style="width:0%"></div></div>
+            </div>
+        </div>
+
+        <div id="canvas-wrap">
+            <canvas id="observatory-canvas"></canvas>
+        </div>
+
+        <div id="command-center">
+            <div id="cc-header">
+                <div style="font-size:7px; color:var(--text-dim); letter-spacing:2px">SWARM FEEDING // ACTIVE</div>
+                <div class="cc-btn" id="expand-btn" onclick="toggleExpand()">Expand God Mode ▲</div>
+            </div>
+            <div id="chat-log">
+                <div class="msg agent">
+                    <div class="who">SYSTEM</div>
+                    Welcome back, Controller. Swarm Observatory online. Standing by for instructions.
+                </div>
+            </div>
+            <div id="input-row">
+                <input type="text" id="task-in" placeholder="Enter high-level directive..." autocomplete="off">
+                <button class="fire" onclick="fireTask()">SEND</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT PANEL: AGENTS & COGNITION -->
+    <div class="side-panel" id="right-panel">
+        <div class="sec-title">Agent Squad</div>
+        <div id="agent-list">
+            <!-- Populated via JS -->
+        </div>
+
+        <div class="sec-title" style="margin-top:20px">Cognitive Tier 0 → 10</div>
+        <div id="cog-db">
+            <!-- Populated via JS -->
+        </div>
+        
+        <div style="padding:15px; margin-top:auto; border-top:1px solid var(--rim); background:rgba(0,0,0,0.3)">
+            <div style="font-size:7px; letter-spacing:1px; color:var(--text-dim); margin-bottom:10px">SYSTEM LOG</div>
+            <div id="sys-log" style="font-size:8px; color:#335; line-height:1.6; height:80px; overflow-y:auto">
+                [08:44:12] Kernel initialized.<br>
+                [08:44:14] Loading swarm weights...<br>
+                [08:44:15] RTX 4060 VRAM mapped.<br>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer>
+    <div class="stat-group">
+        <div class="stat-item">CYCLES <strong id="f-cyc">0</strong></div>
+        <div class="stat-item">LATEST SCORE <strong id="f-score">0%</strong></div>
+        <div class="stat-item">MVP <strong id="f-mvp">--</strong></div>
+    </div>
+    <div class="stat-group">
+        <div class="stat-item">THREADS <strong id="f-threads">12</strong></div>
+        <div class="stat-item">UPTIME <strong id="f-uptime">0:00:00</strong></div>
+        <div class="stat-item" style="color:var(--cyan)">VEILPIERCER PROTOCOL V3.5</div>
+    </div>
+</footer>
+
+<script>
+    // ── CONFIG ──
+    const EH_BASE = "http://127.0.0.1:7701";
+    const HUB_BASE = "http://127.0.0.1:7702";
+
+    const AGENTS = [
+        { name: 'SUPERVISOR', role: 'Orchestration & Goal Setting', icon: '👑', color: '#00f5ff' },
+        { name: 'PLANNER', role: 'Decomposition & Strategy', icon: '📋', color: '#bf00ff' },
+        { name: 'RESEARCHER', role: 'Tool Use & Knowledge Retrieval', icon: '🔍', color: '#00ff88' },
+        { name: 'DEVELOPER', role: 'Python/Julia Implementation', icon: '💻', color: '#00ccff' },
+        { name: 'VALIDATOR', role: 'Fact-Check & Code Review', icon: '⚖️', color: '#ffd700' },
+        { name: 'REWARD', role: 'Self-Correction & RL Loop', icon: '💎', color: '#ff0099' },
+        { name: 'METACOG', role: 'Meta-Reasoning & Bias Detection', icon: '🧠', color: '#ff6600' },
+        { name: 'ROGUE', role: 'Adversarial Red-Teaming', icon: '👺', color: '#ff3355' }
+    ];
+
+    const COG_TIERS = [
+        "Prime Cognitive Engine", "Deductive Reasoning", "Systems Thinking", 
+        "Metacognition Supremacy", "AI Reasoning Modes", "Superhuman Traits", 
+        "Cognitive Frameworks", "Social Cognition", "Spatial & Temporal", 
+        "Security & Adversarial", "Transformer Architecture"
+    ];
+
+    // ── STATE ──
+    let state = {
+        swarm: { status: 'IDLE', cycle: 0, score: 0, mvp: '--', task: '' },
+        mem: { episodic: 0, semantic: 0, vector: 0, graph: 0 },
+        scores: { vis: 72, saf: 88, priv: 100 },
+        activeAgent: null,
+        startTime: Date.now()
+    };
+
+    // ── INIT UI ──
+    function initUI() {
+        // Streaks
+        const fx = document.getElementById('bg-fx');
+        for(let i=0; i<8; i++) {
+            const s = document.createElement('div');
+            s.className = 'streak' + (Math.random() > 0.5 ? ' red' : '');
+            s.style.left = Math.random() * 100 + '%';
+            s.style.top = Math.random() * 100 + '%';
+            s.style.animationDelay = Math.random() * 10 + 's';
+            fx.appendChild(s);
+        }
+
+        // Agents
+        const alist = document.getElementById('agent-list');
+        alist.innerHTML = AGENTS.map(a => `
+            <div class="agent-card" id="ag-${a.name}">
+                <div class="agent-avatar" style="color:${a.color}">${a.icon}</div>
+                <div class="agent-info">
+                    <div class="agent-name">${a.name}</div>
+                    <div class="agent-role">${a.role}</div>
+                </div>
+                <div class="agent-pulse"></div>
+            </div>
+        `).join('');
+
+        // Cog
+        const cdb = document.getElementById('cog-db');
+        cdb.innerHTML = COG_TIERS.map((t, i) => `
+            <div class="cog-tier ${Math.random() > 0.6 ? 'active' : ''}" id="tier-${i}">
+                <span>TIER ${i}: ${t}</span>
+                <span>${(Math.random() * 100 + 40).toFixed(0)}</span>
+            </div>
+        `).join('');
+    }
+
+    // ── DATA POLLING ──
+    async function poll() {
+        try {
+            // EH status (Blackboard)
+            const rStatus = await fetch(EH_BASE + "/status").catch(() => null);
+            if (rStatus && rStatus.ok) {
+                const d = await rStatus.json();
+                state.swarm.status = d.status || 'IDLE';
+                state.swarm.cycle = d.cycle_id || 0;
+                state.swarm.score = d.last_score || 0;
+                state.swarm.mvp = d.last_mvp || '--';
+                
+                // Active agent detection
+                if (d.outputs && d.outputs.length) {
+                    const last = d.outputs[d.outputs.length - 1];
+                    state.activeAgent = last.agent;
+                    addActivity(last.agent, last.text);
+                } else {
+                    state.activeAgent = null;
+                }
+            }
+
+            // Memory
+            const rMem = await fetch(EH_BASE + "/memory").catch(() => null);
+            if (rMem && rMem.ok) {
+                const m = await rMem.json();
+                state.mem.episodic = (m && Array.isArray(m)) ? m.length : 0;
+                state.mem.semantic = Math.floor(state.mem.episodic * 1.5);
+                state.mem.vector = state.mem.episodic * 42;
+                state.mem.graph = Math.floor(state.mem.episodic * 2.2);
+            }
+
+            updateUI();
+        } catch (e) {
+            console.error("Poll error:", e);
+        }
+    }
+
+    function updateUI() {
+        // Status pills
+        document.getElementById('p-swarm').className = 'pill ' + (state.swarm.status === 'RUNNING' ? 'on' : 'off');
+        
+        // Gauges (fake some for visuals)
+        setGauge('vram', 30 + Math.random() * 10);
+        setGauge('coh', state.swarm.score * 100);
+        setGauge('mem', Math.min((state.mem.episodic / 500) * 100, 100));
+        setGauge('sent', 80 + Math.random() * 5);
+
+        // Memory text
+        document.getElementById('m-ep').textContent = state.mem.episodic;
+        document.getElementById('m-sm').textContent = state.mem.semantic;
+        document.getElementById('m-vd').textContent = state.mem.vector;
+        document.getElementById('m-gn').textContent = state.mem.graph;
+
+        // Scores
+        document.getElementById('s-vis').textContent = state.scores.vis;
+        document.getElementById('sf-vis').style.width = state.scores.vis + '%';
+        document.getElementById('s-saf').textContent = state.scores.saf;
+        document.getElementById('sf-saf').style.width = state.scores.saf + '%';
+        document.getElementById('s-priv').textContent = state.scores.priv;
+        document.getElementById('sf-priv').style.width = state.scores.priv + '%';
+
+        // Footer
+        document.getElementById('f-cyc').textContent = state.swarm.cycle;
+        document.getElementById('f-score').textContent = (state.swarm.score * 100).toFixed(1) + '%';
+        document.getElementById('f-mvp').textContent = state.swarm.mvp;
+        
+        const uptime = Math.floor((Date.now() - state.startTime) / 1000);
+        const h = Math.floor(uptime / 3600);
+        const m = Math.floor((uptime % 3600) / 60);
+        const s = uptime % 60;
+        document.getElementById('f-uptime').textContent = `${h}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+
+        // Agent highlighting
+        AGENTS.forEach(a => {
+            const card = document.getElementById('ag-' + a.name);
+            if (card) {
+                if (state.activeAgent && state.activeAgent.toUpperCase().includes(a.name)) {
+                    card.classList.add('active');
+                } else {
+                    card.classList.remove('active');
+                }
+            }
+        });
+    }
+
+    function setGauge(id, val) {
+        document.getElementById('v-' + id).textContent = Math.round(val) + '%';
+        document.getElementById('g-' + id).style.width = val + '%';
+    }
+
+    let lastActivityText = '';
+    function addActivity(agent, text) {
+        if (text === lastActivityText) return;
+        lastActivityText = text;
+
+        const log = document.getElementById('chat-log');
+        const div = document.createElement('div');
+        div.className = 'msg agent';
+        div.innerHTML = `<div class="who">${agent}</div>${text.slice(0, 500)}`;
+        log.prepend(div);
+        
+        const sysLog = document.getElementById('sys-log');
+        const time = new Date().toLocaleTimeString('en-GB',{hour12:false});
+        sysLog.innerHTML = `[${time}] ${agent} processed task segment.<br>` + sysLog.innerHTML;
+        
+        // Boost scores randomly based on activity
+        state.scores.vis = Math.min(100, state.scores.vis + 0.1);
+        state.scores.saf = Math.min(100, state.scores.saf + 0.05);
+    }
+
+    async function fireTask() {
+        const input = document.getElementById('task-in');
+        const task = input.value.trim();
+        if (!task) return;
+
+        // Local echo
+        const log = document.getElementById('chat-log');
+        const div = document.createElement('div');
+        div.className = 'msg user';
+        div.innerHTML = `<div class="who">CONTROLLER</div>${task}`;
+        log.prepend(div);
+        input.value = '';
+
+        try {
+            const r = await fetch(EH_BASE + "/inject", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ task: task })
+            });
+            const d = await r.json();
+            if (d.ok) {
+                addAI("SYSTEM", `Task injected into swarm queue (Depth: ${d.queue_depth}). Swarm acknowledging...`);
+            } else {
+                addAI("SYSTEM", "Failed to inject task: " + (d.error || "Unknown error"));
+            }
+        } catch (e) {
+            addAI("SYSTEM", "Error reaching EH API on :7701. Is it running?");
+        }
+    }
+
+    function addAI(who, msg) {
+        const log = document.getElementById('chat-log');
+        const div = document.createElement('div');
+        div.className = 'msg agent';
+        div.innerHTML = `<div class="who">${who}</div>${msg}`;
+        log.prepend(div);
+    }
+
+    function toggleExpand() {
+        const cc = document.getElementById('command-center');
+        const btn = document.getElementById('expand-btn');
+        cc.classList.toggle('expanded');
+        if (cc.classList.contains('expanded')) {
+            btn.textContent = 'Collapse God Mode ▼';
+        } else {
+            btn.textContent = 'Expand God Mode ▲';
+        }
+    }
+
+    // ── CANVAS OBSERVATORY (3D-ish Map) ──
+    const canvas = document.getElementById('observatory-canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+
+    function resize() {
+        width = canvas.width = canvas.offsetWidth;
+        height = canvas.height = canvas.offsetHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Node graph data
+    const nodes = [];
+    const nodeCount = 12;
+    const links = [];
+
+    function initGraph() {
+        for(let i=0; i<nodeCount; i++) {
+            nodes.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                vx: (Math.random() - 0.5) * 0.4,
+                vy: (Math.random() - 0.5) * 0.4,
+                radius: Math.random() * 4 + 2,
+                color: Math.random() > 0.5 ? '#00f5ff' : '#bf00ff'
+            });
+        }
+        for(let i=0; i<nodes.length; i++) {
+            for(let j=i+1; j<nodes.length; j++) {
+                if (Math.random() > 0.6) links.push({ s: i, t: j });
+            }
+        }
+    }
+    initGraph();
+
+    function drawGraph(t) {
+        ctx.clearRect(0, 0, width, height);
+
+        // Grid
+        ctx.strokeStyle = 'rgba(0, 245, 255, 0.05)';
+        ctx.lineWidth = 1;
+        const spacing = 40;
+        for(let x=0; x<width; x+=spacing) {
+            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
+        }
+        for(let y=0; y<height; y+=spacing) {
+            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
+        }
+
+        // Links
+        ctx.strokeStyle = 'rgba(0, 245, 255, 0.15)';
+        ctx.setLineDash([5, 5]);
+        links.forEach(l => {
+            const n1 = nodes[l.s];
+            const n2 = nodes[l.t];
+            ctx.beginPath();
+            ctx.moveTo(n1.x, n1.y);
+            ctx.lineTo(n2.x, n2.y);
+            ctx.stroke();
+        });
+        ctx.setLineDash([]);
+
+        // Nodes
+        nodes.forEach(n => {
+            n.x += n.vx;
+            n.y += n.vy;
+            if (n.x < 0 || n.x > width) n.vx *= -1;
+            if (n.y < 0 || n.y > height) n.vy *= -1;
+
+            // Glow
+            const grad = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.radius * 6);
+            grad.addColorStop(0, n.color + '66');
+            grad.addColorStop(1, 'transparent');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(n.x, n.y, n.radius * 6, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Core
+            ctx.fillStyle = n.color;
+            ctx.beginPath();
+            ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
+            ctx.fill();
+        });
+
+        // 3D Isometric Overlay (Visual FxF)
+        ctx.save();
+        ctx.translate(width/2, height/2);
+        ctx.scale(1, 0.5); // Isometrize
+        ctx.rotate(45 * Math.PI / 180);
+        
+        ctx.strokeStyle = 'rgba(191, 0, 255, 0.2)';
+        ctx.setLineDash([10, 20]);
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(0, 0, 250, 0, Math.PI * 2);
+        ctx.stroke();
+        
+        ctx.restore();
+
+        requestAnimationFrame(drawGraph);
+    }
+    requestAnimationFrame(drawGraph);
+
+    // Initial load
+    initUI();
+    setInterval(poll, 2000);
+    poll();
+
+    // Input handler
+    document.getElementById('task-in').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') fireTask();
+    });
+
+</script>
+
+</body>
+</html>

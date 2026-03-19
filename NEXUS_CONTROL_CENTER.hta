@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>NEXUS CONTROL CENTER</title>
+  <HTA:APPLICATION ID="NexusDash" BORDER="thin" CAPTION="yes" SHOWINTASKBAR="yes" SINGLEINSTANCE="yes" SYSMENU="yes" WINDOWSTATE="normal"/>
+  <meta charset="UTF-8">
+  <style>
+    body { background: #0a0a0a; color: #fff; font-family: 'Segoe UI', sans-serif; padding: 30px; }
+    h1 { color: #00e5ff; font-weight: 800; font-size: 24px; letter-spacing: 2px; margin-bottom: 24px; }
+    .cat { margin-bottom: 30px; }
+    .cat h2 { font-size: 14px; color: #555; text-transform: uppercase; border-bottom: 1px solid #222; padding-bottom: 8px; margin-bottom: 16px; font-weight: 700; letter-spacing: 2px; }
+    .btn { display: block; width: 100%; text-align: left; background: #111; border: 1px solid #333; color: #ddd; padding: 14px 20px; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; margin-bottom: 10px; transition: 0.2s; }
+    .btn:hover { background: #1a1a1a; border-color: #00e5ff; color: #00e5ff; }
+    .btn span { display: block; font-size: 11px; color: #666; font-weight: normal; margin-top: 4px; }
+    .btn-red:hover { border-color: #ff1744; color: #ff1744; }
+  </style>
+  <script language="VBScript">
+    Sub RunBat(scriptName)
+        Set objShell = CreateObject("WScript.Shell")
+        objShell.Run "cmd.exe /c """ & scriptName & """", 1, False
+    End Sub
+
+    Sub OpenUrl(url)
+        Set objShell = CreateObject("WScript.Shell")
+        objShell.Run """" & url & """", 1, False
+    End Sub
+
+    Sub RunDiagnostics()
+        Set objShell = CreateObject("WScript.Shell")
+        ' /k keeps the window open so the user can read the diagnostics output
+        objShell.Run "cmd.exe /k ""python run_diagnostics.py""", 1, False
+    End Sub
+  </script>
+</head>
+<body>
+  <h1>◈ NEXUS CONTROL CENTER</h1>
+  
+  <div class="cat">
+    <h2>1. Server Operations</h2>
+    <button class="btn" onclick="RunBat('START_ULTIMATE_GOD_MODE.bat')">
+      ▶ START ALL SERVERS (GOD MODE)
+      <span>Launches all backend engines, local LLMs, and memory cores</span>
+    </button>
+    <button class="btn btn-red" onclick="RunDiagnostics()">
+      ☤ RUN SYSTEM DIAGNOSTICS
+      <span>Executes the diagnostic python script to check swarm memory status</span>
+    </button>
+  </div>
+
+  <div class="cat">
+    <h2>2. Dashboards & Hubs</h2>
+    <button class="btn" onclick="OpenUrl('http://localhost:3000/nexus_ultimate_hub.html')">
+      ❖ OPEN GOD MODE HUB
+      <span>Live swarm observatory, memory pulse, and control interface</span>
+    </button>
+    <button class="btn" onclick="OpenUrl('C:\Users\fyou1\Desktop\New folder\nexus-ultra\NEXUS-LAUNCHER.html')">
+      ⚡ VIEW NETWORK STATUS
+      <span>Loads the GUI checking local ports to see which nodes are currently running</span>
+    </button>
+  </div>
+
+  <div class="cat">
+    <h2>3. Product Previews</h2>
+    <button class="btn" onclick="OpenUrl('https://veil-piercer.com')">
+      🌐 VEILPIERCER WEB (cloudflared live)
+      <span>Opens the live Stripe-connected endpoint for public web preview</span>
+    </button>
+  </div>
+</body>
+</html>

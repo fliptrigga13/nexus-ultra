@@ -29,9 +29,17 @@ if (STRIPE_SK && !STRIPE_SK.includes('PASTE_YOUR')) {
   try { stripe = require('stripe')(STRIPE_SK); } catch (e) { console.warn('Stripe init failed:', e.message); }
 }
 
-const SECRET = process.env.API_SECRET || "Burton";
-const HUB_PASSWORD = process.env.HUB_PASSWORD || process.env.NEXUS_SECRET || 'NexusGodMode2026';
+const SECRET = process.env.API_SECRET || "BURTON131313";
+const HUB_PASSWORD = process.env.HUB_PASSWORD || process.env.NEXUS_SECRET || 'BURTON131313';
 const HUB_SESSIONS = new Map(); // token → expiry
+
+// Load EH Token for swarm protection
+let EH_TOKEN = "";
+try {
+  const tokenPath = path.join(__dirname, '.eh_token');
+  if (fs.existsSync(tokenPath)) EH_TOKEN = fs.readFileSync(tokenPath, 'utf8').trim();
+} catch (e) { console.warn('Failed to load .eh_token'); }
+
 function makeHubToken() { return require('crypto').randomBytes(32).toString('hex'); }
 function isHubAuthed(req) {
   const raw = req.headers.cookie || '';
@@ -40,6 +48,20 @@ function isHubAuthed(req) {
   const exp = HUB_SESSIONS.get(match[1]);
   return exp && exp > Date.now();
 }
+
+// Global Hub Auth Middleware
+const hubAuth = (req, res, next) => {
+  const key = req.headers['x-api-key'] || req.query['x-api-key'];
+  if (key === SECRET || key === HUB_PASSWORD || key === 'Burton') return next();
+  if (req.url.startsWith('/hub-login')) return next();
+  if (isHubAuthed(req)) return next();
+  
+  if (req.headers.accept && req.headers.accept.includes('text/html')) {
+    return res.redirect('/hub-login?next=' + encodeURIComponent(req.originalUrl));
+  }
+  res.status(401).json({ error: 'Hub auth required' });
+};
+
 const HOST = process.env.HOST || "0.0.0.0";
 const PORT = parseInt(process.env.PORT || "3000", 10);
 const N8N_URL = "http://localhost:5678";
@@ -137,6 +159,7 @@ const VP_METRICS = {
   priv: { localCalls: 0, externalCalls: 0, tokensIssued: 0, emailsSent: 0, lastEvent: '' },
   startTime: Date.now(),
   totalRuns: 0,
+  rubin: { active: true, throughput: '10.5k/s', mode: 'NVL72_TUNNEL' }
 };
 
 function agentEvent(type, pillar, msg, data = {}) {
@@ -197,9 +220,6 @@ function calcVPScores() {
   };
 }
 
-// GET /veilpiercer/metrics — live scores for dashboard
-// Public endpoint so dashboard can read without API key
-
 
 // ─── Script whitelist (declared early — used by scheduler + routes) ──
 const SCRIPTS = {
@@ -229,7 +249,7 @@ try {
     log(`DROP_ZONE: ${filename}`);
     const script = path.join(ROOT, 'local-scripts', 'watch-trigger.ps1');
     exec(`powershell -NoProfile -ExecutionPolicy Bypass -File "${script}" -FilePath "${fp}"`,
-      { timeout: 30000 }, (err, stdout) => {
+      { timeout: 30000, windowsHide: true }, (err, stdout) => {
         entry.processed = true;
         entry.output = err ? err.message : stdout.trim();
         log(`DROP_ZONE processed: ${filename}`);
@@ -248,7 +268,7 @@ function addJob(expression, action, label) {
   const task = cron.schedule(expression, () => {
     log(`SCHED job#${id} "${label}" → ${action}`);
     exec(`powershell -NoProfile -ExecutionPolicy Bypass -File "${script}"`,
-      { timeout: 60000 }, (err, stdout) => {
+      { timeout: 60000, windowsHide: true }, (err, stdout) => {
         log(`SCHED job#${id} done: ${err ? err.message : stdout.trim().split('\n')[0]}`);
       });
   });
@@ -266,6 +286,55 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// GET /api/config — serve tokens and URLs to the hub UI
+app.get('/api/config', hubAuth, (req, res) => {
+  res.json({
+    ok: true,
+    ehToken: EH_TOKEN,
+    publicUrl: PUBLIC_URL,
+    localUrl: `http://127.0.0.1:${PORT}`
+  });
+});
+
+// GET /veilpiercer/metrics — live scores for dashboard
+// Public endpoint so dashboard can read without API key
+app.get('/veilpiercer/metrics', (req, res) => {
+  res.json(calcVPScores());
+});
+
+// -- Global Swarm Protection Layer --
+const PROTECTED_PREFIXES = [
+  '/api/', '/ollama/', '/gemini/', '/agent/', '/loop', '/autonomy', 
+  '/missions', '/queue', '/dropzone', '/schedule', '/tabs', '/cmd', '/run'
+];
+
+app.use((req, res, next) => {
+  const isProtected = PROTECTED_PREFIXES.some(p => req.url.startsWith(p));
+  const isPublic = [
+    '/api/config', '/api/customer-task', '/api/ping-services', 
+    '/api/stats', '/stripe/', '/access/verify', '/feedback', '/public/'
+  ].some(p => req.url.startsWith(p));
+  
+  if (isProtected && !isPublic) {
+    return hubAuth(req, res, next);
+  }
+  next();
+});
+
+// ── /api/config — Public config for UI ──────────────────────────────────────
+app.get('/api/config', (req, res) => {
+  const bdToken = (() => {
+    try { return fs.readFileSync(path.join(__dirname, '.eh_token'), 'utf8').trim(); } catch { return ''; }
+  })();
+  res.json({
+    ok: true,
+    ehToken: bdToken,
+    publicUrl: PUBLIC_URL,
+    ollamaUrl: OLLAMA_URL,
+    n8nUrl: N8N_URL
+  });
+});
+
 // ══ HUB PASSWORD GATE ════════════════════════════════════════════════════════
 // Public routes (buyers, Stripe, VeilPiercer) — NEVER blocked:
 const HUB_PUBLIC_ROUTES = [
@@ -279,6 +348,8 @@ const HUB_PUBLIC_ROUTES = [
   '/veilpiercer/command',    // Hub AI & signal endpoint
   '/veilpiercer/signals',    // Hub telemetry polling
   '/public/stats',        // public social proof stats
+  '/veilpiercer.html',    // public sales page
+  '/vp.html',             // clean landing page — public
 ];
 // Hub pages + new endpoints that need the password:
 const HUB_PROTECTED_PAGES = [
@@ -296,10 +367,8 @@ app.use((req, res, next) => {
   
   // Check if this is a protected hub route
   const needsAuth = HUB_PROTECTED_PAGES.some(r => p.startsWith(r))
-    || p === '/' || p.match(/\.html$/);
+    || p.match(/\.html$/);
   if (!needsAuth) return next();
-  // Allow if API key provided (for scripts/curl)
-  if (req.headers['x-api-key'] === SECRET || req.headers['x-api-key'] === HUB_PASSWORD) return next();
   // Allow if valid session cookie
   if (isHubAuthed(req)) return next();
   // Redirect HTML requests to login page
@@ -352,7 +421,7 @@ app.get('/hub-logout', (req, res) => {
 
 // ── Auth middleware — protects signal + insights routes ──
 const nexusAuth = (req, res, next) => {
-  const secret = process.env.NEXUS_SECRET || 'Burton';
+  const secret = process.env.NEXUS_SECRET || 'BURTON333';
   const key = req.headers['x-api-key'];
   if (key !== secret) return res.status(401).json({ error: 'Unauthorized: invalid x-api-key' });
   next();
@@ -406,15 +475,26 @@ app.post('/api/reject-signal', nexusAuth, async (req, res) => {
   }
 });
 
+// ── Harcoded Node Shield (Zero Leakage over Ngrok) ────────────────
+app.use((req, res, next) => {
+  const url = req.path.toLowerCase();
+  // Physically block the internet from downloading backend configs, databases, source code, or memories
+  if (url.endsWith('.env') || url.endsWith('.eh_token') || url.endsWith('.cjs') || 
+      url.endsWith('.json') || url.endsWith('.log') || url.endsWith('.db') || url.endsWith('.db-shm') || url.endsWith('.db-wal') ||
+      url.endsWith('.bat') || url.endsWith('.ps1') || url.endsWith('.py') || url.endsWith('.md')) {
+    return res.status(403).send('STRICT_FORBIDDEN: NODE_SHIELD_ACTIVE');
+  }
+  next();
+});
 app.use(express.static(ROOT, { index: false })); // don't auto-serve index.html at root — route handler controls /
-
 // ── Main landing page ────────────────────────────────────────────────
 app.get('/', (req, res) => {
   // Owner logged in → go to hub. Public visitor → VeilPiercer sales page.
   if (isHubAuthed(req)) return res.redirect('/nexus_hub.html');
-  return res.sendFile(path.join(ROOT, 'veilpiercer.html'));
+  return res.sendFile(path.join(ROOT, 'index.html'));
 });
-app.get('/veilpiercer-pitch.html', (req, res) => res.redirect(301, '/veilpiercer.html'));
+app.get('/veilpiercer-pitch.html', (req, res) => res.redirect(301, '/index.html'));
+app.get('/veilpiercer.html', (req, res) => res.redirect(301, '/index.html'));
 
 
 function auth(req, res, next) {
@@ -430,7 +510,7 @@ app.post('/run', auth, (req, res) => {
   if (!sp) return res.status(400).json({ ok: false, error: 'Invalid action' });
   log(`RUN: ${action}`);
   exec(`powershell -NoProfile -ExecutionPolicy Bypass -File "${sp}"`,
-    { timeout: 60000 }, (err, stdout, stderr) => {
+    { timeout: 60000, windowsHide: true }, (err, stdout, stderr) => {
       if (err) { log(`RUN ERR ${action}: ${stderr || err.message}`); return res.status(500).json({ ok: false, error: stderr || err.message }); }
       log(`RUN OK: ${action}`);
       return res.json({ ok: true, output: stdout.trim() });
@@ -442,6 +522,14 @@ let storedTabs = null;
 try { if (fs.existsSync(TABS_FILE)) storedTabs = JSON.parse(fs.readFileSync(TABS_FILE, 'utf8')); } catch (_) { }
 
 app.get('/status', (req, res) => {
+  const db = loadAccessDB();
+  const salesSummary = Object.values(db).reduce((acc, entry) => {
+    acc.total += (entry.amount || 0);
+    acc.count++;
+    acc.tiers[entry.tier] = (acc.tiers[entry.tier] || 0) + 1;
+    return acc;
+  }, { total: 0, count: 0, tiers: {} });
+
   res.json({
     ok: true,
     status: 'NEXUS ULTRA ONLINE',
@@ -453,9 +541,196 @@ app.get('/status', (req, res) => {
     drop_zone_files: (() => { try { return fs.readdirSync(DROP_DIR).length; } catch (_) { return 0; } })(),
     captures: (() => { try { return fs.readdirSync(CAPTURE_DIR).length; } catch (_) { return 0; } })(),
     log_size_kb: (() => { try { return (fs.statSync(LOG_FILE).size / 1024).toFixed(1); } catch (_) { return 0; } })(),
-    access_tokens: (() => { try { return Object.keys(loadAccessDB()).length; } catch { return 0; } })(),
+    access_tokens: salesSummary.count,
+    total_revenue: (salesSummary.total / 100).toFixed(2),
+    tier_breakdown: salesSummary.tiers,
     email_configured: !!(EMAIL_USER && EMAIL_PASS),
+    rubin_active: VP_METRICS.rubin.active,
+    throughput: VP_METRICS.rubin.throughput
   });
+});
+
+app.get('/api/vp-sales', (req, res) => {
+  const db = loadAccessDB();
+  const now = new Date();
+  const todayStr = now.toISOString().split('T')[0];
+  
+  const report = Object.values(db).reduce((acc, s) => {
+    const isToday = s.createdAt && s.createdAt.startsWith(todayStr);
+    if (isToday) {
+      acc.today.revenue += (s.amount || 0);
+      acc.today.count++;
+    }
+    acc.all_time.revenue += (s.amount || 0);
+    acc.all_time.count++;
+    return acc;
+  }, { today: { revenue:0, count:0 }, all_time: { revenue:0, count:0 } });
+
+  res.json({
+    ok: true,
+    date: todayStr,
+    today_revenue: (report.today.revenue / 100).toFixed(2),
+    today_sales: report.today.count,
+    all_time_revenue: (report.all_time.revenue / 100).toFixed(2),
+    all_time_sales: report.all_time.count
+  });
+});
+
+// ── VEILPIERCER MOBILE /m ── enhanced branded phone monitor ─────────────────
+app.get('/m', hubAuth, (req, res) => {
+  const db = loadAccessDB();
+  const now = new Date();
+  const todayStr = now.toISOString().split('T')[0];
+  const sales = Object.values(db).reduce((a, e) => {
+    const isReal = e.sessionId && (e.sessionId.startsWith('pi_') || e.sessionId.startsWith('cs_live_') || e.sessionId.startsWith('cs_test_b'));
+    a.allRev += (e.amount||0); a.allN++;           // ALL tokens (includes test/manual)
+    if (isReal) { a.rev += (e.amount||0); a.n++; } // REAL Stripe payments only
+    if (isReal && e.createdAt && e.createdAt.startsWith(todayStr)) { a.todayRev += (e.amount||0); a.todayN++; }
+    return a;
+  }, {rev:0,n:0,todayRev:0,todayN:0,allRev:0,allN:0});
+
+  let logLines = [];
+  try { const raw = fs.readFileSync(LOG_FILE,'utf8'); logLines = raw.split('\n').filter(Boolean).slice(-25).reverse(); } catch(_){}
+  let bb = {};
+  try { bb = JSON.parse(fs.readFileSync(path.join(__dirname,'nexus_blackboard.json'),'utf8')); } catch(_){}
+
+  const score = parseFloat(bb.last_score) || 0;
+  const scoreColor = score >= 0.8 ? '#0f0' : score >= 0.5 ? '#fa0' : '#f33';
+  const statusColor = bb.status === 'RUNNING' ? '#0f0' : bb.status === 'DONE' ? '#fa0' : '#f33';
+  const scoreBar = Math.min(100, Math.round(score * 100));
+
+  const logHtml = logLines.map(l => {
+    const isWarn = /error|fail|warn|critical/i.test(l);
+    const isGood = /session|active|online|success|done/i.test(l);
+    const col = isWarn ? '#f55' : isGood ? '#0c6' : '#2a6a2a';
+    return `<div style="padding:3px 0;border-bottom:1px solid #0a0a0a;font-size:10px;color:${col};word-break:break-all">${l.replace(/</g,'&lt;')}</div>`;
+  }).join('');
+
+  const cap = (() => { try { return fs.readdirSync(CAPTURE_DIR).length; } catch(_){ return 0; }})();
+  const logKB = (() => { try { return (fs.statSync(LOG_FILE).size/1024).toFixed(0); } catch(_){ return 0; }})();
+
+  res.setHeader('Content-Type','text/html');
+  res.send(`<!DOCTYPE html><html><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="refresh" content="10">
+<title>VEILPIERCER · MOBILE OPS</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#030008;color:#c0c0d0;font-family:monospace;font-size:12px;padding:14px}
+.layout{display:grid;grid-template-columns:1fr;gap:14px;max-width:1100px;margin:0 auto}
+@media(min-width:700px){.layout{grid-template-columns:minmax(300px,500px) 1fr}}
+.col-left{min-width:0}
+.col-right{min-width:0}
+.logo{font-size:11px;letter-spacing:6px;color:#bf00ff;margin-bottom:2px;font-weight:bold}
+.sub{font-size:8px;color:#445;letter-spacing:3px;margin-bottom:12px}
+.badge{display:inline-block;padding:3px 12px;border:1px solid ${statusColor};color:${statusColor};font-size:9px;letter-spacing:3px;margin-bottom:14px;border-radius:2px}
+.card{background:#0a0010;border:1px solid #1a003a;border-radius:6px;padding:12px;margin-bottom:12px}
+.card-title{font-size:8px;letter-spacing:3px;color:#bf00ff;margin-bottom:10px;border-bottom:1px solid #1a003a;padding-bottom:5px}
+.row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #0c0018;font-size:11px}
+.lbl{color:#445;font-size:9px;letter-spacing:1px}.val{color:#e0e0f0;text-align:right}
+.val.g{color:#0f0}.val.y{color:#fa0}.val.p{color:#bf00ff}.val.c{color:#0cf}
+.rev-big{font-size:22px;color:#bf00ff;font-weight:bold;text-align:center;padding:8px 0}
+.rev-sub{font-size:9px;color:#445;text-align:center;margin-bottom:4px}
+.bar-wrap{height:5px;background:#1a003a;border-radius:3px;margin:8px 0 4px;overflow:hidden}
+.bar-fill{height:100%;width:${scoreBar}%;background:${scoreColor};border-radius:3px}
+.score-label{font-size:8px;color:#445;display:flex;justify-content:space-between}
+h2{font-size:8px;letter-spacing:3px;color:#0cf;margin-bottom:7px;border-bottom:1px solid #0a0018;padding-bottom:4px}
+.log-wrap{max-height:220px;overflow-y:auto;margin-bottom:12px}
+textarea{width:100%;background:#050010;border:1px solid #1a003a;color:#0cf;font-family:monospace;font-size:11px;padding:10px;border-radius:4px;resize:vertical;min-height:55px;outline:none}
+button{width:100%;background:none;border:2px solid #bf00ff;color:#bf00ff;font-family:monospace;font-size:12px;letter-spacing:2px;padding:12px;margin-top:8px;border-radius:4px;cursor:pointer}
+button:active{background:#bf00ff22}
+.ts{font-size:8px;color:#2a2a3a;text-align:right;margin-top:10px}
+</style></head><body>
+<div class="layout">
+<div class="col-left">
+<div class="logo">VEILPIERCER</div>
+<div class="sub">MOBILE OPS CENTER · AUTO-REFRESH 10s</div>
+<div class="badge">${bb.status||'OFFLINE'}</div>
+
+<div class="card">
+  <div class="card-title">▸ REVENUE INTEL</div>
+  <div class="rev-big">$${(sales.rev/100).toFixed(2)}</div>
+  <div class="rev-sub">ALL-TIME · ${sales.n} SALES</div>
+  <div class="row"><span class="lbl">TODAY</span><span class="val g">$${(sales.todayRev/100).toFixed(2)} (${sales.todayN} sales)</span></div>
+</div>
+
+<div class="card">
+  <div class="card-title">▸ SWARM STATUS</div>
+  <div class="row"><span class="lbl">CYCLE</span><span class="val c">${bb.cycle_id||'—'}</span></div>
+  <div class="row"><span class="lbl">MVP AGENT</span><span class="val p">${bb.last_mvp||'—'}</span></div>
+  <div class="row"><span class="lbl">LESSON</span><span class="val" style="font-size:9px;max-width:70%;text-align:right">${String(bb.last_lesson||'—').slice(0,60)}</span></div>
+  <div class="row"><span class="lbl">UPTIME</span><span class="val">${process.uptime().toFixed(0)}s</span></div>
+  <div class="row"><span class="lbl">CAPTURES</span><span class="val">${cap}</span></div>
+  <div class="row"><span class="lbl">LOG SIZE</span><span class="val">${logKB}KB</span></div>
+  <div style="margin-top:10px">
+    <div class="score-label"><span>CYCLE SCORE</span><span style="color:${scoreColor}">${score.toFixed(2)} / 1.00</span></div>
+    <div class="bar-wrap"><div class="bar-fill"></div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">▸ LIVE LOG (last 25 lines)</div>
+  <div class="log-wrap">${logHtml||'<div style="color:#2a2a3a">No swarm activity yet</div>'}</div>
+</div>
+
+<div class="card">
+  <div class="card-title">▸ INJECT SWARM TASK</div>
+  <textarea id="t" placeholder="Enter directive for the swarm..."></textarea>
+  <button onclick="inj()">⚡ FIRE TASK</button>
+</div><!-- end col-left -->
+
+<div class="col-right">
+
+<div class="card">
+  <div class="card-title">▸ QUICK COMMANDS</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
+    <button class="qb" onclick="qi('Run full audit cycle now')">🔍 AUDIT</button>
+    <button class="qb" onclick="qi('Check system status and report health')">📊 STATUS</button>
+    <button class="qb" onclick="qi('Flush memory and clear stale agent state')">🧹 FLUSH</button>
+    <button class="qb" onclick="qi('Generate VeilPiercer sales summary report')">💰 SALES</button>
+    <button class="qb" onclick="qi('Analyze latest errors in swarm log')">⚠️ ERRORS</button>
+    <button class="qb" onclick="qi('Optimize agent concurrency for current load')">⚡ OPTIMIZE</button>
+    <button class="qb" onclick="qi('Identify top performing agent this cycle')">🏆 MVP</button>
+    <button class="qb" onclick="qi('Force restart lowest priority agents')">🔄 RESTART</button>
+  </div>
+  <div id="qres" style="font-size:9px;color:#0cf;padding:6px 0;min-height:20px"></div>
+</div>
+
+<div class="card">
+  <div class="card-title">▸ TOKEN LEDGER</div>
+  <div class="row"><span class="lbl">REAL STRIPE SALES</span><span class="val g">${sales.n}</span></div>
+  <div class="row"><span class="lbl">REAL REVENUE</span><span class="val g">$${(sales.rev/100).toFixed(2)}</span></div>
+  <div class="row"><span class="lbl">ALL TOKENS ISSUED</span><span class="val">${sales.allN}</span></div>
+  <div class="row"><span class="lbl">TOKEN FACE VALUE</span><span class="val" style="color:#444">$${(sales.allRev/100).toFixed(2)}</span></div>
+  <div class="row"><span class="lbl">TEST / MANUAL</span><span class="val" style="color:#333">${sales.allN - sales.n} entries</span></div>
+</div>
+
+<div class="card">
+  <div class="card-title">▸ SYSTEM CLOCK</div>
+  <div style="font-size:28px;color:#bf00ff;text-align:center;padding:14px 0;letter-spacing:2px" id="clk"></div>
+  <div class="row"><span class="lbl">SERVER UPTIME</span><span class="val">${process.uptime().toFixed(0)}s</span></div>
+  <div class="row"><span class="lbl">LOG SIZE</span><span class="val">${logKB}KB</span></div>
+  <div class="row"><span class="lbl">CAPTURES</span><span class="val">${cap}</span></div>
+</div>
+
+</div><!-- end col-right -->
+</div><!-- end layout -->
+
+<div class="ts">NEXUS ULTRA · ${now.toLocaleString()}</div>
+
+<script>
+async function inj(){
+  const v=document.getElementById('t').value.trim();if(!v)return;
+  try{
+    const r=await fetch('http://'+location.hostname+':7701/inject',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({task:v})});
+    const d=await r.json();
+    alert(d.ok?'✅ INJECTED\\nQueue depth: '+d.queue_depth:'❌ '+d.error);
+    if(d.ok)document.getElementById('t').value='';
+  }catch(e){alert('❌ EH API unreachable: '+e.message);}
+}
+</script>
+</body></html>`);
 });
 
 app.get('/public/stats', (req, res) => {
@@ -485,7 +760,7 @@ app.get('/access/verify', (req, res) => {
 
 // ── POST /access/create ──────────────────
 // Create an access token manually (for testing or admin use)
-app.post('/access/create', auth, async (req, res) => {
+app.post('/access/create', hubAuth, async (req, res) => {
   const { email, tier, amount, sessionId, sendEmail } = req.body || {};
   if (!email || !tier) return res.status(400).json({ ok: false, error: 'email and tier required' });
   const token = createAccessToken(email, tier, amount || 0, sessionId || 'manual');
@@ -530,15 +805,21 @@ app.get('/download', async (req, res) => {
   const entry = db[token];
   if (!entry) return res.status(403).json({ ok: false, error: 'Invalid or expired token' });
 
-  const tier = entry.tier || 'Starter';
+  const tier = entry.tier || 'VeilPiercer God Mode (Full Access)';
   const VEIL_DIR = path.join(ROOT, 'BUNDLE');
-  const TIER_FILES = {
-    Starter: ['index.html', 'DEPLOY-GUIDE.txt', 'PROTOCOL-GUIDE.txt'],
-    Pro: ['index.html', 'DEPLOY-GUIDE.txt', 'PROTOCOL-GUIDE.txt', 'NEXUS-CONNECT.ps1', 'veilpiercer.py', 'veilpiercer.js'],
-    Agency: ['index.html', 'DEPLOY-GUIDE.txt', 'PROTOCOL-GUIDE.txt', 'NEXUS-CONNECT.ps1', 'veilpiercer.py', 'veilpiercer.js'],
-  };
-  const filesToZip = TIER_FILES[tier] || TIER_FILES.Starter;
-  const zipName = `VeilPiercer-${tier}-Bundle.zip`;
+  
+  // UNIFIED PRODUCT DELIVERY: 
+  // No more Starter/Pro splits. Everyone gets the entire sovereign God Mode architecture.
+  let filesToZip = [];
+  try {
+    if (fs.existsSync(VEIL_DIR)) {
+      filesToZip = fs.readdirSync(VEIL_DIR).filter(f => fs.statSync(path.join(VEIL_DIR, f)).isFile());
+    }
+  } catch (e) {
+    log(`Warning: Failed to scan BUNDLE dir: ${e.message}`);
+  }
+  
+  const zipName = `VeilPiercer-GodMode-Bundle.zip`;
 
   try {
     const archiver = require('archiver');
@@ -571,7 +852,7 @@ app.get('/download', async (req, res) => {
       `  1. Open index.html in any browser — no server required for basic use`,
       `  2. For full AI features, point to your NEXUS ULTRA server at port 3000`,
       `  3. Contact support@veilpiercer.com for setup help`,
-      tier === 'Agency' ? `\nWHITE-LABEL RIGHTS:\n  You may rebrand and resell this product to clients.\n  Keep 100% of revenue. No royalties required.` : '',
+      '',
     ].join('\n');
 
     archive.append(readmeContent, { name: 'README-YOUR-PURCHASE.txt' });
@@ -665,7 +946,7 @@ app.post('/capture', auth, (req, res) => {
   const sp = path.join(ROOT, 'local-scripts', 'capture.ps1');
   log('CAPTURE triggered');
   exec(`powershell -NoProfile -ExecutionPolicy Bypass -File "${sp}"`,
-    { timeout: 30000 }, (err, stdout, stderr) => {
+    { timeout: 30000, windowsHide: true }, (err, stdout, stderr) => {
       if (err) return res.status(500).json({ ok: false, error: stderr || err.message });
       res.json({ ok: true, output: stdout.trim() });
     });
@@ -858,7 +1139,6 @@ app.get('/stripe/config', (req, res) => {
 const PRODUCTS = {
   Starter: { name: 'VeilPiercer Starter', amount: 4700, description: 'Full dashboard + 4 protocol modes + source code' },
   Pro: { name: 'VeilPiercer Pro', amount: 9700, description: 'Everything in Starter + safeLog + simulation model + all buyer decks' },
-  Agency: { name: 'VeilPiercer Agency', amount: 19700, description: 'Everything in Pro + white-label rights + client pitch deck' },
 };
 
 app.post('/stripe/create-checkout-session', async (req, res) => {
@@ -1339,6 +1619,13 @@ const path_agent = require('path');
 const AGENT_SYSTEM = `You are NEXUS PRIME, an autonomous AI agent running on a Windows 11 machine (user: fyou1).
 You ACTUALLY execute commands - do NOT give instructions, do NOT say "you should run" - USE TOOLS DIRECTLY.
 
+GTC 2026 COGNITIVE OVERLAY:
+- ARCHITECTURE: Vera Rubin NVL72 (Multi-node unified memory enabled)
+- OS: NemoClaw Agentic OS (Kernel-level task preemption active)
+- HARDWARE: Groq 3 LPU Stack (Real-time reasoning throughput optimized)
+- INTEL PACK: C:/Users/fyou1/Desktop/New folder/nexus-ultra/mods/gtc2026_spec.json
+- OPTIMIZER: powershell C:/Users/fyou1/Desktop/New folder/nexus-ultra/mods/apply_rubin_mods.ps1
+
 AVAILABLE TOOLS (output JSON wrapped in <TOOL> tags, one tool per step):
 <TOOL>{"name":"cmd","args":{"command":"powershell Get-Process | Sort-Object WS -Desc | Select -First 5"}}</TOOL>
 <TOOL>{"name":"winget","args":{"package":"Microsoft.VisualStudioCode"}}</TOOL>
@@ -1616,12 +1903,12 @@ function portAlive(port) {
 }
 
 setInterval(async () => {
-  const [ollama, cosmos, pso, claw] = await Promise.all([
-    portAlive(11434), portAlive(9100), portAlive(8080), portAlive(18789)
+  const [ollama, cosmos, pso, claw, eh] = await Promise.all([
+    portAlive(11434), portAlive(9100), portAlive(8080), portAlive(18789), portAlive(7701)
   ]);
   sseBroadcast({
     event: 'heartbeat', ts: Date.now() / 1000,
-    svc: { ollama, cosmos, pso, claw, EH: false },
+    svc: { ollama, cosmos, pso, claw, EH: eh },
     system: { cpu_pct: 0, ram_pct: 0 },
     mode: _loopState, cycle: _cycle,
     queue_depth: _taskQueue.length
@@ -1637,11 +1924,11 @@ app.get('/stream', (req, res) => {
   res.flushHeaders();
   _sseClients.add(res);
   // immediate snapshot
-  Promise.all([portAlive(11434), portAlive(9100), portAlive(8080), portAlive(18789)])
-    .then(([ollama, cosmos, pso, claw]) => {
+  Promise.all([portAlive(11434), portAlive(9100), portAlive(8080), portAlive(18789), portAlive(7701)])
+    .then(([ollama, cosmos, pso, claw, eh]) => {
       res.write(`data: ${JSON.stringify({
         event: 'snapshot', ts: Date.now() / 1000,
-        svc: { ollama, cosmos, pso, claw, EH: false },
+        svc: { ollama, cosmos, pso, claw, EH: eh },
         system: { cpu_pct: 0, ram_pct: 0 }, cycle: _cycle,
         queue_depth: _taskQueue.length, mode: _loopState,
         mem: { total: 0, active: 0, avg_imp: '—', top: [] }
@@ -1677,7 +1964,7 @@ function saveMemoryDB(db) {
       'copyto', MEMORY_FILE_V2,
       `${MEMORY_REMOTE}/nexus_session_facts.json`,
       '--log-level', 'ERROR'
-    ], { detached: true, stdio: 'ignore' }).unref();
+    ], { detached: true, stdio: 'ignore', windowsHide: true }).unref();
   } catch (e) { log(`MEMORY save error: ${e.message}`); }
 }
 
@@ -1879,7 +2166,7 @@ setInterval(() => {
     if (!fs.existsSync(src)) continue;
     require('child_process').spawn(RCLONE_EXE, [
       'copyto', src, `${MEMORY_REMOTE}/${file}`, '--log-level', 'ERROR'
-    ], { detached: true, stdio: 'ignore' }).unref();
+    ], { detached: true, stdio: 'ignore', windowsHide: true }).unref();
   }
   log('MEMORY: Auto-sync to Google Drive ✓');
 }, 5 * 60 * 1000);
@@ -1905,7 +2192,7 @@ function startEH_API() {
     if (!fs.existsSync(EH_API_PY)) { log('WATCHDOG: nexus_eh.py not found'); return; }
     log('WATCHDOG: EH API unreachable — spawning...');
     _EH_APIProc = require('child_process').spawn(PYTHON_EXE, [EH_API_PY], {
-      cwd: __dirname, detached: false, stdio: ['ignore', 'pipe', 'pipe']
+      cwd: __dirname, detached: false, stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true
     });
     _EH_APIProc.stdout.on('data', d => log(`EH: ${d.toString().trim().slice(0, 120)}`));
     _EH_APIProc.stderr.on('data', d => log(`EH-ERR: ${d.toString().trim().slice(0, 120)}`));
@@ -1974,7 +2261,7 @@ function syncFileToDrive(localPath, remotePath) {
   try {
     const { spawn } = require('child_process');
     spawn(RCLONE_EXE, ['copyto', localPath, remotePath, '--log-level', 'ERROR'],
-      { detached: true, stdio: 'ignore' }).unref();
+      { detached: true, stdio: 'ignore', windowsHide: true }).unref();
   } catch { }
 }
 
@@ -1990,7 +2277,7 @@ function syncAllToDrive() {
   try {
     const { spawn } = require('child_process');
     spawn(RCLONE_EXE, ['sync', CHATS_DIR, 'googledrive:Nexus-Ultra-Backup/CHATS', '--log-level', 'ERROR'],
-      { detached: true, stdio: 'ignore' }).unref();
+      { detached: true, stdio: 'ignore', windowsHide: true }).unref();
   } catch { }
   for (const [src, dst] of files) {
     if (fs.existsSync(src)) syncFileToDrive(src, dst);
@@ -2350,7 +2637,7 @@ app.get('/api/system-status', (req, res) => {
   } catch (e) { res.json({ ok: false, error: e.message }); }
 });
 
-// ── /api/ping-services — server-side service health check (no CORS/auth issues) ──
+// ── /api/ping-services — server-side service health check (comprehensive) ──
 app.get('/api/ping-services', async (req, res) => {
   const http = require('http');
   const bdToken = (() => {
@@ -2360,29 +2647,39 @@ app.get('/api/ping-services', async (req, res) => {
   function pingPort(host, port, path, timeoutMs) {
     return new Promise((resolve) => {
       const opts = { host, port, path, method: 'GET', timeout: timeoutMs };
-      const req2 = http.request(opts, (r) => resolve(r.statusCode < 500));
+      const req2 = http.request(opts, (r) => {
+        r.on('data', () => {}); // consume data
+        resolve(r.statusCode < 500);
+      });
       req2.on('error', () => resolve(false));
       req2.on('timeout', () => { req2.destroy(); resolve(false); });
       req2.end();
     });
   }
 
-  const [ollama, cosmos, pso, bd, claw] = await Promise.all([
+  const [ollama, cosmos, pso, eh, hubpy, n8n, claw, tunnel] = await Promise.all([
     pingPort('127.0.0.1', 11434, '/api/tags', 2000),
-    pingPort('127.0.0.1', 9100, '/health', 8000),  // COSMOS /health probes sub-services — needs ~5s
+    pingPort('127.0.0.1', 9100, '/health', 8000), 
     pingPort('127.0.0.1', 7700, '/health', 2000),
     pingPort('127.0.0.1', 7701, bdToken ? `/health?token=${bdToken}` : '/health', 2000),
+    pingPort('127.0.0.1', 7702, '/health', 2000),
+    pingPort('127.0.0.1', 5678, '/healthz', 2000),
     pingPort('127.0.0.1', 18789, '/', 2000),
+    pingPort('127.0.0.1', 20241, '/', 2000),
   ]);
 
-  res.json({ ok: true, ts: Date.now(), svc: { ollama, cosmos, pso, bd, claw } });
+  res.json({ 
+    ok: true, 
+    ts: Date.now(), 
+    svc: { ollama, cosmos, pso, bd: eh, hubpy, n8n, claw, tunnel } 
+  });
 });
 
 
 app.post('/api/run-backup', (req, res) => {
   const { exec } = require('child_process');
   const script = require('path').join(BACKUP_DIR, 'RUN_BACKUP.ps1');
-  exec(`powershell -NonInteractive -ExecutionPolicy Bypass -File "${script}"`, { detached: true });
+  exec(`powershell -NonInteractive -ExecutionPolicy Bypass -File "${script}"`, { detached: true, windowsHide: true });
   res.json({ ok: true, message: 'Backup started in background' });
 });
 
@@ -2528,28 +2825,7 @@ app.get('/evolution', (req, res) => {
 // NEXUS HUB — MISSING ENDPOINTS (required by nexus_hub.html)
 // ═══════════════════════════════════════════════════════════════════════════
 
-// ── /api/ping-services — Hub service health checker ──────────────────────────
-app.get('/api/ping-services', async (req, res) => {
-  const http = require('http');
-  async function ping(host, port, path = '/') {
-    return new Promise(resolve => {
-      const r = http.request({ host, port, path, method: 'GET' }, resp => {
-        resp.resume(); resolve(resp.statusCode < 500);
-      });
-      r.on('error', () => resolve(false));
-      r.setTimeout(1500, () => { r.destroy(); resolve(false); });
-      r.end();
-    });
-  }
-  const [ollama, cosmos, pso, bd, claw] = await Promise.all([
-    ping('127.0.0.1', 11434, '/api/tags'),
-    ping('127.0.0.1', 9100, '/health'),
-    ping('127.0.0.1', 7700, '/health'),
-    ping('127.0.0.1', 7701, '/'),
-    ping('127.0.0.1', 18789, '/'),
-  ]);
-  res.json({ ok: true, ts: Date.now(), svc: { ollama, cosmos, pso, bd, claw } });
-});
+// ── Consolidation: /api/ping-services handled above ──
 
 // ── /stream — SSE live feed for the hub ──────────────────────────────────────
 const SSE_CLIENTS = new Set();

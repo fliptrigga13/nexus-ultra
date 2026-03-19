@@ -1,7 +1,7 @@
 # VEILPIERCER — NEXUS CONNECTION KIT
 # Use this to verify your connection to the NEXUS ULTRA control plane.
 
-$API = "https://aggregatory-unrumored-elidia.ngrok-free.dev"
+$API = "http://127.0.0.1:3000"
 Write-Host "◈ VEILPIERCER: Verifying connection to NEXUS..." -ForegroundColor Cyan
 
 try {

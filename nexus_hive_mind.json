@@ -1,0 +1,538 @@
+{
+  "dominant_strategy": "EXPLOIT",
+  "quorum_votes": {
+    "Route via RESEARCHER for high-quality outputs": {
+      "PLANNER": 0.260948648907483
+    },
+    "Route via SUPERVISOR for high-quality outputs": {
+      "RESEARCHER": 0.6267944,
+      "DEVELOPER": 0.2581811325993666,
+      "REWARD": 0.25771486761256995
+    },
+    "Route via DEVELOPER for high-quality outputs": {
+      "RESEARCHER": 0.2668086818816752,
+      "SUPERVISOR": 0.7657898340951982,
+      "PLANNER": 1.0
+    },
+    "Route via REWARD for high-quality outputs": {
+      "VALIDATOR": 0.256182957580243
+    },
+    "Route via PLANNER for high-quality outputs": {
+      "SUPERVISOR": 0.27083092109727713,
+      "PLANNER": 1.0
+    },
+    "Route via VALIDATOR for high-quality outputs": {
+      "DEVELOPER": 0.2667470478473098,
+      "PLANNER": 1.0
+    }
+  },
+  "collective_rules": [],
+  "total_ticks": 8540,
+  "colony_fitness": 0.5002,
+  "active_path": [
+    "SUPERVISOR",
+    "PLANNER"
+  ],
+  "signals": [
+    {
+      "from": "RESEARCHER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T18:59:53.765294"
+    },
+    {
+      "from": "RESEARCHER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T19:00:09.136006"
+    },
+    {
+      "from": "RESEARCHER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T19:00:24.486672"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.95)",
+      "ts": "2026-03-17T19:00:54.659915"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.95)",
+      "ts": "2026-03-17T19:01:09.767345"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.95)",
+      "ts": "2026-03-17T19:03:40.491794"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.95)",
+      "ts": "2026-03-17T19:03:55.639744"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.95)",
+      "ts": "2026-03-17T19:04:10.767295"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.95)",
+      "ts": "2026-03-17T19:04:25.898147"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.95)",
+      "ts": "2026-03-17T19:06:56.779234"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T19:08:57.477923"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T19:09:12.583686"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T19:10:58.104641"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T19:11:13.230144"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T19:11:28.334885"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T19:11:43.427732"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T19:13:13.896469"
+    },
+    {
+      "from": "RESEARCHER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T19:14:44.337454"
+    },
+    {
+      "from": "RESEARCHER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T19:16:44.908297"
+    },
+    {
+      "from": "RESEARCHER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T19:17:00.019681"
+    },
+    {
+      "from": "RESEARCHER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T19:17:15.155310"
+    },
+    {
+      "from": "RESEARCHER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T19:17:30.290543"
+    },
+    {
+      "from": "RESEARCHER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T19:17:45.399904"
+    },
+    {
+      "from": "RESEARCHER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T19:18:00.548077"
+    },
+    {
+      "from": "RESEARCHER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T19:19:48.166943"
+    },
+    {
+      "from": "RESEARCHER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T19:20:03.289171"
+    },
+    {
+      "from": "RESEARCHER",
+      "msg": "MVP signal deposited (score=0.75)",
+      "ts": "2026-03-17T19:23:04.229751"
+    },
+    {
+      "from": "RESEARCHER",
+      "msg": "MVP signal deposited (score=0.75)",
+      "ts": "2026-03-17T19:23:19.400135"
+    },
+    {
+      "from": "RESEARCHER",
+      "msg": "MVP signal deposited (score=0.75)",
+      "ts": "2026-03-17T19:25:04.805649"
+    },
+    {
+      "from": "RESEARCHER",
+      "msg": "MVP signal deposited (score=0.75)",
+      "ts": "2026-03-17T19:25:19.937493"
+    },
+    {
+      "from": "RESEARCHER",
+      "msg": "MVP signal deposited (score=0.75)",
+      "ts": "2026-03-17T19:25:35.558605"
+    },
+    {
+      "from": "RESEARCHER",
+      "msg": "MVP signal deposited (score=0.75)",
+      "ts": "2026-03-17T19:25:50.881078"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T19:26:06.024565"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T19:26:21.157747"
+    },
+    {
+      "from": "RESEARCHER",
+      "msg": "MVP signal deposited (score=0.75)",
+      "ts": "2026-03-17T19:27:51.654631"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T19:28:21.933833"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.88)",
+      "ts": "2026-03-17T19:28:37.109478"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.88)",
+      "ts": "2026-03-17T19:28:52.299322"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T19:29:52.572285"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T19:30:07.715944"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.88)",
+      "ts": "2026-03-17T19:31:23.199916"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.88)",
+      "ts": "2026-03-17T19:31:38.338618"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.88)",
+      "ts": "2026-03-17T19:31:53.444452"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.65)",
+      "ts": "2026-03-17T19:34:54.325024"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.65)",
+      "ts": "2026-03-17T19:35:09.430163"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.65)",
+      "ts": "2026-03-17T19:36:54.959632"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.65)",
+      "ts": "2026-03-17T19:37:10.261097"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.65)",
+      "ts": "2026-03-17T19:37:40.477184"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.65)",
+      "ts": "2026-03-17T19:37:55.690413"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.65)",
+      "ts": "2026-03-17T19:38:10.854929"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.75)",
+      "ts": "2026-03-17T19:38:25.970483"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.75)",
+      "ts": "2026-03-17T19:38:41.076075"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.75)",
+      "ts": "2026-03-17T19:40:41.666665"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.75)",
+      "ts": "2026-03-17T19:40:56.787307"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.75)",
+      "ts": "2026-03-17T19:41:11.876349"
+    },
+    {
+      "from": "RESEARCHER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T19:41:26.978142"
+    },
+    {
+      "from": "RESEARCHER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T19:41:42.085631"
+    },
+    {
+      "from": "RESEARCHER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T19:43:12.614518"
+    },
+    {
+      "from": "RESEARCHER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T19:43:27.740094"
+    },
+    {
+      "from": "RESEARCHER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T19:43:42.866582"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.65)",
+      "ts": "2026-03-17T19:43:57.972495"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.65)",
+      "ts": "2026-03-17T19:44:13.094430"
+    },
+    {
+      "from": "RESEARCHER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T19:45:13.392006"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.65)",
+      "ts": "2026-03-17T19:45:43.642411"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.65)",
+      "ts": "2026-03-17T19:47:14.133915"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.65)",
+      "ts": "2026-03-17T19:47:29.226969"
+    },
+    {
+      "from": "RESEARCHER",
+      "msg": "MVP signal deposited (score=0.95)",
+      "ts": "2026-03-17T19:57:02.164318"
+    },
+    {
+      "from": "RESEARCHER",
+      "msg": "MVP signal deposited (score=0.95)",
+      "ts": "2026-03-17T19:57:17.301287"
+    },
+    {
+      "from": "RESEARCHER",
+      "msg": "MVP signal deposited (score=0.95)",
+      "ts": "2026-03-17T19:57:32.457245"
+    },
+    {
+      "from": "RESEARCHER",
+      "msg": "MVP signal deposited (score=0.95)",
+      "ts": "2026-03-17T19:57:47.593188"
+    },
+    {
+      "from": "SUPERVISOR",
+      "msg": "MVP signal deposited (score=0.95)",
+      "ts": "2026-03-17T19:58:02.714440"
+    },
+    {
+      "from": "SUPERVISOR",
+      "msg": "MVP signal deposited (score=0.95)",
+      "ts": "2026-03-17T19:58:17.917432"
+    },
+    {
+      "from": "SUPERVISOR",
+      "msg": "MVP signal deposited (score=0.95)",
+      "ts": "2026-03-17T19:59:35.497413"
+    },
+    {
+      "from": "SUPERVISOR",
+      "msg": "MVP signal deposited (score=0.95)",
+      "ts": "2026-03-17T19:59:51.251824"
+    },
+    {
+      "from": "SUPERVISOR",
+      "msg": "MVP signal deposited (score=0.95)",
+      "ts": "2026-03-17T20:00:06.959337"
+    },
+    {
+      "from": "SUPERVISOR",
+      "msg": "MVP signal deposited (score=0.95)",
+      "ts": "2026-03-17T20:00:22.214673"
+    },
+    {
+      "from": "SUPERVISOR",
+      "msg": "MVP signal deposited (score=0.95)",
+      "ts": "2026-03-17T20:00:37.940498"
+    },
+    {
+      "from": "SUPERVISOR",
+      "msg": "MVP signal deposited (score=0.95)",
+      "ts": "2026-03-17T20:00:54.429457"
+    },
+    {
+      "from": "SUPERVISOR",
+      "msg": "MVP signal deposited (score=0.95)",
+      "ts": "2026-03-17T20:01:12.523150"
+    },
+    {
+      "from": "SUPERVISOR",
+      "msg": "MVP signal deposited (score=0.95)",
+      "ts": "2026-03-17T20:01:30.293099"
+    },
+    {
+      "from": "SUPERVISOR",
+      "msg": "MVP signal deposited (score=0.95)",
+      "ts": "2026-03-17T20:01:45.434455"
+    },
+    {
+      "from": "SUPERVISOR",
+      "msg": "MVP signal deposited (score=0.95)",
+      "ts": "2026-03-17T20:02:00.589430"
+    },
+    {
+      "from": "SUPERVISOR",
+      "msg": "MVP signal deposited (score=0.95)",
+      "ts": "2026-03-17T20:02:15.794054"
+    },
+    {
+      "from": "SUPERVISOR",
+      "msg": "MVP signal deposited (score=0.95)",
+      "ts": "2026-03-17T20:02:30.936606"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T20:02:46.230640"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T20:03:01.714616"
+    },
+    {
+      "from": "SUPERVISOR",
+      "msg": "MVP signal deposited (score=0.95)",
+      "ts": "2026-03-17T20:05:20.576022"
+    },
+    {
+      "from": "SUPERVISOR",
+      "msg": "MVP signal deposited (score=0.95)",
+      "ts": "2026-03-17T20:05:35.826279"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T20:07:06.652991"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T20:07:21.787789"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T20:07:36.946663"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T20:07:52.116642"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T20:08:07.266574"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T20:08:22.433645"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T20:08:37.579066"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T20:08:52.686923"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T20:09:07.845204"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T20:09:22.973153"
+    },
+    {
+      "from": "DEVELOPER",
+      "msg": "MVP signal deposited (score=0.85)",
+      "ts": "2026-03-17T20:09:38.104179"
+    },
+    {
+      "from": "RESEARCHER",
+      "msg": "MVP signal deposited (score=0.75)",
+      "ts": "2026-03-17T20:09:53.228318"
+    }
+  ]
+}

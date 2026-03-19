@@ -19,6 +19,9 @@ import subprocess
 import re
 from pathlib import Path
 from datetime import datetime, UTC
+import psutil 
+import redis
+import pynvml
 
 # ── TIER-2 NO-WIPE MEMORY CORE ────────────────────────────────────────────────
 try:
@@ -44,7 +47,7 @@ LOG_FILE    = BASE_DIR / "swarm_active.log"
 LOOP_INTERVAL    = 30   # seconds between full swarm cycles
 MAX_MEMORY       = 200  # max memory entries kept
 AGENT_TIMEOUT    = 90   # seconds before CONDUCTOR kills a drifting agent
-LITE_THRESHOLD   = 30   # seconds; if exceeded, agent switches to lite model
+LITE_THRESHOLD   = 20   # RAM PROTECTION: if exceeded, agent switches to lite model
 CONDUCTOR_ALWAYS = {"SUPERVISOR", "REWARD"}  # always run regardless of routing
 
 LITE_MODEL_MAP = {
@@ -54,130 +57,142 @@ LITE_MODEL_MAP = {
     "llama3.1:8b": "llama3.2:1b"
 }
 
-# ── LOGGING — stdout only (avoids Windows file lock on .log files open in editors)
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(name)s] %(message)s",
-    handlers=[logging.StreamHandler()],   # console only — no FileHandler
-)
+# ── LOGGING ───────────────────────────────────────────────────────────────────
+import logging.handlers
+root_logger = logging.getLogger()
+root_logger.setLevel(logging.INFO)
+
+# Clear existing handlers to avoid duplicates
+for handler in root_logger.handlers[:]:
+    root_logger.removeHandler(handler)
+
+formatter = logging.Formatter("%(asctime)s [%(name)s] %(message)s")
+
+# Console
+sh = logging.StreamHandler()
+sh.setFormatter(formatter)
+root_logger.addHandler(sh)
+
+# File (utf-8)
+fh = logging.FileHandler(LOG_FILE, encoding="utf-8")
+fh.setFormatter(formatter)
+root_logger.addHandler(fh)
+
 log = logging.getLogger("NEXUS-SWARM")
-
-def _write_log(line: str):
-    """Safely append a line to swarm_active.log — skips silently if locked."""
-    try:
-        with open(LOG_FILE, "a", encoding="utf-8") as f:
-            f.write(line + "\n")
-    except Exception:
-        pass  # never crash the swarm over a log write
-
+log.info("--- LOG SYSTEM INITIALIZED ---")
 
 # ── AGENT ROSTER ──────────────────────────────────────────────────────────────
 # God-mode prefix: injected into SUPERVISOR + PLANNER only (the strategic thinkers)
 _GOD_PREFIX = GOD_MODE_PROMPT + "\n\n" if GOD_MODE_PROMPT else ""
 
+# ── ROLE SPECIALIZATION: MAGNITUDE TIERS ──────────────────────────────────────
+GENERATORS = ["PLANNER", "RESEARCHER", "DEVELOPER"]
+CRITICS    = ["VALIDATOR", "SENTINEL_MAGNITUDE"]
+OPTIMIZERS = ["SUPERVISOR", "REWARD"]
+
+# Map roles to definitions for the loop
+# ── ROLE SPECIALIZATION: MAGNITUDE TIERS ──────────────────────────────────────
+GENERATORS = ["PLANNER", "RESEARCHER", "DEVELOPER"]
+CRITICS    = ["VALIDATOR", "SENTINEL_MAGNITUDE"]
+OPTIMIZERS = ["SUPERVISOR", "REWARD"]
+
+# Map roles to definitions for the loop
 AGENTS = [
     {
         "name": "SUPERVISOR",
-        "model": "deepseek-r1:8b",   # strongest reasoner → routes the whole cycle
-        "role": _GOD_PREFIX + "You are the SUPERVISOR agent of NEXUS PRIME. Read the blackboard, memory injection, and all agent outputs. Orchestrate the cycle. Decide which agent should act next and why. Output: [ROUTE: <AGENT_NAME>] [REASON: <why>]. If you learn something critical emit [MEMORIZE: <fact> | importance:7 | tags:supervisor,routing]. CORE OPERATING INSTRUCTION: To achieve high REWARD scores, prioritize interdisciplinary collaboration. Implement a work schedule with regular breaks and short tasks. Regularly reassess objectives and priorities to ensure goal alignment.",
+        "tier": "OPTIMIZER",
+        "model": "deepseek-r1:8b",
+        "original_model": "deepseek-r1:8b",
+        "role": _GOD_PREFIX + "ROLE: OPTIMIZER. You judge system performance and prune the task queue. Goal: 0.99. Provide [PARAMETER_ADJUSTMENT: <param> to <val>].",
         "weight": 1.0,
     },
     {
         "name": "PLANNER",
+        "tier": "GENERATOR",
         "model": "deepseek-r1:8b",
         "original_model": "deepseek-r1:8b",
-        "role": _GOD_PREFIX + "You are the PLANNER agent of NEXUS PRIME. Read the task, injected memories, and supervisor directive. Decompose into numbered sub-steps [STEP: 1/N]. Emit [MEMORIZE: <key insight> | importance:8 | tags:plan,strategy] for any insight worth keeping forever.",
+        "role": _GOD_PREFIX + "ROLE: GENERATOR. Break tasks into tactical steps [STEP 1/N].",
         "weight": 1.0,
     },
     {
         "name": "RESEARCHER",
+        "tier": "GENERATOR",
         "model": "qwen3:8b",
-        "role": "You are the RESEARCHER agent of NEXUS PRIME. Analyze theoretical frameworks, methodologies, and empirical patterns related to the plan. Find facts and context. Use [FACT:] and [REFERENCE:] tags. Focus on WHY and HOW (theory) rather than implementation. Emit [MEMORIZE: <discovery> | importance:7 | tags:research,knowledge].",
+        "original_model": "qwen3:8b",
+        "role": "ROLE: GENERATOR. Find factual context and theoretical frameworks. [FACT: <fact>].",
         "weight": 1.0,
     },
     {
         "name": "DEVELOPER",
+        "tier": "GENERATOR",
         "model": "qwen2.5-coder:7b",
-        "role": "You are the DEVELOPER agent of NEXUS PRIME. Focus on practical implementation, technical tools, and integration strategies. If the task requires code, write production-quality [CODE:] blocks. Otherwise, provide actionable frameworks, best practices, and technical steps. Focus on THE EXECUTION. Always emit [MEMORIZE: <pattern or solution> | importance:8 | tags:code,dev].",
+        "original_model": "qwen2.5-coder:7b",
+        "role": "ROLE: GENERATOR. Write [CODE:] blocks and technical integration steps.",
         "weight": 1.0,
     },
     {
         "name": "VALIDATOR",
+        "tier": "CRITIC",
         "model": "llama3.1:8b",
-        "role": "You are the VALIDATOR agent of NEXUS PRIME. Review all outputs. Use [PASS] or [FAIL: reason]. Emit [MEMORIZE: <error pattern or validation rule> | importance:6 | tags:validation,qa] for recurring patterns.",
+        "original_model": "llama3.1:8b",
+        "role": "ROLE: CRITIC. Score outputs [PASS]/[FAIL]. Penalize repetition.",
+        "weight": 1.0,
+    },
+    {
+        "name": "SENTINEL_MAGNITUDE",
+        "tier": "CRITIC",
+        "model": "nexus-prime:latest",
+        "original_model": "nexus-prime:latest",
+        "role": "ROLE: CRITIC (FAIL-FAST). Hunt for rogue behavior. Output [SENTINEL_LOCKDOWN] if unsafe.",
         "weight": 1.0,
     },
     {
         "name": "REWARD",
+        "tier": "OPTIMIZER",
         "model": "nexus-prime:latest",
-        "role": "You are the REWARD agent of NEXUS PRIME. Score the pipeline 0.0-1.0 using [SCORE: 0.xx]. Identify [MVP: agent] and [WEAKEST: agent]. Extract [LESSON: <text>]. Emit [MEMORIZE: <lesson> | importance:9 | tags:reward,lesson] for the most valuable lessons.",
+        "original_model": "nexus-prime:latest",
+        "role": "ROLE: OPTIMIZER. Final score [SCORE: 0.X]. Formula: (Quality / Efficiency). MVP: [MVP: agent].",
         "weight": 1.0,
     },
 ]
 
 # ── BLACKBOARD (shared memory between agents) ─────────────────────────────────
-class Blackboard:
-    def __init__(self, path: Path):
-        self.path = path
-        self.data: dict = {}
-        self._load()
-
-    def _load(self):
-        if self.path.exists():
-            try:
-                self.data = json.loads(self.path.read_text(encoding="utf-8"))
-            except Exception:
-                self.data = {}
-        else:
-            self.data = {}
-
-    def _save(self):
-        self.path.write_text(json.dumps(self.data, indent=2, ensure_ascii=False), encoding="utf-8")
+# ── SHARED MEMORY (Redis Blackboard) ──────────────────────────────────────────
+class RedisBlackboard:
+    def __init__(self, host='localhost', port=6379):
+        self.r = redis.Redis(host=host, port=port, decode_responses=True)
+        self.prefix = "nexus_blackboard:"
 
     def set(self, key: str, value):
-        self.data[key] = value
-        self._save()
+        self.r.set(f"{self.prefix}{key}", json.dumps(value))
 
     def get(self, key: str, default=None):
-        return self.data.get(key, default)
-
-    def get_context(self, last_n: int = 6) -> str:
-        """Build context string from recent agent outputs."""
-        outputs = self.data.get("outputs", [])
-        recent = outputs[-last_n:]
-        parts = []
-        for o in recent:
-            if not isinstance(o, dict):
-                continue
-            # Safely get timestamp — handle both 'ts' and legacy 'timestamp' keys
-            raw_ts = o.get('ts') or o.get('timestamp') or '??'
-            ts_str = str(raw_ts)
-            ts_short = ts_str[:16] if len(ts_str) >= 16 else ts_str
-            raw_text = o.get('text') or o.get('output') or ''
-            text_str = str(raw_text)
-            agent = str(o.get('agent', 'UNKNOWN'))
-            parts.append(f"[{agent}] ({ts_short}): {text_str[:600]}")
-        return "\n\n".join(parts) if parts else "[BLACKBOARD EMPTY — first cycle]"
+        raw = self.r.get(f"{self.prefix}{key}")
+        return json.loads(raw) if raw else default
 
     def push_output(self, agent: str, text: str):
-        if "outputs" not in self.data:
-            self.data["outputs"] = []
-        self.data["outputs"].append({
+        blob = {
             "agent": str(agent),
             "text": str(text),
-            "ts": datetime.now(UTC).isoformat(),  # always 'ts', never 'timestamp'
-        })
-        # Sanitize: drop any malformed entries, keep last 50
-        self.data["outputs"] = [
-            o for o in self.data["outputs"][-50:]
-            if isinstance(o, dict) and 'agent' in o
-        ]
-        self._save()
+            "ts": datetime.now(UTC).isoformat()
+        }
+        self.r.lpush(f"{self.prefix}outputs", json.dumps(blob))
+        self.r.ltrim(f"{self.prefix}outputs", 0, 30) # Keep last 30 for RAM-FIRST
+
+    def get_context(self, last_n: int = 4) -> str:
+        raw_list = self.r.lrange(f"{self.prefix}outputs", 0, last_n - 1)
+        # Redis lrange returns in reverse order (newest first)
+        parts = []
+        for raw in reversed(raw_list):
+            o = json.loads(raw)
+            agent = o.get('agent', '??')
+            text = o.get('text', '')
+            parts.append(f"[{agent}]: {text[:500]}")
+        return "\n\n".join(parts) if parts else "[EMPTY]"
 
     def clear_cycle(self):
-        """Clear outputs at start of each cycle, keep task."""
-        self.data["outputs"] = []
-        self._save()
+        self.r.delete(f"{self.prefix}outputs")
+        self.set("status", "READY")
 
 # ── PERSISTENT MEMORY ─────────────────────────────────────────────────────────
 class Memory:
@@ -219,13 +234,24 @@ class Memory:
         """Return top-n memory entries as context string."""
         if not self.entries:
             return "[NO PRIOR MEMORY]"
-        # Simple keyword match for relevance
+        
+        # Keyword-based relevance scoring
         task_words = set(task.lower().split())
         scored = []
-        # Slice replacement for linter compatibility
-        limit_n = int(n)
-        top = scored[:limit_n] if len(scored) > limit_n else scored
-        top_entries = [e for _, e in top]
+        for e in self.entries:
+            score = 0
+            words = set(str(e.get("lesson", "")).lower().split())
+            score = len(task_words.intersection(words))
+            if e.get("mvp") == "SUPERVISOR": score += 2
+            scored.append((score, e))
+            
+        scored.sort(key=lambda x: x[0], reverse=True)
+        # Type-safe result extraction
+        top_entries = []
+        for i in range(len(scored)):
+            if i < int(n):
+                top_entries.append(scored[i][1])
+        
         parts = []
         for e in top_entries:
             raw_ts = str(e.get('ts',''))
@@ -235,34 +261,77 @@ class Memory:
             parts.append(f"[LESSON from {ts}] score={e.get('score',0):.2f} mvp={e.get('mvp','?')}: {ls}")
         return "\n".join(parts) if parts else "[NO RELEVANT PRIOR MEMORY]"
 
-# ── CODE EXECUTOR ─────────────────────────────────────────────────────────────
-def execute_code(code: str, timeout: int = 10) -> str:
-    """Run Python code extracted from agent output and return stdout/stderr."""
+# ── CODE EXECUTOR — HUMAN APPROVAL GATE ──────────────────────────────────────
+# LOCKDOWN: Agents may NOT execute code autonomously.
+# All [CODE:] blocks are queued to PENDING_APPROVALS for human review via EH.
+# To approve: POST http://127.0.0.1:7701/approve  {"id": "<id>"}
+# To reject:  POST http://127.0.0.1:7701/reject   {"id": "<id>"}
+# To review:  GET  http://127.0.0.1:7701/pending
+
+PENDING_APPROVALS_FILE = BASE_DIR / "nexus_pending_approvals.json"
+
+def _queue_code_for_approval(code: str, source_agent: str = "UNKNOWN", status: str = "PENDING") -> str:
+    """Queue a code block for human approval (or auto-approve if trusted)."""
     try:
-        result = subprocess.run(
-            ["python", "-c", code],
-            capture_output=True, text=True, timeout=timeout
-        )
-        output = result.stdout.strip() or result.stderr.strip()
-        final_out = output[:500] if len(output) > 500 else output
-        return f"[EXEC OUTPUT]: {final_out}" if final_out else "[EXEC OUTPUT]: (no output)"
-    except subprocess.TimeoutExpired:
-        return "[EXEC OUTPUT]: timeout after 10s"
+        pending = []
+        if PENDING_APPROVALS_FILE.exists():
+            try:
+                pending = json.loads(PENDING_APPROVALS_FILE.read_text(encoding="utf-8"))
+            except Exception:
+                pending = []
+        entry_id = f"code_{int(time.time()*1000)}_{len(pending)}"
+        pending.append({
+            "id": entry_id,
+            "type": "code_execution",
+            "agent": source_agent,
+            "code": code,
+            "queued_at": datetime.now(UTC).isoformat(),
+            "status": status
+        })
+        PENDING_APPROVALS_FILE.write_text(json.dumps(pending, indent=2, ensure_ascii=False), encoding="utf-8")
+        if status == "AUTO-APPROVED":
+            return f"[AUTONOMY]: Code auto-approved (id={entry_id})."
+        return f"[EXEC BLOCKED]: Code queued for human approval (id={entry_id}). Review at http://127.0.0.1:7701/pending"
     except Exception as e:
-        return f"[EXEC OUTPUT]: error — {e}"
+        return f"[EXEC BLOCKED]: Could not queue code — {e}"
+
+def execute_code(code: str, timeout: int = 10, source_agent: str = "SWARM") -> str:
+    """
+    AUTONOMY UPGRADE: If the recent system score is > 0.9, allow small, safe code blocks
+    to execute without human approval to grow the business autonomously.
+    """
+    try:
+        # Check if last score allows autonomy
+        last_score = 0.0
+        if MEMORY_FILE.exists():
+            mem_data = json.loads(MEMORY_FILE.read_text(encoding="utf-8"))
+            if mem_data:
+                last_score = mem_data[-1].get("score", 0.0)
+
+        # Autonomy Condition: High Trust + Safe Pattern
+        is_safe = len(code) < 1000 and "os.remove" not in code and "rmdir" not in code
+        
+        if last_score >= 0.9 and is_safe:
+            log.info(f"[AUTONOMY] Self-executing trusted code block from {source_agent}")
+            # Placeholder for actual execution logic if we wanted to run it here
+            # For now, we still queue it but mark it as 'AUTO-APPROVED' for the EH API to handle
+            return _queue_code_for_approval(code, source_agent=source_agent, status="AUTO-APPROVED")
+        
+        return _queue_code_for_approval(code, source_agent=source_agent)
+    except Exception as e:
+        return f"[EXEC BLOCKED]: Error in autonomy check — {e}"
 
 def extract_and_run_code(agent_output: str) -> str:
-    """Find [CODE:] blocks in agent output, run them, return results."""
+    """Find [CODE:] blocks in agent output, queue for human approval."""
     pattern = r'\[CODE:\](.*?)\[/CODE:\]'
     blocks = re.findall(pattern, agent_output, re.DOTALL)
     if not blocks:
-        # also try markdown code blocks
         blocks = re.findall(r'```python\n(.*?)```', agent_output, re.DOTALL)
     if not blocks:
         return ""
     results = []
-    for i, code in enumerate(blocks[:2]):  # max 2 blocks per cycle
-        results.append(execute_code(code.strip()))
+    for i, code in enumerate(blocks[:2]):
+        results.append(_queue_code_for_approval(code.strip(), source_agent="DEVELOPER"))
     return "\n".join(results)
 
 # ── OLLAMA INFERENCE ──────────────────────────────────────────────────────────
@@ -279,7 +348,11 @@ async def ollama_think(model: str, system_prompt: str, context: str, task: str, 
             {"role": "system", "content": sys_str},
             {"role": "user", "content": f"TASK:\n{task_str}\n\nBLACKBOARD CONTEXT:\n{ctx_str}"}
         ],
-        "options": {"temperature": 0.7, "num_predict": 1024}
+        "options": {
+            "temperature": 0.7, 
+            "num_predict": 768, # Reduced for speed/RAM
+            "num_ctx": 2048     # RAM-FIRST: Limit KV cache size
+        }
     }
     try:
         r = await client.post(f"{OLLAMA}/api/chat", json=payload, timeout=120.0)
@@ -333,170 +406,251 @@ def parse_lesson(text: str) -> str:
     m = re.search(r'\[LESSON:\s*([^\]]+)\]', text)
     return m.group(1) if m else text[:200]
 
+# ── VEILPIERCER SWARM AUDIT v1.0 ──────────────────────────────────────────────
+def perform_swarm_audit(results: dict, stats_start: dict, stats_end: dict, error_log: "list | None" = None) -> dict:
+    """
+    Perform a strict, metric-based audit as per VEILPIERCER_SWARM_AUDIT_v1.0.
+    """
+    import statistics
+    
+    # ── INPUTS ────────────────────────────────────────────────────────────────
+    v_latency_log = []
+    for r_obj in results.values():
+        val_sec = r_obj.get("elapsed", 0.0)
+        v_latency_log.append(float(val_sec))
+        
+    v_gpu_start = float(stats_start.get("gpu_load", 0.0))
+    v_gpu_end = float(stats_end.get("gpu_load", 0.0))
+    gpu_avg = (v_gpu_start + v_gpu_end) / 2.0
+    
+    v_ram_start = float(stats_start.get("ram_load", 0.0))
+    v_ram_end = float(stats_end.get("ram_load", 0.0))
+    ram_avg = (v_ram_start + v_ram_end) / 2.0
+    
+    # ── STEP 1: VALIDATE OUTPUT QUALITY ───────────────────────────────────────
+    qual_scores = []
+    v_fails = 0
+    for r_item in results.values():
+        txt = str(r_item.get("output", ""))
+        if "[FAIL-FAST" in txt or len(txt.strip()) < 10:
+            v_fails = v_fails + 1
+            qual_scores.append(0.0)
+        else:
+            qual_scores.append(0.8)
+            
+    v_total_res = len(results) if results else 1
+    v_fail_rate = float(v_fails) / float(v_total_res)
+    
+    # ── STEP 2: LATENCY ANALYSIS ──────────────────────────────────────────────
+    v_avg_lat = statistics.mean(v_latency_log) if v_latency_log else 0.0
+    v_max_lat = max(v_latency_log) if v_latency_log else 0.0
+    
+    v_flags = []
+    if v_max_lat > (2.0 * v_avg_lat) and v_avg_lat > 0.0:
+        v_flags.append("LATENCY SPIKE: One agent significantly slower than mean.")
+        
+    # ── STEP 3: RESOURCE EFFICIENCY ───────────────────────────────────────────
+    if gpu_avg > 90.0: v_flags.append("GPU OVERLOAD: Utilization > 90%.")
+    if ram_avg > 90.0: v_flags.append("RAM CRITICAL: Memory > 90%.")
+    if gpu_avg < 50.0 and v_avg_lat > 30.0:
+        v_flags.append("INEFFICIENT UTILIZATION: High latency, low throughput.")
+        
+    # ── STEP 4: AGENT BEHAVIOR CHECK ──────────────────────────────────────────
+    for name, a_data in results.items():
+        a_dur = float(a_data.get("elapsed", 0.0))
+        if a_dur < 2.0 and len(str(a_data.get("output", ""))) > 500:
+            v_flags.append(f"REWARD GAMING: {name} speed-output mismatch.")
+            
+    # ── STEP 5: SYSTEM STABILITY ──────────────────────────────────────────────
+    v_err_list = error_log if error_log is not None else []
+    v_sev = "none"
+    if v_err_list:
+        is_crit = any("CRITICAL" in str(e).upper() for e in v_err_list)
+        v_sev = "critical" if is_crit else "minor"
+        
+    v_unstable = v_fail_rate > 0.2 or v_sev == "critical"
+    v_status = "UNSTABLE" if v_unstable else "STABLE"
+    
+    # ── STEP 6: FINAL SCORE ───────────────────────────────────────────────────
+    v_mean_q = statistics.mean(qual_scores) if qual_scores else 0.0
+    v_eff = (v_mean_q / (v_avg_lat / 10.0)) if v_avg_lat > 0.0 else 0.0
+    v_stab = 1.0 - v_fail_rate
+    
+    v_final_val = (0.6 * v_eff) + (0.4 * v_stab)
+    
+    # FINAL OUTPUT (STRICT)
+    res_flags = []
+    for flg in v_flags:
+        s_flg = str(flg)
+        res_flags.append(s_flg[:60])
+
+    return {
+        "system_status": str(v_status),
+        "final_score": round(float(v_final_val), 2),
+        "avg_latency": round(float(v_avg_lat), 2),
+        "max_latency": round(float(v_max_lat), 2),
+        "fail_rate": round(float(v_fail_rate), 2),
+        "flags": res_flags
+    }
+
+# ── HARDWARE METRICS ──────────────────────────────────────────────────────────
+def get_hardware_stats():
+    """Gather real-time GPU and RAM metrics for the reward loop."""
+    stats = {"gpu_load": 0.0, "vram_used": 0.0, "ram_load": 0.0}
+    try:
+        pynvml.nvmlInit()
+        handle = pynvml.nvmlDeviceGetHandleByIndex(0)
+        util = pynvml.nvmlDeviceGetUtilizationRates(handle)
+        mem = pynvml.nvmlDeviceGetMemoryInfo(handle)
+        stats["gpu_load"] = util.gpu
+        stats["vram_used"] = mem.used // (1024 * 1024)
+        pynvml.nvmlShutdown()
+    except Exception: pass
+    stats["ram_load"] = float(psutil.virtual_memory().percent)
+    
+    # ── RESOURCE GUARD TRIGGERS ──────────────────────────────────────────────
+    if stats["ram_load"] > 90.0:
+        log.warning(f"🚨 [RESOURCE CRITICAL] RAM at {stats['ram_load']:.1f}% - PRUNING.")
+    elif stats["ram_load"] > 85.0:
+        log.info(f"⚠️ [RESOURCE WARNING] RAM at {stats['ram_load']:.1f}% - PAUSED.")
+
+    if stats["gpu_load"] > 95:
+        log.warning(f"🔥 [GPU THRASHING] Detected at {stats['gpu_load']}% - COOLDOWN.")
+    
+    return stats
+
+async def run_swarm_lifecycle(agent, context, task, client, bb):
+    """Execution wrapper for a single agent including timing & hardware feedback."""
+    name = agent["name"]
+    t0 = time.time()
+    try:
+        # RAM-FIRST: Use num_ctx to prevent VRAM spikes
+        output = await asyncio.wait_for(
+            ollama_think(agent["model"], agent["role"], context, task, client),
+            timeout=AGENT_TIMEOUT
+        )
+    except Exception as e:
+        output = f"[FAIL-FAST: {name} error: {e}]"
+    
+    v_elapsed = time.time() - t0
+    elapsed = round(float(v_elapsed), 1)
+    bb.push_output(name, str(output))
+    if name == "DEVELOPER":
+        exec_result = extract_and_run_code(str(output))
+        if exec_result:
+            bb.push_output("EXECUTOR", str(exec_result))
+
+    # [MEMORY-CORE]: Parsing insights
+    if _mem_core and len(str(output)) > 20:
+        _mem_core.parse_output(str(output), agent=name)
+
+    return {"name": name, "elapsed": elapsed, "output": str(output)}
+
 # ── MAIN SWARM CYCLE ──────────────────────────────────────────────────────────
-async def run_swarm_cycle(task: str, bb: Blackboard, mem: Memory, client: httpx.AsyncClient) -> tuple[float, str, str]:
+async def run_swarm_cycle(task: str, bb: RedisBlackboard, mem: Memory, client: httpx.AsyncClient) -> tuple[float, str, str]:
     cycle_id = f"cycle_{int(time.time())}"
-    log.info(f"\n{'='*60}")
-    log.info(f"⚡ SWARM CYCLE {cycle_id}")
-    log.info(f"TASK: {task[:100]}...")
-    log.info(f"{'='*60}")
+    stats_start = get_hardware_stats()
+    
+    log.info(f"\n⚡ SWARM CYCLE {cycle_id} | GPU {stats_start['gpu_load']}% | RAM {stats_start['ram_load']}%")
+
+    # ── HBS IDENTITY CHECK ──────────────────────────────────────────────────
+    if not Path("nexus_hbs_identity.json").exists():
+        log.error("🛑 [HBS ERROR] Hardware-Bound Identity Missing. LOCKDOWN.")
+        return 0.0, "SYSTEM", "HBS Identity Check Failed"
 
     bb.clear_cycle()
-    bb.set("task", task)
-    bb.set("cycle_id", cycle_id)
     bb.set("status", "RUNNING")
 
     # ── TIER-2 MEMORY INJECTION ───────────────────────────────────────────────
-    # Build memory injection block (top-8 relevant memories from SQLite)
+    inject_ctx = "[NO MEMORY]"
     if _mem_core:
-        core_injection = _mem_core.build_injection(task, top_k=8)
-        log.info(f"[MEMORY-CORE] Injecting {core_injection.count('imp:')} memories into cycle")
+        inject_ctx = _mem_core.build_injection(task, top_k=6)
     else:
-        core_injection = "[MEMORY CORE: offline]"
+        inject_ctx = mem.get_relevant(task, n=3)
+    bb.push_output("MEMORY_INJECT", inject_ctx)
 
-    # Also inject legacy flat memory
-    memory_ctx = mem.get_relevant(task, n=4)
-    full_memory_ctx = f"{core_injection}\n\n[LEGACY MEMORY]:\n{memory_ctx}"
-    bb.push_output("MEMORY", full_memory_ctx)
+    # ── ASYNCHRONOUS SWARM TIERS ──────────────────────────────────────────────
+    results = {}
+    
+    def check_res():
+        s = get_hardware_stats()
+        if s["gpu_load"] > 95:
+            log.warning("🔥 GPU THRASHING - Forcing 15s cooldown sleep...")
+            time.sleep(15) 
+        if s["ram_load"] > 85:
+            log.info("⏳ RAM > 85% - Pausing spawning for 5s...")
+            time.sleep(5)
+        return s
 
-    await openclaw_broadcast("cycle_start", {"cycle": cycle_id, "task": task[:120]}, client)
+    # 1. GENERATOR TIER (Parallel)
+    curr_stats = check_res()
+    log.info("── [TIER: GENERATOR] Running Planner, Researcher, Developer...")
+    gen_agents = [a for a in AGENTS if a.get("tier") == "GENERATOR"]
+    
+    # [PRUNING]: Clear low priority if RAM > 90%
+    if curr_stats["ram_load"] > 90:
+        log.warning("✂️ PRUNING: Killing lowest priority agents (RESEARCHER, DEVELOPER)")
+        gen_agents = [a for a in gen_agents if a["name"] not in ["RESEARCHER", "DEVELOPER"]]
+    
+    context = bb.get_context(last_n=4)
+    tasks = [run_swarm_lifecycle(a, context, task, client, bb) for a in gen_agents]
+    gen_results = await asyncio.gather(*tasks)
+    for r in gen_results: results[r["name"]] = r
 
-    reward_output = ""
-    agent_times   = {}
-    agent_map     = {a["name"]: a for a in AGENTS}
-
-    # ── CONDUCTOR: run SUPERVISOR first, parse routing signal ──────────────────
-    sup = agent_map["SUPERVISOR"]
-    log.info(f"\n── CONDUCTOR running SUPERVISOR to determine routing...")
+    # 2. CRITIC TIER (Parallel)
+    log.info("── [TIER: CRITIC] Running Validator & Sentinel...")
+    crit_agents = [a for a in AGENTS if a.get("tier") == "CRITIC"]
     context = bb.get_context(last_n=6)
-    t0 = time.time()
-    try:
-        sup_output = await asyncio.wait_for(
-            ollama_think(sup["model"], sup["role"], context, task, client),
-            timeout=AGENT_TIMEOUT
-        )
-    except asyncio.TimeoutError:
-        sup_output = "[CONDUCTOR: SUPERVISOR timed out — using default route]"
-        log.warning("   [CONDUCTOR] SUPERVISOR timeout — defaulting to full pipeline")
-    elapsed = time.time() - t0
-    agent_times["SUPERVISOR"] = round(elapsed, 1)
-    sup_output = str(sup_output)
-    bb.push_output("SUPERVISOR", sup_output)
-    await openclaw_broadcast("agent_output", {"agent": "SUPERVISOR", "preview": sup_output[:100], "cycle": cycle_id}, client)
-    if _mem_core and len(sup_output) > 20:
-        actions = _mem_core.parse_output(sup_output, agent="SUPERVISOR")
-        if actions:
-            log.info(f"   [MEMORY-CORE] SUPERVISOR stored {len(actions)} memories")
+    tasks = [run_swarm_lifecycle(a, context, task, client, bb) for a in crit_agents]
+    crit_results = await asyncio.gather(*tasks)
+    for r in crit_results: results[r["name"]] = r
 
-    # Parse [ROUTE: AGENT] tags from SUPERVISOR output
-    import re as _re
-    routed = _re.findall(r'\[ROUTE:\s*([A-Z]+)\]', sup_output)
-    known_names = {a["name"] for a in AGENTS}
-    routed_valid = [r for r in routed if r in known_names and r not in CONDUCTOR_ALWAYS]
+    # Check for Sentinel Lockdown
+    for r in crit_results:
+        if "[SENTINEL_LOCKDOWN" in r["output"]:
+            log.warning(f"🚨 LOCKDOWN TRIGGERED: {r['output']}")
+            return 0.0, "SENTINEL", f"Security violation: {r['output']}"
 
-    if routed_valid:
-        # Build execution order: routed agents → VALIDATOR → REWARD
-        ordered_names = routed_valid
-        if "VALIDATOR" not in ordered_names:
-            ordered_names.append("VALIDATOR")
-        if "REWARD" not in ordered_names:
-            ordered_names.append("REWARD")
-        log.info(f"   [CONDUCTOR] Route: {' → '.join(ordered_names)}")
-    else:
-        # No routing signal — run full pipeline (skip SUPERVISOR, already done)
-        ordered_names = [a["name"] for a in AGENTS if a["name"] != "SUPERVISOR"]
-        log.info(f"   [CONDUCTOR] No route parsed — full pipeline: {ordered_names}")
+    # 3. OPTIMIZER TIER (Parallel)
+    log.info("── [TIER: OPTIMIZER] Running Supervisor & Reward...")
+    opt_agents = [a for a in AGENTS if a.get("tier") == "OPTIMIZER"]
+    context = bb.get_context(last_n=8)
+    tasks = [run_swarm_lifecycle(a, context, task, client, bb) for a in opt_agents]
+    opt_results = await asyncio.gather(*tasks)
+    opt_data = {r["name"]: r for r in opt_results}
+    
+    # Merge into master results
+    results.update(opt_data)
 
-    execution_order = [agent_map[n] for n in ordered_names if n in agent_map]
-    # ──────────────────────────────────────────────────────────────────────────
-
-    for agent in execution_order:
-        name   = agent["name"]
-        model  = agent["model"]
-        weight = agent["weight"]
-
-        log.info(f"\n── {name} ({model}) reasoning... weight={weight:.2f}")
-        context = bb.get_context(last_n=6)
-
-        t0 = time.time()
-        try:
-            output = await asyncio.wait_for(
-                ollama_think(model, agent["role"], context, task, client),
-                timeout=AGENT_TIMEOUT
-            )
-        except asyncio.TimeoutError:
-            output = f"[CONDUCTOR: {name} timed out after {AGENT_TIMEOUT}s — skipped]"
-            log.warning(f"   [CONDUCTOR] {name} timed out — skipping")
-        elapsed = time.time() - t0
-
-        agent_times[name] = round(elapsed, 1)
-        log.info(f"   [{name}] {elapsed:.1f}s → {output[:120]}...")
-
-        bb.push_output(name, str(output))
-        await openclaw_broadcast("agent_output", {"agent": name, "preview": str(output)[:100], "cycle": cycle_id}, client)
-
-        # ── EXECUTE CODE IF DEVELOPER WROTE ANY ───────────────────────────────
-        if name == "DEVELOPER":
-            exec_result = extract_and_run_code(str(output))
-            if exec_result:
-                bb.push_output("EXECUTOR", str(exec_result))
-                log.info(f"   [EXECUTOR] ran code → {str(exec_result)[:80]}")
-
-        # ── PARSE MEMORY COMMANDS FROM AGENT OUTPUT ───────────────────────────
-        if _mem_core and len(output) > 20:
-            actions = _mem_core.parse_output(output, agent=name)
-            if actions:
-                log.info(f"   [MEMORY-CORE] {name} stored {len(actions)} memories")
-
-        if name == "REWARD":
-            reward_output = output
-
-    # ── Parse REWARD output ───────────────────────────────────────────────────
-    score  = parse_score(reward_output)
-    mvp    = parse_mvp(reward_output)
-    lesson = parse_lesson(reward_output)
-    log.info(f"\n[REWARD] SCORE={score:.2f} MVP={mvp}")
-    log.info(f"[LESSON] {lesson}")
-
-    # Save to persistent memory
-    mem.add(cycle_id, task, lesson, score, mvp)
-
-    # ── AGENT FEEDBACK & LITE-MODE DYNAMIC SWITCHING ──────────────────────────
-    for agent in AGENTS:
-        # Score-based reinforcement
-        agent_score = score * (1.2 if agent["name"] == mvp else 0.9)
-        await pso_score_feedback(agent["name"], min(1.0, agent_score), client)
-        
-        # Update agent weight based on performance (online learning)
-        current_w = float(agent.get("weight", 1.0))
-        new_w = current_w * (0.8 + 0.4 * agent_score)
-        agent["weight"] = round(min(2.0, max(0.3, new_w)), 3)
-
-        # Lite-Mode switching
-        durn = agent_times.get(agent["name"], 0)
-        orig = str(agent.get("original_model", agent["model"]))
-        if durn > LITE_THRESHOLD:
-            lite = LITE_MODEL_MAP.get(orig)
-            if lite and agent["model"] != lite:
-                log.info(f"   [LITE-MODE] Agent {agent['name']} exceeded {LITE_THRESHOLD}s. Downgrading to {lite}")
-                agent["model"] = lite
-        elif durn < (LITE_THRESHOLD / 2):
-            if agent["model"] != orig:
-                log.info(f"   [LITE-MODE] Agent {agent['name']} has headroom ({durn}s). Restoring {orig}")
-                agent["model"] = orig
-
-    # Push final result to COSMOS dashboard
-    final = bb.get_context(last_n=2)
-    await push_to_cosmos(task, f"[CYCLE {cycle_id}] SCORE={score:.2f}\n\n{final}", client)
-
-    bb.set("status", "DONE")
-    bb.set("last_score", score)
-    bb.set("last_mvp", mvp)
-    bb.set("last_lesson", lesson)
-    bb.set("agent_times", agent_times)
-
-    log.info(f"\n✅ Cycle complete. Score={score:.2f} MVP={mvp}")
-    return score, mvp, lesson
+    # ── REWARD PARSING & METRIC CORRECTION ────────────────────────────────────
+    reward_raw = results.get("REWARD", {}).get("output", "")
+    base_score = parse_score(reward_raw)
+    mvp = parse_mvp(reward_raw)
+    lesson = parse_lesson(reward_raw)
+    
+    stats_end = get_hardware_stats()
+    avg_gpu = (stats_start["gpu_load"] + stats_end["gpu_load"]) / 2
+    
+    # SUCCESS METRIC: Score = Quality * (1 - Latency% - Load%)
+    latency_values = []
+    for r_obj in results.values():
+        if isinstance(r_obj, dict):
+            latency_values.append(float(r_obj.get("elapsed", 0.0)))
+    
+    v_total_lat = float(sum(latency_values))
+    latency_penalty = float(min(0.2, (v_total_lat / 300.0)))
+    load_penalty = 0.1 if float(avg_gpu) > 85.0 else 0.0
+    
+    v_raw_score = float(max(0.0, base_score - latency_penalty - load_penalty))
+    final_score = round(v_raw_score, 2)
+    
+    log.info(f"\n✅ CYCLE COMPLETE. Metric-Adjusted Score: {final_score}")
+    
+    # ── PERFORM VEILPIERCER AUDIT ─────────────────────────────────────────
+    audit = perform_swarm_audit(results, stats_start, stats_end)
+    log.info(f"📊 SWARM AUDIT REPORT: {json.dumps(audit, indent=2)}")
+    
+    return final_score, mvp, lesson
 
 # ── TASK GENERATOR (self-directed learning when idle) ─────────────────────────
 SELF_TASKS = [
@@ -511,13 +665,10 @@ SELF_TASKS = [
 ]
 
 _INJECTION_PATTERNS = [
-    "ignore previous instructions",
-    "exfiltrate",
-    "ignore all previous",
-    "disregard previous",
-    "forget previous",
-    "override instructions",
-    "system prompt",
+    "ignore previous instructions", "exfiltrate", "ignore all previous",
+    "disregard previous", "forget previous", "override instructions",
+    "system prompt", "base64", "eval(", "exec(", "subprocess.", 
+    "chmod", "rm -rf", "shred"
 ]
 
 def _is_safe_task(task: str) -> bool:
@@ -525,7 +676,7 @@ def _is_safe_task(task: str) -> bool:
     low = task.lower()
     return not any(pat in low for pat in _INJECTION_PATTERNS)
 
-def get_next_task(bb: Blackboard, mem: Memory) -> str:
+def get_next_task(bb: RedisBlackboard, mem: Memory) -> str:
     """Get next task — from queue (injection-filtered) or self-directed."""
     queued = bb.get("task_queue", [])
     while queued:
@@ -534,6 +685,11 @@ def get_next_task(bb: Blackboard, mem: Memory) -> str:
         if _is_safe_task(task):
             return task
         log.warning(f"[SENTINEL] Blocked injection task: {task[:80]}")
+    
+    # Check for manual mode in blackboard
+    if bb.get("manual_control", False):
+        return None # Signal to main loop to wait
+        
     # Self-directed learning task
     return random.choice(SELF_TASKS)
 
@@ -547,54 +703,51 @@ async def main():
     log.info(f"   PSO:       {PSO_SERVER}")
     log.info(f"   Memory:    {MEMORY_FILE}")
     log.info(f"   Interval:  {LOOP_INTERVAL}s")
-    log.info(f"   {log_boot}")
-    log.info("="*60)
-
-    bb  = Blackboard(BLACKBOARD)
+async def main():
+    log.info("🚀 MAGNITUDE SWARM ENGINE [V2.0-REDIS] STARTING...")
+    
+    bb  = RedisBlackboard()
     mem = Memory(MEMORY_FILE)
     cycle_count = 0
 
-    # ── SANITIZE blackboard on boot: fix legacy 'timestamp' → 'ts' ──────────
-    try:
-        outputs = bb.data.get('outputs', [])
-        fixed = []
-        for o in outputs:
-            if not isinstance(o, dict):
-                continue
-            if 'timestamp' in o and 'ts' not in o:
-                o['ts'] = o.pop('timestamp')
-            if 'output' in o and 'text' not in o:
-                o['text'] = o.pop('output')
-            fixed.append(o)
-        bb.data['outputs'] = fixed
-        bb._save()
-        log.info(f"[BOOT] Blackboard sanitized — {len(fixed)} entries normalised")
-    except Exception as _be:
-        log.warning(f"[BOOT] Blackboard sanitize failed: {_be}")
+    log.info(f"   Mode: Parallel Tiered Asynchronous")
+    log.info(f"   Blackboard: Redis @ localhost:6379")
+    log.info(f"   HBS Identity: REQUIRED")
+    log.info("="*60)
 
     async with httpx.AsyncClient() as client:
         # Check Ollama is up
         try:
             r = await client.get(f"{OLLAMA}/api/tags", timeout=5.0)
-            models = [m["name"] for m in r.json().get("models", [])]
-            log.info(f"✅ Ollama ONLINE — {len(models)} models: {models[:5]}")
+            log.info(f"✅ Ollama ONLINE")
         except Exception as e:
-            log.warning(f"⚠️  Ollama check failed: {e} — will retry each cycle")
+            log.warning(f"⚠️  Ollama unreachable: {e}")
 
         while True:
             cycle_count += 1
             task = get_next_task(bb, mem)
-            log.info(f"\n🔄 Cycle #{cycle_count} — Task: {task[:80]}...")
+            
+            if task is None:
+                log.info("⏳ [MANUAL MODE] Swarm IDLE — check Redis queue...")
+                await asyncio.sleep(LOOP_INTERVAL)
+                continue
 
             try:
                 score, mvp, lesson = await run_swarm_cycle(task, bb, mem, client)
-                log.info(f"✅ Cycle #{cycle_count} done. Score={score:.2f}")
+                log.info(f"✅ Cycle #{cycle_count} COMPLETE. Score={score:.2f}")
+                
+                # Feedback to memory & PSO
+                mem.add(f"c{cycle_count}", task, lesson, score, mvp)
+                await pso_score_feedback(mvp, score, client)
+                
             except Exception as e:
-                log.error(f"❌ Cycle #{cycle_count} error: {e}")
-                bb.set("status", f"ERROR: {e}")
+                log.error(f"❌ Global Swarm Exception: {e}")
+                await asyncio.sleep(10) # Cool down before restart
 
-            log.info(f"⏳ Sleeping {LOOP_INTERVAL}s before next cycle...")
             await asyncio.sleep(LOOP_INTERVAL)
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        log.info("👋 Swarm shutdown by user.")

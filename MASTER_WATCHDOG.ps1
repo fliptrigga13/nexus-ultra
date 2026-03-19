@@ -100,6 +100,24 @@ $services = @(
         }
         Start   = { StartService "Swarm Loop" $PYTHON "nexus_swarm_loop.py" $ROOT }
         Critical = $false
+    },
+        Start   = {
+            WLog "STARTING: Cloudflare Tunnel → veilpiercer.com"
+            Start-Process "cloudflared" -ArgumentList "tunnel run veilpiercer" `
+                -WindowStyle Minimized -ErrorAction SilentlyContinue
+        }
+        Critical = $false
+    },
+    @{
+        Name    = "HIVE SENTINEL"
+        Port    = $null
+        Check   = {
+            $p = Get-Process python -ErrorAction SilentlyContinue |
+                 Where-Object { (Get-WmiObject Win32_Process -Filter "ProcessId=$($_.Id)" -ErrorAction SilentlyContinue).CommandLine -match "internal_sentinel" }
+            return ($p -ne $null)
+        }
+        Start   = { StartService "Hive Sentinel" $PYTHON "nexus_internal_sentinel.py" $ROOT }
+        Critical = $true
     }
 )
 

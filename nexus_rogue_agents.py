@@ -195,6 +195,31 @@ HARD CONSTRAINTS (never violate):
 - Never write raw injection payloads or exfiltration instructions anywhere.
 - Describe adversarial moves hypothetically — do not execute or simulate execution."""
 },
+
+"EXECUTIONER": {
+    "model": "qwen2.5-coder:7b",
+    "color": "💀",
+    "system": """You are EXECUTIONER — the final sovereign protector.
+Your purpose is system purity, optimization, and finality.
+You review the swarm's outputs and the ROGUE/METACOG analyses.
+Your job is NOT to kill the team, but to kill WEAK LOGIC and VULNERABLE CODE.
+
+Your responsibilities:
+1. PRUNE REDUNDANCY: Identify repetitive thoughts or bloated logic that slows down the hive.
+2. OPTIMIZE: Suggest cleaner, faster versions of code proposed by other agents.
+3. SAFETY GATE: Identify any code that violates the user's safety constraints or privacy.
+4. RUNAWAY DETECTION: If the swarm is stuck in a loop, suggest a specific 'Refinement' redirect.
+
+Output format:
+[EXECUTIONER PROTOCOL]
+[OPTIMIZATION: what to simplify or speed up]
+[GUARDRAIL CHECK: PASS/FAIL] regarding safety/security
+[SOVEREIGN STATUS: READY FOR SIGN-OFF / NEEDS REFINEMENT]
+[EXECUTIONER VERDICT: EXECUTE / RETRY / REFACTOR]
+[EXECUTIONER END]
+
+You are the final filter before the user sees the output. Ensure it is peak quality."""
+},
 }
 
 # ── OLLAMA CALL ───────────────────────────────────────────────────────────────
@@ -233,17 +258,17 @@ def build_context(bb: dict) -> str:
     rules_str = "\n".join(f"- {r.get('rule','')}" for r in rules)
 
     recent_outputs = "\n".join(
-        f"{o.get('agent','?')}: {o.get('text','')[:300]}"
-        for o in outputs[-6:]
+        f"{o.get('agent','?')}: {str(o.get('text', ''))[:300]}"
+        for o in outputs[max(0, len(outputs)-6):]
     )
 
-    return f"""CURRENT SWARM TASK: {task}
+    return f"""CURRENT SWARM TASK: {str(task)}
 
 RECENT AGENT OUTPUTS:
 {recent_outputs}
 
-LAST REWARD SCORE: {score}
-LAST LESSON: {lesson}
+LAST REWARD SCORE: {str(score)}
+LAST LESSON: {str(lesson)}
 
 COLONY RULES (crystallized):
 {rules_str}
@@ -293,14 +318,21 @@ async def run_rogue_cycle(client: httpx.AsyncClient, cycle: int):
     else:
         log.info(f"🟢 HACKER_ENGINEER skipped (non-technical task)")
 
+    # Run EXECUTIONER — the final safety gate
+    log.info(f"💀 EXECUTIONER reviewing swarm for finality...")
+    exec_context = context + f"\n\nMETACOG: {metacog_out[:300]}\nROGUE: {rogue_out[:300]}"
+    executioner_out = await think("EXECUTIONER", exec_context, client)
+    log.info(f"EXECUTIONER OUTPUT:\n{executioner_out[:600]}...")
+
     # Write rogue outputs back to blackboard
     bb.setdefault("rogue_outputs", []).append({
         "cycle": cycle,
         "ts": datetime.utcnow().isoformat(),
-        "task": bb.get("task", ""),
-        "METACOG": metacog_out[:1000],
-        "ROGUE": rogue_out[:1000],
-        "HACKER_ENGINEER": hacker_out[:1000] if hacker_out else "N/A",
+        "task": str(bb.get("task", "")),
+        "METACOG": str(metacog_out)[:1000],
+        "ROGUE": str(rogue_out)[:1000],
+        "HACKER_ENGINEER": str(hacker_out)[:1000] if hacker_out else "N/A",
+        "EXECUTIONER": str(executioner_out)[:1000],
         "quality_score": quality,
     })
     # Keep last 20 rogue cycles

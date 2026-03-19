@@ -1,0 +1,7 @@
+{
+  "fingerprint": "3cce0ae3592c4baa927b36eb23fd854a1c6a4cdab1e32d072b2abe475168639e",
+  "gpu": "GPU-59f0c8e8-1c7d-367d-9f1a-98a7166067aa",
+  "cpu": "CPU-UNREACHABLE",
+  "baseboard": "BB-UNREACHABLE",
+  "status": "HARDWARE_BOUND_LOCKED"
+}
