@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VEILPIERCER | The 2026 AI Agent Observatory &amp; Control Plane</title>
+  <title>VEILPIERCER | Your AI Swarm. Working Overnight. You Get the Results.</title>
   <link
     href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Fira+Code:wght@300;400;500&display=swap"
     rel="stylesheet">
@@ -2072,7 +2072,7 @@
   </style>
   <meta name="description" content="Stop rogue agents and audit decision chains in real-time. VeilPiercer is the definitive AI control plane built for the 2026 Tensor Era and local CUDA swarms.">
   <meta name="keywords" content="AI Security Swarm, Local CUDA AI, AutoGPT Control, LangChain Observatory, Offline AI, 2026 Tensor Era">
-  <meta property="og:title" content="VEILPIERCER | The 2026 AI Agent Observatory">
+  <meta property="og:title" content="VEILPIERCER | Your AI Swarm. Working Overnight. You Get the Results.">
   <meta property="og:description" content="Stop rogue agents and audit decision chains in real-time. VeilPiercer is the definitive AI control plane built for the 2026 Tensor Era and local CUDA swarms.">
 </head>
 
@@ -2105,16 +2105,16 @@
 
     <div class="hero-content">
       <div class="hero-col L">
-        <div class="h-stat-box"><div class="v">53K+</div><div class="l">OPS ANALYZED</div></div>
-        <div class="h-stat-box"><div class="v">0.31ms</div><div class="l">INFERENCE Δ</div></div>
-        <div class="h-stat-box"><div class="v">100%</div><div class="l">LOCAL_STACK</div></div>
+        <div class="h-stat-box"><div class="v">382+</div><div class="l">CYCLES RUN</div></div>
+        <div class="h-stat-box"><div class="v">1,929+</div><div class="l">LESSONS STORED</div></div>
+        <div class="h-stat-box"><div class="v">$0</div><div class="l">API COST</div></div>
       </div>
 
       <div class="hero-center" style="text-align: center;">
         <div style="font-size: 10px; color: var(--vis); letter-spacing: 4px; margin-bottom: 20px;">[ PRODUCTION READY v2.6 ]</div>
         <h1 style="font-family: 'Unbounded', sans-serif; font-size: clamp(50px, 9vw, 110px); line-height: 1; letter-spacing: -2px; margin-bottom: 10px; color: transparent; -webkit-text-stroke: 1px var(--vis); text-shadow: 0 0 20px rgba(0,229,255,0.6), 0 0 40px rgba(0,229,255,0.3), 0 0 80px rgba(0,229,255,0.1);">VEILPIERCER</h1>
-        <div style="font-size: 20px; color: #fff; letter-spacing: 4px; margin-bottom: 30px; text-transform: uppercase; font-family: 'Inter', sans-serif; font-weight: 800; text-shadow: 0 0 10px rgba(255,255,255,0.5);">The 2026 AI Agent Observatory</div>
-        <p style="font-size: 14px; color: var(--t2); max-width: 600px; margin: 0 auto 40px; line-height: 1.6;">STOP ROGUE LOOPS. AUDIT DECISION CHAINS. ENFORCE PROTOCOLS. THE FIRST CONTROL PLANE BUILT FOR THE TENSOR ERA.</p>
+        <div style="font-size: 20px; color: #fff; letter-spacing: 4px; margin-bottom: 30px; text-transform: uppercase; font-family: 'Inter', sans-serif; font-weight: 800; text-shadow: 0 0 10px rgba(255,255,255,0.5);">Your AI Swarm. Working Overnight. You Get the Results.</div>
+        <p style="font-size: 14px; color: var(--t2); max-width: 600px; margin: 0 auto 40px; line-height: 1.6;">A live AI swarm that researches markets, synthesizes intelligence, and compounds every cycle — while you sleep. Scored insights delivered. No setup. No cloud bill. $0 in API costs.</p>
         <div style="display: flex; gap: 20px; justify-content: center;">
           <a href="#pricing" class="btn-primary">GET ACCESS</a>
           <a href="#proof" class="btn-ghost">SEE PROOF</a>
@@ -3436,17 +3436,22 @@ function obsReset(){if(window.__obsResetFn)window.__obsResetFn();}
   var CYAN=new THREE.Color(0x00e5ff);
   var PURP=new THREE.Color(0xbf00ff);
   var GRN =new THREE.Color(0x00ff88);
+  var GOLD=new THREE.Color(0xffd100); // Add a rare gold highlight for premium feel
   function rr(a,b){return a+Math.random()*(b-a);}
   for(var i=0;i<N;i++){
     var t=Math.random();
+    // Start them with minimal rigid velocity; the fluid physics will take over
     nodes.push({
       x:rr(-W*0.9,W*0.9),y:rr(-H*0.9,H*0.9),z:rr(-350,150),
-      vx:rr(-.18,.18),vy:rr(-.18,.18),vz:rr(-.05,.05),
-      col:t>.88?PURP:(t>.76?GRN:CYAN),
-      sz:t>.88?4.8:(t>.76?3.2:1.8),
+      vx:rr(-.05,.05),vy:rr(-.05,.05),vz:rr(-.02,.02),
+      // Increase tensor/gold ratio slightly for more highlights
+      col:t>.92?GOLD:(t>.82?PURP:(t>.70?GRN:CYAN)),
+      sz:t>.92?6.0:(t>.82?4.5:2.5),
       pulse:Math.random()*Math.PI*2,
-      ps:rr(.5,1.3),
-      isTensor:t>.88
+      ps:rr(.5,1.8), // Faster pulse range
+      isTensor:t>.82,
+      phaseX: rr(0, Math.PI*2),
+      phaseY: rr(0, Math.PI*2)
     });
   }
 
@@ -3468,6 +3473,61 @@ function obsReset(){if(window.__obsResetFn)window.__obsResetFn();}
       blending: THREE.AdditiveBlending,
       sizeAttenuation: true
   });
+
+  // ── EXTERIOR SOURCE NODES — External Comms Anchors ──────────────────────────
+  // Isolated from swarm node array. Represent outbound networking/outsourcing.
+  // Positioned at the 4 cardinal edges, pulling reach-lines into the swarm core.
+  var EXT_ORANGE = new THREE.Color(0xff6a00);
+  var EXT_WHITE  = new THREE.Color(0xffffff);
+  var extNodes = [
+    { label:'NET-NORTH', x: 0,         y: H*0.88,  z: -80, col: EXT_ORANGE, pulse:0,    ps:0.9 },
+    { label:'NET-SOUTH', x: 0,         y:-H*0.88,  z: -80, col: EXT_WHITE,  pulse:1.57, ps:0.7 },
+    { label:'NET-EAST',  x: W*0.88,    y: 0,       z:-120, col: EXT_ORANGE, pulse:3.14, ps:1.1 },
+    { label:'NET-WEST',  x:-W*0.88,    y: 0,       z:-120, col: EXT_WHITE,  pulse:4.71, ps:0.8 },
+  ];
+
+  // Geometry for exterior node points
+  var extPPos = new Float32Array(extNodes.length*3);
+  var extPCol = new Float32Array(extNodes.length*3);
+  var extPSz  = new Float32Array(extNodes.length);
+  var extGeo  = new THREE.BufferGeometry();
+  var extPPA  = new THREE.BufferAttribute(extPPos,3); extPPA.setUsage(THREE.DynamicDrawUsage);
+  var extPCA  = new THREE.BufferAttribute(extPCol,3); extPCA.setUsage(THREE.DynamicDrawUsage);
+  var extPSA  = new THREE.BufferAttribute(extPSz,1);  extPSA.setUsage(THREE.DynamicDrawUsage);
+  extGeo.setAttribute('position',extPPA);
+  extGeo.setAttribute('color',extPCA);
+  extGeo.setAttribute('size',extPSA);
+  // Use same ShaderMaterial for consistent glow but with vertexColors
+  var extMat = new THREE.ShaderMaterial({
+    vertexShader:[
+      'attribute float size;attribute vec3 color;varying vec3 vC;',
+      'void main(){vC=color;vec4 mv=modelViewMatrix*vec4(position,1.);',
+      'gl_PointSize=size*(480./-mv.z);gl_Position=projectionMatrix*mv;}'
+    ].join(''),
+    fragmentShader:[
+      'varying vec3 vC;void main(){',
+      'vec2 uv=gl_PointCoord-.5;float d=length(uv);if(d>.5)discard;',
+      'float core=smoothstep(.12,.0,d);float ring=smoothstep(.5,.3,d)*0.6;',
+      'float glow=smoothstep(.5,.0,d)*0.9;',
+      'gl_FragColor=vec4(vC,(core+ring+glow)*1.6);}'
+    ].join(''),
+    blending:THREE.AdditiveBlending,depthTest:false,transparent:true
+  });
+  var extPts = new THREE.Points(extGeo,extMat);
+  scene.add(extPts);
+
+  // Reach lines from exterior nodes into nearest swarm nodes
+  var REACH_MAX = extNodes.length * 6;
+  var extLPos = new Float32Array(REACH_MAX*6);
+  var extLCol = new Float32Array(REACH_MAX*6);
+  var extLGeo = new THREE.BufferGeometry();
+  var extLPA  = new THREE.BufferAttribute(extLPos,3); extLPA.setUsage(THREE.DynamicDrawUsage);
+  var extLCA  = new THREE.BufferAttribute(extLCol,3); extLCA.setUsage(THREE.DynamicDrawUsage);
+  extLGeo.setAttribute('position',extLPA); extLGeo.setAttribute('color',extLCA);
+  var extLMat = new THREE.LineBasicMaterial({vertexColors:true,blending:THREE.AdditiveBlending,depthTest:false,transparent:true});
+  var extLines = new THREE.LineSegments(extLGeo,extLMat);
+  scene.add(extLines);
+
   var ptSystem = new THREE.Points(ptGeo, ptMat);
   scene.add(ptSystem);
 
@@ -3540,30 +3600,82 @@ function obsReset(){if(window.__obsResetFn)window.__obsResetFn();}
     for(var i=0;i<N;i++){
       var nd=nodes[i];
       nd.pulse+=nd.ps*.016;
-      nd.x+=nd.vx;nd.y+=nd.vy;nd.z+=nd.vz;
       
+      /* Fluid Curl Physics (Waving Fabric) */
+      var curlX = Math.sin(t*0.5 + nd.phaseY + nd.y*0.003) * 0.15;
+      var curlY = Math.cos(t*0.6 + nd.phaseX + nd.x*0.003) * 0.15;
+      nd.vx += curlX;
+      nd.vy += curlY;
+
       /* breathing loop force (out and in) */
       var dist = Math.sqrt(nd.x*nd.x + nd.y*nd.y + nd.z*nd.z) || 1;
-      var breathe = Math.sin(t * 0.8) * 0.12; // Adjusted for smooth rhythm
+      var breathe = Math.sin(t * 0.8) * 0.18; // Slightly stronger rhythm
       nd.vx += (nd.x / dist) * breathe;
       nd.vy += (nd.y / dist) * breathe;
-      nd.vz += (nd.z / dist) * breathe;
+      nd.vz += (nd.z / dist) * breathe * 0.5;
 
-      /* mouse gravity (toned down to allow breathing) */
-      var dx=mx-nd.x,dy=my-nd.y,d2=dx*dx+dy*dy,R2=350*350;
-      if(d2<R2&&d2>1){var s=.015*(1-Math.sqrt(d2)/350);nd.vx+=dx*s;nd.vy+=dy*s;}
+      nd.x+=nd.vx;nd.y+=nd.vy;nd.z+=nd.vz;
+
+      /* mouse gravity (toned down to allow fluid flow) */
+      var dx=mx-nd.x,dy=my-nd.y,d2=dx*dx+dy*dy,R2=400*400;
+      if(d2<R2&&d2>1){var s=.02*(1-Math.sqrt(d2)/400);nd.vx+=dx*s;nd.vy+=dy*s;}
       
-      nd.vx*=.98;nd.vy*=.98;nd.vz*=.985; // Slightly more friction for control
-      var sp=Math.sqrt(nd.vx*nd.vx+nd.vy*nd.vy);if(sp>1.2){nd.vx*=1.2/sp;nd.vy*=1.2/sp;}
-      var BX=W*.65,BY=H*.65;
-      if(nd.x<-BX){nd.x=-BX;nd.vx=Math.abs(nd.vx);}if(nd.x>BX){nd.x=BX;nd.vx=-Math.abs(nd.vx);}
-      if(nd.y<-BY){nd.y=-BY;nd.vy=Math.abs(nd.vy);}if(nd.y>BY){nd.y=BY;nd.vy=-Math.abs(nd.vy);}
-      if(nd.z<-250){nd.z=-250;nd.vz=Math.abs(nd.vz);}if(nd.z>80){nd.z=80;nd.vz=-Math.abs(nd.vz);}
+      nd.vx*=.96;nd.vy*=.96;nd.vz*=.97; // Increase friction for smoother flow
+      var sp=Math.sqrt(nd.vx*nd.vx+nd.vy*nd.vy);if(sp>1.5){nd.vx*=1.5/sp;nd.vy*=1.5/sp;}
+      
+      /* Soft Boundaries (Gravitational pull back to center, no hard bounces) */
+      var BX=W*.75,BY=H*.75;
+      if(nd.x<-BX) nd.vx += 0.05; if(nd.x>BX) nd.vx -= 0.05;
+      if(nd.y<-BY) nd.vy += 0.05; if(nd.y>BY) nd.vy -= 0.05;
+      if(nd.z<-300) nd.vz += 0.02; if(nd.z>150) nd.vz -= 0.02;
+
       var pf=1+Math.sin(nd.pulse)*.18+(nd.isTensor?Math.sin(t*2.2+i)*.14:0);
       pPos[i*3]=nd.x;pPos[i*3+1]=nd.y;pPos[i*3+2]=nd.z;
       pCol[i*3]=nd.col.r;pCol[i*3+1]=nd.col.g;pCol[i*3+2]=nd.col.b;
       pSz[i]=nd.sz*pf;
     }
+    /* === EXTERIOR SOURCE NODES TICK === */
+    var eli = 0;
+    for(var ei=0; ei<extNodes.length; ei++){
+      var en = extNodes[ei];
+      en.pulse += en.ps * 0.016;
+      // Slow drift — exterior nodes orbit gently, stay at the perimeter
+      en.x += Math.sin(t*0.08 + ei*1.5) * 0.3;
+      en.y += Math.cos(t*0.07 + ei*1.2) * 0.2;
+
+      var pf = 1.0 + Math.sin(en.pulse) * 0.35;
+      extPPos[ei*3]=en.x; extPPos[ei*3+1]=en.y; extPPos[ei*3+2]=en.z;
+      extPCol[ei*3]=en.col.r; extPCol[ei*3+1]=en.col.g; extPCol[ei*3+2]=en.col.b;
+      extPSz[ei] = 10.0 * pf; // Large, unmissable beacon
+
+      // Find the 6 nearest swarm nodes and draw pulsed reach lines
+      var dists = [];
+      for(var ni=0; ni<N; ni++){
+        var nd=nodes[ni];
+        var ddx=en.x-nd.x,ddy=en.y-nd.y,ddz=en.z-nd.z;
+        dists.push({d:Math.sqrt(ddx*ddx+ddy*ddy+ddz*ddz),idx:ni});
+      }
+      dists.sort(function(a,b){return a.d-b.d;});
+      var reachCount = 6;
+      for(var ri=0; ri<reachCount && eli<REACH_MAX; ri++){
+        var nd = nodes[dists[ri].idx];
+        var rd = dists[ri].d;
+        // Traveling pulse on the reach line
+        var reachFlow = Math.sin(rd*0.006 - t*2.5 + en.pulse) * 0.5 + 0.5;
+        var ral = reachFlow * 0.9;
+        var b2 = eli*6;
+        extLPos[b2]=en.x;    extLPos[b2+1]=en.y;    extLPos[b2+2]=en.z;
+        extLCol[b2]=en.col.r*ral; extLCol[b2+1]=en.col.g*ral; extLCol[b2+2]=en.col.b*ral;
+        extLPos[b2+3]=nd.x;  extLPos[b2+4]=nd.y;  extLPos[b2+5]=nd.z;
+        extLCol[b2+3]=en.col.r*ral*0.3; extLCol[b2+4]=en.col.g*ral*0.3; extLCol[b2+5]=en.col.b*ral*0.3;
+        eli++;
+      }
+    }
+    for(var k=eli;k<REACH_MAX;k++){var b=k*6;extLPos[b]=extLPos[b+1]=extLPos[b+2]=extLPos[b+3]=extLPos[b+4]=extLPos[b+5]=0;}
+    extLGeo.setDrawRange(0,eli*2);
+    extPPA.needsUpdate=true; extPCA.needsUpdate=true; extPSA.needsUpdate=true;
+    extLPA.needsUpdate=true; extLCA.needsUpdate=true;
+
     /* edges */
     var li=0;
     for(var a=0;a<N&&li<MAXL;a++){
@@ -3573,7 +3685,18 @@ function obsReset(){if(window.__obsResetFn)window.__obsResetFn();}
         var ex=na.x-nb.x,ey=na.y-nb.y,ez=na.z-nb.z;
         var ed=Math.sqrt(ex*ex+ey*ey+ez*ez);
         if(ed<CDIST){
-          var al=Math.pow(1-ed/CDIST, 0.7)*1.3;
+          // Base opacity by distance
+          var distAlpha = Math.pow(1-ed/CDIST, 0.85);
+          // Traveling Synaptic Highlight (Pulse wave traveling through the fabric)
+          var flow = Math.sin(ed*0.015 - t*3.0 + na.pulse) * 0.5 + 0.5; 
+          // Boost opacity intensely for highlighted lines, keep others dim/ambient
+          var al = distAlpha * (0.3 + flow * 1.5); 
+          
+          // Add a rare super-bright flash if both are tensor nodes
+          if (na.isTensor && nb.isTensor && flow > 0.8) {
+            al *= 2.5; 
+          }
+
           var rc=(na.col.r+nb.col.r)*.5*al,gc=(na.col.g+nb.col.g)*.5*al,bc=(na.col.b+nb.col.b)*.5*al;
           var base=li*6;
           lPos[base]=na.x;lPos[base+1]=na.y;lPos[base+2]=na.z;
