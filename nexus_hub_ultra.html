@@ -429,18 +429,33 @@
             const rStatus = await fetch(EH_BASE + "/status").catch(() => null);
             if (rStatus && rStatus.ok) {
                 const d = await rStatus.json();
-                state.swarm.status = d.status || 'IDLE';
-                state.swarm.cycle = d.cycle_id || 0;
-                state.swarm.score = d.last_score || 0;
-                state.swarm.mvp = d.last_mvp || '--';
-                
-                // Active agent detection
+                state.swarm.status = d.status || 'RUNNING';
+                state.swarm.cycle = d.cycle_id || state.swarm.cycle;
+                if (d.last_score && d.last_score > 0) state.swarm.score = d.last_score;
+                state.swarm.mvp = d.last_mvp || state.swarm.mvp;
+
                 if (d.outputs && d.outputs.length) {
                     const last = d.outputs[d.outputs.length - 1];
                     state.activeAgent = last.agent;
                     addActivity(last.agent, last.text);
                 } else {
                     state.activeAgent = null;
+                }
+            }
+
+            // === LIVE BLACKBOARD SCORE (fallback via Node :3000) ===
+            const rBB = await fetch("http://127.0.0.1:3000/api/blackboard").catch(() => null);
+            if (rBB && rBB.ok) {
+                const bb = await rBB.json().catch(() => null);
+                if (bb) {
+                    if (bb.colony_fitness) state.swarm.score = bb.colony_fitness;
+                    if (bb.mycelial_state && bb.mycelial_state.tick) state.swarm.cycle = bb.mycelial_state.tick;
+                    const signals = bb.hive_signals;
+                    if (signals && signals.length) {
+                        const last = signals[signals.length - 1];
+                        state.swarm.mvp = last.from || state.swarm.mvp;
+                        state.swarm.status = 'RUNNING';
+                    }
                 }
             }
 
