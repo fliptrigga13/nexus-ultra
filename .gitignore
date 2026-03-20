@@ -7,6 +7,11 @@ nexus_memory.json
 nexus_session_facts.json
 .eh_token
 .backdoor_token
+.otp_store.json
+.passkey_store.json
+access-tokens.json
+brain_export/
+nexus_signal.json
 *.log
 swarm_active.log
 evolution_log.json
