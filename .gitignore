@@ -65,3 +65,19 @@ node_modules/
 .vercel/
 .vercel
 .env*.local
+
+# Added by cleanup 2026-03-20
+Modelfile.nexus
+.modelfile_sha256
+nexus_prime_evolved.modelfile
+cloudflared.log
+cosmos_*.log
+ngrok_out.log
+node_watchdog.log
+rotator_*.log
+server_error.log
+startup.log
+swarm_*.log
+task_rotator.log
+backup/backup_logs/
+railway.toml
