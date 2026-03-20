@@ -30,6 +30,38 @@ import logging
 from pathlib import Path
 from datetime import datetime
 from typing import Optional
+import numpy as np
+
+# ── FAISS lazy imports (CPU-only, no VRAM) ──────────────────────────────────
+_faiss_mod  = None
+_embedder   = None
+
+def _get_faiss():
+    global _faiss_mod
+    if _faiss_mod is None:
+        try:
+            import faiss as _f
+            _faiss_mod = _f
+        except ImportError:
+            pass
+    return _faiss_mod
+
+def _get_embedder():
+    global _embedder
+    if _embedder is None:
+        try:
+            from sentence_transformers import SentenceTransformer
+            _embedder = SentenceTransformer("all-MiniLM-L6-v2")  # 80MB CPU model
+        except ImportError:
+            pass
+    return _embedder
+
+def _embed(text: str):
+    model = _get_embedder()
+    if model is None:
+        return None
+    vec = model.encode([text[:512]], normalize_embeddings=True)
+    return vec.astype("float32")
 
 BASE_DIR  = Path(__file__).parent
 DB_PATH   = BASE_DIR / "nexus_mind.db"
@@ -117,11 +149,36 @@ def init_db() -> sqlite3.Connection:
 # ══════════════════════════════════════════════════════════════════════════════
 class MemoryCore:
 
+    FAISS_DIM = 384  # all-MiniLM-L6-v2
+
     def __init__(self):
         self.conn = init_db()
+        self._faiss_index  = None   # built lazily on first recall()
+        self._faiss_id_map = []     # maps FAISS row index → SQLite memory id
         log.info(f"✅ MemoryCore online — DB: {DB_PATH}")
         count = self.conn.execute("SELECT COUNT(*) FROM memories").fetchone()[0]
         log.info(f"   📚 {count} memories loaded from previous sessions (no wipe)")
+
+    def _build_faiss_index(self):
+        """Embed all non-archived memories into a FAISS IndexFlatIP."""
+        faiss = _get_faiss()
+        embedder = _get_embedder()
+        if faiss is None or embedder is None:
+            return  # silently skip — keyword fallback will be used
+        rows = self.conn.execute(
+            "SELECT id, content FROM memories WHERE archived=0 ORDER BY importance DESC LIMIT 2000"
+        ).fetchall()
+        if not rows:
+            return
+        texts  = [r[1][:512] for r in rows]
+        ids    = [r[0]      for r in rows]
+        vecs   = embedder.encode(texts, normalize_embeddings=True,
+                                 batch_size=64, show_progress_bar=False).astype("float32")
+        index  = faiss.IndexFlatIP(self.FAISS_DIM)
+        index.add(vecs)
+        self._faiss_index  = index
+        self._faiss_id_map = ids
+        log.info(f"   🔍 FAISS index built: {len(ids)} memories embedded (all-MiniLM-L6-v2)")
 
     # ── STORE ─────────────────────────────────────────────────────────────────
     def store(self, content: str, importance: float = 5.0,
@@ -139,18 +196,47 @@ class MemoryCore:
         log.info(f"  💾 STORED [{agent}] imp={importance:.1f} tags={tags}: {content[:80]}...")
         return cur.lastrowid
 
-    # ── SEMANTIC SEARCH (TF-IDF style keyword matching, offline) ──────────────
+    # ── SEMANTIC SEARCH (FAISS vector search → keyword fallback) ─────────────
     def recall(self, query: str, top_k: int = 8, min_importance: float = 0.5) -> list:
         """
-        Offline semantic search using TF-IDF keyword overlap.
-        No vector DB needed. Works entirely in SQLite.
+        Semantic search: FAISS vector embeddings (all-MiniLM-L6-v2) when available,
+        TF-IDF keyword overlap as offline fallback.
         """
-        # Tokenize query
+        if not query.strip():
+            return self._top_by_importance(top_k)
+
+        # ── Try FAISS vector search first ─────────────────────────────────────
+        faiss_ids = self._faiss_recall(query, top_k * 2)
+        if faiss_ids:
+            rows = []
+            for fid in faiss_ids:
+                row = self.conn.execute(
+                    """SELECT id, content, tags, importance, agent, tier, access_count
+                       FROM memories WHERE id=? AND archived=0 AND importance>=?""",
+                    (fid, min_importance)
+                ).fetchone()
+                if row:
+                    rows.append(row)
+            if rows:
+                results = []
+                for row in rows[:top_k]:
+                    mem_id, content, tags, importance, agent, tier, acc = row
+                    self.conn.execute(
+                        "UPDATE memories SET access_count=access_count+1, updated_at=? WHERE id=?",
+                        (datetime.utcnow().isoformat(), mem_id)
+                    )
+                    results.append({
+                        "id": mem_id, "content": content, "tags": tags,
+                        "importance": importance, "agent": agent, "tier": tier,
+                    })
+                self.conn.commit()
+                return results
+
+        # ── Fallback: TF-IDF keyword overlap ─────────────────────────────────
         query_tokens = set(re.findall(r'\b\w{3,}\b', query.lower()))
         if not query_tokens:
             return self._top_by_importance(top_k)
 
-        # Pull all non-archived memories above threshold
         rows = self.conn.execute(
             """SELECT id, content, tags, importance, agent, tier, access_count
                FROM memories
@@ -159,7 +245,6 @@ class MemoryCore:
             (min_importance,)
         ).fetchall()
 
-        # Score each memory by keyword overlap + importance
         scored = []
         for row in rows:
             mem_id, content, tags, importance, agent, tier, acc = row
@@ -168,7 +253,6 @@ class MemoryCore:
             overlap = len(query_tokens & mem_tokens)
             if overlap == 0:
                 continue
-            # TF-like score: overlap × log(importance+1) + access_bonus
             score = overlap * math.log(importance + 1) + (acc * 0.1)
             scored.append((score, row))
 
@@ -176,7 +260,6 @@ class MemoryCore:
         results = []
         for _, row in scored[:top_k]:
             mem_id, content, tags, importance, agent, tier, acc = row
-            # Increment access count (popular memories strengthen)
             self.conn.execute(
                 "UPDATE memories SET access_count=access_count+1, updated_at=? WHERE id=?",
                 (datetime.utcnow().isoformat(), mem_id)
@@ -186,6 +269,26 @@ class MemoryCore:
                 "importance": importance, "agent": agent, "tier": tier,
             })
         self.conn.commit()
+        return results
+
+    def _faiss_recall(self, query: str, top_k: int) -> list:
+        """Internal: returns list of SQLite memory IDs via FAISS vector search."""
+        # Build index lazily on first call
+        if self._faiss_index is None:
+            self._build_faiss_index()
+        if self._faiss_index is None or self._faiss_index.ntotal == 0:
+            return []
+        q_vec = _embed(query)
+        if q_vec is None:
+            return []
+        k = min(top_k, self._faiss_index.ntotal)
+        scores, indices = self._faiss_index.search(q_vec, k)
+        results = []
+        for idx, score in zip(indices[0], scores[0]):
+            if idx < 0 or idx >= len(self._faiss_id_map):
+                continue
+            if score > 0.15:  # min cosine similarity threshold
+                results.append(self._faiss_id_map[idx])
         return results
 
     # ── TOP BY IMPORTANCE (no query) ──────────────────────────────────────────

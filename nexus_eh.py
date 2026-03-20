@@ -124,6 +124,62 @@ def load_initial_bb():
         else:
             TASK_QUEUE.append(t)
 
+def _redis_client():
+    """Return an authenticated Redis client, or None if unavailable."""
+    try:
+        import redis as _redis
+        _redis_pass = None
+        _env = BASE_DIR / ".env"
+        if _env.exists():
+            for _line in _env.read_text(encoding="utf-8").splitlines():
+                if _line.startswith("REDIS_PASSWORD="):
+                    _redis_pass = _line.split("=", 1)[1].strip()
+                    break
+        r = _redis.Redis(host="localhost", port=6379, password=_redis_pass, decode_responses=True)
+        r.ping()
+        return r
+    except Exception:
+        return None
+
+def read_redis_blackboard() -> dict:
+    """Read live swarm state from Redis. Falls back to JSON file."""
+    try:
+        r = _redis_client()
+        if r is None:
+            return read_json(BLACKBOARD)
+        prefix = "nexus_blackboard:"
+        # Read recent outputs (newest first from lpush)
+        raw_outputs = r.lrange(f"{prefix}outputs", 0, 29)
+        outputs = []
+        for raw in reversed(raw_outputs):  # oldest first for display
+            try:
+                outputs.append(json.loads(raw))
+            except Exception:
+                pass
+        # Read scalar keys
+        def rget(key, default=None):
+            val = r.get(f"{prefix}{key}")
+            if val is None:
+                return default
+            try:
+                return json.loads(val)
+            except Exception:
+                return val
+        return {
+            "status":      rget("status", "RUNNING"),
+            "cycle_id":    rget("cycle_id", "—"),
+            "task":        rget("task", "[none]"),
+            "last_score":  rget("last_score", None),
+            "last_mvp":    rget("last_mvp", "—"),
+            "last_lesson": rget("last_lesson", ""),
+            "colony_fitness": rget("colony_fitness", 0),
+            "outputs":     outputs,
+            "mycelial_state": rget("mycelial_state", {}),
+        }
+    except Exception as e:
+        log.warning(f"[EH] Redis read failed, falling back to file: {e}")
+        return read_json(BLACKBOARD)
+
 load_initial_bb()
 
 def sync_bb_to_disk():
@@ -452,7 +508,8 @@ async def handle(reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
 
         elif path == "/status":
             content_type = "application/json"
-            bb = read_json(BLACKBOARD)
+            # Read from Redis (live) — falls back to file if Redis is down
+            bb = read_redis_blackboard()
             response_body = json.dumps(bb, indent=2, ensure_ascii=False)
 
         elif path == "/memory":
@@ -466,12 +523,13 @@ async def handle(reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
 
         elif path == "/agents":
             content_type = "application/json"
-            bb = read_json(BLACKBOARD)
+            bb = read_redis_blackboard()  # live from Redis
             response_body = json.dumps({
                 "outputs": bb.get("outputs", [])[-6:],
                 "cycle": bb.get("cycle_id"),
                 "status": bb.get("status"),
-                "times": bb.get("agent_times", {}),
+                "last_score": bb.get("last_score"),
+                "last_mvp": bb.get("last_mvp"),
             }, indent=2)
 
         elif path == "/inject" and method == "POST":

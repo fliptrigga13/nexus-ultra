@@ -127,11 +127,11 @@ class GenePool:
 
     def get_elite(self, agent: str) -> str:
         """Return the highest-fitness prompt for this agent."""
-        variants = self.pool.get(agent, [])
+        variants = [v for v in self.pool.get(agent, []) if isinstance(v, dict)]
         if not variants:
             return BASE_AGENTS.get(agent, {}).get("base_prompt", "")
-        best = max(variants, key=lambda v: v["fitness"])
-        return best["prompt"]
+        best = max(variants, key=lambda v: v.get("fitness", 0))
+        return best.get("prompt", BASE_AGENTS.get(agent, {}).get("base_prompt", ""))
 
     def add_variant(self, agent: str, prompt: str, parent_fitness: float, generation: int):
         if agent not in self.pool:
@@ -167,16 +167,18 @@ class GenePool:
 
     def prune(self):
         for agent in list(self.pool.keys()):
-            variants = self.pool[agent]
+            if not isinstance(self.pool[agent], list):
+                continue  # skip __meta__ and non-list entries
+            variants = [v for v in self.pool[agent] if isinstance(v, dict)]
             # Keep elites + prune weak
-            elites = sorted(variants, key=lambda v: v["fitness"], reverse=True)[:ELITE_COUNT]
-            rest = [v for v in variants if v not in elites and v["fitness"] >= MIN_SCORE_TO_KEEP]
+            elites = sorted(variants, key=lambda v: v.get("fitness", 0), reverse=True)[:ELITE_COUNT]
+            rest = [v for v in variants if v not in elites and v.get("fitness", 0) >= MIN_SCORE_TO_KEEP]
             self.pool[agent] = elites + rest
             self._save()
 
     def best(self, agent: str) -> dict:
-        variants = self.pool.get(agent, [])
-        return max(variants, key=lambda v: v["fitness"]) if variants else {}
+        variants = [v for v in self.pool.get(agent, []) if isinstance(v, dict)]
+        return max(variants, key=lambda v: v.get("fitness", 0)) if variants else {}
 
     def stats(self) -> dict:
         return {a: {"variants": len(v), "best_fitness": max((x["fitness"] for x in v), default=0)} for a, v in self.pool.items()}

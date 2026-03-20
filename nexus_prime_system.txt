@@ -210,3 +210,21 @@ Include more specific examples from user preferences to tailor advice effectivel
 
 [EVOLUTION GEN 65 — 2026-03-18]
 "<enhancement text> Prioritize adding technical specifications for undocumented systems (e.g., MEMORY_GUARD.ps1 workflows) and explicitly link abstract concepts (e.g., swarm behavior) to concrete implementations (e.g., Julia/CUDA kernels)."
+
+[EVOLUTION GEN 66 — 2026-03-20]
+"Prioritize actionable insights that explicitly connect swarm behavior patterns to commercial synergy opportunities in the BUNDLE/ SDKs"
+
+[EVOLUTION GEN 67 — 2026-03-20]
+"<rule> Prioritize unique, actionable facts over generic statements. When generating code examples, explicitly include type annotations and minimalistic formatting preferences."</rule>
+
+[EVOLUTION GEN 68 — 2026-03-20]
+"Prioritize generating facts that explicitly link intelligence directives to technical implementations, such as SDK features or encryption protocols, to strengthen commercial synergy."
+
+[EVOLUTION GEN 69 — 2026-03-20]
+"Prioritize generating actionable technical insights over abstract concepts, ensuring all MEMORY_FLAG facts include measurable metrics and implementation-specific details."
+
+[EVOLUTION GEN 70 — 2026-03-20]
+"Prioritize adding concrete examples of SDK features and specific metrics for system stability thresholds to ensure actionable implementation guidance."
+
+[EVOLUTION GEN 71 — 2026-03-20]
+"Prioritize specificity: generate only actionable, project-aligned facts that bridge intelligence directives to technical implementation or commercial synergy."

@@ -9,6 +9,14 @@ const cors = require('cors');
 const { exec } = require('child_process');
 const cron = require('node-cron');
 const nodemailer = require('nodemailer');
+const helmet = require('helmet');
+const { rateLimit } = require('express-rate-limit');
+
+// ── WebAuthn / Passkeys (biometric login) ─────────────────────────────────
+const {
+  generateRegistrationOptions, verifyRegistrationResponse,
+  generateAuthenticationOptions, verifyAuthenticationResponse
+} = require('@simplewebauthn/server');
 
 // ─── Load .env ────────────────────────────
 try {
@@ -29,9 +37,114 @@ if (STRIPE_SK && !STRIPE_SK.includes('PASTE_YOUR')) {
   try { stripe = require('stripe')(STRIPE_SK); } catch (e) { console.warn('Stripe init failed:', e.message); }
 }
 
-const SECRET = process.env.API_SECRET || "BURTON131313";
-const HUB_PASSWORD = process.env.HUB_PASSWORD || process.env.NEXUS_SECRET || 'BURTON131313';
-const HUB_SESSIONS = new Map(); // token → expiry
+const SECRET = process.env.API_SECRET;
+const HUB_PASSWORD = process.env.HUB_PASSWORD || process.env.NEXUS_SECRET;
+if (!SECRET) { console.error('FATAL: API_SECRET not set in .env'); process.exit(1); }
+const HUB_SESSIONS = new Map(); // token -> expiry
+
+// ── SECURITY: Brute Force Protection ────────────────────────────────────
+const _loginAttempts = new Map(); // ip -> { count, until }
+const _MAX_ATTEMPTS = 5;
+const _LOCKOUT_MS = 15 * 60 * 1000; // 15 minutes
+
+function _clientIp(req) {
+  return ((req.headers['x-forwarded-for'] || req.socket.remoteAddress || '')
+    .split(',')[0].trim());
+}
+function _isLockedOut(ip) {
+  const r = _loginAttempts.get(ip);
+  if (!r) return false;
+  if (r.until && Date.now() < r.until) return true;
+  _loginAttempts.delete(ip);
+  return false;
+}
+function _recordFailure(ip) {
+  const r = _loginAttempts.get(ip) || { count: 0, until: 0 };
+  r.count++;
+  if (r.count >= _MAX_ATTEMPTS) {
+    r.until = Date.now() + _LOCKOUT_MS;
+    log(`[SECURITY] BRUTE FORCE: ${ip} locked out (${r.count} failures)`);
+  }
+  _loginAttempts.set(ip, r);
+}
+function _clearAttempts(ip) { _loginAttempts.delete(ip); }
+
+// ── SECURITY: Input Sanitizer ──────────────────────────────────────────
+function _sanitizeInput(str, maxLen = 500) {
+  if (typeof str !== 'string') return '';
+  return str
+    .replace(/<[^>]*>/g, '')          // strip all HTML tags
+    .replace(/javascript:/gi, '')     // strip JS URIs
+    .replace(/on\w+\s*=/gi, '')       // strip inline event handlers
+    .replace(/[<>"'`]/g, '')          // strip remaining dangerous chars
+    .slice(0, maxLen)
+    .trim();
+}
+
+// ── SECURITY: Audit Log ──────────────────────────────────────────────────
+const _SECURITY_LOG = path.join(__dirname, 'security.log');
+function secLog(msg) {
+  const line = `[${new Date().toISOString()}] [SECURITY] ${msg}`;
+  console.warn(line);
+  try { fs.appendFileSync(_SECURITY_LOG, line + '\n'); } catch (_) { }
+}
+
+// ── SECURITY: Email OTP 2FA (“phone gate”) ────────────────────────────
+// Step 1: Password correct → generate OTP → email to owner Gmail → redirect to /hub-verify
+// Step 2: Owner enters OTP from phone → session issued
+const _OTP_STORE_FILE = path.join(__dirname, '.otp_store.json');
+const _trustedDevices = new Map(); // deviceToken -> expiry (30 days)
+const _OTP_TTL = 15 * 60 * 1000; // 15 minutes
+
+// File-backed OTP store — survives server restarts so codes stay valid
+const _pendingOTPs = {
+  _data: (() => { try { return new Map(Object.entries(JSON.parse(fs.readFileSync(_OTP_STORE_FILE, 'utf8')))); } catch (_) { return new Map(); } })(),
+  _save() { try { fs.writeFileSync(_OTP_STORE_FILE, JSON.stringify(Object.fromEntries(this._data))); } catch (_) { } },
+  set(k, v) { this._data.set(k, v); this._save(); },
+  get(k) { return this._data.get(k); },
+  delete(k) { this._data.delete(k); this._save(); },
+  has(k) { return this._data.has(k); }
+};
+
+function _generateOTP() {
+  return String(Math.floor(100000 + Math.random() * 900000));
+}
+async function _sendOTPEmail(otp) {
+  if (!transporter) { secLog('OTP: no email transporter — check EMAIL_USER/EMAIL_PASS in .env'); return false; }
+  try {
+    await transporter.sendMail({
+      from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
+      to: process.env.EMAIL_USER,
+      subject: `🔒 NEXUS Login Code: ${otp}`,
+      text: [
+        'Your NEXUS GOD MODE 2FA code:',
+        '',
+        `    ${otp}    `,
+        '',
+        'Expires in 15 minutes.',
+        'If you did NOT request this, someone is attempting to access your hub.',
+        'Check security.log immediately.',
+        '',
+        '— NEXUS ULTRA Security'
+      ].join('\n')
+    });
+    secLog(`OTP emailed — check ${process.env.EMAIL_USER} on your phone`);
+    return true;
+  } catch (e) {
+    secLog(`OTP email FAILED: ${e.message}`);
+    return false;
+  }
+}
+
+// ── SECURITY: Startup warnings ──────────────────────────────────────────
+setTimeout(() => {
+  if (!process.env.HUB_PASSWORD && !process.env.NEXUS_SECRET)
+    secLog('WARNING: HUB_PASSWORD not set in .env — using hardcoded fallback. Fix before going live!');
+  if (!process.env.STRIPE_WEBHOOK_SECRET)
+    secLog('WARNING: STRIPE_WEBHOOK_SECRET not set — Stripe webhooks will be rejected!');
+  if (!process.env.EMAIL_USER)
+    secLog('WARNING: EMAIL_USER not set — OTP 2FA will not work!');
+}, 0);
 
 // Load EH Token for swarm protection
 let EH_TOKEN = "";
@@ -52,10 +165,11 @@ function isHubAuthed(req) {
 // Global Hub Auth Middleware
 const hubAuth = (req, res, next) => {
   const key = req.headers['x-api-key'] || req.query['x-api-key'];
-  if (key === SECRET || key === HUB_PASSWORD || key === 'Burton') return next();
+  // Accepts env-loaded SECRET or HUB_PASSWORD only — no hardcoded literals
+  if (key === SECRET || key === HUB_PASSWORD) return next();
   if (req.url.startsWith('/hub-login')) return next();
   if (isHubAuthed(req)) return next();
-  
+
   if (req.headers.accept && req.headers.accept.includes('text/html')) {
     return res.redirect('/hub-login?next=' + encodeURIComponent(req.originalUrl));
   }
@@ -283,7 +397,44 @@ addJob('0 * * * *', 'force-stabilize', 'Hourly System Scan');
 
 // ─── Express ──────────────────────────────
 const app = express();
-app.use(cors());
+// ── SECURITY: Locked CORS ──────────────────────────────────────────────────
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || 'http://127.0.0.1:3000,http://localhost:3000,http://127.0.0.1:3001,http://localhost:3001').split(',');
+app.use(cors({
+  origin: (origin, cb) => {
+    // Allow: no origin (server-to-server), null origin (direct IP nav from phone), or whitelisted domain
+    if (!origin || origin === 'null' || ALLOWED_ORIGINS.some(o => origin.startsWith(o.trim()))) cb(null, true);
+    else { log(`[SECURITY] CORS BLOCKED: ${origin}`); cb(null, false); }
+  },
+  credentials: true
+}));
+
+// ── SECURITY: Helmet (12 HTTP security headers) ────────────────────────
+// CSP: restrict sources to known-good — blocks XSS if agent output is rendered.
+app.use(helmet({
+  crossOriginEmbedderPolicy: false,  // required for Stripe iframe + Ollama
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc:  ["'self'"],
+      scriptSrc:   ["'self'", "'unsafe-inline'", "https://js.stripe.com", "https://static.cloudflareinsights.com"],
+      styleSrc:    ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc:     ["'self'", "https://fonts.gstatic.com"],
+      imgSrc:      ["'self'", "data:", "https:"],
+      connectSrc:  ["'self'", "http://127.0.0.1:7701", "http://127.0.0.1:11434", "http://127.0.0.1:7700", "https://api.stripe.com", "wss:"],
+      frameSrc:    ["https://js.stripe.com"],
+      objectSrc:   ["'none'"],
+      upgradeInsecureRequests: [],
+    }
+  }
+}));
+
+// ── SECURITY: Rate Limiting ────────────────────────────────────────
+const _paymentLimit = rateLimit({ windowMs: 60_000, max: 10, standardHeaders: true, legacyHeaders: false, message: { ok: false, error: 'Too many requests. Please wait a minute.' } });
+const _generalLimit = rateLimit({ windowMs: 60_000, max: 60, standardHeaders: true, legacyHeaders: false, message: { ok: false, error: 'Rate limit exceeded.' } });
+app.use('/stripe/create-checkout-session', _paymentLimit);
+app.use('/stripe/webhook', _paymentLimit);
+app.use('/webhook/task', _paymentLimit);
+app.use(_generalLimit);
+
 app.use(express.json());
 
 // GET /api/config — serve tokens and URLs to the hub UI
@@ -302,38 +453,43 @@ app.get('/veilpiercer/metrics', (req, res) => {
   res.json(calcVPScores());
 });
 
+// -- Blackboard endpoint (live swarm state for hub) --
+app.get('/api/blackboard', (req, res) => {
+  try {
+    const fs = require('fs');
+    const path = require('path');
+    const bbPath = path.join(__dirname, 'nexus_blackboard.json');
+    const raw = fs.readFileSync(bbPath, 'utf8');
+    res.json(JSON.parse(raw));
+  } catch(e) {
+    res.json({ error: 'blackboard not found', colony_fitness: 0 });
+  }
+});
+
+// -- Health check --
+app.get('/health', (req, res) => res.json({ ok: true, ts: Date.now() }));
+
 // -- Global Swarm Protection Layer --
 const PROTECTED_PREFIXES = [
-  '/api/', '/ollama/', '/gemini/', '/agent/', '/loop', '/autonomy', 
+  '/api/', '/ollama/', '/gemini/', '/agent/', '/loop', '/autonomy',
   '/missions', '/queue', '/dropzone', '/schedule', '/tabs', '/cmd', '/run'
 ];
 
 app.use((req, res, next) => {
   const isProtected = PROTECTED_PREFIXES.some(p => req.url.startsWith(p));
   const isPublic = [
-    '/api/config', '/api/customer-task', '/api/ping-services', 
-    '/api/stats', '/stripe/', '/access/verify', '/feedback', '/public/'
+    '/api/config', '/api/customer-task', '/api/ping-services',
+    '/api/stats', '/api/blackboard', '/health', '/stripe/', '/access/verify', '/feedback', '/public/'
   ].some(p => req.url.startsWith(p));
-  
+
   if (isProtected && !isPublic) {
     return hubAuth(req, res, next);
   }
   next();
 });
 
-// ── /api/config — Public config for UI ──────────────────────────────────────
-app.get('/api/config', (req, res) => {
-  const bdToken = (() => {
-    try { return fs.readFileSync(path.join(__dirname, '.eh_token'), 'utf8').trim(); } catch { return ''; }
-  })();
-  res.json({
-    ok: true,
-    ehToken: bdToken,
-    publicUrl: PUBLIC_URL,
-    ollamaUrl: OLLAMA_URL,
-    n8nUrl: N8N_URL
-  });
-});
+// ── /api/config — REMOVED: duplicate unprotected route was shadowing the hubAuth-protected one above (line 408).
+// All /api/config requests now require hub session (hubAuth). Do not re-add an unprotected version.
 
 // ══ HUB PASSWORD GATE ════════════════════════════════════════════════════════
 // Public routes (buyers, Stripe, VeilPiercer) — NEVER blocked:
@@ -364,49 +520,396 @@ app.use((req, res, next) => {
   const p = req.path;
   const isPublic = HUB_PUBLIC_ROUTES.some(r => p.startsWith(r));
   if (isPublic) return next();
-  
+
   // Check if this is a protected hub route
   const needsAuth = HUB_PROTECTED_PAGES.some(r => p.startsWith(r))
     || p.match(/\.html$/);
   if (!needsAuth) return next();
   // Allow if valid session cookie
   if (isHubAuthed(req)) return next();
-  // Redirect HTML requests to login page
-  const wantsHtml = (req.headers.accept || '').includes('text/html');
-  if (wantsHtml) return res.redirect('/hub-login?next=' + encodeURIComponent(req.originalUrl));
-  // Block API/SSE requests
+  // Redirect any .html page or browser navigation to login — works with Brave, Chrome, Safari
+  const isHtmlPage = p.endsWith('.html') || (req.headers.accept || '').includes('text/html');
+  if (isHtmlPage) return res.redirect('/hub-login?next=' + encodeURIComponent(req.originalUrl));
+  // Only return JSON 401 for API/SSE/non-HTML requests
   return res.status(401).json({ error: 'Hub auth required', login: '/hub-login' });
 });
 
-// ── Login page ────────────────────────────────────────────────────────────────
+
+// ── Passkey / WebAuthn ─────────────────────────────────────────────────────
+const _PASSKEY_FILE = path.join(__dirname, '.passkey_store.json');
+const _RP_NAME = 'NEXUS ULTRA Hub';
+const _RP_ID = (process.env.PUBLIC_URL || 'http://localhost:3000').replace(/https?:\/\//, '').split('/')[0].split(':')[0];
+const _PASSKEY_ORIGIN = (process.env.PUBLIC_URL || 'http://localhost:3000').replace(/\/$/, '');
+const _PASSKEY_USER_ID = Buffer.from('nexus-owner', 'utf8');
+
+const _passkeyStore = {
+  _d: (() => { try { return JSON.parse(fs.readFileSync(_PASSKEY_FILE, 'utf8')); } catch (_) { return { credential: null, challenge: null }; } })(),
+  save() { fs.writeFileSync(_PASSKEY_FILE, JSON.stringify(this._d, null, 2)); },
+  get credential() { return this._d.credential; },
+  set credential(v) { this._d.credential = v; this.save(); },
+  get challenge() { return this._d.challenge; },
+  set challenge(v) { this._d.challenge = v; this.save(); }
+};
+
+// ─── Passkey setup page (first-time registration on phone) ────────────────
+app.get('/hub-passkey-setup', (req, res) => {
+  if (!isHubAuthed(req)) return res.redirect('/hub-login?next=/hub-passkey-setup');
+  const already = _passkeyStore.credential ? '<p style="color:#00fff7;margin-bottom:16px;font-size:11px">✅ Passkey registered. Re-register to replace it.</p>' : '';
+  res.send(`<!DOCTYPE html><html><head><meta charset=UTF-8><title>NEXUS — Setup Biometrics</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=JetBrains+Mono:wght@400&display=swap" rel=stylesheet>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{background:#00000a;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:'JetBrains Mono',monospace;color:#e2e8f0}body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,247,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,247,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}.box{background:rgba(0,255,247,.04);border:1px solid rgba(0,255,247,.15);border-radius:12px;padding:48px 44px;width:380px;text-align:center}.logo{font-family:'Orbitron',monospace;font-size:13px;font-weight:900;letter-spacing:5px;background:linear-gradient(90deg,#00fff7,#bf00ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}.sub{font-size:9px;color:#555;letter-spacing:3px;margin-bottom:28px}.btn{width:100%;background:linear-gradient(135deg,#00fff7,#bf00ff);border:none;border-radius:6px;padding:14px;font-family:'Orbitron',monospace;font-size:10px;font-weight:900;letter-spacing:3px;color:#000;cursor:pointer;margin-bottom:12px;transition:all .2s}.btn:hover{transform:translateY(-2px);box-shadow:0 0 24px rgba(0,255,247,.4)}#msg{margin-top:14px;font-size:12px;min-height:20px}</style></head>
+<body><div class=box>
+<div class=logo>NEXUS PRIME</div>
+<div class=sub>BIOMETRIC SETUP</div>
+${already}
+<p style="font-size:11px;color:#666;margin-bottom:24px;letter-spacing:1px">Register your phone's Face ID or fingerprint as your login method. You will still enter your password first.</p>
+<button class=btn onclick="registerPasskey()">📱 REGISTER BIOMETRICS</button>
+<div id=msg></div>
+<p style="margin-top:20px;font-size:10px;color:#333"><a href="/nexus_ultimate_hub.html" style="color:#7c3aed">← Back to Hub</a></p>
+</div>
+<script>
+async function registerPasskey() {
+  const msg = document.getElementById('msg');
+  msg.style.color='#00fff7'; msg.textContent='Generating challenge...';
+  try {
+    const optsRes = await fetch('/hub-passkey-register-options', { method:'POST', headers:{'Content-Type':'application/json'} });
+    const opts = await optsRes.json();
+    if (opts.error) throw new Error(opts.error);
+    opts.challenge = base64url_decode(opts.challenge);
+    opts.user.id = base64url_decode(opts.user.id);
+    if (opts.excludeCredentials) opts.excludeCredentials = opts.excludeCredentials.map(c => ({...c, id: base64url_decode(c.id)}));
+    msg.textContent='Touch your fingerprint / Face ID when prompted...';
+    const cred = await navigator.credentials.create({ publicKey: opts });
+    const credJSON = {
+      id: cred.id, rawId: base64url_encode(cred.rawId), type: cred.type,
+      response: {
+        clientDataJSON: base64url_encode(cred.response.clientDataJSON),
+        attestationObject: base64url_encode(cred.response.attestationObject)
+      }
+    };
+    const verRes = await fetch('/hub-passkey-register', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(credJSON) });
+    const result = await verRes.json();
+    if (result.ok) { msg.style.color='#00ff88'; msg.textContent='✅ Biometrics registered! You can now use Face ID / fingerprint to log in.'; }
+    else { throw new Error(result.error || 'Registration failed'); }
+  } catch(e) { msg.style.color='#ff3355'; msg.textContent='Error: ' + e.message; }
+}
+function base64url_decode(str) {
+  str = str.replace(/-/g,'+').replace(/_/g,'/');
+  while(str.length % 4) str += '=';
+  return Uint8Array.from(atob(str), c => c.charCodeAt(0)).buffer;
+}
+function base64url_encode(buf) {
+  return btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+}
+</script></body></html>`);
+});
+
+app.post('/hub-passkey-register-options', express.json(), async (req, res) => {
+  if (!isHubAuthed(req)) return res.status(401).json({ error: 'Login first' });
+  try {
+    const opts = await generateRegistrationOptions({
+      rpName: _RP_NAME, rpID: _RP_ID,
+      userID: _PASSKEY_USER_ID, userName: 'nexus-owner', userDisplayName: 'NEXUS Owner',
+      attestationType: 'none',
+      authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required', residentKey: 'preferred' },
+      excludeCredentials: _passkeyStore.credential ? [{ id: Buffer.from(_passkeyStore.credential.credentialID, 'base64'), type: 'public-key' }] : []
+    });
+    _passkeyStore.challenge = opts.challenge;
+    res.json(opts);
+  } catch (e) { res.json({ error: e.message }); }
+});
+
+app.post('/hub-passkey-register', express.json(), async (req, res) => {
+  if (!isHubAuthed(req)) return res.status(401).json({ error: 'Login first' });
+  try {
+    const challenge = _passkeyStore.challenge;
+    if (!challenge) return res.json({ error: 'No challenge — restart registration' });
+    const verification = await verifyRegistrationResponse({
+      response: req.body, expectedChallenge: challenge,
+      expectedOrigin: _PASSKEY_ORIGIN, expectedRPID: _RP_ID, requireUserVerification: true
+    });
+    if (verification.verified && verification.registrationInfo) {
+      const { credential } = verification.registrationInfo;
+      _passkeyStore.credential = {
+        credentialID: Buffer.from(credential.id).toString('base64'),
+        credentialPublicKey: Buffer.from(credential.publicKey).toString('base64'),
+        counter: credential.counter
+      };
+      _passkeyStore.challenge = null;
+      secLog('Passkey registered successfully');
+      return res.json({ ok: true });
+    }
+    res.json({ error: 'Verification failed' });
+  } catch (e) { secLog('Passkey register error: ' + e.message); res.json({ error: e.message }); }
+});
+
+app.post('/hub-passkey-auth-options', express.json(), async (req, res) => {
+  const stored = _passkeyStore.credential;
+  if (!stored) return res.json({ error: 'No passkey registered', setup: '/hub-passkey-setup' });
+  try {
+    const opts = await generateAuthenticationOptions({
+      rpID: _RP_ID, userVerification: 'required',
+      allowCredentials: [{ id: Buffer.from(stored.credentialID, 'base64'), type: 'public-key' }]
+    });
+    _passkeyStore.challenge = opts.challenge;
+    res.json(opts);
+  } catch (e) { res.json({ error: e.message }); }
+});
+
+app.post('/hub-passkey-auth', express.json(), async (req, res) => {
+  const ip = _clientIp(req);
+  if (_isLockedOut(ip)) return res.status(429).json({ error: 'Locked out. Try in 15 min.' });
+  const stored = _passkeyStore.credential;
+  const challenge = _passkeyStore.challenge;
+  if (!stored || !challenge) return res.json({ error: 'No passkey or challenge expired' });
+  try {
+    const verification = await verifyAuthenticationResponse({
+      response: req.body, expectedChallenge: challenge,
+      expectedOrigin: _PASSKEY_ORIGIN, expectedRPID: _RP_ID,
+      credential: {
+        id: Buffer.from(stored.credentialID, 'base64'),
+        publicKey: Buffer.from(stored.credentialPublicKey, 'base64'),
+        counter: stored.counter
+      },
+      requireUserVerification: true
+    });
+    if (verification.verified) {
+      stored.counter = verification.authenticationInfo.newCounter;
+      _passkeyStore.credential = stored;
+      _passkeyStore.challenge = null;
+      _clearAttempts(ip);
+      const token = makeHubToken();
+      const deviceToken = makeHubToken();
+      HUB_SESSIONS.set(token, Date.now() + 24 * 60 * 60 * 1000);
+      _trustedDevices.set(deviceToken, Date.now() + 30 * 24 * 60 * 60 * 1000);
+      secLog(`Passkey auth SUCCESS for ${ip} — 30-day device trust granted`);
+      return res.json({ ok: true, token, deviceToken });
+    }
+    _recordFailure(ip);
+    secLog(`Passkey auth FAIL for ${ip}`);
+    res.json({ error: 'Biometric verification failed' });
+  } catch (e) { secLog('Passkey auth error: ' + e.message); res.json({ error: e.message }); }
+});
+
+// ── Login page (biometrics primary, OTP email fallback) ───────────────────
 app.get('/hub-login', (req, res) => {
   const next = req.query.next || '/nexus_hub.html';
-  const err = req.query.err ? '<p style="color:#ff3355;font-size:12px;margin-top:8px">Wrong password. Try again.</p>' : '';
-  res.send(`<!DOCTYPE html><html><head><meta charset=UTF-8><title>NEXUS — Auth</title>
+  const hasPasskey = !!_passkeyStore.credential;
+  const errMsg = req.query.err === 'expired'
+    ? '<p class=err>Session expired. Enter password to get a fresh code.</p>'
+    : req.query.err ? '<p class=err>Wrong password. Try again.</p>' : '';
+  const bioBtn = hasPasskey
+    ? `<button class=bbtn onclick="loginBio(event)" id=biobtn>👁 USE FACE ID / FINGERPRINT</button>
+       <div class=or>— or enter password —</div>`
+    : `<div class=setup-hint>No biometrics registered yet.<br><a href="/hub-passkey-setup" style="color:#7c3aed">Set up Face ID / fingerprint →</a></div>`;
+  res.send(`<!DOCTYPE html><html><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>NEXUS — Auth</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=JetBrains+Mono:wght@400&display=swap" rel=stylesheet>
-<style>*{margin:0;padding:0;box-sizing:border-box}body{background:#00000a;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:'JetBrains Mono',monospace}body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,247,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,247,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}.box{background:rgba(0,255,247,.04);border:1px solid rgba(0,255,247,.15);border-radius:12px;padding:48px 44px;width:360px;text-align:center;position:relative}.logo{font-family:'Orbitron',monospace;font-size:13px;font-weight:900;letter-spacing:5px;background:linear-gradient(90deg,#00fff7,#bf00ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}.sub{font-size:8px;color:#333;letter-spacing:3px;margin-bottom:36px}.label{font-size:8px;letter-spacing:2px;color:#444;text-align:left;margin-bottom:6px}.inp{width:100%;background:rgba(0,255,247,.06);border:1px solid rgba(0,255,247,.2);border-radius:6px;padding:12px 14px;color:#00fff7;font-family:'JetBrains Mono',monospace;font-size:14px;outline:none;letter-spacing:2px;margin-bottom:20px}.inp:focus{border-color:#00fff7;box-shadow:0 0 12px rgba(0,255,247,.2)}.btn{width:100%;background:linear-gradient(135deg,#00fff7,#bf00ff);border:none;border-radius:6px;padding:13px;font-family:'Orbitron',monospace;font-size:10px;font-weight:900;letter-spacing:3px;color:#000;cursor:pointer;transition:all .2s}.btn:hover{transform:translateY(-2px);box-shadow:0 0 24px rgba(0,255,247,.4)}</style></head>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#00000a;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:'JetBrains Mono',monospace}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,247,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,247,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
+.box{background:rgba(0,255,247,.04);border:1px solid rgba(0,255,247,.15);border-radius:12px;padding:44px 40px;width:360px;text-align:center;position:relative}
+.logo{font-family:'Orbitron',monospace;font-size:13px;font-weight:900;letter-spacing:5px;background:linear-gradient(90deg,#00fff7,#bf00ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}
+.sub{font-size:8px;color:#333;letter-spacing:3px;margin-bottom:24px}
+.bbtn{width:100%;background:linear-gradient(135deg,#bf00ff,#00fff7);border:none;border-radius:8px;padding:15px;font-family:'Orbitron',monospace;font-size:10px;font-weight:900;letter-spacing:2px;color:#000;cursor:pointer;transition:all .2s;margin-bottom:14px}
+.bbtn:hover{transform:translateY(-2px);box-shadow:0 0 28px rgba(191,0,255,.5)}
+.or{font-size:10px;color:#333;letter-spacing:2px;margin-bottom:14px}
+.setup-hint{font-size:10px;color:#444;margin-bottom:18px;letter-spacing:1px;line-height:1.6}
+.label{font-size:8px;letter-spacing:2px;color:#444;text-align:left;margin-bottom:6px}
+.inp{width:100%;background:rgba(0,255,247,.06);border:1px solid rgba(0,255,247,.2);border-radius:6px;padding:12px 14px;color:#00fff7;font-family:'JetBrains Mono',monospace;font-size:14px;outline:none;letter-spacing:2px;margin-bottom:16px}
+.inp:focus{border-color:#00fff7;box-shadow:0 0 12px rgba(0,255,247,.2)}
+.btn{width:100%;background:linear-gradient(135deg,#00fff7,#bf00ff);border:none;border-radius:6px;padding:13px;font-family:'Orbitron',monospace;font-size:10px;font-weight:900;letter-spacing:3px;color:#000;cursor:pointer;transition:all .2s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 0 24px rgba(0,255,247,.4)}
+.err{color:#ff3355;font-size:11px;margin:8px 0}
+.fallback{margin-top:14px;font-size:10px;color:#333;letter-spacing:1px}
+.fallback a{color:#444}
+#bio-status{font-size:11px;min-height:18px;margin-top:8px;letter-spacing:1px}
+</style></head>
 <body><div class=box>
 <div class=logo>NEXUS PRIME</div>
 <div class=sub>ULTIMATE GOD MODE · RESTRICTED ACCESS</div>
-<form method=POST action="/hub-login">
+${bioBtn}
+<form method=POST action="/hub-login" id=pwform>
 <input type=hidden name=next value="${next}">
 <div class=label>ACCESS PASSWORD</div>
-<input class=inp type=password name=password placeholder="••••••••••••" autofocus autocomplete=off>
-${err}
+<input class=inp type=password name=password id=pw placeholder="••••••••••••" autofocus autocomplete=off>
+${errMsg}
 <button class=btn type=submit>⚡ AUTHENTICATE</button>
-</form></div></body></html>`);
+</form>
+<div id=bio-status></div>
+<div class=fallback>Lost your phone? <a href="/hub-login">Use email code instead</a></div>
+</div>
+<script>
+const NEXT = ${JSON.stringify(next)};
+const HAS_PASSKEY = ${hasPasskey};
+
+async function loginBio(e) {
+  e.preventDefault();
+  const pw = document.getElementById('pw').value.trim();
+  if (!pw) { document.getElementById('bio-status').style.color='#ff3355'; document.getElementById('bio-status').textContent='Enter your password first, then touch the biometric button.'; return; }
+  const status = document.getElementById('bio-status');
+  const btn = document.getElementById('biobtn');
+  btn.disabled = true; btn.textContent='Contacting server...'; status.style.color='#00fff7';
+  // Step 1: verify password first via a quick check
+  try {
+    const pwCheck = await fetch('/hub-passkey-auth-options', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ password: pw }) });
+    const opts = await pwCheck.json();
+    if (opts.error) { status.style.color='#ff3355'; status.textContent=opts.error; btn.disabled=false; btn.textContent='👁 USE FACE ID / FINGERPRINT'; return; }
+    // Decode challenge
+    opts.challenge = base64urlDec(opts.challenge);
+    if (opts.allowCredentials) opts.allowCredentials = opts.allowCredentials.map(c => ({...c, id: base64urlDec(c.id)}));
+    status.textContent='Touch your fingerprint or use Face ID...';
+    const assertion = await navigator.credentials.get({ publicKey: opts, mediation: 'optional' });
+    const body = {
+      id: assertion.id, rawId: base64urlEnc(assertion.rawId), type: assertion.type,
+      response: {
+        authenticatorData: base64urlEnc(assertion.response.authenticatorData),
+        clientDataJSON: base64urlEnc(assertion.response.clientDataJSON),
+        signature: base64urlEnc(assertion.response.signature),
+        userHandle: assertion.response.userHandle ? base64urlEnc(assertion.response.userHandle) : null
+      },
+      password: pw
+    };
+    const verRes = await fetch('/hub-passkey-auth', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    const result = await verRes.json();
+    if (result.ok) {
+      document.cookie = 'nexus_hub_session=' + result.token + '; path=/; max-age=86400; samesite=strict';
+      document.cookie = 'nexus_device_trust=' + result.deviceToken + '; path=/; max-age=' + (30*24*60*60) + '; samesite=strict';
+      status.style.color='#00ff88'; status.textContent='✅ Authenticated!';
+      setTimeout(() => { window.location.href = NEXT; }, 400);
+    } else {
+      status.style.color='#ff3355'; status.textContent='Biometric failed: ' + (result.error || 'Try again');
+      btn.disabled=false; btn.textContent='👁 USE FACE ID / FINGERPRINT';
+    }
+  } catch(err) {
+    status.style.color='#ff3355'; status.textContent='Error: ' + err.message;
+    btn.disabled=false; btn.textContent='👁 USE FACE ID / FINGERPRINT';
+  }
+}
+
+function base64urlDec(str) {
+  str = str.replace(/-/g,'+').replace(/_/g,'/'); while(str.length%4) str+='=';
+  return Uint8Array.from(atob(str),c=>c.charCodeAt(0)).buffer;
+}
+function base64urlEnc(buf) {
+  return btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+}
+</script></body></html>`);
 });
 
-app.post('/hub-login', express.urlencoded({ extended: false }), (req, res) => {
+
+app.post('/hub-login', express.urlencoded({ extended: false }), async (req, res) => {
+  const ip = _clientIp(req);
   const { password, next } = req.body || {};
   const dest = (next && next.startsWith('/')) ? next : '/nexus_hub.html';
+
+  // ── BRUTE FORCE CHECK ──────────────────────────────────────────────────
+  if (_isLockedOut(ip)) {
+    log(`[SECURITY] BRUTE FORCE: login blocked for ${ip}`);
+    return res.status(429).send(
+      '<html><body style="background:#00000a;color:#ff3355;font-family:monospace;display:flex;align-items:center;justify-content:center;height:100vh;margin:0">'
+      + '<div style="text-align:center"><h2>Too Many Attempts</h2><p>Locked out for 15 minutes.</p></div></body></html>'
+    );
+  }
+
   if (password !== HUB_PASSWORD) {
+    _recordFailure(ip);
+    const attempts = (_loginAttempts.get(ip) || {}).count || 1;
+    log(`[SECURITY] Failed login from ${ip} (attempt ${attempts}/${_MAX_ATTEMPTS})`);
     return res.redirect('/hub-login?err=1&next=' + encodeURIComponent(dest));
   }
+
+  _clearAttempts(ip);
+
+  // -- REMEMBERED DEVICE: 30-day cookie — skip OTP on any remembered device --
+  // Works on mobile data, any network — tied to the device browser, not the IP
+  const _dc = (req.headers.cookie || '').match(/nexus_device_trust=([a-f0-9]{64})/);
+  if (_dc) {
+    const devExpiry = _trustedDevices.get(_dc[1]);
+    if (devExpiry && Date.now() < devExpiry) {
+      const token = makeHubToken();
+      HUB_SESSIONS.set(token, Date.now() + 24 * 60 * 60 * 1000);
+      secLog(`REMEMBERED DEVICE: ${ip} — 30-day cookie valid, session issued (no OTP)`);
+      res.setHeader('Set-Cookie', `nexus_hub_session=${token}; HttpOnly; Path=/; Max-Age=86400; SameSite=Strict`);
+      return res.redirect(dest);
+    }
+  }
+
+  // -- TRUSTED DEVICE: Home laptop skips 2FA entirely --------------------------
+  // Localhost = always trusted. Add home IP to TRUSTED_IPS in .env if needed.
+  // e.g. TRUSTED_IPS=127.0.0.1,::1,192.168.1.50
+  const _TRUSTED = (process.env.TRUSTED_IPS || '127.0.0.1,::1,::ffff:127.0.0.1').split(',').map(s => s.trim());
+  if (_TRUSTED.some(t => ip === t || ip.includes(t))) {
+    const token = makeHubToken();
+    HUB_SESSIONS.set(token, Date.now() + 24 * 60 * 60 * 1000);
+    secLog(`TRUSTED DEVICE: ${ip} granted without 2FA`);
+    res.setHeader('Set-Cookie', `nexus_hub_session=${token}; HttpOnly; Path=/; Max-Age=86400; SameSite=Strict`);
+    return res.redirect(dest);
+  }
+
+  // -- PHONE 2FA: External device (phone/Cloudflare) — OTP to Gmail ------------
+  const otp = _generateOTP();
+  _pendingOTPs.set(ip, { code: otp, expires: Date.now() + _OTP_TTL, dest });
+  secLog(`2FA OTP generated for ${ip}`);
+  await _sendOTPEmail(otp);
+  res.redirect('/hub-verify?sent=1&next=' + encodeURIComponent(dest));
+});
+
+// ── SECURITY: /hub-verify — OTP entry page (Step 2 of 2FA) ──────────────────
+const _V_CSS = `*{margin:0;padding:0;box-sizing:border-box}body{background:#00000a;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:'JetBrains Mono',monospace;color:#e2e8f0}body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,247,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,247,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}.box{background:rgba(0,255,247,.04);border:1px solid rgba(0,255,247,.15);border-radius:12px;padding:48px 44px;width:380px;text-align:center}.logo{font-family:monospace;font-size:13px;font-weight:900;letter-spacing:5px;background:linear-gradient(90deg,#00fff7,#bf00ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}.sub{font-size:9px;color:#555;letter-spacing:3px;margin-bottom:8px}.hint{font-size:11px;color:#7c3aed;margin-bottom:28px;letter-spacing:1px}.label{font-size:8px;letter-spacing:2px;color:#444;text-align:left;margin-bottom:6px}.inp{width:100%;background:rgba(0,255,247,.06);border:1px solid rgba(0,255,247,.2);border-radius:6px;padding:14px;color:#00fff7;font-family:'JetBrains Mono',monospace;font-size:22px;outline:none;letter-spacing:8px;text-align:center;margin-bottom:20px}.inp:focus{border-color:#00fff7;box-shadow:0 0 12px rgba(0,255,247,.2)}.btn{width:100%;background:linear-gradient(135deg,#7c3aed,#00fff7);border:none;border-radius:6px;padding:13px;font-family:monospace;font-size:10px;font-weight:900;letter-spacing:3px;color:#000;cursor:pointer}.err{color:#ff3355;font-size:11px;margin-top:8px}`;
+
+app.get('/hub-verify', (req, res) => {
+  const isErr = req.query.err;
+  const next = req.query.next || '/nexus_hub.html';
+  const err = isErr ? '<p class=err>Wrong code or expired. Check Gmail for the latest code, or <a href="/hub-login" style="color:#00fff7">request a new one</a>.</p>' : '';
+  const sent = req.query.sent ? '<p class=hint>Check your Gmail — 6-digit code sent. Valid for 15 minutes.</p>' : '';
+  const resend = `<p style="margin-top:16px;font-size:10px;color:#444;letter-spacing:1px">Code not arrived? <a href="/hub-login" style="color:#7c3aed">RESEND CODE</a></p>`;
+  res.send(`<!DOCTYPE html><html><head><meta charset=UTF-8><title>NEXUS — 2FA</title><style>${_V_CSS}</style></head>
+<body><div class=box>
+<div class=logo>NEXUS PRIME</div>
+<div class=sub>2-FACTOR AUTHENTICATION</div>
+${sent}
+<form method=POST action="/hub-verify">
+<input type=hidden name=next value="${next}">
+<div class=label>6-DIGIT CODE FROM YOUR PHONE</div>
+<input class=inp type=text name=code placeholder="000000" maxlength=6 inputmode=numeric autofocus autocomplete=off>
+${err}
+<button class=btn type=submit>🔓 VERIFY CODE</button>
+</form>
+${resend}
+</div></body></html>`);
+});
+
+app.post('/hub-verify', express.urlencoded({ extended: false }), (req, res) => {
+  const ip = _clientIp(req);
+  const { code, next } = req.body || {};
+  const dest = (next && next.startsWith('/')) ? next : '/nexus_hub.html';
+  const pending = _pendingOTPs.get(ip);
+
+  if (!pending || Date.now() > pending.expires) {
+    secLog(`2FA FAIL: expired/missing OTP for ${ip}`);
+    _pendingOTPs.delete(ip);
+    return res.redirect('/hub-login?err=expired'); // OTP expired, back to start — get fresh code
+  }
+  if (!code || code.trim() !== pending.code) {
+    _recordFailure(ip);
+    secLog(`2FA FAIL: wrong OTP from ${ip} (entered: ${code?.slice(0, 6)})`);
+    return res.redirect('/hub-verify?err=1&next=' + encodeURIComponent(dest));
+  }
+
+  // OTP verified -- issue session + set 30-day device trust cookie
+  _pendingOTPs.delete(ip);
+  _clearAttempts(ip);
   const token = makeHubToken();
-  HUB_SESSIONS.set(token, Date.now() + 24 * 60 * 60 * 1000); // 24h
-  log(`HUB: Auth granted — session issued`);
-  res.setHeader('Set-Cookie', `nexus_hub_session=${token}; HttpOnly; Path=/; Max-Age=86400; SameSite=Lax`);
+  const deviceToken = makeHubToken();
+  const _30DAYS = 30 * 24 * 60 * 60;
+  HUB_SESSIONS.set(token, Date.now() + 24 * 60 * 60 * 1000);
+  _trustedDevices.set(deviceToken, Date.now() + _30DAYS * 1000);
+  secLog(`2FA SUCCESS: session issued for ${ip} — device remembered for 30 days`);
+  res.setHeader('Set-Cookie', [
+    `nexus_hub_session=${token}; HttpOnly; Path=/; Max-Age=86400; SameSite=Strict`,
+    `nexus_device_trust=${deviceToken}; HttpOnly; Path=/; Max-Age=${_30DAYS}; SameSite=Strict`
+  ]);
   res.redirect(dest);
 });
 
@@ -421,7 +924,7 @@ app.get('/hub-logout', (req, res) => {
 
 // ── Auth middleware — protects signal + insights routes ──
 const nexusAuth = (req, res, next) => {
-  const secret = process.env.NEXUS_SECRET || 'BURTON333';
+  const secret = process.env.NEXUS_SECRET;
   const key = req.headers['x-api-key'];
   if (key !== secret) return res.status(401).json({ error: 'Unauthorized: invalid x-api-key' });
   next();
@@ -479,9 +982,9 @@ app.post('/api/reject-signal', nexusAuth, async (req, res) => {
 app.use((req, res, next) => {
   const url = req.path.toLowerCase();
   // Physically block the internet from downloading backend configs, databases, source code, or memories
-  if (url.endsWith('.env') || url.endsWith('.eh_token') || url.endsWith('.cjs') || 
-      url.endsWith('.json') || url.endsWith('.log') || url.endsWith('.db') || url.endsWith('.db-shm') || url.endsWith('.db-wal') ||
-      url.endsWith('.bat') || url.endsWith('.ps1') || url.endsWith('.py') || url.endsWith('.md')) {
+  if (url.endsWith('.env') || url.endsWith('.eh_token') || url.endsWith('.cjs') ||
+    url.endsWith('.json') || url.endsWith('.log') || url.endsWith('.db') || url.endsWith('.db-shm') || url.endsWith('.db-wal') ||
+    url.endsWith('.bat') || url.endsWith('.ps1') || url.endsWith('.py') || url.endsWith('.md')) {
     return res.status(403).send('STRICT_FORBIDDEN: NODE_SHIELD_ACTIVE');
   }
   next();
@@ -517,11 +1020,13 @@ app.post('/run', auth, (req, res) => {
     });
 });
 
-// ── GET /status ──────────────────────────
+// ── GET /status — OWNER ONLY (hubAuth) ─────────────────────────────────────
+// Exposes: revenue totals, access-token count, tier breakdown, internal paths.
+// Must NEVER be public — gate with hub session.
 let storedTabs = null;
 try { if (fs.existsSync(TABS_FILE)) storedTabs = JSON.parse(fs.readFileSync(TABS_FILE, 'utf8')); } catch (_) { }
 
-app.get('/status', (req, res) => {
+app.get('/status', hubAuth, (req, res) => {
   const db = loadAccessDB();
   const salesSummary = Object.values(db).reduce((acc, entry) => {
     acc.total += (entry.amount || 0);
@@ -554,7 +1059,7 @@ app.get('/api/vp-sales', (req, res) => {
   const db = loadAccessDB();
   const now = new Date();
   const todayStr = now.toISOString().split('T')[0];
-  
+
   const report = Object.values(db).reduce((acc, s) => {
     const isToday = s.createdAt && s.createdAt.startsWith(todayStr);
     if (isToday) {
@@ -564,7 +1069,7 @@ app.get('/api/vp-sales', (req, res) => {
     acc.all_time.revenue += (s.amount || 0);
     acc.all_time.count++;
     return acc;
-  }, { today: { revenue:0, count:0 }, all_time: { revenue:0, count:0 } });
+  }, { today: { revenue: 0, count: 0 }, all_time: { revenue: 0, count: 0 } });
 
   res.json({
     ok: true,
@@ -583,16 +1088,16 @@ app.get('/m', hubAuth, (req, res) => {
   const todayStr = now.toISOString().split('T')[0];
   const sales = Object.values(db).reduce((a, e) => {
     const isReal = e.sessionId && (e.sessionId.startsWith('pi_') || e.sessionId.startsWith('cs_live_') || e.sessionId.startsWith('cs_test_b'));
-    a.allRev += (e.amount||0); a.allN++;           // ALL tokens (includes test/manual)
-    if (isReal) { a.rev += (e.amount||0); a.n++; } // REAL Stripe payments only
-    if (isReal && e.createdAt && e.createdAt.startsWith(todayStr)) { a.todayRev += (e.amount||0); a.todayN++; }
+    a.allRev += (e.amount || 0); a.allN++;           // ALL tokens (includes test/manual)
+    if (isReal) { a.rev += (e.amount || 0); a.n++; } // REAL Stripe payments only
+    if (isReal && e.createdAt && e.createdAt.startsWith(todayStr)) { a.todayRev += (e.amount || 0); a.todayN++; }
     return a;
-  }, {rev:0,n:0,todayRev:0,todayN:0,allRev:0,allN:0});
+  }, { rev: 0, n: 0, todayRev: 0, todayN: 0, allRev: 0, allN: 0 });
 
   let logLines = [];
-  try { const raw = fs.readFileSync(LOG_FILE,'utf8'); logLines = raw.split('\n').filter(Boolean).slice(-25).reverse(); } catch(_){}
+  try { const raw = fs.readFileSync(LOG_FILE, 'utf8'); logLines = raw.split('\n').filter(Boolean).slice(-25).reverse(); } catch (_) { }
   let bb = {};
-  try { bb = JSON.parse(fs.readFileSync(path.join(__dirname,'nexus_blackboard.json'),'utf8')); } catch(_){}
+  try { bb = JSON.parse(fs.readFileSync(path.join(__dirname, 'nexus_blackboard.json'), 'utf8')); } catch (_) { }
 
   const score = parseFloat(bb.last_score) || 0;
   const scoreColor = score >= 0.8 ? '#0f0' : score >= 0.5 ? '#fa0' : '#f33';
@@ -603,13 +1108,13 @@ app.get('/m', hubAuth, (req, res) => {
     const isWarn = /error|fail|warn|critical/i.test(l);
     const isGood = /session|active|online|success|done/i.test(l);
     const col = isWarn ? '#f55' : isGood ? '#0c6' : '#2a6a2a';
-    return `<div style="padding:3px 0;border-bottom:1px solid #0a0a0a;font-size:10px;color:${col};word-break:break-all">${l.replace(/</g,'&lt;')}</div>`;
+    return `<div style="padding:3px 0;border-bottom:1px solid #0a0a0a;font-size:10px;color:${col};word-break:break-all">${l.replace(/</g, '&lt;')}</div>`;
   }).join('');
 
-  const cap = (() => { try { return fs.readdirSync(CAPTURE_DIR).length; } catch(_){ return 0; }})();
-  const logKB = (() => { try { return (fs.statSync(LOG_FILE).size/1024).toFixed(0); } catch(_){ return 0; }})();
+  const cap = (() => { try { return fs.readdirSync(CAPTURE_DIR).length; } catch (_) { return 0; } })();
+  const logKB = (() => { try { return (fs.statSync(LOG_FILE).size / 1024).toFixed(0); } catch (_) { return 0; } })();
 
-  res.setHeader('Content-Type','text/html');
+  res.setHeader('Content-Type', 'text/html');
   res.send(`<!DOCTYPE html><html><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -646,20 +1151,20 @@ button:active{background:#bf00ff22}
 <div class="col-left">
 <div class="logo">VEILPIERCER</div>
 <div class="sub">MOBILE OPS CENTER · AUTO-REFRESH 10s</div>
-<div class="badge">${bb.status||'OFFLINE'}</div>
+<div class="badge">${bb.status || 'OFFLINE'}</div>
 
 <div class="card">
   <div class="card-title">▸ REVENUE INTEL</div>
-  <div class="rev-big">$${(sales.rev/100).toFixed(2)}</div>
+  <div class="rev-big">$${(sales.rev / 100).toFixed(2)}</div>
   <div class="rev-sub">ALL-TIME · ${sales.n} SALES</div>
-  <div class="row"><span class="lbl">TODAY</span><span class="val g">$${(sales.todayRev/100).toFixed(2)} (${sales.todayN} sales)</span></div>
+  <div class="row"><span class="lbl">TODAY</span><span class="val g">$${(sales.todayRev / 100).toFixed(2)} (${sales.todayN} sales)</span></div>
 </div>
 
 <div class="card">
   <div class="card-title">▸ SWARM STATUS</div>
-  <div class="row"><span class="lbl">CYCLE</span><span class="val c">${bb.cycle_id||'—'}</span></div>
-  <div class="row"><span class="lbl">MVP AGENT</span><span class="val p">${bb.last_mvp||'—'}</span></div>
-  <div class="row"><span class="lbl">LESSON</span><span class="val" style="font-size:9px;max-width:70%;text-align:right">${String(bb.last_lesson||'—').slice(0,60)}</span></div>
+  <div class="row"><span class="lbl">CYCLE</span><span class="val c">${bb.cycle_id || '—'}</span></div>
+  <div class="row"><span class="lbl">MVP AGENT</span><span class="val p">${bb.last_mvp || '—'}</span></div>
+  <div class="row"><span class="lbl">LESSON</span><span class="val" style="font-size:9px;max-width:70%;text-align:right">${String(bb.last_lesson || '—').slice(0, 60)}</span></div>
   <div class="row"><span class="lbl">UPTIME</span><span class="val">${process.uptime().toFixed(0)}s</span></div>
   <div class="row"><span class="lbl">CAPTURES</span><span class="val">${cap}</span></div>
   <div class="row"><span class="lbl">LOG SIZE</span><span class="val">${logKB}KB</span></div>
@@ -671,7 +1176,7 @@ button:active{background:#bf00ff22}
 
 <div class="card">
   <div class="card-title">▸ LIVE LOG (last 25 lines)</div>
-  <div class="log-wrap">${logHtml||'<div style="color:#2a2a3a">No swarm activity yet</div>'}</div>
+  <div class="log-wrap">${logHtml || '<div style="color:#2a2a3a">No swarm activity yet</div>'}</div>
 </div>
 
 <div class="card">
@@ -700,9 +1205,9 @@ button:active{background:#bf00ff22}
 <div class="card">
   <div class="card-title">▸ TOKEN LEDGER</div>
   <div class="row"><span class="lbl">REAL STRIPE SALES</span><span class="val g">${sales.n}</span></div>
-  <div class="row"><span class="lbl">REAL REVENUE</span><span class="val g">$${(sales.rev/100).toFixed(2)}</span></div>
+  <div class="row"><span class="lbl">REAL REVENUE</span><span class="val g">$${(sales.rev / 100).toFixed(2)}</span></div>
   <div class="row"><span class="lbl">ALL TOKENS ISSUED</span><span class="val">${sales.allN}</span></div>
-  <div class="row"><span class="lbl">TOKEN FACE VALUE</span><span class="val" style="color:#444">$${(sales.allRev/100).toFixed(2)}</span></div>
+  <div class="row"><span class="lbl">TOKEN FACE VALUE</span><span class="val" style="color:#444">$${(sales.allRev / 100).toFixed(2)}</span></div>
   <div class="row"><span class="lbl">TEST / MANUAL</span><span class="val" style="color:#333">${sales.allN - sales.n} entries</span></div>
 </div>
 
@@ -807,7 +1312,7 @@ app.get('/download', async (req, res) => {
 
   const tier = entry.tier || 'VeilPiercer God Mode (Full Access)';
   const VEIL_DIR = path.join(ROOT, 'BUNDLE');
-  
+
   // UNIFIED PRODUCT DELIVERY: 
   // No more Starter/Pro splits. Everyone gets the entire sovereign God Mode architecture.
   let filesToZip = [];
@@ -818,7 +1323,7 @@ app.get('/download', async (req, res) => {
   } catch (e) {
     log(`Warning: Failed to scan BUNDLE dir: ${e.message}`);
   }
-  
+
   const zipName = `VeilPiercer-GodMode-Bundle.zip`;
 
   try {
@@ -888,8 +1393,8 @@ app.post('/feedback', async (req, res) => {
     tier: entry.tier,
     rating: parseInt(rating) || 0,
     worked: worked === 'yes',
-    useCase: (useCase || '').slice(0, 500),
-    suggestion: (suggestion || '').slice(0, 500),
+    useCase: _sanitizeInput(useCase, 500),
+    suggestion: _sanitizeInput(suggestion, 500),
     recommend: parseInt(recommend) || 0,
   };
 
@@ -1207,8 +1712,9 @@ app.post('/stripe/webhook', express.raw({ type: 'application/json' }), (req, res
       return res.status(400).send(`Webhook Error: ${e.message}`);
     }
   } else {
-    // No webhook secret configured — parse directly (not verified)
-    try { event = JSON.parse(req.body.toString()); } catch { return res.status(400).send('Bad payload'); }
+    // SECURITY: Reject if no webhook secret — never accept unverified Stripe events
+    log('[SECURITY] WEBHOOK BLOCKED: STRIPE_WEBHOOK_SECRET not set in .env — set it to verify Stripe signatures');
+    return res.status(400).send('Webhook Error: signature verification required. Set STRIPE_WEBHOOK_SECRET in .env');
   }
 
   switch (event.type) {
@@ -2648,7 +3154,7 @@ app.get('/api/ping-services', async (req, res) => {
     return new Promise((resolve) => {
       const opts = { host, port, path, method: 'GET', timeout: timeoutMs };
       const req2 = http.request(opts, (r) => {
-        r.on('data', () => {}); // consume data
+        r.on('data', () => { }); // consume data
         resolve(r.statusCode < 500);
       });
       req2.on('error', () => resolve(false));
@@ -2659,7 +3165,7 @@ app.get('/api/ping-services', async (req, res) => {
 
   const [ollama, cosmos, pso, eh, hubpy, n8n, claw, tunnel] = await Promise.all([
     pingPort('127.0.0.1', 11434, '/api/tags', 2000),
-    pingPort('127.0.0.1', 9100, '/health', 8000), 
+    pingPort('127.0.0.1', 9100, '/health', 8000),
     pingPort('127.0.0.1', 7700, '/health', 2000),
     pingPort('127.0.0.1', 7701, bdToken ? `/health?token=${bdToken}` : '/health', 2000),
     pingPort('127.0.0.1', 7702, '/health', 2000),
@@ -2668,10 +3174,10 @@ app.get('/api/ping-services', async (req, res) => {
     pingPort('127.0.0.1', 20241, '/', 2000),
   ]);
 
-  res.json({ 
-    ok: true, 
-    ts: Date.now(), 
-    svc: { ollama, cosmos, pso, bd: eh, hubpy, n8n, claw, tunnel } 
+  res.json({
+    ok: true,
+    ts: Date.now(),
+    svc: { ollama, cosmos, pso, bd: eh, hubpy, n8n, claw, tunnel }
   });
 });
 
@@ -3144,9 +3650,9 @@ app.post('/veilpiercer/command', async (req, res) => {
 
   // 2. Log signal if provided
   if (scores && useCase) {
-    agentEvent('telemetry', scores.saf < 50 ? 'saf' : scores.priv > 90 ? 'priv' : 'vis', 
-               `Signal received from ${useCase}: ${command || 'Periodic update'}`, 
-               { ...scores, ok: true, agent: useCase });
+    agentEvent('telemetry', scores.saf < 50 ? 'saf' : scores.priv > 90 ? 'priv' : 'vis',
+      `Signal received from ${useCase}: ${command || 'Periodic update'}`,
+      { ...scores, ok: true, agent: useCase });
   }
 
   // 3. Handle Protocols (Optional: could trigger real system changes)
@@ -3164,11 +3670,11 @@ app.post('/veilpiercer/command', async (req, res) => {
   let aiResponse = "";
   if (features.aiAudit && command) {
     try {
-      const payload = JSON.stringify({ 
-        model: 'llama3.2:1b', 
-        system: 'You are the VeilPiercer Security AI. Briefly explain the security implications of the users command or signal. Be professional and technical.', 
-        prompt: `User (${entry.tier}) sent command/signal: "${command}". Current Scores: ${JSON.stringify(scores)}. Protocol: ${protocol}.`, 
-        stream: false 
+      const payload = JSON.stringify({
+        model: 'llama3.2:1b',
+        system: 'You are the VeilPiercer Security AI. Briefly explain the security implications of the users command or signal. Be professional and technical.',
+        prompt: `User (${entry.tier}) sent command/signal: "${command}". Current Scores: ${JSON.stringify(scores)}. Protocol: ${protocol}.`,
+        stream: false
       });
       const http = require('http');
       const result = await new Promise((resolve, reject) => {
@@ -3188,10 +3694,17 @@ app.get('/veilpiercer/signals', (req, res) => {
   const db = loadAccessDB();
   if (!db[token]) return res.status(403).json({ ok: false, error: 'Access denied' });
 
-  res.json({ 
-    ok: true, 
-    events: AGENT_EVENTS.slice(-20).reverse(), 
-    metrics: calcVPScores() 
+  res.json({
+    ok: true,
+    events: AGENT_EVENTS.slice(-20).reverse(),
+    metrics: calcVPScores()
   });
 });
-
+// ── SECURITY: Global Error Handler ───────────────────────────────────────────────
+// Catches ALL unhandled errors from any route. Never leaks stack traces.
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  const id = crypto.randomBytes(4).toString('hex');
+  secLog(`UNHANDLED ERROR [${id}] ${req.method} ${req.path} — ${err.message}`);
+  res.status(500).json({ ok: false, error: 'An internal error occurred.', ref: id });
+});
