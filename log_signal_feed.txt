@@ -1,0 +1,2741 @@
+2026-03-20 19:35:40,701 ============================================================
+2026-03-20 19:35:40,701  NEXUS SIGNAL FEED ONLINE
+2026-03-20 19:35:40,701  Sources: Yahoo Finance | Hacker News | CoinGecko
+2026-03-20 19:35:40,701  Poll interval: 600s | Output: nexus_signal.json
+2026-03-20 19:35:40,701 ============================================================
+2026-03-20 19:35:41,534 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Oracle Stock Has Lost More Th...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 154, in main
+    poll()  # First poll immediately on startup
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Oracle Stock Has Lost More Th...'
+Arguments: ()
+2026-03-20 19:45:42,264 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Oracle Stock Has Lost More Th...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Oracle Stock Has Lost More Th...'
+Arguments: ()
+2026-03-20 19:55:43,575 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Oracle Stock Has Lost More Th...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Oracle Stock Has Lost More Th...'
+Arguments: ()
+2026-03-20 20:05:44,505 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Oracle Stock Has Lost More Th...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Oracle Stock Has Lost More Th...'
+Arguments: ()
+2026-03-20 20:15:45,607 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Oracle Stock Has Lost More Th...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Oracle Stock Has Lost More Th...'
+Arguments: ()
+2026-03-20 20:25:46,478 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Oracle Stock Has Lost More Th...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Oracle Stock Has Lost More Th...'
+Arguments: ()
+2026-03-20 20:35:47,467 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Oracle Stock Has Lost More Th...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Oracle Stock Has Lost More Th...'
+Arguments: ()
+2026-03-20 20:45:48,310 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Is This the Dark-Horse Driver...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Is This the Dark-Horse Driver...'
+Arguments: ()
+2026-03-20 20:55:49,099 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Forget $5 Trillion, Dan Ives ...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Forget $5 Trillion, Dan Ives ...'
+Arguments: ()
+2026-03-20 21:05:50,227 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Forget $5 Trillion, Dan Ives ...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Forget $5 Trillion, Dan Ives ...'
+Arguments: ()
+2026-03-20 21:15:51,108 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] This Resilient Dividend Stock...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] This Resilient Dividend Stock...'
+Arguments: ()
+2026-03-20 21:25:52,041 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] This Resilient Dividend Stock...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] This Resilient Dividend Stock...'
+Arguments: ()
+2026-03-20 21:35:52,840 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] This Resilient Dividend Stock...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] This Resilient Dividend Stock...'
+Arguments: ()
+2026-03-20 21:45:53,650 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] This Resilient Dividend Stock...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] This Resilient Dividend Stock...'
+Arguments: ()
+2026-03-20 21:55:54,468 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Could Amazon and USPS' Failin...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: "[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Could Amazon and USPS' Failin..."
+Arguments: ()
+2026-03-20 22:05:55,412 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] This Nvidia-Backed Stock Is S...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] This Nvidia-Backed Stock Is S...'
+Arguments: ()
+2026-03-20 22:15:56,308 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] This Nvidia-Backed Stock Is S...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] This Nvidia-Backed Stock Is S...'
+Arguments: ()
+2026-03-20 22:25:57,449 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] This Nvidia-Backed Stock Is S...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] This Nvidia-Backed Stock Is S...'
+Arguments: ()
+2026-03-20 22:35:58,282 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Pentagon formalizes Palantir ...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Pentagon formalizes Palantir ...'
+Arguments: ()
+2026-03-20 22:45:59,095 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Pentagon formalizes Palantir ...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Pentagon formalizes Palantir ...'
+Arguments: ()
+2026-03-20 22:55:59,999 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] The Good News Just Keeps Flow...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] The Good News Just Keeps Flow...'
+Arguments: ()
+2026-03-20 23:06:01,087 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] The Good News Just Keeps Flow...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] The Good News Just Keeps Flow...'
+Arguments: ()
+2026-03-20 23:16:03,042 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] The Latest Super Micro Comput...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] The Latest Super Micro Comput...'
+Arguments: ()
+2026-03-20 23:26:04,179 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Tesla Is Investing in xAI. Is...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Tesla Is Investing in xAI. Is...'
+Arguments: ()
+2026-03-20 23:36:04,973 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Tesla Is Investing in xAI. Is...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Tesla Is Investing in xAI. Is...'
+Arguments: ()
+2026-03-20 23:46:05,750 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Tesla Is Investing in xAI. Is...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Tesla Is Investing in xAI. Is...'
+Arguments: ()
+2026-03-20 23:56:06,579 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Oil Shock: What History Says ...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Oil Shock: What History Says ...'
+Arguments: ()
+2026-03-21 00:06:07,556 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Nike Stock Has Been Absolutel...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Nike Stock Has Been Absolutel...'
+Arguments: ()
+2026-03-21 00:16:09,068 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Nike Stock Has Been Absolutel...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Nike Stock Has Been Absolutel...'
+Arguments: ()
+2026-03-21 00:26:09,859 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Nike Stock Has Been Absolutel...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Nike Stock Has Been Absolutel...'
+Arguments: ()
+2026-03-21 00:36:10,702 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] ASML vs. Broadcom: Which AI S...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] ASML vs. Broadcom: Which AI S...'
+Arguments: ()
+2026-03-21 00:46:11,465 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Could Buying Nebius Stock Tod...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Could Buying Nebius Stock Tod...'
+Arguments: ()
+2026-03-21 00:56:13,283 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Could Buying Nebius Stock Tod...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Could Buying Nebius Stock Tod...'
+Arguments: ()
+2026-03-21 01:06:15,383 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Goldman Sachs Just Sounded th...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Goldman Sachs Just Sounded th...'
+Arguments: ()
+2026-03-21 01:16:16,744 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Goldman Sachs Just Sounded th...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Goldman Sachs Just Sounded th...'
+Arguments: ()
+2026-03-21 01:26:17,720 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Goldman Sachs Just Sounded th...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Goldman Sachs Just Sounded th...'
+Arguments: ()
+2026-03-21 01:36:18,839 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Goldman Sachs Just Sounded th...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Goldman Sachs Just Sounded th...'
+Arguments: ()
+2026-03-21 01:46:19,806 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Better Industrial Stock: Ford...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Better Industrial Stock: Ford...'
+Arguments: ()
+2026-03-21 01:56:21,038 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Better Industrial Stock: Ford...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Better Industrial Stock: Ford...'
+Arguments: ()
+2026-03-21 02:06:21,893 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Better Industrial Stock: Ford...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Better Industrial Stock: Ford...'
+Arguments: ()
+2026-03-21 02:16:22,811 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Thinking About Buying Swarmer...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Thinking About Buying Swarmer...'
+Arguments: ()
+2026-03-21 02:26:23,663 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Thinking About Buying Swarmer...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Thinking About Buying Swarmer...'
+Arguments: ()
+2026-03-21 02:36:24,568 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Thinking About Buying Swarmer...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Thinking About Buying Swarmer...'
+Arguments: ()
+2026-03-21 02:46:25,366 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Top 2 AI Growth Stocks to Buy...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Top 2 AI Growth Stocks to Buy...'
+Arguments: ()
+2026-03-21 02:56:26,705 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Top 2 AI Growth Stocks to Buy...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Top 2 AI Growth Stocks to Buy...'
+Arguments: ()
+2026-03-21 03:06:27,548 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Top 2 AI Growth Stocks to Buy...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Top 2 AI Growth Stocks to Buy...'
+Arguments: ()
+2026-03-21 03:16:29,658 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Top 2 AI Growth Stocks to Buy...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Top 2 AI Growth Stocks to Buy...'
+Arguments: ()
+2026-03-21 03:26:30,713 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Meet the 5 "Magnificent Seven...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Meet the 5 "Magnificent Seven...'
+Arguments: ()
+2026-03-21 03:36:31,573 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Meet the 5 "Magnificent Seven...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Meet the 5 "Magnificent Seven...'
+Arguments: ()
+2026-03-21 03:46:32,390 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Prediction: This Will Be Nvid...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Prediction: This Will Be Nvid...'
+Arguments: ()
+2026-03-21 03:56:33,594 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Think You'll Live on Social S...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: "[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Think You'll Live on Social S..."
+Arguments: ()
+2026-03-21 04:06:34,407 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Think You'll Live on Social S...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: "[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Think You'll Live on Social S..."
+Arguments: ()
+2026-03-21 04:16:35,320 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Can Lululemon Stock Recover? ...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Can Lululemon Stock Recover? ...'
+Arguments: ()
+2026-03-21 04:26:36,177 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Can Lululemon Stock Recover? ...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Can Lululemon Stock Recover? ...'
+Arguments: ()
+2026-03-21 04:36:37,644 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Is It Too Late To Reassess Pa...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Is It Too Late To Reassess Pa...'
+Arguments: ()
+2026-03-21 04:46:38,504 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Is It Too Late To Reassess Pa...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Is It Too Late To Reassess Pa...'
+Arguments: ()
+2026-03-21 04:56:39,340 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Tariff-Related Lawsuits Could...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Tariff-Related Lawsuits Could...'
+Arguments: ()
+2026-03-21 05:06:40,270 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Warren Buffett Spent $3.5 Bil...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Warren Buffett Spent $3.5 Bil...'
+Arguments: ()
+2026-03-21 05:16:41,114 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Warren Buffett Spent $3.5 Bil...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Warren Buffett Spent $3.5 Bil...'
+Arguments: ()
+2026-03-21 05:26:41,946 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Billionaire Bill Ackman Has 2...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Billionaire Bill Ackman Has 2...'
+Arguments: ()
+2026-03-21 05:36:42,898 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Could Qualcomm Stock Turn $1,...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Could Qualcomm Stock Turn $1,...'
+Arguments: ()
+2026-03-21 05:46:43,855 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] How Much Will a SpaceX Starsh...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] How Much Will a SpaceX Starsh...'
+Arguments: ()
+2026-03-21 05:56:44,883 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] 2 Artificial Intelligence (AI...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] 2 Artificial Intelligence (AI...'
+Arguments: ()
+2026-03-21 06:06:45,826 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] The 1 Asset Warren Buffett Sa...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] The 1 Asset Warren Buffett Sa...'
+Arguments: ()
+2026-03-21 06:16:46,706 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] The Core Question for Freshwo...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] The Core Question for Freshwo...'
+Arguments: ()
+2026-03-21 06:26:47,949 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] 1 Artificial Intelligence (AI...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] 1 Artificial Intelligence (AI...'
+Arguments: ()
+2026-03-21 06:36:48,844 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] The VT ETF Might Be Smarter T...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] The VT ETF Might Be Smarter T...'
+Arguments: ()
+2026-03-21 06:46:49,665 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Meta Platforms (META) and Neb...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Meta Platforms (META) and Neb...'
+Arguments: ()
+2026-03-21 06:56:52,128 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Better Growth Stock in 2026: ...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Better Growth Stock in 2026: ...'
+Arguments: ()
+2026-03-21 07:06:53,068 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Better Growth Stock in 2026: ...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Better Growth Stock in 2026: ...'
+Arguments: ()
+2026-03-21 07:16:54,434 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Undervalued and Profitable: 3...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Undervalued and Profitable: 3...'
+Arguments: ()
+2026-03-21 07:26:55,326 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] 1 Reason Now Is a Great Time ...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] 1 Reason Now Is a Great Time ...'
+Arguments: ()
+2026-03-21 07:36:56,287 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Better Crypto Buy: Bitcoin vs...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Better Crypto Buy: Bitcoin vs...'
+Arguments: ()
+2026-03-21 07:46:57,171 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Oil Is Down Today, Up Tomorro...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Oil Is Down Today, Up Tomorro...'
+Arguments: ()
+2026-03-21 07:56:58,034 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] NNN REIT s 36-Year Dividend S...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] NNN REIT s 36-Year Dividend S...'
+Arguments: ()
+2026-03-21 08:06:58,949 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] NNN REIT s 36-Year Dividend S...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] NNN REIT s 36-Year Dividend S...'
+Arguments: ()
+2026-03-21 08:16:59,865 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Who s Right on Arbor Realty? ...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Who s Right on Arbor Realty? ...'
+Arguments: ()
+2026-03-21 08:27:01,507 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Where Will SoFi Technologies ...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Where Will SoFi Technologies ...'
+Arguments: ()
+2026-03-21 08:37:02,525 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Forget Rate Cuts: What if the...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Forget Rate Cuts: What if the...'
+Arguments: ()
+2026-03-21 08:47:03,324 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Better AI Stock: Alphabet vs....
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Better AI Stock: Alphabet vs....'
+Arguments: ()
+2026-03-21 08:57:04,203 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Down 21% This Year: Is Oracle...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Down 21% This Year: Is Oracle...'
+Arguments: ()
+2026-03-21 09:07:05,268 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] The Trade Desk Is Being Value...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] The Trade Desk Is Being Value...'
+Arguments: ()
+2026-03-21 09:17:06,194 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] The Trade Desk Is Being Value...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] The Trade Desk Is Being Value...'
+Arguments: ()
+2026-03-21 09:27:07,010 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Dow Jones Jumps Late After Se...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Dow Jones Jumps Late After Se...'
+Arguments: ()
+2026-03-21 09:37:08,064 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Jensen Huang Just Delivered I...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Jensen Huang Just Delivered I...'
+Arguments: ()
+2026-03-21 09:47:08,911 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Jensen Huang Just Delivered I...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Jensen Huang Just Delivered I...'
+Arguments: ()
+2026-03-21 09:57:09,756 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Jensen Huang Just Delivered I...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Jensen Huang Just Delivered I...'
+Arguments: ()
+2026-03-21 10:07:10,659 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Jensen Huang Just Delivered I...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Jensen Huang Just Delivered I...'
+Arguments: ()
+2026-03-21 10:17:11,651 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] 0G Positions as the Blockchai...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] 0G Positions as the Blockchai...'
+Arguments: ()
+2026-03-21 10:27:12,417 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] If You'd Invested $1,000 in C...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: "[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] If You'd Invested $1,000 in C..."
+Arguments: ()
+2026-03-21 10:37:13,333 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] If You'd Invested $1,000 in C...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: "[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] If You'd Invested $1,000 in C..."
+Arguments: ()
+2026-03-21 10:47:14,193 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] If You'd Invested $1,000 in C...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: "[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] If You'd Invested $1,000 in C..."
+Arguments: ()
+2026-03-21 10:57:15,100 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Palo Alto Networks Acquired 3...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Palo Alto Networks Acquired 3...'
+Arguments: ()
+2026-03-21 11:07:16,074 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Palo Alto Networks Acquired 3...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Palo Alto Networks Acquired 3...'
+Arguments: ()
+2026-03-21 11:17:16,978 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Palo Alto Networks Acquired 3...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Palo Alto Networks Acquired 3...'
+Arguments: ()
+2026-03-21 11:27:17,925 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Will Securing NVIDIA s OpenSh...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Will Securing NVIDIA s OpenSh...'
+Arguments: ()
+2026-03-21 11:37:18,736 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Oil Shocks Could Continue to ...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Oil Shocks Could Continue to ...'
+Arguments: ()
+2026-03-21 11:47:19,506 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Could Nvidia Stock Turn $10,0...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Could Nvidia Stock Turn $10,0...'
+Arguments: ()
+2026-03-21 11:57:20,248 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Could Nvidia Stock Turn $10,0...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Could Nvidia Stock Turn $10,0...'
+Arguments: ()
+2026-03-21 12:07:21,925 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Dow Jones Bounces Late After ...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Dow Jones Bounces Late After ...'
+Arguments: ()
+2026-03-21 12:17:22,727 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] The Iran War Just Triggered a...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] The Iran War Just Triggered a...'
+Arguments: ()
+2026-03-21 12:27:23,477 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] 3 Top EV Stocks With AI Upsid...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] 3 Top EV Stocks With AI Upsid...'
+Arguments: ()
+2026-03-21 12:37:24,558 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] 2 AI Stocks That Didn't Get t...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: "[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] 2 AI Stocks That Didn't Get t..."
+Arguments: ()
+2026-03-21 12:47:25,351 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] 2 AI Stocks That Didn't Get t...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: "[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] 2 AI Stocks That Didn't Get t..."
+Arguments: ()
+2026-03-21 12:57:26,193 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] 2 AI Stocks That Didn't Get t...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: "[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] 2 AI Stocks That Didn't Get t..."
+Arguments: ()
+2026-03-21 13:07:27,217 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] The Ultimate Growth Stock to ...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] The Ultimate Growth Stock to ...'
+Arguments: ()
+2026-03-21 13:17:28,252 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] The Ultimate Growth Stock to ...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] The Ultimate Growth Stock to ...'
+Arguments: ()
+2026-03-21 13:27:29,084 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Pentagon Taps Palantir Maven ...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Pentagon Taps Palantir Maven ...'
+Arguments: ()
+2026-03-21 13:37:29,868 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Prediction: XRP Will Be Worth...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Prediction: XRP Will Be Worth...'
+Arguments: ()
+2026-03-21 13:47:30,776 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Prediction: XRP Will Be Worth...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Prediction: XRP Will Be Worth...'
+Arguments: ()
+2026-03-21 13:57:31,579 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Goldman Sachs Projects $700 B...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Goldman Sachs Projects $700 B...'
+Arguments: ()
+2026-03-21 14:07:32,359 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] 1 Magnificent Stock Down 25% ...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] 1 Magnificent Stock Down 25% ...'
+Arguments: ()
+2026-03-21 14:17:33,124 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Dow Jones Bounces Late After ...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Dow Jones Bounces Late After ...'
+Arguments: ()
+2026-03-21 14:27:33,868 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] The Best Stocks to Invest $5,...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] The Best Stocks to Invest $5,...'
+Arguments: ()
+2026-03-21 14:37:34,611 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] 3 Reasons Why Taiwan Semicond...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] 3 Reasons Why Taiwan Semicond...'
+Arguments: ()
+2026-03-21 14:47:35,555 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Jensen Huang says CEOs  out o...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Jensen Huang says CEOs  out o...'
+Arguments: ()
+2026-03-21 14:57:36,313 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] 2 Great Dividend-Paying Oil S...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] 2 Great Dividend-Paying Oil S...'
+Arguments: ()
+2026-03-21 15:07:37,336 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] A Once-in-a-Lifetime Opportun...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] A Once-in-a-Lifetime Opportun...'
+Arguments: ()
+2026-03-21 15:17:38,488 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] A Once-in-a-Lifetime Opportun...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] A Once-in-a-Lifetime Opportun...'
+Arguments: ()
+2026-03-21 15:27:39,409 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Wall Street Analyst Warns of ...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Wall Street Analyst Warns of ...'
+Arguments: ()
+2026-03-21 15:37:40,214 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Wall Street Analyst Warns of ...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Wall Street Analyst Warns of ...'
+Arguments: ()
+2026-03-21 15:47:41,064 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Down 23% This Year, Is It Fin...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Down 23% This Year, Is It Fin...'
+Arguments: ()
+2026-03-21 15:57:41,898 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Dow Jones Bounces Late After ...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Dow Jones Bounces Late After ...'
+Arguments: ()
+2026-03-21 16:07:43,044 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Palantir Is Executing Perfect...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Palantir Is Executing Perfect...'
+Arguments: ()
+2026-03-21 16:17:43,881 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Palantir Is Executing Perfect...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Palantir Is Executing Perfect...'
+Arguments: ()
+2026-03-21 16:27:44,660 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] How Will Dow Jones Futures Op...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] How Will Dow Jones Futures Op...'
+Arguments: ()
+2026-03-21 16:37:46,700 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] 2 Beaten-Down Stocks That Sti...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] 2 Beaten-Down Stocks That Sti...'
+Arguments: ()
+2026-03-21 16:47:47,776 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Meta Stock Slips Below $600. ...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Meta Stock Slips Below $600. ...'
+Arguments: ()
+2026-03-21 16:57:49,007 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Meta Stock Slips Below $600. ...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Meta Stock Slips Below $600. ...'
+Arguments: ()
+2026-03-21 17:07:51,018 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Meta Stock Slips Below $600. ...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Meta Stock Slips Below $600. ...'
+Arguments: ()
+2026-03-21 17:17:52,470 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] I Just Put More Than $10,000 ...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] I Just Put More Than $10,000 ...'
+Arguments: ()
+2026-03-21 17:27:53,458 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Microsoft Is Now the Cheapest...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Microsoft Is Now the Cheapest...'
+Arguments: ()
+2026-03-21 17:37:54,212 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Microsoft Is Now the Cheapest...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Microsoft Is Now the Cheapest...'
+Arguments: ()
+2026-03-21 17:47:55,891 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Got $5,000? 2 Beaten-Down Tec...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Got $5,000? 2 Beaten-Down Tec...'
+Arguments: ()
+2026-03-21 17:57:57,387 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Better Semiconductor Stock: B...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Better Semiconductor Stock: B...'
+Arguments: ()
+2026-03-21 18:08:04,505 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] EV Stocks Have Massive Upside...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] EV Stocks Have Massive Upside...'
+Arguments: ()
+2026-03-21 18:18:05,645 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] EV Stocks Have Massive Upside...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] EV Stocks Have Massive Upside...'
+Arguments: ()
+2026-03-21 18:28:06,458 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Salesforce And NVIDIA Target ...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Salesforce And NVIDIA Target ...'
+Arguments: ()
+2026-03-21 18:38:07,312 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Salesforce And NVIDIA Target ...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Salesforce And NVIDIA Target ...'
+Arguments: ()
+2026-03-21 18:48:08,077 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] This Nuclear Energy Trend Cou...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] This Nuclear Energy Trend Cou...'
+Arguments: ()
+2026-03-21 18:58:08,853 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Uber's Advertising Business M...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: "[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Uber's Advertising Business M..."
+Arguments: ()
+2026-03-21 19:08:09,605 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Is This Stock a Buy on the Di...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Is This Stock a Buy on the Di...'
+Arguments: ()
+2026-03-21 19:18:10,441 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Is This Stock a Buy on the Di...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Is This Stock a Buy on the Di...'
+Arguments: ()
+2026-03-21 19:28:11,245 [FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Is This Stock a Buy on the Di...
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Python314\Lib\logging\__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 31: character maps to <undefined>
+Call stack:
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 160, in <module>
+    main()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 157, in main
+    poll()
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_signal_feed.py", line 140, in poll
+    logging.info(f"[FEED] ✅ Signal saved — {hits}/3 sources | Task: {task[:100]}...")
+Message: '[FEED] ✅ Signal saved — 3/3 sources | Task: REAL-WORLD SIGNAL ANALYSIS TASK: Based on live signals — [MARKET NEWS] Is This Stock a Buy on the Di...'
+Arguments: ()

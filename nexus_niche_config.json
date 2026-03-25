@@ -1,0 +1,41 @@
+{
+  "active_client": "VeilPiercer",
+  "clients": {
+    "VeilPiercer": {
+      "niche": "Solo AI developers, indie hackers, and small agencies wanting 100% offline local LLM infrastructure without cloud API costs or privacy concerns. Key buyer insight: they struggle most with UNDERSTANDING what their agents did, not resolving conflicts after the fact. The debugging blind spot is the primary pain, not coordination.",
+      "keywords": [
+        "local AI", "Ollama", "self-hosted LLM", "API costs too high",
+        "privacy", "offline AI", "llama", "open source AI", "no cloud",
+        "run AI locally", "LLM on my machine", "inference cost",
+        "agent debugging", "agent observability", "LangChain", "LangGraph",
+        "CrewAI", "AutoGen", "agent logging", "what my agent did",
+        "debugging agents", "agent behavior", "agent tracing", "agent audit",
+        "local LLM agent", "multi-step agent", "agent stack"
+      ],
+      "pain_signals": [
+        "too expensive", "API limits", "data privacy", "slow inference",
+        "cloud dependency", "rate limit", "OpenAI bill", "Anthropic cost",
+        "can't afford", "privacy concern", "data leak", "vendor lock",
+        "debugging blind", "blind spot", "no visibility", "what changed between runs",
+        "why did my run", "can't see what my agent", "don't know what happened",
+        "agent diverged", "state drift", "behaves differently", "no clear way",
+        "hard to debug", "what breaks first", "silent failure", "agent hallucinating",
+        "tool call", "replay session", "compare runs", "between runs"
+      ],
+      "urls": [
+        "https://www.reddit.com/r/LocalLLaMA/hot.json?limit=15",
+        "https://www.reddit.com/r/SideProject/hot.json?limit=10",
+        "https://www.reddit.com/r/selfhosted/hot.json?limit=10",
+        "https://www.reddit.com/r/Entrepreneur/hot.json?limit=10",
+        "https://www.reddit.com/r/LangChain/hot.json?limit=10",
+        "https://www.reddit.com/r/MachineLearning/hot.json?limit=10",
+        "https://hn.algolia.com/api/v1/search?query=local+llm+self+hosted&tags=story&hitsPerPage=10",
+        "https://hn.algolia.com/api/v1/search?query=AI+costs+privacy&tags=story&hitsPerPage=10",
+        "https://hn.algolia.com/api/v1/search?query=AI+agent+debugging+observability&tags=story&hitsPerPage=10"
+      ],
+      "scrape_interval_minutes": 30,
+      "max_tasks_per_scrape": 5,
+      "min_relevance_score": 0.25
+    }
+  }
+}

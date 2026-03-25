@@ -219,8 +219,29 @@ Format your response with clear sections:
         return {"response": "", "flags": [], "improvements": [], "prompt_enhancement": "", "quality_score": 0.0}
 
     # Parse response
-    flags = re.findall(r'\[MEMORY_FLAG:\s*([^\]]+)\]', response, re.IGNORECASE)
-    flags = [f.strip() for f in flags if len(f.strip()) > 10][:MAX_FACTS_PER_CYCLE]
+    flags_raw = re.findall(r'\[MEMORY_FLAG:\s*([^\]]+)\]', response, re.IGNORECASE)
+    # --- SECURITY: validate each flag before it enters memory ---
+    _BAD_FLAG_PATTERNS = [
+        r'<[a-z]+',           # HTML tags
+        r'javascript:',       # JS injection
+        r'ignore.*instruct',  # prompt override
+        r'system.*prompt',    # system access
+        r'\beval\s*\(',       # code execution
+        r'\bexec\s*\(',       # code execution
+        r'http[s]?://',       # URL exfiltration
+    ]
+    def _valid_flag(f: str) -> bool:
+        f = f.strip()
+        if len(f) < 10 or len(f) > 100:
+            return False
+        if any(ord(c) < 32 and c not in ('\n', '\r', '\t') for c in f):
+            return False  # control characters
+        low = f.lower()
+        if any(re.search(p, low) for p in _BAD_FLAG_PATTERNS):
+            log(f"  [GUARD] Rejected flag (injection pattern): {f[:60]}", "WARN")
+            return False
+        return True
+    flags = [f.strip() for f in flags_raw if _valid_flag(f)][:MAX_FACTS_PER_CYCLE]
 
     improvements = re.findall(r'[-•]\s*(.+)', response)
     improvements = [i.strip() for i in improvements if len(i.strip()) > 10][:5]

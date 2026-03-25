@@ -1,218 +1,218 @@
 {
   "SUPERVISOR→SUPERVISOR": {
     "strength": 0.01,
-    "deposits": 293,
-    "age": 8903,
-    "last_deposit": "2026-03-17T20:05:35.758753"
+    "deposits": 333,
+    "age": 14656,
+    "last_deposit": "2026-03-21T01:15:15.617333"
   },
   "SUPERVISOR→PLANNER": {
     "strength": 0.01,
     "deposits": 2464,
-    "age": 8903,
+    "age": 14656,
     "last_deposit": "2026-03-17T20:10:08.301355"
   },
   "SUPERVISOR→RESEARCHER": {
     "strength": 0.01,
     "deposits": 293,
-    "age": 8903,
+    "age": 14656,
     "last_deposit": "2026-03-17T20:05:35.788628"
   },
   "SUPERVISOR→DEVELOPER": {
     "strength": 0.01,
     "deposits": 298,
-    "age": 8903,
+    "age": 14656,
     "last_deposit": "2026-03-17T20:05:35.800311"
   },
   "SUPERVISOR→VALIDATOR": {
     "strength": 0.01,
     "deposits": 293,
-    "age": 8903,
+    "age": 14656,
     "last_deposit": "2026-03-17T20:05:35.811627"
   },
   "SUPERVISOR→REWARD": {
     "strength": 0.01,
-    "deposits": 293,
-    "age": 8903,
-    "last_deposit": "2026-03-17T20:05:35.819022"
+    "deposits": 739,
+    "age": 14656,
+    "last_deposit": "2026-03-21T23:29:33.202423"
   },
   "PLANNER→SUPERVISOR": {
     "strength": 0.01,
     "deposits": 152,
-    "age": 8903,
+    "age": 14656,
     "last_deposit": "2026-03-17T17:38:06.909970"
   },
   "PLANNER→PLANNER": {
     "strength": 0.01,
     "deposits": 216,
-    "age": 8903,
+    "age": 14656,
     "last_deposit": "2026-03-17T19:51:15.445117"
   },
   "PLANNER→RESEARCHER": {
     "strength": 0.01,
-    "deposits": 2076,
-    "age": 8903,
-    "last_deposit": "2026-03-17T20:10:08.308807"
+    "deposits": 2568,
+    "age": 14656,
+    "last_deposit": "2026-03-21T21:12:55.949921"
   },
   "PLANNER→DEVELOPER": {
     "strength": 0.01,
-    "deposits": 160,
-    "age": 8903,
-    "last_deposit": "2026-03-17T17:38:06.957494"
+    "deposits": 454,
+    "age": 14656,
+    "last_deposit": "2026-03-21T20:53:25.081416"
   },
   "PLANNER→VALIDATOR": {
     "strength": 0.01,
     "deposits": 248,
-    "age": 8903,
+    "age": 14656,
     "last_deposit": "2026-03-17T19:52:15.749369"
   },
   "PLANNER→REWARD": {
     "strength": 0.01,
     "deposits": 152,
-    "age": 8903,
+    "age": 14656,
     "last_deposit": "2026-03-17T17:38:06.990605"
   },
   "RESEARCHER→SUPERVISOR": {
     "strength": 0.01,
     "deposits": 520,
-    "age": 8903,
+    "age": 14656,
     "last_deposit": "2026-03-17T20:09:53.195116"
   },
   "RESEARCHER→PLANNER": {
     "strength": 0.01,
-    "deposits": 520,
-    "age": 8903,
-    "last_deposit": "2026-03-17T20:09:53.199729"
+    "deposits": 983,
+    "age": 14656,
+    "last_deposit": "2026-03-21T19:19:19.582063"
   },
   "RESEARCHER→RESEARCHER": {
     "strength": 0.01,
-    "deposits": 520,
-    "age": 8903,
-    "last_deposit": "2026-03-17T20:09:53.202915"
+    "deposits": 555,
+    "age": 14656,
+    "last_deposit": "2026-03-21T02:10:22.174640"
   },
   "RESEARCHER→DEVELOPER": {
     "strength": 0.01,
-    "deposits": 2053,
-    "age": 8903,
-    "last_deposit": "2026-03-17T20:09:53.232613"
+    "deposits": 2476,
+    "age": 14656,
+    "last_deposit": "2026-03-21T21:12:55.950308"
   },
   "RESEARCHER→VALIDATOR": {
     "strength": 0.01,
     "deposits": 520,
-    "age": 8903,
+    "age": 14656,
     "last_deposit": "2026-03-17T20:09:53.217768"
   },
   "RESEARCHER→REWARD": {
     "strength": 0.01,
     "deposits": 520,
-    "age": 8903,
+    "age": 14656,
     "last_deposit": "2026-03-17T20:09:53.222530"
   },
   "DEVELOPER→SUPERVISOR": {
     "strength": 0.01,
-    "deposits": 558,
-    "age": 8903,
-    "last_deposit": "2026-03-17T20:09:38.076634"
+    "deposits": 590,
+    "age": 14656,
+    "last_deposit": "2026-03-21T03:43:26.394645"
   },
   "DEVELOPER→PLANNER": {
     "strength": 0.01,
-    "deposits": 558,
-    "age": 8903,
-    "last_deposit": "2026-03-17T20:09:38.081073"
+    "deposits": 604,
+    "age": 14656,
+    "last_deposit": "2026-03-21T19:59:51.497242"
   },
   "DEVELOPER→RESEARCHER": {
     "strength": 0.01,
-    "deposits": 558,
-    "age": 8903,
-    "last_deposit": "2026-03-17T20:09:38.085772"
+    "deposits": 594,
+    "age": 14656,
+    "last_deposit": "2026-03-21T02:01:06.797644"
   },
   "DEVELOPER→DEVELOPER": {
     "strength": 0.01,
-    "deposits": 558,
-    "age": 8903,
-    "last_deposit": "2026-03-17T20:09:38.091843"
+    "deposits": 577,
+    "age": 14656,
+    "last_deposit": "2026-03-21T02:38:53.463780"
   },
   "DEVELOPER→VALIDATOR": {
     "strength": 0.01,
     "deposits": 955,
-    "age": 8903,
+    "age": 14656,
     "last_deposit": "2026-03-17T20:09:38.096875"
   },
   "DEVELOPER→REWARD": {
     "strength": 0.01,
     "deposits": 558,
-    "age": 8903,
+    "age": 14656,
     "last_deposit": "2026-03-17T20:09:38.100580"
   },
   "VALIDATOR→SUPERVISOR": {
     "strength": 0.01,
-    "deposits": 14,
-    "age": 8903,
-    "last_deposit": "2026-03-17T18:08:41.320512"
+    "deposits": 29,
+    "age": 14656,
+    "last_deposit": "2026-03-21T03:16:25.148827"
   },
   "VALIDATOR→PLANNER": {
     "strength": 0.01,
-    "deposits": 14,
-    "age": 8903,
-    "last_deposit": "2026-03-17T18:08:41.328525"
+    "deposits": 33,
+    "age": 14656,
+    "last_deposit": "2026-03-21T03:25:10.618019"
   },
   "VALIDATOR→RESEARCHER": {
     "strength": 0.01,
     "deposits": 14,
-    "age": 8903,
+    "age": 14656,
     "last_deposit": "2026-03-17T18:08:41.336183"
   },
   "VALIDATOR→DEVELOPER": {
     "strength": 0.01,
     "deposits": 14,
-    "age": 8903,
+    "age": 14656,
     "last_deposit": "2026-03-17T18:08:41.341881"
   },
   "VALIDATOR→VALIDATOR": {
     "strength": 0.01,
-    "deposits": 14,
-    "age": 8903,
-    "last_deposit": "2026-03-17T18:08:41.346911"
+    "deposits": 31,
+    "age": 14656,
+    "last_deposit": "2026-03-21T03:08:09.784557"
   },
   "VALIDATOR→REWARD": {
     "strength": 0.01,
     "deposits": 809,
-    "age": 8903,
+    "age": 14656,
     "last_deposit": "2026-03-17T20:09:53.236548"
   },
   "REWARD→SUPERVISOR": {
     "strength": 0.01,
-    "deposits": 8,
-    "age": 8903,
-    "last_deposit": "2026-03-17T18:13:43.477303"
+    "deposits": 137,
+    "age": 14656,
+    "last_deposit": "2026-03-21T20:29:52.876240"
   },
   "REWARD→PLANNER": {
     "strength": 0.01,
     "deposits": 8,
-    "age": 8903,
+    "age": 14656,
     "last_deposit": "2026-03-17T18:13:43.482501"
   },
   "REWARD→RESEARCHER": {
     "strength": 0.01,
-    "deposits": 8,
-    "age": 8903,
-    "last_deposit": "2026-03-17T18:13:43.488765"
+    "deposits": 38,
+    "age": 14656,
+    "last_deposit": "2026-03-21T01:36:01.724099"
   },
   "REWARD→DEVELOPER": {
     "strength": 0.01,
     "deposits": 8,
-    "age": 8903,
+    "age": 14656,
     "last_deposit": "2026-03-17T18:13:43.492700"
   },
   "REWARD→VALIDATOR": {
     "strength": 0.01,
     "deposits": 8,
-    "age": 8903,
+    "age": 14656,
     "last_deposit": "2026-03-17T18:13:43.496577"
   },
   "REWARD→REWARD": {
     "strength": 0.01,
-    "deposits": 8,
-    "age": 8903,
-    "last_deposit": "2026-03-17T18:13:43.500005"
+    "deposits": 41,
+    "age": 14656,
+    "last_deposit": "2026-03-21T02:30:23.060459"
   }
 }

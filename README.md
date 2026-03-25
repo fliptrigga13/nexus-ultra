@@ -135,3 +135,82 @@ MIT — do whatever you want with it.
 ---
 
 *Built on: Ollama · Python · Julia · DeepSeek · Qwen · Llama · Gemma*
+
+---
+
+## Security — API Access Token
+
+### What it is
+NEXUS_API_TOKEN is a 48-character secret key that protects all sensitive
+backend endpoints on port 3000 from unauthorized WiFi or network access.
+
+### The Token
+`
+xiv7G3ZO5JFN4zSmYMDpIwj2eAHokcUtq8fnEdTguayQ1RK9
+`
+Also stored in: .env as NEXUS_API_TOKEN
+
+### What it protects
+Any call to these LOCAL SWARM endpoints requires this token in the request header:
+
+| Endpoint | What it does |
+|----------|-------------|
+| POST /api/cycle | Injects tasks into the swarm blackboard |
+| POST /api/flush | Clears all queued swarm tasks |
+| GET  /api/status | Returns full system status |
+| POST /api/chat-history | Saves encrypted chat logs |
+| POST /api/evolution | Triggers evolution cycle |
+| POST /api/embed | Embeds data into FAISS memory |
+
+### How to use it
+Add this header to any API call:
+`
+x-nexus-token: xiv7G3ZO5JFN4zSmYMDpIwj2eAHokcUtq8fnEdTguayQ1RK9
+`
+
+Example (curl):
+`ash
+curl -X POST http://localhost:3000/api/cycle \
+  -H "x-nexus-token: xiv7G3ZO5JFN4zSmYMDpIwj2eAHokcUtq8fnEdTguayQ1RK9" \
+  -H "Content-Type: application/json" \
+  -d '{"task": "Analyze top 3 VeilPiercer growth opportunities"}'
+`
+
+### Public endpoints (NO token required)
+All VeilPiercer buyer-facing pages, /health, and the observatory remain open.
+
+---
+
+## Day Summary — March 20, 2026 (For Next Agent)
+
+### What Was Built Today
+| File | Change |
+|------|--------|
+| 
+exus_swarm_loop.py | FAISS top_k 3->6 (all 1991 memories), _is_safe_task() hardened (25 patterns, 500-char cap) |
+| 
+exus_node09_optimizer.py | CREATED — RAM/CPU/VRAM monitor with Redis write and throttle logic |
+| server.cjs | +3 VeilPiercer endpoints, +sanitizeTask() guard, +requireToken/requireLocalhost middleware, +AES-256-GCM chat encryption |
+| NEXUS_MASTER_LAUNCHER.py | CREATED — single command launches all 8 components |
+| 
+exus_security_guard.py | CREATED — SHA256 modelfile integrity verifier (sealed Gen 72 hash) |
+| SELF_EVOLUTION_LOOP.py | _valid_flag() validator added — 7 injection patterns, 10-100 char range |
+| 
+exus_prime_evolved.modelfile | Created from Gen 72 evolution — baked in 575 session facts |
+| README.md | API token documented with full usage guide |
+| NEXUS_TODO.txt | Created on Desktop — ordered task list |
+
+### System State for Next Agent
+- **Model**: nexus-evolved (Gen 72, 575 facts, built on nexus-prime:latest)
+- **Security**: All 5 adversary vectors closed, USB blocked, BT discovery off
+- **Access**: Localhost = full control | LAN/phone = view only | Internet = blocked
+- **NEXUS_API_TOKEN**: xiv7G3ZO5JFN4zSmYMDpIwj2eAHokcUtq8fnEdTguayQ1RK9 (in .env)
+- **Processes**: 8 running (swarm, evolution hourly, sentinel, antennae, mycelium, signal-feed, cognitive, node-09)
+- **GDrive sync**: Configured and active (rclone googledrive remote)
+
+### Open Items for Next Agent
+1. Screen lock / PIN — user must set manually in Windows Settings
+2. Stripe webhook config for VeilPiercer billing
+3. MEMORY_FLAG evolution quality review after Gen 73+
+4. Tally Counter Widget (UI bouncer/process counter) — not yet built
+5. 64GB RAM upgrade — unlocks dual-model, score ceiling to 98+

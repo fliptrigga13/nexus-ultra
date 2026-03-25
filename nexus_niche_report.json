@@ -1,0 +1,162 @@
+{
+  "client": "VeilPiercer",
+  "generated_at": "2026-03-21T23:28:07.973648+00:00",
+  "total_signals": 9,
+  "swarm_memories": 0,
+  "scraped_signals": 9,
+  "top_signals": [
+    {
+      "title": "Show HN: Omnifact – Self-Hosted, Privacy-First AI Platform for Enterprise",
+      "body": "Hi HN, we&#x27;re Patrick and Florian, and we created Omnifact out of frustration with the underwhelming impact of AI on business productivity. After working with large companies struggling to adopt AI in a meaningful way due to data privacy concerns and vendor lock-in, we decided to build the platform we wished we had.<p>Omnifact is designed for organizations that want to make use of generative AI and RAG without compromising data security or flexibility.<p>Here&#x27;s the tech breakdown:<p>- D",
+      "type": "pain",
+      "source": "https://news.ycombinator.com/item?id=41329407",
+      "relevance": 0.5555555555555556,
+      "agent": "NICHE INTAKE"
+    },
+    {
+      "title": "Show HN: Open-source multimodal AI that runs in the browser",
+      "body": "I built an AI assistant that runs completely in your browser using WebGPU. After the initial model download (~200MB-4GB depending on model choice), it works offline. No API keys. No subscriptions. No data leaves your device.<p>Browser-based local AI addresses this:<p>1. Works offline after first load – Local AI makes possible offline AI use. Resilience – Work continues even during outages. Affordability – No recurring cloud or bandwidth costs. Privacy – Data stays on the device, reducing exposur",
+      "type": "pain",
+      "source": "https://johnjboren.github.io/ai-assistant.html",
+      "relevance": 0.4166666666666667,
+      "agent": "NICHE INTAKE"
+    },
+    {
+      "title": "Show HN: God's Eye – Subdomain recon with local AI analysis",
+      "body": "Hi HN! I built God&#x27;s Eye, an AI-powered subdomain enumeration tool that combines \ntraditional recon techniques with local LLM analysis.<p>What makes it different:\n- 100% local &amp; private - no data leaves your machine\n- Zero API costs - uses Ollama with models like DeepSeek-R1 and Qwen2.5-Coder\n- 20 passive sources (crt.sh, Certspotter, AlienVault, etc.)\n- AI analysis of discovered subdomains for security insights\n- Written in Go for speed<p>I built this because most subdomain tools just ",
+      "type": "pain",
+      "source": "https://github.com/Vyntral/god-eye",
+      "relevance": 0.4166666666666667,
+      "agent": "NICHE INTAKE"
+    },
+    {
+      "title": "Show HN: AgenticSeek – Self-hosted alternative to cloud-based AI tools",
+      "body": "I’ve spent the last two months building AgenticSeek, a privacy-focused alternative to cloud-based AI tools like ManusAI. It runs entirely on your machine—no API calls, no data leaks.<p>Why AgenticSeek?<p>Optimized for local LLMs (developed mostly on an RTX 3060 running deepseek r1 14b).<p>Truly private: All components (TTS, STT, planner) run locally.<p>More responsive than alternatives (we respond fast to issues + active Discord).<p>Designed to be fun—think JARVIS-like voice control, multi-agent",
+      "type": "intent",
+      "source": "https://github.com/Fosowl/agenticSeek",
+      "relevance": 0.2777777777777778,
+      "agent": "NICHE INTAKE"
+    },
+    {
+      "title": "M5 Max 128G Performance tests. I just got my new toy, and here's what it can do.",
+      "body": "I just started into this stuff a couple months ago, so be gentle. I'm and old grey-haired IT guy, so I'm not coming from 0, but this stuff is all new to me. \n\nWhat started with a Raspberry PI with a Hailo10H, playing around with openclaw and ollama, turned into me trying ollama on my Macbook M3 Pro 16G, where I immediately saw the potential. The new M5 was announced at just the right time to trigger my OCD, and I got the thing just yesterday. \n\nI've been using claude code for a while now, having",
+      "type": "insight",
+      "source": "https://reddit.com/r/LocalLLaMA/comments/1rzkw4x/m5_max_128g_performance_tests_i_just_got_my_new/",
+      "relevance": 0.2777777777777778,
+      "agent": "NICHE INTAKE"
+    },
+    {
+      "title": "Show HN: Llamactl – Self-hosted LLM manager with OpenAI-compatible routing",
+      "body": "Llamactl is a unified management system for running local LLMs across llama.cpp, MLX, and vLLM backends, with a web dashboard and OpenAI-compatible API.<p>I originally built this because I got tired of constantly SSHing to my server to edit a config just try out a new model. It&#x27;s grown a lot since then.<p>What it does:<p>Web UI for creating and managing LLM instances from your browser<p>Full llama.cpp model lifecycle - download from HuggingFace, create preset.ini configs with an in-browser ",
+      "type": "insight",
+      "source": "https://github.com/lordmathis/llamactl",
+      "relevance": 0.2777777777777778,
+      "agent": "NICHE INTAKE"
+    },
+    {
+      "title": "Show HN: MirrorMate – A self-hosted AI smart mirror with local LLMs",
+      "body": "Hi HN,\nI built MirrorMate, a self-hosted AI smart mirror that runs entirely on your own hardware.<p>It connects to a local LLM (Ollama), supports speech (STT&#x2F;TTS), embeddings, and simple memory via RAG.\nThe goal is to have a persistent, always-on personal assistant without sending data to the cloud.<p>It’s still experimental, but usable today on a Raspberry Pi or a small home server.<p>A short demo video is available in the README.<p>GitHub: <a href=\"https:&#x2F;&#x2F;github.com&#x2F;orange",
+      "type": "insight",
+      "source": "https://github.com/orangekame3/mirrormate",
+      "relevance": 0.2777777777777778,
+      "agent": "NICHE INTAKE"
+    },
+    {
+      "title": "Building an AI Agent? Don't let it burn your budget",
+      "body": "I built a free tool that stress-tests your Agent before deployment.<p>Catch Infinite Loops (Save Costs)<p>Prevent Data Leaks (Ensure Privacy)<p>Paste your System Prompt and see how resilient your Agent is: https:&#x2F;&#x2F;agentic-qa-api.onrender.com&#x2F;docs<p>How to Use It (The 3-Step Guide)\nIt takes just 30 seconds to verify.<p>Step 1: Open the Link\nGo to our Live Dashboard:https:&#x2F;&#x2F;agentic-qa-api.onrender.com&#x2F;docs<p>Step 2: Input Your &#x27;Brain&#x27; (Prompt)\nLocate the inp",
+      "type": "pain",
+      "source": "https://news.ycombinator.com/item?id=46067581",
+      "relevance": 0.2777777777777778,
+      "agent": "NICHE INTAKE"
+    },
+    {
+      "title": "Show HN: Rewrite Text – On-Device AI Writing Tool for iOS",
+      "body": "Hi HN,<p>I built a small iOS app that performs text rewriting and summarization entirely on-device using Apple’s Foundation Models (iOS 18+).<p>Most AI writing tools rely on cloud APIs. That introduces API costs, privacy concerns, and infrastructure overhead. I wanted to explore what it looks like to build a useful AI writing utility with:<p>- no backend\n- no external APIs\n- no server costs\n- fully offline support<p>The app can rewrite text in different tones, generate summaries, extract key poi",
+      "type": "pain",
+      "source": "https://apps.apple.com/us/app/rewrite-text-ai-writing-tool/id6758913519",
+      "relevance": 0.2777777777777778,
+      "agent": "NICHE INTAKE"
+    }
+  ],
+  "signals": [
+    {
+      "title": "Show HN: Omnifact – Self-Hosted, Privacy-First AI Platform for Enterprise",
+      "body": "Hi HN, we&#x27;re Patrick and Florian, and we created Omnifact out of frustration with the underwhelming impact of AI on business productivity. After working with large companies struggling to adopt AI in a meaningful way due to data privacy concerns and vendor lock-in, we decided to build the platform we wished we had.<p>Omnifact is designed for organizations that want to make use of generative AI and RAG without compromising data security or flexibility.<p>Here&#x27;s the tech breakdown:<p>- D",
+      "type": "pain",
+      "source": "https://news.ycombinator.com/item?id=41329407",
+      "relevance": 0.5555555555555556,
+      "agent": "NICHE INTAKE"
+    },
+    {
+      "title": "Show HN: Open-source multimodal AI that runs in the browser",
+      "body": "I built an AI assistant that runs completely in your browser using WebGPU. After the initial model download (~200MB-4GB depending on model choice), it works offline. No API keys. No subscriptions. No data leaves your device.<p>Browser-based local AI addresses this:<p>1. Works offline after first load – Local AI makes possible offline AI use. Resilience – Work continues even during outages. Affordability – No recurring cloud or bandwidth costs. Privacy – Data stays on the device, reducing exposur",
+      "type": "pain",
+      "source": "https://johnjboren.github.io/ai-assistant.html",
+      "relevance": 0.4166666666666667,
+      "agent": "NICHE INTAKE"
+    },
+    {
+      "title": "Show HN: God's Eye – Subdomain recon with local AI analysis",
+      "body": "Hi HN! I built God&#x27;s Eye, an AI-powered subdomain enumeration tool that combines \ntraditional recon techniques with local LLM analysis.<p>What makes it different:\n- 100% local &amp; private - no data leaves your machine\n- Zero API costs - uses Ollama with models like DeepSeek-R1 and Qwen2.5-Coder\n- 20 passive sources (crt.sh, Certspotter, AlienVault, etc.)\n- AI analysis of discovered subdomains for security insights\n- Written in Go for speed<p>I built this because most subdomain tools just ",
+      "type": "pain",
+      "source": "https://github.com/Vyntral/god-eye",
+      "relevance": 0.4166666666666667,
+      "agent": "NICHE INTAKE"
+    },
+    {
+      "title": "Show HN: AgenticSeek – Self-hosted alternative to cloud-based AI tools",
+      "body": "I’ve spent the last two months building AgenticSeek, a privacy-focused alternative to cloud-based AI tools like ManusAI. It runs entirely on your machine—no API calls, no data leaks.<p>Why AgenticSeek?<p>Optimized for local LLMs (developed mostly on an RTX 3060 running deepseek r1 14b).<p>Truly private: All components (TTS, STT, planner) run locally.<p>More responsive than alternatives (we respond fast to issues + active Discord).<p>Designed to be fun—think JARVIS-like voice control, multi-agent",
+      "type": "intent",
+      "source": "https://github.com/Fosowl/agenticSeek",
+      "relevance": 0.2777777777777778,
+      "agent": "NICHE INTAKE"
+    },
+    {
+      "title": "M5 Max 128G Performance tests. I just got my new toy, and here's what it can do.",
+      "body": "I just started into this stuff a couple months ago, so be gentle. I'm and old grey-haired IT guy, so I'm not coming from 0, but this stuff is all new to me. \n\nWhat started with a Raspberry PI with a Hailo10H, playing around with openclaw and ollama, turned into me trying ollama on my Macbook M3 Pro 16G, where I immediately saw the potential. The new M5 was announced at just the right time to trigger my OCD, and I got the thing just yesterday. \n\nI've been using claude code for a while now, having",
+      "type": "insight",
+      "source": "https://reddit.com/r/LocalLLaMA/comments/1rzkw4x/m5_max_128g_performance_tests_i_just_got_my_new/",
+      "relevance": 0.2777777777777778,
+      "agent": "NICHE INTAKE"
+    },
+    {
+      "title": "Show HN: Llamactl – Self-hosted LLM manager with OpenAI-compatible routing",
+      "body": "Llamactl is a unified management system for running local LLMs across llama.cpp, MLX, and vLLM backends, with a web dashboard and OpenAI-compatible API.<p>I originally built this because I got tired of constantly SSHing to my server to edit a config just try out a new model. It&#x27;s grown a lot since then.<p>What it does:<p>Web UI for creating and managing LLM instances from your browser<p>Full llama.cpp model lifecycle - download from HuggingFace, create preset.ini configs with an in-browser ",
+      "type": "insight",
+      "source": "https://github.com/lordmathis/llamactl",
+      "relevance": 0.2777777777777778,
+      "agent": "NICHE INTAKE"
+    },
+    {
+      "title": "Show HN: MirrorMate – A self-hosted AI smart mirror with local LLMs",
+      "body": "Hi HN,\nI built MirrorMate, a self-hosted AI smart mirror that runs entirely on your own hardware.<p>It connects to a local LLM (Ollama), supports speech (STT&#x2F;TTS), embeddings, and simple memory via RAG.\nThe goal is to have a persistent, always-on personal assistant without sending data to the cloud.<p>It’s still experimental, but usable today on a Raspberry Pi or a small home server.<p>A short demo video is available in the README.<p>GitHub: <a href=\"https:&#x2F;&#x2F;github.com&#x2F;orange",
+      "type": "insight",
+      "source": "https://github.com/orangekame3/mirrormate",
+      "relevance": 0.2777777777777778,
+      "agent": "NICHE INTAKE"
+    },
+    {
+      "title": "Building an AI Agent? Don't let it burn your budget",
+      "body": "I built a free tool that stress-tests your Agent before deployment.<p>Catch Infinite Loops (Save Costs)<p>Prevent Data Leaks (Ensure Privacy)<p>Paste your System Prompt and see how resilient your Agent is: https:&#x2F;&#x2F;agentic-qa-api.onrender.com&#x2F;docs<p>How to Use It (The 3-Step Guide)\nIt takes just 30 seconds to verify.<p>Step 1: Open the Link\nGo to our Live Dashboard:https:&#x2F;&#x2F;agentic-qa-api.onrender.com&#x2F;docs<p>Step 2: Input Your &#x27;Brain&#x27; (Prompt)\nLocate the inp",
+      "type": "pain",
+      "source": "https://news.ycombinator.com/item?id=46067581",
+      "relevance": 0.2777777777777778,
+      "agent": "NICHE INTAKE"
+    },
+    {
+      "title": "Show HN: Rewrite Text – On-Device AI Writing Tool for iOS",
+      "body": "Hi HN,<p>I built a small iOS app that performs text rewriting and summarization entirely on-device using Apple’s Foundation Models (iOS 18+).<p>Most AI writing tools rely on cloud APIs. That introduces API costs, privacy concerns, and infrastructure overhead. I wanted to explore what it looks like to build a useful AI writing utility with:<p>- no backend\n- no external APIs\n- no server costs\n- fully offline support<p>The app can rewrite text in different tones, generate summaries, extract key poi",
+      "type": "pain",
+      "source": "https://apps.apple.com/us/app/rewrite-text-ai-writing-tool/id6758913519",
+      "relevance": 0.2777777777777778,
+      "agent": "NICHE INTAKE"
+    }
+  ],
+  "summary": {
+    "pain": 5,
+    "intent": 1,
+    "action": 0,
+    "insight": 3,
+    "competitor": 0
+  }
+}

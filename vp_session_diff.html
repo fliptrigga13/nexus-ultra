@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VeilPiercer — Session Diff</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600&display=swap"
+    rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    :root {
+      --bg: #010205;
+      --surface: rgba(0, 245, 255, 0.04);
+      --border: rgba(0, 245, 255, 0.12);
+      --cyan: #00f5ff;
+      --green: #39ff14;
+      --red: #ff2060;
+      --gold: #ffd700;
+      --purple: #bc13fe;
+      --text: #c8f0ff;
+      --muted: rgba(200, 240, 255, 0.45);
+    }
+
+    html {
+      scroll-behavior: smooth
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden
+    }
+
+    /* ── NAV ── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 32px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(1, 2, 5, 0.9);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-family: 'Orbitron', monospace;
+      font-size: 14px;
+      color: var(--cyan);
+      letter-spacing: 0.3em
+    }
+
+    .logo span {
+      display: block;
+      font-size: 9px;
+      letter-spacing: 0.5em;
+      color: var(--muted);
+      margin-top: 2px
+    }
+
+    .nav-tag {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.2em
+    }
+
+    /* ── LAYOUT ── */
+    .page {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 32px
+    }
+
+    .section-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.4em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 8px
+    }
+
+    h2 {
+      font-family: 'Orbitron', monospace;
+      font-size: 22px;
+      color: #fff;
+      margin-bottom: 24px
+    }
+
+    /* ── SESSION PICKER ── */
+    .picker {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 32px
+    }
+
+    .pick-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px
+    }
+
+    .pick-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      margin-bottom: 12px;
+      color: var(--cyan)
+    }
+
+    .pick-label.b {
+      color: var(--green)
+    }
+
+    select {
+      width: 100%;
+      padding: 10px 14px;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      cursor: pointer;
+      outline: none;
+    }
+
+    select:focus {
+      border-color: var(--cyan)
+    }
+
+    /* ── CTA ── */
+    .cta-row {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 40px;
+      gap: 16px
+    }
+
+    .btn {
+      padding: 12px 32px;
+      border-radius: 6px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      text-transform: uppercase;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--cyan), #00aa88);
+      color: #010205;
+      font-weight: 700
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0, 245, 255, 0.35)
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border)
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--cyan);
+      color: var(--cyan)
+    }
+
+    /* ── DIVERGENCE BANNER ── */
+    #divergence-banner {
+      display: none;
+      padding: 14px 20px;
+      border-radius: 8px;
+      margin-bottom: 28px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.15em;
+      border: 1px solid;
+    }
+
+    #divergence-banner.found {
+      background: rgba(255, 32, 96, 0.08);
+      border-color: var(--red);
+      color: var(--red)
+    }
+
+    #divergence-banner.clean {
+      background: rgba(57, 255, 20, 0.06);
+      border-color: var(--green);
+      color: var(--green)
+    }
+
+    /* ── DIFF GRID ── */
+    #diff-wrap {
+      display: none
+    }
+
+    .diff-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px
+    }
+
+    .diff-header {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      margin-bottom: 8px
+    }
+
+    .diff-hdr-cell {
+      padding: 10px 16px;
+      background: rgba(0, 245, 255, 0.06);
+      border: 1px solid var(--border);
+      border-radius: 6px 6px 0 0
+    }
+
+    /* step row */
+    .step-pair {
+      display: contents
+    }
+
+    .step-cell {
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      background: rgba(1, 2, 5, 0.8);
+      transition: background 0.2s;
+      position: relative;
+    }
+
+    .step-cell:hover {
+      background: rgba(0, 245, 255, 0.04)
+    }
+
+    /* fork highlight */
+    .step-cell.fork {
+      background: rgba(255, 32, 96, 0.07);
+      border-color: rgba(255, 32, 96, 0.4)
+    }
+
+    .step-cell.fork::before {
+      content: 'FORK';
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      font-size: 8px;
+      letter-spacing: 0.3em;
+      color: var(--red);
+      opacity: 0.7;
+    }
+
+    /* shared = matching state_version */
+    .step-cell.shared {
+      border-left: 3px solid var(--green)
+    }
+
+    .step-cell.post-fork {
+      border-left: 3px solid var(--red)
+    }
+
+    .step-num {
+      font-size: 8px;
+      color: var(--muted);
+      letter-spacing: 0.2em;
+      margin-bottom: 6px;
+      display: flex;
+      gap: 12px;
+      align-items: center
+    }
+
+    .ver-badge {
+      padding: 1px 8px;
+      border-radius: 3px;
+      font-size: 8px;
+      background: rgba(0, 245, 255, 0.1);
+      border: 1px solid rgba(0, 245, 255, 0.2);
+      color: var(--cyan);
+    }
+
+    .ver-badge.diverged {
+      background: rgba(255, 32, 96, 0.12);
+      border-color: rgba(255, 32, 96, 0.3);
+      color: var(--red)
+    }
+
+    .step-prompt {
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-size: 10px;
+      line-height: 1.5;
+      word-break: break-word
+    }
+
+    .step-response {
+      color: var(--text);
+      font-size: 10px;
+      line-height: 1.6;
+      word-break: break-word
+    }
+
+    .step-trunc {
+      color: rgba(200, 240, 255, 0.3);
+      font-size: 9px;
+      margin-top: 4px
+    }
+
+    /* latency chip */
+    .latency {
+      font-size: 8px;
+      color: rgba(200, 240, 255, 0.3);
+      margin-left: auto
+    }
+
+    /* empty state */
+    .empty-state {
+      text-align: center;
+      padding: 80px 24px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+    }
+
+    .empty-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.4
+    }
+
+    /* loading */
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--muted);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      animation: pulse 1.5s ease-in-out infinite
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 0.4
+      }
+
+      50% {
+        opacity: 1
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav>
+    <div class="logo">VEILPIERCER<span>// session diff</span></div>
+    <div class="nav-tag">STATE-LEVEL DIVERGENCE VIEWER</div>
+  </nav>
+
+  <div class="page">
+    <div class="section-label">// session comparison</div>
+    <h2>Where Did They Split?</h2>
+
+    <div class="picker">
+      <div class="pick-panel">
+        <div class="pick-label">⬡ Session A</div>
+        <select id="sel-a">
+          <option value="">-- select session --</option>
+        </select>
+      </div>
+      <div class="pick-panel">
+        <div class="pick-label b">⬡ Session B</div>
+        <select id="sel-b">
+          <option value="">-- select session --</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <button class="btn btn-primary" onclick="runDiff()">◈ Compare Sessions</button>
+      <button class="btn btn-secondary" onclick="loadDemo()">⬡ Load Demo Data</button>
+    </div>
+
+    <div id="divergence-banner"></div>
+
+    <div id="diff-wrap">
+      <div class="diff-header">
+        <div class="diff-hdr-cell" id="hdr-a">Session A</div>
+        <div class="diff-hdr-cell" id="hdr-b">Session B</div>
+      </div>
+      <div class="diff-grid" id="diff-grid"></div>
+    </div>
+
+    <div class="empty-state" id="empty-state">
+      <div class="empty-icon">⬡</div>
+      Select two sessions above and click Compare.<br>
+      Divergence points will be highlighted in red.
+    </div>
+  </div>
+
+  <script>
+    // ── Data Layer ────────────────────────────────────────────────────────────────
+    // In production: fetches from /vp/sessions and /vp/diff
+    // In standalone mode: pulls from vp_session_logger.py demo seed via local API
+    // Falls back to embedded demo data if no server
+
+    async function fetchSessions() {
+      try {
+        const r = await fetch('/vp/sessions');
+        if (!r.ok) throw new Error('no server');
+        return await r.json();
+      } catch {
+        return null;  // use demo
+      }
+    }
+
+    async function fetchDiff(sessA, sessB) {
+      try {
+        const r = await fetch(`/vp/diff?a=${encodeURIComponent(sessA)}&b=${encodeURIComponent(sessB)}`);
+        if (!r.ok) throw new Error('no server');
+        return await r.json();
+      } catch {
+        return null;
+      }
+    }
+
+    // ── Demo Data (standalone, no server needed) ──────────────────────────────────
+    const DEMO_SESSIONS = [
+      { session_id: 'demo-session-A', agent: 'EXECUTIONER', started_at: new Date().toISOString(), steps: 3 },
+      { session_id: 'demo-session-B', agent: 'EXECUTIONER', started_at: new Date().toISOString(), steps: 3 },
+      { session_id: 'demo-session-C', agent: 'METACOG', started_at: new Date().toISOString(), steps: 4 },
+    ];
+
+    const DEMO_DIFF = {
+      session_a: 'demo-session-A',
+      session_b: 'demo-session-B',
+      diverged: true,
+      fork_step: 2,
+      last_shared: 'v2',
+      steps_a: [
+        {
+          step: 0, state_version: 'v1', prompt: 'What is the current market signal?',
+          response: 'Detected high buyer intent on r/LocalLLaMA. 3 active threads this week about switching costs.', latency_ms: 340
+        },
+        {
+          step: 1, state_version: 'v2', prompt: 'Should we post to HN?',
+          response: 'Yes — thread about local debugging has 200+ points. Prime window before weekend.', latency_ms: 280
+        },
+        {
+          step: 2, state_version: 'v3a', prompt: 'Draft the HN comment.',
+          response: 'VeilPiercer gives you full session traceability on every Ollama call — local-only, no cloud. Built exactly for the debugging gap this thread describes.', latency_ms: 512
+        },
+      ],
+      steps_b: [
+        {
+          step: 0, state_version: 'v1', prompt: 'What is the current market signal?',
+          response: 'Spotted competitor move: BaseGrid added branch diffs. Positioning overlap on state traceability.', latency_ms: 310
+        },
+        {
+          step: 1, state_version: 'v2', prompt: 'Should we post to HN?',
+          response: 'Yes — respond to the debugging agent thread with the blind-spot angle.', latency_ms: 290
+        },
+        {
+          step: 2, state_version: 'v3b', prompt: 'Draft the HN comment.',
+          response: 'The blind spot in most agent stacks is state visibility. By the time it breaks, the actual issue happened 3 steps earlier. VeilPiercer logs the full input chain, on-device.', latency_ms: 490
+        },
+      ],
+    };
+
+    // ── UI ────────────────────────────────────────────────────────────────────────
+    let sessions = [];
+
+    async function init() {
+      const data = await fetchSessions();
+      sessions = data || DEMO_SESSIONS;
+      populateSelects(sessions);
+    }
+
+    function populateSelects(list) {
+      const selA = document.getElementById('sel-a');
+      const selB = document.getElementById('sel-b');
+      list.forEach((s, i) => {
+        const label = `${s.session_id.slice(-16)} | ${s.agent} | ${s.steps} steps`;
+        selA.add(new Option(label, s.session_id));
+        selB.add(new Option(label, s.session_id));
+      });
+      if (list.length >= 2) {
+        selA.value = list[0].session_id;
+        selB.value = list[1].session_id;
+      }
+    }
+
+    async function runDiff() {
+      const idA = document.getElementById('sel-a').value;
+      const idB = document.getElementById('sel-b').value;
+      if (!idA || !idB || idA === idB) {
+        alert('Select two different sessions to compare.');
+        return;
+      }
+
+      document.getElementById('empty-state').style.display = 'none';
+      document.getElementById('diff-wrap').style.display = 'block';
+      document.getElementById('diff-grid').innerHTML = '<div class="loading" style="grid-column:span 2">Analyzing divergence...</div>';
+
+      const data = await fetchDiff(idA, idB) || buildClientDiff(idA, idB);
+      renderDiff(data);
+    }
+
+    function loadDemo() {
+      document.getElementById('sel-a').value = 'demo-session-A';
+      document.getElementById('sel-b').value = 'demo-session-B';
+      document.getElementById('empty-state').style.display = 'none';
+      document.getElementById('diff-wrap').style.display = 'block';
+      document.getElementById('diff-grid').innerHTML = '';
+      renderDiff(DEMO_DIFF);
+    }
+
+    function buildClientDiff(idA, idB) {
+      // If no server, build from whichever demo sessions match
+      const demoMap = { 'demo-session-A': DEMO_DIFF.steps_a, 'demo-session-B': DEMO_DIFF.steps_b };
+      if (demoMap[idA] && demoMap[idB]) {
+        return { ...DEMO_DIFF, session_a: idA, session_b: idB };
+      }
+      return { session_a: idA, session_b: idB, diverged: false, fork_step: null, last_shared: null, steps_a: [], steps_b: [] };
+    }
+
+    function renderDiff(data) {
+      // Headers
+      const sessA = sessions.find(s => s.session_id === data.session_a);
+      const sessB = sessions.find(s => s.session_id === data.session_b);
+      document.getElementById('hdr-a').innerHTML =
+        `<span style="color:var(--cyan)">${data.session_a.slice(-16)}</span><br><span style="color:var(--muted);font-size:9px">${sessA?.agent || ''}</span>`;
+      document.getElementById('hdr-b').innerHTML =
+        `<span style="color:var(--green)">${data.session_b.slice(-16)}</span><br><span style="color:var(--muted);font-size:9px">${sessB?.agent || ''}</span>`;
+
+      // Banner
+      const banner = document.getElementById('divergence-banner');
+      if (data.diverged) {
+        banner.className = 'found';
+        banner.style.display = 'block';
+        banner.textContent = `⚡ DIVERGENCE DETECTED — Fork at step ${data.fork_step} (last shared: ${data.last_shared})`;
+      } else if (data.steps_a.length > 0) {
+        banner.className = 'clean';
+        banner.style.display = 'block';
+        banner.textContent = '✓ SESSIONS ALIGNED — No divergence detected across all shared steps';
+      } else {
+        banner.style.display = 'none';
+      }
+
+      // Grid
+      const grid = document.getElementById('diff-grid');
+      grid.innerHTML = '';
+
+      const maxSteps = Math.max(data.steps_a.length, data.steps_b.length);
+      for (let i = 0; i < maxSteps; i++) {
+        const sa = data.steps_a[i];
+        const sb = data.steps_b[i];
+        const isFork = i === data.fork_step;
+        const isPostFork = data.fork_step !== null && i > data.fork_step;
+        const isBefore = !isFork && !isPostFork;
+
+        grid.appendChild(makeCell(sa, isFork, isPostFork, isBefore, 'cyan'));
+        grid.appendChild(makeCell(sb, isFork, isPostFork, isBefore, 'green'));
+      }
+
+      if (maxSteps === 0) {
+        grid.innerHTML = '<div style="grid-column:span 2;padding:40px;text-align:center;color:var(--muted);font-size:11px">No steps found for these sessions.</div>';
+      }
+    }
+
+    function makeCell(step, isFork, isPostFork, isShared, colorKey) {
+      const el = document.createElement('div');
+      el.className = 'step-cell' + (isFork ? ' fork' : isPostFork ? ' post-fork' : ' shared');
+
+      if (!step) {
+        el.innerHTML = '<span style="color:var(--muted);font-size:10px">— no data —</span>';
+        return el;
+      }
+
+      const verClass = (isFork || isPostFork) ? 'diverged' : '';
+      const maxBody = 280;
+      const resp = step.response || '';
+      const truncated = resp.length > maxBody;
+
+      el.innerHTML = `
+    <div class="step-num">
+      <span>STEP ${step.step}</span>
+      <span class="ver-badge ${verClass}">${step.state_version}</span>
+      ${step.latency_ms ? `<span class="latency">${step.latency_ms}ms</span>` : ''}
+    </div>
+    <div class="step-prompt">▶ ${escHtml(step.prompt || '')}</div>
+    <div class="step-response">${escHtml(resp.slice(0, maxBody))}${truncated ? '...' : ''}</div>
+    ${truncated ? `<div class="step-trunc">+${resp.length - maxBody} chars truncated</div>` : ''}
+  `;
+      return el;
+    }
+
+    function escHtml(s) {
+      return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    // ── Init ──────────────────────────────────────────────────────────────────────
+    init();
+  </script>
+</body>
+
+</html>

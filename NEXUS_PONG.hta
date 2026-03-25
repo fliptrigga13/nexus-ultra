@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>NEXUS — System Oracle</title>
+<HTA:APPLICATION
+  ID="NexusOracle"
+  APPLICATIONNAME="NEXUS System Oracle"
+  SCROLL="no"
+  SINGLEINSTANCE="yes"
+  WINDOWSTATE="normal"
+  BORDER="thin"
+  CAPTION="yes"
+/>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Cinzel:wght@400;600&display=swap');
+
+  :root {
+    --gold:     #c9a84c;
+    --gold-dim: #7a6030;
+    --gold-hl:  #f0cc70;
+    --obsidian: #0a0a0c;
+    --ink:      #13131a;
+    --ruled:    #1e1c14;
+    --copper:   #8b5e3c;
+    --cream:    #e8dfc0;
+    --cream-dim:#8a8070;
+    --alive:    #7abf7a;
+    --dead:     #bf5a5a;
+    --pending:  #c9a84c;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--obsidian);
+    color: var(--cream);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 14px;
+    width: 560px;
+    height: 520px;
+    overflow: hidden;
+    background-image:
+      radial-gradient(ellipse at 50% 0%, #1a180800 0%, #0a0a0c 70%),
+      repeating-linear-gradient(0deg, transparent, transparent 28px, #1a180810 29px);
+  }
+
+  /* ── Header ──────────────────────────────────────────────────── */
+  .crown {
+    border-bottom: 1px solid var(--gold-dim);
+    padding: 14px 20px 12px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: linear-gradient(180deg, #18160800 0%, transparent 100%);
+  }
+  .crown img {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 1px solid var(--gold-dim);
+    filter: drop-shadow(0 0 8px #c9a84c44);
+  }
+  .crown-text {}
+  .crown-title {
+    font-family: 'Cinzel', serif;
+    font-size: 18px;
+    letter-spacing: 5px;
+    color: var(--gold);
+    text-shadow: 0 0 20px #c9a84c55;
+  }
+  .crown-subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--gold-dim);
+    margin-top: 2px;
+  }
+  .crown-time {
+    margin-left: auto;
+    text-align: right;
+    font-size: 11px;
+    color: var(--gold-dim);
+    font-family: 'Cinzel', serif;
+    letter-spacing: 1px;
+  }
+
+  /* ── Oracle Grid ──────────────────────────────────────────────── */
+  .oracle {
+    padding: 14px 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+
+  .vessel {
+    background: var(--ink);
+    border: 1px solid #2a2510;
+    border-radius: 2px;
+    padding: 10px 12px;
+    position: relative;
+    transition: border-color 0.3s;
+  }
+  .vessel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .vessel.alive { border-color: #2a3a1a; }
+  .vessel.alive::before { opacity: 1; background: linear-gradient(90deg, transparent, var(--alive), transparent); }
+  .vessel.dead { border-color: #3a1a1a; }
+  .vessel.dead::before { opacity: 1; background: linear-gradient(90deg, transparent, var(--dead), transparent); }
+
+  .vessel-name {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--gold-dim);
+    margin-bottom: 3px;
+  }
+  .vessel-addr {
+    font-size: 9px;
+    color: #3a3420;
+    font-style: italic;
+    margin-bottom: 8px;
+  }
+  .vessel-state {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .flame {
+    font-size: 13px;
+    line-height: 1;
+  }
+  .verdict {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+  .verdict.alive  { color: var(--alive); }
+  .verdict.dead   { color: var(--dead); }
+  .verdict.seeking { color: var(--pending); }
+  .latency {
+    font-size: 9px;
+    color: var(--gold-dim);
+    margin-top: 3px;
+    font-style: italic;
+  }
+
+  /* ── Credentials Panel ─────────────────────────────────────────── */
+  .codex {
+    margin: 0 16px;
+    border: 1px solid #2a2510;
+    border-radius: 2px;
+    background: var(--ink);
+    padding: 10px 14px;
+    position: relative;
+  }
+  .codex::before {
+    content: 'CREDENTIALS';
+    position: absolute;
+    top: -7px; left: 12px;
+    font-family: 'Cinzel', serif;
+    font-size: 8px;
+    letter-spacing: 3px;
+    color: var(--gold-dim);
+    background: var(--ink);
+    padding: 0 6px;
+  }
+  .cred-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+  .cred-row:last-child { margin-bottom: 0; }
+  .cred-label {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: var(--gold-dim);
+    min-width: 80px;
+  }
+  .cred-input {
+    flex: 1;
+    background: #0d0d12;
+    border: 1px solid #2a2510;
+    color: var(--cream);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    padding: 3px 8px;
+    outline: none;
+    letter-spacing: 1px;
+  }
+  .cred-input:focus { border-color: var(--gold-dim); }
+  .cred-eye {
+    font-size: 11px;
+    cursor: pointer;
+    color: var(--gold-dim);
+    background: none;
+    border: none;
+    padding: 0 4px;
+    font-family: inherit;
+  }
+
+  /* ── Footer ─────────────────────────────────────────────────────── */
+  .plinth {
+    position: absolute;
+    bottom: 0; width: 100%;
+    border-top: 1px solid #2a2510;
+    padding: 9px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--obsidian);
+  }
+  .plinth-oracle { font-size: 10px; color: #3a3420; font-style: italic; }
+  .rune-btn {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 2px;
+    background: none;
+    border: 1px solid var(--gold-dim);
+    color: var(--gold-dim);
+    padding: 4px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .rune-btn:hover { border-color: var(--gold); color: var(--gold); background: #c9a84c08; }
+  .rune-btn.dismiss { border-color: #3a2a1a; color: #5a4a3a; }
+  .rune-btn.dismiss:hover { border-color: var(--copper); color: var(--copper); }
+</style>
+</head>
+<body>
+
+<!-- ── Crown ──────────────────────────────────────────────────────── -->
+<div class="crown">
+  <img id="sigil" src="nexus_sigil.png" alt="NEXUS Sigil" onerror="this.style.display='none'"/>
+  <div class="crown-text">
+    <div class="crown-title">N E X U S</div>
+    <div class="crown-subtitle">System Oracle &mdash; Connection Rite</div>
+  </div>
+  <div class="crown-time" id="clockface">—</div>
+</div>
+
+<!-- ── Oracle Vessels ─────────────────────────────────────────────── -->
+<div class="oracle" id="oracle"></div>
+
+<!-- ── Credentials Codex ──────────────────────────────────────────── -->
+<div class="codex">
+  <div class="cred-row">
+    <span class="cred-label">HUB GATE</span>
+    <input class="cred-input" id="hubPw" type="password" value="BURTON131313" />
+    <button class="cred-eye" onclick="toggle('hubPw')">◉</button>
+  </div>
+  <div class="cred-row">
+    <span class="cred-label">REDIS SEAL</span>
+    <input class="cred-input" id="redisPw" type="password" placeholder="Redis password..." />
+    <button class="cred-eye" onclick="toggle('redisPw')">◉</button>
+  </div>
+</div>
+
+<!-- ── Plinth ─────────────────────────────────────────────────────── -->
+<div class="plinth">
+  <span class="plinth-oracle" id="oracle-verdict">Awaiting the oracle...</span>
+  <div style="display:flex;gap:8px;">
+    <button class="rune-btn" onclick="consecrate()">⟳ DIVINE</button>
+    <button class="rune-btn dismiss" onclick="window.close()">✕ DEPART</button>
+  </div>
+</div>
+
+<script>
+var VESSELS = [
+  { id:'hub',    name:'THE HUB',     addr:'localhost:3000',   url:'http://localhost:3000/' },
+  { id:'eh',     name:'EH ORACLE',  addr:'127.0.0.1:7701',   url:'http://127.0.0.1:7701/health' },
+  { id:'ollama', name:'OLLAMA',     addr:'localhost:11434',  url:'http://localhost:11434/api/tags' },
+  { id:'pso',    name:'PSO MIND',   addr:'localhost:7700',   url:'http://localhost:7700/status' },
+  { id:'redis',  name:'BLACKBOARD', addr:'localhost:6379',   url:'http://127.0.0.1:7701/status' },
+  { id:'tunnel', name:'THE VEIL',   addr:'veil-piercer.com', url:'https://veil-piercer.com/' },
+];
+
+var GLYPHS = { alive:'◈', dead:'◇', seeking:'◌' };
+
+function render() {
+  var el = document.getElementById('oracle');
+  el.innerHTML = '';
+  for (var i = 0; i < VESSELS.length; i++) {
+    var v = VESSELS[i];
+    el.innerHTML +=
+      '<div class="vessel seeking" id="v_'+v.id+'">' +
+        '<div class="vessel-name">'+v.name+'</div>' +
+        '<div class="vessel-addr">'+v.addr+'</div>' +
+        '<div class="vessel-state">' +
+          '<span class="flame" id="fl_'+v.id+'">◌</span>' +
+          '<span class="verdict seeking" id="vd_'+v.id+'">SEEKING</span>' +
+        '</div>' +
+        '<div class="latency" id="lt_'+v.id+'"></div>' +
+      '</div>';
+  }
+}
+
+function consecrate() {
+  render();
+  var alive = 0, dead = 0, total = VESSELS.length;
+  document.getElementById('oracle-verdict').innerText = 'The oracle speaks...';
+
+  for (var i = 0; i < VESSELS.length; i++) {
+    (function(v, idx) {
+      setTimeout(function() {
+        var t0 = Date.now();
+        var xhr = new XMLHttpRequest();
+        xhr.timeout = 3500;
+        xhr.open('GET', v.url, true);
+        xhr.onload = function() {
+          var ms = Date.now() - t0;
+          mark(v.id, true, ms);
+          alive++;
+          update(alive, dead, total);
+        };
+        xhr.onerror = xhr.ontimeout = function() {
+          mark(v.id, false, 0);
+          dead++;
+          update(alive, dead, total);
+        };
+        xhr.send();
+      }, idx * 120);
+    })(VESSELS[i], i);
+  }
+}
+
+function mark(id, ok, ms) {
+  var card   = document.getElementById('v_' + id);
+  var flame  = document.getElementById('fl_' + id);
+  var verd   = document.getElementById('vd_' + id);
+  var lat    = document.getElementById('lt_' + id);
+  if (!card) return;
+
+  if (ok) {
+    card.className = 'vessel alive';
+    flame.innerText = GLYPHS.alive;
+    verd.className = 'verdict alive';
+    verd.innerText = 'PONG';
+    lat.innerText = ms + 'ms';
+  } else {
+    card.className = 'vessel dead';
+    flame.innerText = GLYPHS.dead;
+    verd.className = 'verdict dead';
+    verd.innerText = 'SILENT';
+    lat.innerText = '—';
+  }
+}
+
+function update(alive, dead, total) {
+  if ((alive + dead) < total) return;
+  var el = document.getElementById('oracle-verdict');
+  if (dead === 0) {
+    el.innerText = 'All vessels answer. The system is whole.';
+    el.style.color = '';
+  } else if (alive === 0) {
+    el.innerText = 'Silence. No vessel responds.';
+    el.style.color = '#bf5a5a';
+  } else {
+    el.innerText = alive + ' of ' + total + ' vessels answer. ' + dead + ' are silent.';
+    el.style.color = '#c9a84c';
+  }
+}
+
+function toggle(id) {
+  var el = document.getElementById(id);
+  el.type = el.type === 'password' ? 'text' : 'password';
+}
+
+function zp(n) { return (n < 10 ? '0' : '') + n; }
+
+function tick() {
+  var now = new Date();
+  var h = zp(now.getHours());
+  var m = zp(now.getMinutes());
+  var s = zp(now.getSeconds());
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('clockface').innerHTML =
+    h+':'+m+':'+s+'<br><span style="font-size:9px;letter-spacing:1px">'+
+    now.getDate()+' '+months[now.getMonth()]+' '+now.getFullYear()+'</span>';
+}
+
+window.onload = function() {
+  tick();
+  setInterval(tick, 1000);
+  consecrate();
+  setInterval(consecrate, 20000);
+};
+</script>
+</body>
+</html>

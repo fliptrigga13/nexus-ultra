@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>VeilPiercer — Intelligence Brief</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{
+    --cyan:#00f5ff;--green:#39ff14;--orange:#ff6b00;--pink:#ff006e;
+    --purple:#bc13fe;--gold:#ffd700;--bg:#020408;
+    --pain:#ff006e;--intent:#39ff14;--competitor:#bc13fe;--insight:#00f5ff;--action:#ffd700;
+  }
+  body{background:var(--bg);overflow:hidden;font-family:'Share Tech Mono',monospace;color:#fff;user-select:none;}
+  canvas{display:block;cursor:crosshair;}
+  #hud{position:fixed;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:10;}
+
+  /* TOP BAR */
+  #topbar{
+    position:absolute;top:0;left:0;right:0;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 24px;
+    background:linear-gradient(180deg,rgba(2,4,8,0.98) 0%,transparent 100%);
+    pointer-events:all;
+  }
+  .logo{font-family:'Orbitron',monospace;font-weight:900;font-size:20px;
+    background:linear-gradient(135deg,var(--cyan),var(--green));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    letter-spacing:0.2em;animation:logoShift 6s linear infinite;}
+  .logo span{font-size:10px;letter-spacing:0.4em;-webkit-text-fill-color:#ffffff55;display:block;margin-top:2px;}
+  @keyframes logoShift{
+    0%{background-image:linear-gradient(135deg,#00f5ff,#39ff14);}
+    33%{background-image:linear-gradient(135deg,#39ff14,#bc13fe);}
+    66%{background-image:linear-gradient(135deg,#bc13fe,#ffd700);}
+    100%{background-image:linear-gradient(135deg,#ffd700,#00f5ff);}
+  }
+
+  #stats{display:flex;gap:24px;}
+  .stat{text-align:center;}
+  .stat-val{font-family:'Orbitron',monospace;font-size:16px;color:var(--cyan);animation:statPulse 3s ease-in-out infinite;}
+  .stat-label{font-size:9px;letter-spacing:0.2em;color:#ffffff44;margin-top:2px;}
+  @keyframes statPulse{
+    0%,100%{color:#00f5ff;text-shadow:0 0 8px #00f5ff;}
+    33%{color:#39ff14;text-shadow:0 0 8px #39ff14;}
+    66%{color:#bc13fe;text-shadow:0 0 8px #bc13fe;}
+  }
+
+  /* FILTER TABS */
+  #filters{display:flex;gap:6px;}
+  .filter-btn{
+    padding:5px 12px;border:1px solid rgba(255,255,255,0.12);
+    background:rgba(255,255,255,0.03);color:#ffffff66;
+    font-family:'Share Tech Mono',monospace;font-size:10px;
+    letter-spacing:0.1em;cursor:pointer;border-radius:2px;
+    transition:all 0.2s;pointer-events:all;
+  }
+  .filter-btn:hover,.filter-btn.active{background:rgba(0,245,255,0.08);border-color:var(--cyan);color:var(--cyan);}
+  .filter-btn[data-type="pain"].active{border-color:var(--pain);color:var(--pain);background:rgba(255,0,110,0.08);}
+  .filter-btn[data-type="intent"].active{border-color:var(--intent);color:var(--intent);background:rgba(57,255,20,0.08);}
+  .filter-btn[data-type="competitor"].active{border-color:var(--competitor);color:var(--competitor);background:rgba(188,19,254,0.08);}
+  .filter-btn[data-type="action"].active{border-color:var(--action);color:var(--action);background:rgba(255,215,0,0.08);}
+
+  /* LEFT PANEL */
+  #leftpanel{
+    position:absolute;left:0;top:72px;bottom:0;width:230px;
+    background:linear-gradient(90deg,rgba(2,4,8,0.97) 0%,rgba(2,4,8,0) 100%);
+    padding:16px;display:flex;flex-direction:column;gap:12px;
+    pointer-events:all;overflow-y:auto;
+  }
+  .panel-title{font-size:9px;letter-spacing:0.35em;color:#ffffff33;text-transform:uppercase;margin-bottom:8px;}
+  .panel-section{border-top:1px solid rgba(255,255,255,0.06);padding-top:12px;}
+
+  /* LEGEND */
+  .legend-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:10px;color:#ffffff88;}
+  .legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;box-shadow:0 0 8px currentColor;}
+  .legend-dot.pain{background:var(--pain);color:var(--pain);}
+  .legend-dot.intent{background:var(--intent);color:var(--intent);}
+  .legend-dot.competitor{background:var(--competitor);color:var(--competitor);}
+  .legend-dot.insight{background:var(--insight);color:var(--insight);}
+  .legend-dot.action{background:var(--action);color:var(--action);}
+
+  /* SIGNAL LIST */
+  #signallist{display:flex;flex-direction:column;gap:6px;overflow-y:auto;max-height:300px;}
+  .sig-item{
+    padding:8px;border:1px solid rgba(255,255,255,0.08);
+    background:rgba(255,255,255,0.02);border-radius:2px;
+    cursor:pointer;transition:all 0.2s;font-size:10px;line-height:1.5;
+  }
+  .sig-item:hover{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.2);}
+  .sig-item .sig-type{font-size:8px;letter-spacing:0.2em;margin-bottom:4px;opacity:0.7;}
+  .sig-item .sig-title{color:#fff;line-height:1.4;}
+  .sig-item[data-type="pain"]{border-left:2px solid var(--pain);}
+  .sig-item[data-type="intent"]{border-left:2px solid var(--intent);}
+  .sig-item[data-type="competitor"]{border-left:2px solid var(--competitor);}
+  .sig-item[data-type="action"]{border-left:2px solid var(--action);}
+  .sig-item[data-type="insight"]{border-left:2px solid var(--insight);}
+
+  /* REFRESH BTN */
+  .action-btn{
+    width:100%;padding:10px;border:1px solid rgba(0,245,255,0.3);
+    background:rgba(0,245,255,0.04);color:var(--cyan);
+    font-family:'Share Tech Mono',monospace;font-size:10px;
+    letter-spacing:0.15em;cursor:pointer;border-radius:2px;
+    transition:all 0.25s;text-transform:uppercase;
+  }
+  .action-btn:hover{background:rgba(0,245,255,0.12);box-shadow:0 0 20px rgba(0,245,255,0.3);}
+
+  /* RIGHT PANEL */
+  #rightpanel{
+    position:absolute;right:0;top:72px;bottom:0;width:210px;
+    background:linear-gradient(270deg,rgba(2,4,8,0.97) 0%,rgba(2,4,8,0) 100%);
+    padding:16px;display:flex;flex-direction:column;gap:12px;
+    pointer-events:all;
+  }
+
+  /* INTELLIGENCE SCORE */
+  #score-wrap{padding-bottom:8px;}
+  .score-label{font-size:9px;letter-spacing:0.3em;color:#ffffff33;margin-bottom:8px;}
+  .score-bar-bg{height:90px;background:rgba(255,255,255,0.04);border-radius:2px;position:relative;overflow:hidden;}
+  .score-bar-fill{
+    position:absolute;bottom:0;left:0;right:0;
+    transition:height 0.8s ease;
+    animation:scoreRainbow 3s linear infinite;
+    box-shadow:0 0 20px rgba(0,245,255,0.3);
+  }
+  @keyframes scoreRainbow{
+    0%{background:linear-gradient(0deg,#ff006e,#bc13fe);}
+    25%{background:linear-gradient(0deg,#bc13fe,#00f5ff);}
+    50%{background:linear-gradient(0deg,#00f5ff,#39ff14);}
+    75%{background:linear-gradient(0deg,#39ff14,#ffd700);}
+    100%{background:linear-gradient(0deg,#ffd700,#ff006e);}
+  }
+  .score-val{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    font-family:'Orbitron',monospace;font-size:22px;color:#fff;
+    text-shadow:0 0 20px var(--cyan);}
+
+  /* FEED */
+  #feed{flex:1;overflow:hidden;display:flex;flex-direction:column-reverse;gap:4px;}
+  .feed-entry{
+    font-size:10px;color:#ffffff44;letter-spacing:0.04em;
+    border-left:2px solid #ffffff11;padding-left:8px;
+    animation:feedFade 0.3s ease;line-height:1.5;
+  }
+  .feed-entry.pain{border-color:var(--pain);color:var(--pain);}
+  .feed-entry.intent{border-color:var(--intent);color:var(--intent);}
+  .feed-entry.competitor{border-color:var(--competitor);color:var(--competitor);}
+  .feed-entry.action{border-color:var(--action);color:var(--action);}
+  .feed-entry.insight{border-color:var(--insight);color:var(--insight);}
+  @keyframes feedFade{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:none}}
+
+  /* DETAIL OVERLAY */
+  #detail{
+    position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+    width:540px;max-width:90vw;max-height:80vh;
+    background:rgba(2,4,8,0.97);border:1px solid rgba(0,245,255,0.3);
+    border-radius:4px;padding:28px;z-index:100;display:none;
+    overflow-y:auto;pointer-events:all;
+    box-shadow:0 0 60px rgba(0,245,255,0.15), 0 0 120px rgba(188,19,254,0.1);
+  }
+  #detail.show{display:block;}
+  .detail-type{font-size:9px;letter-spacing:0.4em;margin-bottom:12px;opacity:0.6;}
+  .detail-title{font-family:'Orbitron',monospace;font-size:16px;margin-bottom:16px;line-height:1.4;color:#fff;}
+  .detail-body{font-size:12px;color:#ffffff99;line-height:1.8;white-space:pre-wrap;}
+  .detail-meta{margin-top:16px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.08);
+    display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:10px;color:#ffffff55;}
+  .detail-close{
+    position:absolute;top:16px;right:16px;background:none;border:none;
+    color:#ffffff44;font-size:20px;cursor:pointer;transition:color 0.2s;
+  }
+  .detail-close:hover{color:#fff;}
+
+  /* TOAST */
+  #toast{
+    position:fixed;bottom:28px;left:50%;transform:translateX(-50%);
+    background:rgba(2,4,8,0.95);border:1px solid var(--purple);
+    color:#fff;font-family:'Orbitron',monospace;font-size:12px;
+    letter-spacing:0.15em;padding:10px 24px;border-radius:2px;
+    opacity:0;transition:opacity 0.4s;pointer-events:none;
+    box-shadow:0 0 40px rgba(188,19,254,0.4);
+    animation:toastShimmer 2s linear infinite;
+  }
+  #toast.show{opacity:1;}
+  @keyframes toastShimmer{
+    0%,100%{text-shadow:0 0 10px #00f5ff;}
+    33%{text-shadow:0 0 10px #bc13fe;}
+    66%{text-shadow:0 0 10px #39ff14;}
+  }
+
+  /* WEEK LABEL */
+  #weeklabel{
+    position:absolute;bottom:24px;left:50%;transform:translateX(-50%);
+    font-size:9px;letter-spacing:0.35em;color:#ffffff22;text-align:center;
+  }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="hud">
+  <!-- TOP BAR -->
+  <div id="topbar">
+    <div>
+      <div class="logo">VEILPIERCER<span>intelligence brief</span></div>
+    </div>
+    <div id="stats">
+      <div class="stat"><div class="stat-val" id="s-signals">0</div><div class="stat-label">SIGNALS</div></div>
+      <div class="stat"><div class="stat-val" id="s-pain">0</div><div class="stat-label">PAIN PTS</div></div>
+      <div class="stat"><div class="stat-val" id="s-intent">0</div><div class="stat-label">BUYERS</div></div>
+      <div class="stat"><div class="stat-val" id="s-score">—</div><div class="stat-label">SWARM SCORE</div></div>
+    </div>
+    <div id="filters">
+      <button class="filter-btn active" data-type="all">◈ ALL</button>
+      <button class="filter-btn" data-type="pain">⚡ PAIN</button>
+      <button class="filter-btn" data-type="intent">✦ BUYERS</button>
+      <button class="filter-btn" data-type="competitor">◎ COMPETE</button>
+      <button class="filter-btn" data-type="action">▶ ACTIONS</button>
+      <button class="filter-btn" onclick="window.open('/session-diff','_blank')" style="border-color:rgba(0,245,255,0.4);color:#00f5ff;margin-left:12px;">⬡ SESSION DIFF</button>
+    </div>
+  </div>
+
+  <!-- LEFT PANEL -->
+  <div id="leftpanel">
+    <div>
+      <div class="panel-title">Signal Types</div>
+      <div class="legend-row"><div class="legend-dot pain"></div>Pain Point</div>
+      <div class="legend-row"><div class="legend-dot intent"></div>Buyer Intent</div>
+      <div class="legend-row"><div class="legend-dot competitor"></div>Competitor Move</div>
+      <div class="legend-row"><div class="legend-dot insight"></div>Market Insight</div>
+      <div class="legend-row"><div class="legend-dot action"></div>Action Rec</div>
+    </div>
+
+    <div class="panel-section">
+      <div class="panel-title">Signal Feed</div>
+      <div id="signallist"></div>
+    </div>
+
+    <div class="panel-section">
+      <button class="action-btn" id="btn-refresh">↺ Refresh Signals</button>
+      <br/><br/>
+      <button class="action-btn" id="btn-collapse" style="border-color:rgba(188,19,254,0.3);color:var(--purple);">★ Collapse Wave</button>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div id="rightpanel">
+    <div id="score-wrap">
+      <div class="score-label">INTELLIGENCE SCORE</div>
+      <div class="score-bar-bg">
+        <div class="score-bar-fill" id="score-fill" style="height:0%"></div>
+        <div class="score-val" id="score-val">—</div>
+      </div>
+    </div>
+    <div class="panel-title">Live Feed</div>
+    <div id="feed"></div>
+  </div>
+
+  <div id="weeklabel" id="weeklabel"></div>
+  <div id="toast"></div>
+</div>
+
+<!-- SIGNAL DETAIL -->
+<div id="detail">
+  <button class="detail-close" id="detail-close">✕</button>
+  <div class="detail-type" id="d-type"></div>
+  <div class="detail-title" id="d-title"></div>
+  <div class="detail-body" id="d-body"></div>
+  <div class="detail-meta" id="d-meta"></div>
+</div>
+
+<script>
+// ── Canvas Setup ─────────────────────────────────────────────────────────────
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+let W, H;
+function resize(){ W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+resize();
+window.addEventListener('resize', resize);
+
+// ── Signal Type Config ───────────────────────────────────────────────────────
+const TYPE_CONFIG = {
+  pain:       { color:'#ff006e', label:'PAIN POINT',     size: 6 },
+  intent:     { color:'#39ff14', label:'BUYER INTENT',   size: 7 },
+  competitor: { color:'#bc13fe', label:'COMPETITOR',     size: 5 },
+  insight:    { color:'#00f5ff', label:'MARKET INSIGHT', size: 5 },
+  action:     { color:'#ffd700', label:'ACTION REC',     size: 8 },
+};
+
+function classifySignal(text) {
+  const t = text.toLowerCase();
+  if (t.includes('[execute') || t.includes('action') || t.includes('recommend') || t.includes('next step')) return 'action';
+  if (t.includes('pain') || t.includes('frustrat') || t.includes('expensive') || t.includes('can\'t afford') || t.includes('too much')) return 'pain';
+  if (t.includes('buy') || t.includes('intent') || t.includes('willing to pay') || t.includes('looking for')) return 'intent';
+  if (t.includes('competitor') || t.includes('alternative') || t.includes('vs ') || t.includes('compared')) return 'competitor';
+  return 'insight';
+}
+
+// ── Signal Particle System ───────────────────────────────────────────────────
+let signals = [];
+let particles = [];
+let activeFilter = 'all';
+let globalHue = 0;
+let selectedSignal = null;
+
+class SignalParticle {
+  constructor(signal, index) {
+    this.signal = signal;
+    this.index = index;
+    this.type = signal.type;
+    const cfg = TYPE_CONFIG[this.type];
+    this.baseColor = cfg.color;
+    this.size = cfg.size * (0.8 + Math.random() * 0.6);
+
+    // Spawn in type clusters
+    const clusterAngles = { pain: Math.PI*1.5, intent: Math.PI*0.5, competitor: Math.PI, insight: 0, action: Math.PI*0.25 };
+    const angle = clusterAngles[this.type] + (Math.random() - 0.5) * 1.2;
+    const radius = 150 + Math.random() * 200;
+    this.x = W/2 + Math.cos(angle) * radius;
+    this.y = H/2 + Math.sin(angle) * radius;
+
+    const speed = 0.4 + Math.random() * 0.8;
+    const dir = angle + Math.PI/2 + (Math.random() - 0.5) * 0.8;
+    this.vx = Math.cos(dir) * speed;
+    this.vy = Math.sin(dir) * speed;
+
+    this.trail = [];
+    this.phase = Math.random() * Math.PI * 2;
+    this.hue = Math.random();
+    this.frozen = false;
+    this.visible = true;
+    this.pulseScale = 1;
+    this.pulseDir = 1;
+  }
+
+  update() {
+    if (this.frozen) { this.pulseScale += 0.02 * this.pulseDir; if (this.pulseScale > 1.4 || this.pulseScale < 0.8) this.pulseDir *= -1; return; }
+    this.phase += 0.03;
+    this.trail.unshift({x: this.x, y: this.y});
+    if (this.trail.length > 14) this.trail.pop();
+
+    // Soft boundaries
+    const margin = 100;
+    if (this.x < margin) this.vx += 0.04;
+    if (this.x > W - margin) this.vx -= 0.04;
+    if (this.y < 80) this.vy += 0.04;
+    if (this.y > H - margin) this.vy -= 0.04;
+
+    // Same-type cohesion — cluster together
+    let cx = 0, cy = 0, n = 0;
+    particles.forEach(p => {
+      if (p !== this && p.type === this.type && p.visible) {
+        const dx = p.x - this.x, dy = p.y - this.y;
+        const d = Math.hypot(dx, dy);
+        if (d < 180 && d > 0) { cx += p.x; cy += p.y; n++; }
+      }
+    });
+    if (n) { this.vx += (cx/n - this.x) * 0.0004; this.vy += (cy/n - this.y) * 0.0004; }
+
+    // Cross-type gentle repulsion
+    particles.forEach(p => {
+      if (p !== this && p.visible) {
+        const dx = this.x - p.x, dy = this.y - p.y;
+        const d = Math.hypot(dx, dy);
+        if (d < 30 && d > 0) { this.vx += dx/d * 0.08; this.vy += dy/d * 0.08; }
+      }
+    });
+
+    // Speed limit
+    const spd = Math.hypot(this.vx, this.vy);
+    if (spd > 1.5) { this.vx = this.vx/spd*1.5; this.vy = this.vy/spd*1.5; }
+
+    this.x += this.vx;
+    this.y += this.vy;
+  }
+
+  draw() {
+    if (!this.visible) return;
+    const cfg = TYPE_CONFIG[this.type];
+    const col = cfg.color;
+    const sz = this.size * this.pulseScale;
+
+    // Trail
+    if (this.trail.length > 1) {
+      for (let i = 1; i < this.trail.length; i++) {
+        const a = (1 - i/this.trail.length) * 0.35;
+        ctx.beginPath();
+        ctx.strokeStyle = col.replace('#', 'rgba(').replace(/(..)(..)(..)/, (_,r,g,b)=>
+          `rgba(${parseInt(r,16)},${parseInt(g,16)},${parseInt(b,16)},${a})`);
+        ctx.lineWidth = sz * (1 - i/this.trail.length) * 1.5;
+        ctx.shadowBlur = (1-i/this.trail.length)*12;
+        ctx.shadowColor = col;
+        ctx.moveTo(this.trail[i-1].x, this.trail[i-1].y);
+        ctx.lineTo(this.trail[i].x, this.trail[i].y);
+        ctx.stroke();
+      }
+    }
+
+    // Glow rings (action type gets extra ring)
+    ctx.shadowBlur = this.frozen ? 30 : 14;
+    ctx.shadowColor = col;
+
+    if (this.frozen) {
+      // Pulsing select ring
+      ctx.strokeStyle = col + 'aa';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, sz * 3.5 + Math.sin(this.phase)*4, 0, Math.PI*2);
+      ctx.stroke();
+    }
+
+    // Core dot
+    ctx.fillStyle = col;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, sz, 0, Math.PI*2);
+    ctx.fill();
+
+    // Inner highlight
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.beginPath();
+    ctx.arc(this.x - sz*0.25, this.y - sz*0.25, sz*0.35, 0, Math.PI*2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Label for frozen/selected
+    if (this.frozen) {
+      ctx.fillStyle = '#fff';
+      ctx.font = '11px Share Tech Mono';
+      ctx.textAlign = 'center';
+      const label = (this.signal.title || '').substring(0, 28);
+      ctx.fillText(label + (label.length < (this.signal.title||'').length ? '…' : ''), this.x, this.y - sz - 8);
+    }
+  }
+}
+
+// ── Signal Data Management ───────────────────────────────────────────────────
+function buildParticles() {
+  particles = signals
+    .filter(s => activeFilter === 'all' || s.type === activeFilter)
+    .map((s, i) => new SignalParticle(s, i));
+}
+
+function loadSignals() {
+  // Try to fetch from server, fall back to demo data
+  fetch('/niche/report')
+    .then(r => r.json())
+    .then(data => {
+      const raw = data.signals || data.top_signals || data || [];
+      signals = raw.map((s, i) => ({
+        id: i,
+        title: s.title || s.content?.substring(0,60) || 'Signal ' + i,
+        body: s.body || s.content || '',
+        type: s.type || classifySignal((s.title||'') + ' ' + (s.body||s.content||'')),
+        source: s.url || s.source || 'nexus swarm',
+        relevance: s.relevance || 0.5,
+        agent: s.agent || 'EXECUTIONER',
+        importance: s.importance || 8.5,
+      }));
+      if (!signals.length) loadDemoSignals();
+      else { buildParticles(); updateUI(); toast(`◈ ${signals.length} SIGNALS LOADED`); }
+    })
+    .catch(() => {
+      fetch('nexus_niche_report.json')
+        .then(r => r.json())
+        .then(data => {
+          const raw = data.top_signals || [];
+          signals = raw.map((s, i) => ({
+            id: i,
+            title: s.title || 'Signal ' + i,
+            body: s.body || '',
+            type: classifySignal((s.title||'') + ' ' + (s.body||'')),
+            source: s.url || 'niche scraper',
+            relevance: s.relevance || 0.5,
+            agent: 'NICHE INTAKE',
+          }));
+          if (!signals.length) loadDemoSignals();
+          else { buildParticles(); updateUI(); toast('◈ NICHE SIGNALS LOADED'); }
+        })
+        .catch(loadDemoSignals);
+    });
+}
+
+function loadDemoSignals() {
+  signals = [
+    { id:0, title:'Show HN: Omnifact – Self-Hosted Privacy-First AI Platform', body:'Finally a local AI platform that doesn\'t phone home. Been waiting for this. OpenAI\'s pricing is killing our budget.', type:'pain', source:'HN', relevance:0.92 },
+    { id:1, title:'I spent $800/mo on API costs — switching to local LLM this week', body:'Ridiculous. The moment I found Ollama it changed everything. Happy to pay a one-time tool that helps me set it up.', type:'intent', source:'r/LocalLLaMA', relevance:0.88 },
+    { id:2, title:'Open-source multimodal AI that runs in the browser', body:'No server needed, full privacy. This is the direction everything is going.', type:'insight', source:'HN', relevance:0.75 },
+    { id:3, title:'EXECUTE: Target communities where OpenAI pricing pain is highest', body:'r/LocalLLaMA has 3 active threads this week about switching costs. Post comparison guide Friday. Buyer intent: HIGH.', type:'action', source:'EXECUTIONER', relevance:0.95 },
+    { id:4, title:'Privacy concern with cloud AI — company considering alternatives', body:'Our legal team flagged sending customer data to OpenAI. Looking for on-premise solution urgently.', type:'intent', source:'r/Entrepreneur', relevance:0.85 },
+    { id:5, title:'Competitor analysis: AnythingLLM adds offline mode', body:'AnythingLLM released local mode. No agent memory, no scoring. VeilPiercer differentiation remains intact.', type:'competitor', source:'METACOG', relevance:0.70 },
+    { id:6, title:'Self-hosted AI: the privacy advantage nobody is marketing', body:'Everyone talks features. Nobody is selling the privacy angle directly to compliance-concerned businesses.', type:'insight', source:'r/SideProject', relevance:0.68 },
+    { id:7, title:'EXECUTE: Weekly brief — 3 high-intent buyer signals identified', body:'Token allocation principle applied. Top 3 prospects show buy signals. Recommend outreach this week.', type:'action', source:'EXECUTIONER', relevance:0.98 },
+  ];
+  buildParticles();
+  updateUI();
+  toast('◈ DEMO MODE — SWARM SIGNALS LOADED');
+}
+
+// ── UI Updates ───────────────────────────────────────────────────────────────
+function updateUI() {
+  document.getElementById('s-signals').textContent = signals.length;
+  document.getElementById('s-pain').textContent = signals.filter(s=>s.type==='pain').length;
+  document.getElementById('s-intent').textContent = signals.filter(s=>s.type==='intent').length;
+
+  // Score based on avg relevance
+  const avgRel = signals.reduce((a,s) => a + (s.relevance||0.5), 0) / (signals.length || 1);
+  const scorePct = Math.round(avgRel * 100);
+  document.getElementById('s-score').textContent = (avgRel).toFixed(2);
+  document.getElementById('score-fill').style.height = scorePct + '%';
+  document.getElementById('score-val').textContent = scorePct;
+
+  // Week label
+  const now = new Date();
+  const week = Math.ceil(now.getDate()/7);
+  document.getElementById('weeklabel').textContent =
+    `INTELLIGENCE BRIEF — WEEK ${week} / ${now.getFullYear()} — ${signals.length} SIGNALS DETECTED`;
+
+  // Signal list
+  const list = document.getElementById('signallist');
+  list.innerHTML = '';
+  const toShow = signals.filter(s => activeFilter === 'all' || s.type === activeFilter);
+  toShow.slice(0, 12).forEach((s, i) => {
+    const el = document.createElement('div');
+    el.className = 'sig-item';
+    el.dataset.type = s.type;
+    el.innerHTML = `<div class="sig-type">${TYPE_CONFIG[s.type]?.label || s.type.toUpperCase()}</div><div class="sig-title">${(s.title||'').substring(0,55)}${(s.title||'').length>55?'…':''}</div>`;
+    el.onclick = () => showDetail(s, i);
+    list.appendChild(el);
+  });
+}
+
+let feedEntries = [];
+function feedLog(msg, type='') {
+  const feed = document.getElementById('feed');
+  feedEntries.unshift({ msg, type });
+  if (feedEntries.length > 14) feedEntries.pop();
+  feed.innerHTML = '';
+  feedEntries.forEach(e => {
+    const el = document.createElement('div');
+    el.className = 'feed-entry' + (e.type ? ' ' + e.type : '');
+    el.textContent = '› ' + e.msg;
+    feed.appendChild(el);
+  });
+}
+
+// ── Detail Panel ─────────────────────────────────────────────────────────────
+function showDetail(signal, particleIdx) {
+  const detail = document.getElementById('detail');
+  const cfg = TYPE_CONFIG[signal.type] || TYPE_CONFIG.insight;
+  document.getElementById('d-type').textContent = cfg.label;
+  document.getElementById('d-type').style.color = cfg.color;
+  document.getElementById('d-title').textContent = signal.title || 'Intelligence Signal';
+  document.getElementById('d-body').textContent = signal.body || '(no body captured)';
+  document.getElementById('d-meta').innerHTML = `
+    <div><span style="color:#ffffff44">SOURCE</span><br>${signal.source || '—'}</div>
+    <div><span style="color:#ffffff44">RELEVANCE</span><br>${((signal.relevance||0.5)*100).toFixed(0)}%</div>
+    <div><span style="color:#ffffff44">AGENT</span><br>${signal.agent || 'NICHE INTAKE'}</div>
+    <div><span style="color:#ffffff44">IMPORTANCE</span><br>${signal.importance || '—'}</div>
+  `;
+  detail.classList.add('show');
+
+  // Freeze the particle
+  if (particleIdx !== undefined && particles[particleIdx]) {
+    particles.forEach(p => p.frozen = false);
+    particles[particleIdx].frozen = true;
+  }
+
+  feedLog(signal.title?.substring(0,40), signal.type);
+}
+
+document.getElementById('detail-close').onclick = () => {
+  document.getElementById('detail').classList.remove('show');
+  particles.forEach(p => p.frozen = false);
+};
+
+// ── Filter Buttons ───────────────────────────────────────────────────────────
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeFilter = btn.dataset.type;
+    buildParticles();
+    updateUI();
+  });
+});
+
+// ── Action Buttons ───────────────────────────────────────────────────────────
+document.getElementById('btn-refresh').onclick = () => {
+  loadSignals();
+  feedLog('Signal refresh triggered', 'insight');
+};
+
+document.getElementById('btn-collapse').onclick = () => {
+  particles.forEach(p => {
+    const dx = W/2 - p.x, dy = H/2 - p.y;
+    const d = Math.hypot(dx,dy) || 1;
+    p.vx += dx/d * 4;
+    p.vy += dy/d * 4;
+  });
+  toast('★ WAVE FUNCTION COLLAPSED — ALL SIGNALS CONVERGED');
+  feedLog('Wave collapse: signals converged', 'action');
+};
+
+// ── Canvas Click ─────────────────────────────────────────────────────────────
+canvas.addEventListener('click', e => {
+  const detail = document.getElementById('detail');
+  if (detail.classList.contains('show')) return;
+
+  // Find nearest particle
+  let nearest = null, nd = Infinity;
+  particles.forEach((p, i) => {
+    if (!p.visible) return;
+    const d = Math.hypot(p.x - e.clientX, p.y - e.clientY);
+    if (d < 30 && d < nd) { nd = d; nearest = {p, i}; }
+  });
+  if (nearest) showDetail(nearest.p.signal, nearest.i);
+});
+
+// ── Render Loop ──────────────────────────────────────────────────────────────
+let frame = 0;
+function draw() {
+  ctx.fillStyle = `rgba(2,4,8,0.18)`;
+  ctx.fillRect(0, 0, W, H);
+
+  globalHue = (globalHue + 0.1) % 360;
+  frame++;
+
+  // Background grid
+  if (frame % 2 === 0) {
+    ctx.strokeStyle = 'rgba(0,245,255,0.015)';
+    ctx.lineWidth = 0.5;
+    const grid = 60;
+    for (let x = 0; x < W; x += grid) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    for (let y = 0; y < H; y += grid) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+  }
+
+  // Connection lines between same-type clusters
+  if (frame % 3 === 0) {
+    particles.forEach((p, i) => {
+      if (!p.visible) return;
+      particles.slice(i+1).forEach(q => {
+        if (!q.visible || q.type !== p.type) return;
+        const d = Math.hypot(p.x-q.x, p.y-q.y);
+        if (d < 120) {
+          const a = (1 - d/120) * 0.12;
+          ctx.strokeStyle = TYPE_CONFIG[p.type].color + Math.round(a*255).toString(16).padStart(2,'0');
+          ctx.lineWidth = 0.5;
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(q.x, q.y);
+          ctx.stroke();
+        }
+      });
+    });
+  }
+
+  particles.forEach(p => { p.update(); p.draw(); });
+
+  requestAnimationFrame(draw);
+}
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ── Auto feed ────────────────────────────────────────────────────────────────
+function autoFeed() {
+  if (signals.length > 0) {
+    const s = signals[Math.floor(Math.random() * signals.length)];
+    feedLog(s.title?.substring(0,40) + '…', s.type);
+  }
+  setTimeout(autoFeed, 4000 + Math.random() * 6000);
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+loadSignals();
+draw();
+setTimeout(autoFeed, 3000);
+</script>
+</body>
+</html>

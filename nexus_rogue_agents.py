@@ -29,6 +29,11 @@ from pathlib import Path
 from datetime import datetime
 
 import httpx
+try:
+    import redis as _redis_lib
+    _REDIS_AVAILABLE = True
+except ImportError:
+    _REDIS_AVAILABLE = False
 
 BASE_DIR    = Path(__file__).parent
 BLACKBOARD  = BASE_DIR / "nexus_blackboard.json"
@@ -36,6 +41,55 @@ MEMORY_FILE = BASE_DIR / "nexus_memory.json"
 ROGUE_LOG   = BASE_DIR / "rogue_agents.log"
 OLLAMA      = "http://127.0.0.1:11434"
 INTERVAL    = 45   # seconds between rogue cycles
+
+# ── REDIS BLACKBOARD READER ───────────────────────────────────────────────────
+def _get_redis_password() -> str | None:
+    env_path = BASE_DIR / ".env"
+    if env_path.exists():
+        for line in env_path.read_text(encoding="utf-8", errors="replace").splitlines():
+            if line.startswith("REDIS_PASSWORD="):
+                return line.split("=", 1)[1].strip()
+    return None
+
+def read_redis_bb() -> dict:
+    """Read the live Redis blackboard — source of truth for the swarm."""
+    if not _REDIS_AVAILABLE:
+        return {}
+    try:
+        pw = _get_redis_password()
+        r = _redis_lib.Redis(host="localhost", port=6379, password=pw, decode_responses=True)
+        prefix = "nexus_blackboard:"
+        task = r.get(f"{prefix}task")
+        raw_outputs = r.lrange(f"{prefix}outputs", 0, 29)  # last 30 outputs
+        outputs = []
+        for raw in reversed(raw_outputs):  # oldest first
+            try:
+                outputs.append(json.loads(raw))
+            except Exception:
+                pass
+        status = r.get(f"{prefix}status")
+        # Also grab any task_queue items from JSON fallback
+        task_queue = []
+        if BLACKBOARD.exists():
+            try:
+                jbb = json.loads(BLACKBOARD.read_text(encoding="utf-8"))
+                task_queue = jbb.get("task_queue", [])
+                if not task:
+                    task = jbb.get("task")
+            except Exception:
+                pass
+        return {
+            "task": task or "[ACTIVE — see outputs]",
+            "outputs": outputs,
+            "last_score": None,
+            "last_lesson": None,
+            "collective_rules": [],
+            "task_queue": task_queue,
+            "_source": "redis",
+        }
+    except Exception as e:
+        log.warning(f"[ROGUE] Redis read failed ({e}). Falling back to JSON blackboard.")
+        return {}
 
 logging.basicConfig(
     level=logging.INFO,
@@ -241,13 +295,39 @@ async def think(agent_name: str, context: str, client: httpx.AsyncClient) -> str
 
 # ── BLACKBOARD IO ─────────────────────────────────────────────────────────────
 def read_bb() -> dict:
+    """Read blackboard — Redis is primary, JSON file is fallback."""
+    bb = read_redis_bb()
+    if bb.get("outputs"):  # Redis has live data
+        return bb
+    # Fallback to legacy JSON file
     if BLACKBOARD.exists():
         try: return json.loads(BLACKBOARD.read_text(encoding="utf-8"))
         except: return {}
     return {}
 
 def write_bb(data: dict):
+    """Write rogue outputs back to the JSON file for Hub UI display."""
     BLACKBOARD.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+
+def write_rogue_to_redis(cycle: int, task: str, metacog: str, rogue: str, hacker: str, executor: str, quality: float):
+    """Write rogue analysis back to Redis so the swarm can see it."""
+    if not _REDIS_AVAILABLE:
+        return
+    try:
+        pw = _get_redis_password()
+        r = _redis_lib.Redis(host="localhost", port=6379, password=pw, decode_responses=True)
+        prefix = "nexus_blackboard:"
+        blob = json.dumps({
+            "cycle": cycle, "ts": datetime.utcnow().isoformat(), "task": str(task)[:100],
+            "METACOG": str(metacog)[:500], "ROGUE": str(rogue)[:500],
+            "HACKER": str(hacker)[:500] if hacker else "N/A",
+            "EXECUTIONER": str(executor)[:500], "quality": quality,
+        })
+        r.lpush(f"{prefix}rogue_outputs", blob)
+        r.ltrim(f"{prefix}rogue_outputs", 0, 9)  # keep last 10
+        r.set(f"{prefix}metacog_quality", str(quality))
+    except Exception as e:
+        log.warning(f"[ROGUE] Redis write failed: {e}")
 
 def build_context(bb: dict) -> str:
     task    = bb.get("task", "[no active task]")
@@ -288,9 +368,12 @@ async def run_rogue_cycle(client: httpx.AsyncClient, cycle: int):
     log.info(f"{'='*60}")
 
     bb = read_bb()
-    if not bb.get("task") and not bb.get("outputs"):
-        log.info("[ROGUE] No swarm activity yet — waiting...")
+    outputs = bb.get("outputs", [])
+    if not outputs:
+        log.info("[ROGUE] No swarm outputs yet — waiting for first cycle...")
         return
+    source = bb.get("_source", "json")
+    log.info(f"[ROGUE] Blackboard source: {source} | {len(outputs)} agent outputs loaded")
 
     context = build_context(bb)
 

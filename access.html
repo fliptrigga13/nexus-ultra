@@ -628,32 +628,16 @@
             // Build tier cards with real download links
             const DL = `/download?token=${encodeURIComponent(token)}`;
             const TIER_CONTENT = {
-                Starter: [
-                    { icon: '🖥️', title: 'VeilPiercer Command Hub', desc: 'Click to open your live AI agent observatory', badge: 'included', link: `${NEXUS}/veilpiercer-command.html?token=${encodeURIComponent(token)}` },
-                    { icon: '📦', title: 'Download Source Bundle', desc: 'Click to download your VeilPiercer Starter ZIP', badge: null, link: DL },
-                    { icon: '📄', title: 'Setup Guide', desc: 'Open index.html in any browser — no server needed', badge: null, link: DL },
-                    { icon: '🔑', title: 'Your License', desc: `Single-domain license for ${email}`, badge: null, link: DL },
-                ],
-                Pro: [
-                    { icon: '🖥️', title: 'VeilPiercer Command Hub', desc: 'AI commands + Sentinel active — click to open', badge: 'included', link: `${NEXUS}/veilpiercer-command.html?token=${encodeURIComponent(token)}` },
-                    { icon: '📦', title: 'Download Pro Bundle', desc: 'Full source + safeLog module — click to download', badge: null, link: DL },
-                    { icon: '📊', title: 'Pitch Decks', desc: 'Investor + client decks — included in your ZIP', badge: 'pro', link: DL },
-                    { icon: '🤖', title: 'AI Agent Blueprints', desc: 'n8n + Ollama workflow templates — included in ZIP', badge: 'pro', link: DL },
-                    { icon: '🔑', title: 'Pro License', desc: `Multi-domain (3 projects) for ${email}`, badge: null, link: DL },
-                    { icon: '💬', title: 'Priority Support', desc: 'Email support@veilpiercer.com — 12hr response', badge: 'pro', link: 'mailto:support@veilpiercer.com' },
-                ],
-                Agency: [
-                    { icon: '🖥️', title: 'VeilPiercer Command Hub', desc: 'Full agency hub — all protocols + export rights', badge: 'included', link: `${NEXUS}/veilpiercer-command.html?token=${encodeURIComponent(token)}` },
-                    { icon: '📦', title: 'Download Agency Bundle', desc: 'White-label source — click to download your ZIP', badge: 'agency', link: DL },
-                    { icon: '📊', title: 'Client Pitch Deck', desc: 'Ready-to-present deck — included in ZIP', badge: 'agency', link: DL },
-                    { icon: '🤖', title: 'AI Workflow Pack', desc: 'Full n8n + Ollama + Gemini library — in ZIP', badge: 'agency', link: DL },
-                    { icon: '🔑', title: 'Unlimited License', desc: 'Unlimited client deployments', badge: 'agency', link: DL },
-                    { icon: '🎯', title: 'Revenue Share Rights', desc: 'Sell to clients, keep 100% profit', badge: 'agency', link: DL },
-                    { icon: '☎️', title: 'Onboarding Call', desc: 'Book at support@veilpiercer.com', badge: 'agency', link: 'mailto:support@veilpiercer.com' },
+                VeilPiercer: [
+                    { icon: '🖥', title: 'VeilPiercer Command Hub', desc: 'Your live AI agent observatory', badge: 'included', link: NEXUS + '/veilpiercer-command.html?token=' + encodeURIComponent(token) },
+                    { icon: '⬡', title: 'Session Diff Viewer', desc: 'Trace exactly where your agents diverged, step by step', badge: 'new', link: NEXUS + '/session-diff' },
+                    { icon: '📦', title: 'Download Source Bundle', desc: 'Full 6-agent swarm + all modules', badge: null, link: DL },
+                    { icon: '🔑', title: 'Your License', desc: 'Single-domain lifetime license for ' + email, badge: null, link: DL },
+                    { icon: '💬', title: 'Priority Support', desc: 'support@veilpiercer.com - 24hr response', badge: 'included', link: 'mailto:support@veilpiercer.com' },
                 ]
             };
 
-            const cards = TIER_CONTENT[tier] || TIER_CONTENT.Starter;
+            const cards = TIER_CONTENT[tier] || TIER_CONTENT.VeilPiercer;
             document.getElementById('access-cards').innerHTML = cards.map(c => `
     <a class="card" href="${c.link}" target="${c.link.startsWith('mailto') ? '_self' : '_blank'}">
       <div class="card-icon">${c.icon}</div>

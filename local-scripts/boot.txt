@@ -1,0 +1,22 @@
+Precompiling packages...
+    CUDA Being precompiled by another process (pid: 12416, pidfile: C:\Users\fyou1\.julia\compiled\v1.12\CUDA\oWw5k_6Dxga.ji.pidfile)
+  97622.5 ms  Γ£ô CUDA
+    Atomix ΓåÆ AtomixCUDAExt Being precompiled by another process (pid: 12416, pidfile: C:\Users\fyou1\.julia\compiled\v1.12\AtomixCUDAExt\B0Tg4_6Dxga.ji.pidfile)
+  11903.8 ms  Γ£ô Atomix ΓåÆ AtomixCUDAExt
+  2 dependencies successfully precompiled in 110 seconds. 90 already precompiled.
+  [PSO] Installing HTTP (first run ΓÇö please wait)...
+    Updating registry at `C:\Users\fyou1\.julia\registries\General.toml`
+   Resolving package versions...
+     Project No packages added to or removed from `C:\Users\fyou1\.julia\environments\v1.12\Project.toml`
+    Manifest No packages added to or removed from `C:\Users\fyou1\.julia\environments\v1.12\Manifest.toml`
+Precompiling packages...
+   2430.1 ms  Γ£ô CUDNN_jll
+    cuDNN Being precompiled by another process (pid: 4404, pidfile: C:\Users\fyou1\.julia\compiled\v1.12\cuDNN\awbES_6Dxga.ji.pidfile)
+  10080.8 ms  Γ£ô CUDA ΓåÆ ChainRulesCoreExt
+  11253.8 ms  Γ£ô CUDA ΓåÆ EnzymeCoreExt
+  10704.2 ms  Γ£ô cuDNN
+  13587.3 ms  Γ£ô MLDataDevices ΓåÆ CUDAExt
+  13957.3 ms  Γ£ô NNlib ΓåÆ NNlibCUDAExt
+  15958.6 ms  Γ£ô CUDA ΓåÆ SpecialFunctionsExt
+  20393.3 ms  Γ£ô Flux ΓåÆ FluxCUDAExt
+   7541.3 ms  Γ£ô NNlib ΓåÆ NNlibCUDACUDNNExt

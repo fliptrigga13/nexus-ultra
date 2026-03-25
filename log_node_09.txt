@@ -1,0 +1,4 @@
+  File "C:\Users\fyou1\Desktop\New folder\nexus-ultra\nexus_node09_optimizer.py", line 98
+    r.hset("nexus:node09", "recs",     json.dumps(recs))
+    ^
+SyntaxError: expected 'except' or 'finally' block

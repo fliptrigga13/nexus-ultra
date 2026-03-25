@@ -1,16 +1,62 @@
-VEILPIERCER — DEPLOYMENT GUIDE
+VEILPIERCER — COMPLETE SETUP GUIDE
 ========================================
+Thank you for purchasing VeilPiercer.
+Your access is active. This guide covers everything you need.
 
-Congratulations on your purchase of VeilPiercer.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 1 — ACCESS YOUR COMMAND CENTER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Your personal dashboard is live at:
+  https://veil-piercer.com/access.html?token=YOUR_TOKEN
 
-QUICK START:
-1. Open index.html in any modern browser.
-2. Enter your Personal Access Token when prompted.
-3. Point the connection to your NEXUS ULTRA server.
+The token was in your welcome email. From the dashboard you can:
+  • Monitor live swarm cycles in real time
+  • Submit custom research tasks to the swarm
+  • View the full memory knowledge base
+  • Read AI-generated market intelligence reports
 
-INTEGRATION (Pro/Agency):
-- Drop 'veilpiercer.py' (Python) or 'veilpiercer.js' (Node.js) into your agent folder.
-- Follow the code examples in the SDK files to pipe real-time telemetry to your Hub.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 2 — SUBMITTING A TASK
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+From your access portal, click "Submit a Task to the Swarm."
+Examples of high-value tasks:
+  • "Research the top 5 competitors to [your product] and compare pricing"
+  • "Find 10 buyer personas for [your niche] with top objections"
+  • "Analyze HackerNews for trending topics in [your category]"
 
-SUPPORT:
-Email support@veilpiercer.com for technical integration help.
+Results are delivered within 1-3 swarm cycles (~2-5 minutes).
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 3 — SDK INTEGRATION (OPTIONAL)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+The included SDK lets you pipe VeilPiercer intelligence into
+your own apps, agents, or automations.
+
+Python SDK (veilpiercer.py):
+  from veilpiercer import VeilPiercer
+  vp = VeilPiercer(token="YOUR_TOKEN", hub="https://veil-piercer.com")
+  result = vp.submit_task("Research my top 3 competitors")
+  print(result.output)
+
+Node.js SDK (veilpiercer.js):
+  const vp = new VeilPiercer({ token: "YOUR_TOKEN", hub: "https://veil-piercer.com" });
+  const result = await vp.submitTask("Research my top 3 competitors");
+  console.log(result.output);
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WHAT'S IN THIS BUNDLE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  DEPLOY-GUIDE.txt      — This file
+  PROTOCOL-GUIDE.txt    — Agent modes and protocol reference
+  veilpiercer.py        — Python SDK
+  veilpiercer.js        — Node.js SDK
+  NEXUS-CONNECT.ps1     — Windows PowerShell quick-connect script
+  index.html            — Standalone offline viewer (no server needed)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SUPPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Email: support@veilpiercer.com
+Response time: within 24 hours
+
+© 2026 VeilPiercer · Lauren Flipo · All Rights Reserved

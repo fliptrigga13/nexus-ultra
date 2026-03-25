@@ -1,0 +1,16 @@
+{
+  "source_directories": ["."],
+  "search_path": [
+    "C:/Python314/Lib/site-packages",
+    "C:/Python314/Lib"
+  ],
+  "python_version": "3.14",
+  "strict": false,
+  "ignore": [
+    ".git",
+    "node_modules",
+    "__pycache__",
+    "backup",
+    "past_projects"
+  ]
+}

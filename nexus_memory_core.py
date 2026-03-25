@@ -166,7 +166,7 @@ class MemoryCore:
         if faiss is None or embedder is None:
             return  # silently skip — keyword fallback will be used
         rows = self.conn.execute(
-            "SELECT id, content FROM memories WHERE archived=0 ORDER BY importance DESC LIMIT 2000"
+            "SELECT id, content FROM memories WHERE archived=0 ORDER BY importance DESC LIMIT 5000"
         ).fetchall()
         if not rows:
             return
@@ -193,14 +193,21 @@ class MemoryCore:
             (content.strip()[:2000], tags, importance, tier, agent, now, now)
         )
         self.conn.commit()
+        # WAL checkpoint every 50 writes — prevents unbounded WAL growth
+        write_count = self.conn.execute("SELECT COUNT(*) FROM memories").fetchone()[0]
+        if write_count % 50 == 0:
+            self.conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
         log.info(f"  💾 STORED [{agent}] imp={importance:.1f} tags={tags}: {content[:80]}...")
         return cur.lastrowid
 
     # ── SEMANTIC SEARCH (FAISS vector search → keyword fallback) ─────────────
-    def recall(self, query: str, top_k: int = 8, min_importance: float = 0.5) -> list:
+    def recall(self, query: str, top_k: int = 8, min_importance: float = 0.5,
+               tags_filter: str = "") -> list:
         """
         Semantic search: FAISS vector embeddings (all-MiniLM-L6-v2) when available,
         TF-IDF keyword overlap as offline fallback.
+        tags_filter: if non-empty, restricts results to memories whose tags contain
+                     this string (milestone scoping).
         """
         if not query.strip():
             return self._top_by_importance(top_k)
@@ -210,10 +217,15 @@ class MemoryCore:
         if faiss_ids:
             rows = []
             for fid in faiss_ids:
+                tag_clause = "AND tags LIKE ?" if tags_filter else ""
+                params = [fid, min_importance]
+                if tags_filter:
+                    params.append(f"%{tags_filter}%")
                 row = self.conn.execute(
-                    """SELECT id, content, tags, importance, agent, tier, access_count
-                       FROM memories WHERE id=? AND archived=0 AND importance>=?""",
-                    (fid, min_importance)
+                    f"""SELECT id, content, tags, importance, agent, tier, access_count
+                       FROM memories WHERE id=? AND archived=0 AND importance>=?
+                       {tag_clause}""",
+                    params
                 ).fetchone()
                 if row:
                     rows.append(row)
@@ -237,12 +249,17 @@ class MemoryCore:
         if not query_tokens:
             return self._top_by_importance(top_k)
 
+        tag_clause = "AND tags LIKE ?" if tags_filter else ""
+        params = [min_importance]
+        if tags_filter:
+            params.append(f"%{tags_filter}%")
         rows = self.conn.execute(
-            """SELECT id, content, tags, importance, agent, tier, access_count
+            f"""SELECT id, content, tags, importance, agent, tier, access_count
                FROM memories
                WHERE archived = 0 AND importance >= ?
+               {tag_clause}
                ORDER BY importance DESC LIMIT 500""",
-            (min_importance,)
+            params
         ).fetchall()
 
         scored = []
@@ -389,12 +406,13 @@ class MemoryCore:
         return actions
 
     # ── BUILD INJECTION STRING FOR AGENT PROMPTS ─────────────────────────────
-    def build_injection(self, query: str, agent: str = "", top_k: int = 8) -> str:
+    def build_injection(self, query: str, agent: str = "", top_k: int = 8,
+                        tags_filter: str = "") -> str:
         """
         Build the memory injection block to prepend to any agent's prompt.
-        This is the core of the no-wipe technique.
+        tags_filter: if non-empty, scopes recall to milestone-tagged memories only.
         """
-        memories = self.recall(query, top_k=top_k)
+        memories = self.recall(query, top_k=top_k, tags_filter=tags_filter)
         if not memories:
             return "[MEMORY CORE: No relevant long-term memories yet — this is session 1 for this context]"
 
