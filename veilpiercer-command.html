@@ -24,9 +24,9 @@
       --fail: #ff3355;
       --ok: #00ff99;
 
-      --t1: #c2d8f0;
-      --t2: #456070;
-      --t3: #1a3045;
+      --t1: #d8eeff;
+      --t2: #8eb8d5;
+      --t3: #4a7a9b;
 
       --lockdown-bg: #0f0208;
       --lockdown-rim: #ff3355;
@@ -1004,7 +1004,7 @@
         const emailEl = document.createElement('div');
         emailEl.className = 'cb-item';
         emailEl.style.marginLeft = 'auto';
-        emailEl.innerHTML = `<span style="color:#1a3045">${email}</span>`;
+        emailEl.innerHTML = `<span style="color:var(--t2)">${email}</span>`;
         bar.insertBefore(emailEl, bar.querySelector('.cb-hint'));
       }
 
@@ -1750,14 +1750,13 @@ At this level you can reconstruct any agent chain from logs and detect model deg
     function moveTip(e) { const tip = document.getElementById('ntip'), x = e.touches ? e.touches[0].clientX : e.clientX, y = e.touches ? e.touches[0].clientY : e.clientY; tip.style.left = Math.min(x + 16, window.innerWidth - 240) + 'px'; tip.style.top = Math.max(y - 50, 8) + 'px'; }
     function hideTip() { document.getElementById('ntip').style.display = 'none'; }
 
-    // ── INIT ─────────────────────────────────────────────────────
-    resize();
+    // ── INIT — delay resize so CSS layout is computed first ──────
     addAI('VEILPIERCER',
       `System online. 9 nodes active across 3 pillars.<br><br>
   Type a command or tap a protocol button. Try <strong>"lock down"</strong>, <strong>"amplify"</strong>, or <strong>"what can this be used for?"</strong>`,
       'agent'
     );
-    requestAnimationFrame(draw);
+    requestAnimationFrame(() => { resize(); requestAnimationFrame(draw); });
 
     // ════════════════════════════════════════════════════════════
     //  NEXUS ULTRA — BACKEND CONNECTION
