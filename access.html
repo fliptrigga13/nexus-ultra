@@ -620,7 +620,7 @@
             badge.className = `tier-badge ${tier}`;
             badge.textContent = `⚡ ${tier}`;
 
-            document.getElementById('welcome-title').textContent = `Welcome to VeilPiercer ${tier}`;
+            document.getElementById('welcome-title').textContent = tier === 'VeilPiercer' ? 'Welcome to VeilPiercer' : `Welcome to VeilPiercer ${tier}`;
             document.getElementById('welcome-sub').textContent = `${email} — $${(amount / 100).toFixed(2)} confirmed`;
             document.getElementById('footer-email').textContent = email;
             document.getElementById('footer-tier').textContent = `${tier} Access`;
@@ -661,25 +661,15 @@
                 } catch { document.getElementById('welcome-email-text').textContent = `Welcome to VeilPiercer ${tier}! Your access is now active. Explore everything below.`; }
             }
 
-            // Generate AI onboarding guide
-            try {
-                const r = await fetch(`${NEXUS}/ollama/agent`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ task: 'write-welcome-email', data: { email, tier, amount }, model: 'llama3.2:1b' })
-                });
-                const guideResp = await fetch(`${NEXUS}/ollama/generate`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        model: 'llama3.2:1b',
-                        system: 'You are a VeilPiercer onboarding expert. Be specific, actionable, numbered. No fluff.',
-                        prompt: `Write a 5-step onboarding guide for a new VeilPiercer ${tier} buyer. Steps should help them get maximum value in their first 24 hours. Keep each step to 1-2 sentences.`
-                    })
-                });
-                const gd = await guideResp.json();
-                document.getElementById('ai-guide-text').textContent = gd.response || 'Explore the dashboard, run a protocol, and reach out if you need help!';
-            } catch {
-                document.getElementById('ai-guide-text').textContent = '1. Open the VeilPiercer dashboard\n2. Run each protocol mode\n3. Review the source code\n4. Deploy to your domain\n5. Contact support if you need help';
-            }
+            // Hardcoded factual onboarding guide — no AI hallucination
+            document.getElementById('ai-guide-text').textContent = [
+                '1. Install the tracer: pip install veilpiercer — then add 2 lines to your agent script to start logging every step locally.',
+                '2. Run your agent as normal. A local SQLite file (vp_sessions.db) is created automatically — no cloud, no account needed.',
+                '3. Run a second variation of your agent. VeilPiercer diffs the two sessions and shows exactly which step diverged and why.',
+                '4. Open the Command Hub (your link is in Your Access above). Try LOCK DOWN before an audit or AMPLIFY for full trace depth during a live deploy.',
+                '5. Submit a task to the swarm above — describe what you want researched or built. Results appear here automatically. Support: support@veil-piercer.com'
+            ].join('\n\n');
+
         }
 
         init();
