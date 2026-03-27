@@ -56,11 +56,22 @@ except Exception:
 try:
     from nexus_knowledge_graph import get_kg as _get_kg
     _kg = _get_kg()
-    log_kg_boot = f"[KG] Knowledge graph online — {_kg.get_stats()['nodes']} nodes"
+    log_kg_boot = f"[KG] Knowledge graph online -- {_kg.get_stats()['nodes']} nodes"
 except Exception as _kge:
     _kg = None
     log_kg_boot = f"[KG] Knowledge graph unavailable: {_kge}"
 
+# ── CHRONOS (Temporal Decay + Divergence + Cost Gate) ──────────────────────
+try:
+    from nexus_chronos import get_chronos as _get_chronos
+    _chronos = _get_chronos(_kg) if _kg else None
+    log_chronos_boot = (
+        f"[CHRONOS] online -- "
+        f"{_chronos.get_stats()['nodes_with_decay']} nodes with decay"
+    ) if _chronos else "[CHRONOS] offline (KG unavailable)"
+except Exception as _ce:
+    _chronos = None
+    log_chronos_boot = f"[CHRONOS] unavailable: {_ce}"
 
 # ── CONFIG ────────────────────────────────────────────────────────────────────
 OLLAMA      = "http://127.0.0.1:11434"
@@ -1302,6 +1313,15 @@ async def run_swarm_cycle(task: str, bb: RedisBlackboard, mem: Memory, client: h
     except Exception as e:
         log.warning(f"[MEMORY] FAISS lesson injection failed (non-fatal): {e}")
 
+    # ── CHRONOS TICK (temporal decay sweep) ───────────────────────────────────
+    # Run decay math on all KG facts. Fast (~5ms). Updates confidence scores
+    # so get_supervisor_context() reflects current knowledge health.
+    if _chronos is not None:
+        try:
+            _chronos.tick()
+        except Exception as _ce:
+            log.warning(f"[CHRONOS] Tick failed (non-fatal): {_ce}")
+
     # ── KG FORESIGHT INJECTION (neuro-symbolic patterns) ──────────────────────
     # Inject historical KG patterns into cycle context.
     # All agents receive: top channels, high-readiness pains, conversion blockers,
@@ -1318,6 +1338,16 @@ async def run_swarm_cycle(task: str, bb: RedisBlackboard, mem: Memory, client: h
                 log.info(f"[KG] Injected {_kg.get_stats()['nodes']} KG nodes as cycle foresight")
         except Exception as _kge:
             log.warning(f"[KG] Foresight injection failed (non-fatal): {_kge}")
+
+    # ── CHRONOS TEMPORAL FORESIGHT (trajectory + failure memory) ──────────────
+    if _chronos is not None:
+        try:
+            _ch_ctx = _chronos.get_chronos_context()
+            if _ch_ctx:
+                context = f"{_ch_ctx}\n\n{context}"
+                log.info("[CHRONOS] Temporal foresight injected")
+        except Exception as _ce:
+            log.warning(f"[CHRONOS] Foresight injection failed (non-fatal): {_ce}")
 
     # ── SCOUT LIVE DATA + COORDINATION GRAPH CONTEXT ─────────────────────────
     # SCOUT: gets live Reddit signals + milestone task prompt.
@@ -1658,6 +1688,15 @@ async def run_swarm_cycle(task: str, bb: RedisBlackboard, mem: Memory, client: h
             )
         except Exception as _kge:
             log.warning(f"[KG] Update failed (non-blocking): {_kge}")
+
+    # ── CHRONOS: VP DIVERGENCE SWEEP (failure memory ingestion) ───────────────
+    if _chronos is not None:
+        try:
+            _n_divs = _chronos.ingest_vp_diffs()
+            if _n_divs:
+                log.info(f"[CHRONOS] Ingested {_n_divs} VP divergence(s) as FAILURE_MEMORY")
+        except Exception as _ce:
+            log.warning(f"[CHRONOS] Divergence sweep failed (non-fatal): {_ce}")
 
     return final_score, mvp, lesson
 
