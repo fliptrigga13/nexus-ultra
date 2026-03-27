@@ -1,10 +1,10 @@
-﻿const path = require('path');
+const path = require('path');
 const fs = require('fs');
 const express = require('express');
 const cors = require('cors');
 const { exec } = require('child_process');
 
-const SECRET = "Burton";
+const SECRET = process.env.NEXUS_API_SECRET;
 const HOST = "127.0.0.1";
 const PORT = 3000;
 
@@ -125,3 +125,4 @@ app.post('/cmd', (req, res) => {
 app.listen(PORT, HOST, () => {
   console.log(`Backend running on http://${HOST}:${PORT}`);
 });
+

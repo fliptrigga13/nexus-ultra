@@ -40,7 +40,7 @@ from datetime import datetime
 
 BASE   = Path(__file__).parent
 PYTHON = sys.executable
-ENV    = {**os.environ, "REDIS_PASSWORD": os.getenv("REDIS_PASSWORD", "NEXUS_REDIS_FORT_KNOX_2026")}
+ENV    = {**os.environ, "REDIS_PASSWORD": os.getenv("REDIS_PASSWORD", os.getenv("REDIS_PASSWORD", ""))}
 PID_FILE = BASE / ".nexus_launcher_pids.json"
 
 # -- COMPONENT DEFINITIONS -----------------------------------------------------
@@ -295,3 +295,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

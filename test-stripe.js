@@ -1,6 +1,6 @@
 const http = require('http');
 
-const SECRET = 'Burton';
+const SECRET = process.env.NEXUS_API_SECRET;
 const PORT = 3000;
 
 function hitAccessCreate() {
@@ -82,3 +82,4 @@ function verifyToken(token) {
 
 console.log('Triggering Stripe Access Pipeline test...');
 hitAccessCreate();
+

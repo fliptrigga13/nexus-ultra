@@ -1,6 +1,6 @@
 const http = require('http');
 
-const SECRET = 'Burton';
+const SECRET = process.env.NEXUS_API_SECRET;
 const PORT = 3000;
 const EVENTS = 100;
 const DELAY = 50; // ms between events
@@ -68,3 +68,4 @@ const interval = setInterval(() => {
         console.log(`Fired ${i} events...`);
     }
 }, DELAY);
+

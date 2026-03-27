@@ -212,11 +212,9 @@ MIT — do whatever you want with it.
 NEXUS_API_TOKEN is a 48-character secret key that protects all sensitive
 backend endpoints on port 3000 from unauthorized WiFi or network access.
 
+
 ### The Token
-`
-xiv7G3ZO5JFN4zSmYMDpIwj2eAHokcUtq8fnEdTguayQ1RK9
-`
-Also stored in: .env as NEXUS_API_TOKEN
+Stored in `.env` as `NEXUS_API_TOKEN` — never committed to version control.
 
 ### What it protects
 Any call to these LOCAL SWARM endpoints requires this token in the request header:
@@ -233,16 +231,16 @@ Any call to these LOCAL SWARM endpoints requires this token in the request heade
 ### How to use it
 Add this header to any API call:
 `
-x-nexus-token: xiv7G3ZO5JFN4zSmYMDpIwj2eAHokcUtq8fnEdTguayQ1RK9
+x-nexus-token: <your NEXUS_API_TOKEN from .env>
 `
 
 Example (curl):
-`ash
+```bash
 curl -X POST http://localhost:3000/api/cycle \
-  -H "x-nexus-token: xiv7G3ZO5JFN4zSmYMDpIwj2eAHokcUtq8fnEdTguayQ1RK9" \
+  -H "x-nexus-token: <your NEXUS_API_TOKEN from .env>" \
   -H "Content-Type: application/json" \
   -d '{"task": "Analyze top 3 VeilPiercer growth opportunities"}'
-`
+```
 
 ### Public endpoints (NO token required)
 All VeilPiercer buyer-facing pages, /health, and the observatory remain open.
