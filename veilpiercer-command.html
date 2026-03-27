@@ -955,7 +955,9 @@
       Starter: { aiCommands: false, sentinelLive: false, exportData: false, label: '⚡ STARTER' },
       Pro: { aiCommands: true, sentinelLive: true, exportData: false, label: '🔥 PRO' },
       Agency: { aiCommands: true, sentinelLive: true, exportData: true, label: '🏆 AGENCY' },
+      VeilPiercer: { aiCommands: true, sentinelLive: true, exportData: true, label: '⚡ VEILPIERCER' },
     };
+
 
     async function verifyAndUnlock() {
       const params = new URLSearchParams(window.location.search);
@@ -963,7 +965,7 @@
 
       if (!token) {
         // Allow demo mode without a token — just hide the gate
-        unlockTier('Starter', 'demo@veilpiercer.com', true);
+        unlockTier('Starter', 'demo@veil-piercer.com', true);
         return;
       }
 
@@ -1010,7 +1012,7 @@
       if (!features.aiCommands) {
         const cmdInput = document.getElementById('cmd-input');
         if (cmdInput) {
-          cmdInput.placeholder = 'AI Commands — Pro & Agency only\nUpgrade at veilpiercer.com';
+          cmdInput.placeholder = 'AI Commands — Pro & Agency only\nUpgrade at veil-piercer.com';
           cmdInput.style.opacity = '0.4';
           cmdInput.readOnly = true;
         }
