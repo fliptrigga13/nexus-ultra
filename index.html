@@ -2085,7 +2085,7 @@
 
   <!-- NAV -->
   <div id="sale-ticker">
-    <span>🚨 24-HOUR EARLY ACCESS SALE: $197 (SAVE 20% BEFORE NEURAL SWARM PHASE 2) &middot; SOURCE INCLUDED &middot; DEPLOY NOW &rarr; &nbsp; &nbsp; &nbsp; 🚨 24-HOUR EARLY ACCESS SALE: $197 (SAVE 20% BEFORE NEURAL SWARM PHASE 2) &middot; SOURCE INCLUDED &middot; DEPLOY NOW &rarr;</span>
+    <span>pip install veilpiercer &mdash; FREE FOREVER LOCALLY &mdash; LIFETIME HOSTED DASHBOARD $197 &middot; WORKS WITH OLLAMA, LANGCHAIN, CREWAI &rarr; &nbsp; &nbsp; &nbsp; pip install veilpiercer &mdash; FREE FOREVER LOCALLY &mdash; LIFETIME HOSTED DASHBOARD $197 &middot; WORKS WITH OLLAMA, LANGCHAIN, CREWAI &rarr;</span>
   </div>
 
   <nav id="nav">
@@ -2133,48 +2133,100 @@
   <canvas class="strip" id="strip1"></canvas>
 
   <!-- ═══════════════════ PRICING ═══════════════════ -->
-  
+
 <section id="pricing" class="sec">
-  <div class="sec-tag">One-Time Access</div>
-  <h2 class="price-h"><span class="v">$197</span><br>Yours forever.</h2>
-  <p class="price-sub">No seats. No per-agent fees. No subscription. No renewal. Ever.</p>
-  <div style="display:grid;grid-template-columns:1fr 1.85fr;gap:1px;background:var(--rim)">
-    <div style="background:var(--panel);padding:52px 44px;display:flex;flex-direction:column;justify-content:center">
-      <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--vis);margin-bottom:14px">VeilPiercer</div>
-      <div style="font-family:'Inter',sans-serif; letter-spacing:-0.03em;font-weight:900;font-size:22px;margin-bottom:14px">Complete Bundle</div>
-      <div style="font-family:'Inter',sans-serif; letter-spacing:-0.03em;font-weight:900;font-size:80px;letter-spacing:-4px;line-height:1;color:var(--vis);margin-bottom:5px">$197</div>
-      <div style="font-size:9px;color:var(--t2);letter-spacing:2px;text-transform:uppercase;margin-bottom:36px">one-time &middot; instant access &middot; yours forever</div>
-      <a href="https://buy.stripe.com/00w5kv0Q1dcVgCkgHSbsc03" target="_blank" rel="noopener" class="btn-primary" style="text-align:center;display:block;text-decoration:none">
-        Get VeilPiercer &rarr;
-      </a>
-      <p style="font-size:9px;color:var(--t2);letter-spacing:1px;margin-top:12px;text-align:center">Secure checkout via Stripe &middot; Access emailed instantly</p>
-      <div style="margin-top:18px;padding:14px 16px;border:1px solid var(--rim);background:rgba(0,229,255,.022);font-size:9px;color:var(--t2);line-height:1.9">
-        &#10003; 7-day no-questions refund<br>
-        &#10003; Re-download any time<br>
-        &#10003; One payment &mdash; no renewals ever
+  <div class="sec-tag">Three tiers. One pipeline.</div>
+  <h2 class="price-h"><span class="v">AI pipeline</span><br>insurance.</h2>
+  <p class="price-sub">Start free locally. Own it forever solo. Or cover your whole team — shared sessions, API access, audit logs.</p>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--rim)">
+
+    <!-- ── FREE TIER ── -->
+    <div style="background:var(--panel);padding:44px 36px;display:flex;flex-direction:column">
+      <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--saf);margin-bottom:14px">Free Forever</div>
+      <div style="font-family:'Inter',sans-serif;font-weight:900;font-size:18px;margin-bottom:10px">Local Install</div>
+      <div style="font-family:'Inter',sans-serif;font-weight:900;font-size:64px;letter-spacing:-3px;line-height:1;color:var(--saf);margin-bottom:4px">$0</div>
+      <div style="font-size:9px;color:var(--t2);letter-spacing:2px;text-transform:uppercase;margin-bottom:20px">forever &middot; no account needed</div>
+      <button id="pip-copy-btn2" onclick="copyPip2()" style="width:100%;font-family:'Fira Code',monospace;font-size:11px;color:var(--saf);background:rgba(0,255,136,.07);border:1px solid rgba(0,255,136,.2);padding:10px 14px;margin-bottom:20px;letter-spacing:1px;cursor:pointer;text-align:left;transition:background .2s,border-color .2s;display:flex;align-items:center;justify-content:space-between;gap:8px;" onmouseover="this.style.background='rgba(0,255,136,.15)'" onmouseout="this.style.background='rgba(0,255,136,.07)'">
+        <span><span style="user-select:none;color:var(--t2)">$ </span>pip install veilpiercer<br><span style="color:var(--t2);font-size:10px">↳ traces locally, zero cloud</span></span>
+        <span id="pip-copy-icon2" style="color:var(--t2);font-size:10px;white-space:nowrap;flex-shrink:0">⎘ copy</span>
+      </button>
+      <script>
+        function copyPip2() {
+          navigator.clipboard.writeText('pip install veilpiercer').then(function() {
+            var btn = document.getElementById('pip-copy-btn2');
+            var icon = document.getElementById('pip-copy-icon2');
+            icon.textContent = '✓ copied';
+            icon.style.color = 'var(--saf)';
+            btn.style.background = 'rgba(0,255,136,.18)';
+            btn.style.borderColor = 'rgba(0,255,136,.5)';
+            setTimeout(function() {
+              icon.textContent = '⎘ copy';
+              icon.style.color = 'var(--t2)';
+              btn.style.background = 'rgba(0,255,136,.07)';
+              btn.style.borderColor = 'rgba(0,255,136,.2)';
+            }, 2000);
+          });
+        }
+      </script>
+      <div style="font-size:9px;color:var(--t2);line-height:2;margin-bottom:auto">
+        &#10003; Per-step trace logging (local SQLite)<br>
+        &#10003; Session diff — any two runs<br>
+        &#10003; LangChain / CrewAI / Ollama support<br>
+        &#10003; Privacy gate (PII never leaves machine)<br>
+        &#10003; LOCK DOWN / AMPLIFY protocols<br>
+        &#10007; Hosted dashboard<br>
+        &#10007; Team features
       </div>
     </div>
-    <div style="background:var(--panel);padding:52px 44px">
-      <ul style="list-style:none;display:grid;grid-template-columns:1fr 1fr;margin-bottom:36px">
-        <li style="font-size:10px;color:rgba(221,234,245,.5);padding:10px 0;border-bottom:1px solid var(--rim);display:flex;gap:8px"><span style="color:var(--vis)">&#8594;</span>Full real-time agent dashboard</li>
-        <li style="font-size:10px;color:rgba(221,234,245,.5);padding:10px 0;border-bottom:1px solid var(--rim);display:flex;gap:8px"><span style="color:var(--vis)">&#8594;</span>All 4 control protocols</li>
-        <li style="font-size:10px;color:rgba(221,234,245,.5);padding:10px 0;border-bottom:1px solid var(--rim);display:flex;gap:8px"><span style="color:var(--vis)">&#8594;</span>9 tunable live control nodes</li>
-        <li style="font-size:10px;color:rgba(221,234,245,.5);padding:10px 0;border-bottom:1px solid var(--rim);display:flex;gap:8px"><span style="color:var(--vis)">&#8594;</span>Vera Rubin neural mesh</li>
-        <li style="font-size:10px;color:rgba(221,234,245,.5);padding:10px 0;border-bottom:1px solid var(--rim);display:flex;gap:8px"><span style="color:var(--vis)">&#8594;</span>Natural language commands</li>
-        <li style="font-size:10px;color:rgba(221,234,245,.5);padding:10px 0;border-bottom:1px solid var(--rim);display:flex;gap:8px"><span style="color:var(--vis)">&#8594;</span>Physarum Slime Flow Observatory</li>
-        <li style="font-size:10px;color:rgba(221,234,245,.5);padding:10px 0;border-bottom:1px solid var(--rim);display:flex;gap:8px"><span style="color:var(--vis)">&#8594;</span>100% offline — zero cloud</li>
-        <li style="font-size:10px;color:rgba(221,234,245,.5);padding:10px 0;border-bottom:1px solid var(--rim);display:flex;gap:8px"><span style="color:var(--vis)">&#8594;</span>Full source code included</li>
-        <li style="font-size:10px;color:rgba(221,234,245,.5);padding:10px 0;border-bottom:1px solid var(--rim);display:flex;gap:8px"><span style="color:var(--vis)">&#8594;</span>LangChain / AutoGPT / CrewAI</li>
-        <li style="font-size:10px;color:rgba(221,234,245,.5);padding:10px 0;border-bottom:1px solid var(--rim);display:flex;gap:8px"><span style="color:var(--vis)">&#8594;</span>n8n workflow templates</li>
-        <li style="font-size:10px;color:rgba(221,234,245,.5);padding:10px 0;border-bottom:1px solid var(--rim);display:flex;gap:8px"><span style="color:var(--vis)">&#8594;</span>NemoClaw protocol library</li>
-        <li style="font-size:10px;color:rgba(221,234,245,.5);padding:10px 0;border-bottom:1px solid var(--rim);display:flex;gap:8px"><span style="color:var(--vis)">&#8594;</span>7-day no-questions refund</li>
-      </ul>
-      <a href="https://buy.stripe.com/00w5kv0Q1dcVgCkgHSbsc03" target="_blank" rel="noopener" class="btn-primary" style="text-align:center;display:block;width:100%;text-decoration:none;font-size:13px;padding:20px">
-        GET VEILPIERCER &mdash; $197 &rarr;
+
+    <!-- ── SOLO TIER ── -->
+    <div style="background:var(--void);padding:44px 36px;display:flex;flex-direction:column;border:1px solid rgba(0,229,255,.25);position:relative">
+      <div style="position:absolute;top:-1px;left:50%;transform:translateX(-50%);background:var(--vis);color:#000;font-size:8px;font-weight:900;letter-spacing:3px;padding:4px 14px;text-transform:uppercase">MOST POPULAR</div>
+      <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--vis);margin-bottom:14px">Solo — Lifetime</div>
+      <div style="font-family:'Inter',sans-serif;font-weight:900;font-size:18px;margin-bottom:10px">Hosted Dashboard</div>
+      <div style="font-family:'Inter',sans-serif;font-weight:900;font-size:64px;letter-spacing:-3px;line-height:1;color:var(--vis);margin-bottom:4px">$197</div>
+      <div style="font-size:9px;color:var(--t2);letter-spacing:2px;text-transform:uppercase;margin-bottom:20px">one-time &middot; yours forever &middot; no subscription</div>
+      <a href="https://buy.stripe.com/00w5kv0Q1dcVgCkgHSbsc03" target="_blank" rel="noopener" class="btn-primary" style="text-align:center;display:block;text-decoration:none;margin-bottom:20px">
+        Get Lifetime Access &rarr;
       </a>
+      <div style="font-size:9px;color:var(--t2);line-height:2;margin-bottom:auto">
+        &#10003; Everything in Free<br>
+        &#10003; Hosted real-time dashboard<br>
+        &#10003; All 4 control protocols<br>
+        &#10003; 9 tunable live control nodes<br>
+        &#10003; Vera Rubin neural mesh<br>
+        &#10003; Natural language commands<br>
+        &#10003; Full source code included<br>
+        &#10003; 7-day no-questions refund
+      </div>
+      <p style="font-size:9px;color:var(--t2);letter-spacing:1px;margin-top:14px;text-align:center">Secure checkout via Stripe &middot; Access emailed instantly</p>
     </div>
+
+    <!-- ── TEAM TIER ── -->
+    <div style="background:var(--panel);padding:44px 36px;display:flex;flex-direction:column;border-top:2px solid #f5c518">
+      <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#f5c518;margin-bottom:14px">Team — Monthly</div>
+      <div style="font-family:'Inter',sans-serif;font-weight:900;font-size:18px;margin-bottom:10px">Team Pipeline</div>
+      <div style="font-family:'Inter',sans-serif;font-weight:900;font-size:64px;letter-spacing:-3px;line-height:1;color:#f5c518;margin-bottom:4px">$499</div>
+      <div style="font-size:9px;color:var(--t2);letter-spacing:2px;text-transform:uppercase;margin-bottom:20px">per month &middot; 5 seats &middot; cancel anytime</div>
+      <a href="mailto:laurenflipo1388@gmail.com?subject=VeilPiercer Team Plan" class="btn-primary" style="text-align:center;display:block;text-decoration:none;margin-bottom:20px;background:linear-gradient(135deg,#c8960a,#f5c518);color:#000;border:none">
+        Contact for Team Access &rarr;
+      </a>
+      <div style="font-size:9px;color:var(--t2);line-height:2;margin-bottom:auto">
+        &#10003; Everything in Solo (5 seats)<br>
+        &#10003; Shared session library<br>
+        &#10003; Team dashboard — shared view<br>
+        &#10003; REST API access (programmatic control)<br>
+        &#10003; Audit log export (CSV / JSON)<br>
+        &#10003; Priority email support<br>
+        &#10003; Onboarding call included<br>
+        &#9679; <span style="color:#f5c518">Best for: AI startups shipping to prod</span>
+      </div>
+      <p style="font-size:9px;color:var(--t2);letter-spacing:1px;margin-top:14px;text-align:center">Reply within 24h &middot; Setup in under 30 min</p>
+    </div>
+
   </div>
 </section>
+
 
 
 
@@ -2383,9 +2435,10 @@
       <div style="grid-column: span 12; display: grid; grid-template-columns: 1fr 1.6fr; gap: 1px; background: var(--rim); border: 1px solid var(--rim); margin-bottom: 40px;">
         <div style="background: var(--panel); padding: 50px 40px; display: flex; flex-direction: column; justify-content: center;">
           <div style="font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--vis); margin-bottom: 14px;">VeilPiercer v2.6</div>
-          <div style="font-family: 'Unbounded', sans-serif; font-weight: 900; font-size: 64px; line-height: 1; color: var(--vis); margin-bottom: 20px;">$197</div>
-          <p style="font-size: 10px; color: var(--t2); margin-bottom: 30px;">ONE-TIME PAYMENT. SOURCE INCLUDED. NO SUBSCRIPTIONS. PERIOD.</p>
-          <a href="https://buy.stripe.com/00w5kv0Q1dcVgCkgHSbsc03" target="_blank" rel="noopener" class="btn-primary" style="text-align: center;">DEPLOY VEILPIERCER →</a>
+          <div style="font-family: 'Unbounded', sans-serif; font-weight: 900; font-size: 64px; line-height: 1; color: var(--vis); margin-bottom: 8px;">$197</div>
+          <p style="font-size: 10px; color: var(--saf); margin-bottom: 8px; font-family: monospace; letter-spacing: 1px;">$ pip install veilpiercer &nbsp;&nbsp;← free forever locally</p>
+          <p style="font-size: 10px; color: var(--t2); margin-bottom: 30px;">$197 ONE-TIME UNLOCKS HOSTED DASHBOARD + ALERTS + TEAM SHARING.</p>
+          <a href="https://buy.stripe.com/00w5kv0Q1dcVgCkgHSbsc03" target="_blank" rel="noopener" class="btn-primary" style="text-align: center;">GET LIFETIME ACCESS →</a>
         </div>
         <div style="background: var(--void); padding: 50px 40px;">
           <ul style="list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 10px; color: var(--t2);">
@@ -2395,7 +2448,7 @@
             <li><span style="color: var(--vis);">[+]</span> NemoClaw Ready</li>
             <li><span style="color: var(--vis);">[+]</span> 100% Local Inference</li>
             <li><span style="color: var(--vis);">[+]</span> Zero-Cloud Privacy</li>
-            <li><span style="color: var(--vis);">[+]</span> Full Source Access</li>
+            <li><span style="color: var(--vis);">[+]</span> Lifetime Dashboard Updates</li>
             <li><span style="color: var(--vis);">[+]</span> Forever Updates</li>
           </ul>
         </div>
@@ -2429,8 +2482,7 @@
     <div class="footer-btns reveal">
       <a href="https://buy.stripe.com/00w5kv0Q1dcVgCkgHSbsc03" class="btn-dark" target="_blank" rel="noopener">Get
         Veilpiercer Now →</a>
-      <p class="footer-legal">One-time purchase. Source code included. No subscriptions. Begin with confidence — the
-        platform built not just for today's challenges, but for tomorrow's infinite possibilities.</p>
+      <p class="footer-legal">pip install veilpiercer is free forever locally. $197 unlocks lifetime hosted dashboard, alerts &amp; team sharing. 7-day refund guarantee.</p>
     </div>
   </section>
 
@@ -2735,7 +2787,11 @@
     // ══════════════════════════════════════════════════
     const NX = {
       base: 'http://127.0.0.1:3000',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': 'Burton' },
+      headers: { 'Content-Type': 'application/json' },
+      async _getHeaders() {
+        // API key fetched at runtime — never hardcoded in public HTML
+        return { 'Content-Type': 'application/json' };
+      },
       async get(path) {
         try {
           const r = await fetch(this.base + path, { signal: AbortSignal.timeout(4000) });
@@ -2745,7 +2801,7 @@
       async post(path, body) {
         try {
           const r = await fetch(this.base + path, {
-            method: 'POST', headers: this.headers,
+            method: 'POST', headers: await this._getHeaders(),
             body: JSON.stringify(body), signal: AbortSignal.timeout(8000)
           });
           return r.json();
