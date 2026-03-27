@@ -456,7 +456,8 @@ app.use((req, res, next) => {
   const isProtected = PROTECTED_PREFIXES.some(p => req.url.startsWith(p));
   const isPublic = [
     '/api/config', '/api/customer-task', '/api/ping-services', 
-    '/api/stats', '/stripe/', '/access/verify', '/feedback', '/public/', '/veilpiercer-sales.html'
+    '/api/stats', '/api/result', '/api/results',
+    '/stripe/', '/access/verify', '/feedback', '/public/', '/veilpiercer-sales.html'
   ].some(p => req.url.startsWith(p));
   
   if (isProtected && !isPublic) {
