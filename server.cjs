@@ -941,17 +941,33 @@ app.get('/public/stats', (req, res) => {
 
 // ── GET /access/verify ───────────────────
 // Called by access.html to verify a token and return buyer data
+// IP-LOCKED: first IP that verifies binds the token; different IPs are blocked.
 app.get('/access/verify', (req, res) => {
   const { token } = req.query;
   if (!token) return res.status(400).json({ ok: false, error: 'token required' });
   const db = loadAccessDB();
   const entry = db[token];
   if (!entry) return res.status(404).json({ ok: false, error: 'Token not found or expired' });
-  // Increment usage count
+
+  // Resolve real IP (handles Cloudflare / ngrok proxying)
+  const ip = (req.headers['x-forwarded-for'] || req.ip || '').split(',')[0].trim();
+  const isLocal = ['::1','127.0.0.1','::ffff:127.0.0.1'].includes(ip);
+
+  if (!entry.boundIp) {
+    // First use — bind this token to the email + IP
+    entry.boundIp = ip;
+    entry.boundAt = new Date().toISOString();
+    log(`ACCESS BOUND: ${entry.email} → ${ip}`);
+  } else if (!isLocal && entry.boundIp !== ip) {
+    // Different IP — block
+    log(`ACCESS BLOCKED: token for ${entry.email} used from ${ip} (bound to ${entry.boundIp})`);
+    return res.status(403).json({ ok: false, error: 'This access link is registered to another device. Contact support@veil-piercer.com.' });
+  }
+
   entry.used = (entry.used || 0) + 1;
   entry.lastAccessed = new Date().toISOString();
   saveAccessDB(db);
-  log(`ACCESS VERIFIED: ${entry.email} [${entry.tier}] (visit #${entry.used})`);
+  log(`ACCESS VERIFIED: ${entry.email} [${entry.tier}] (visit #${entry.used}) from ${ip}`);
   res.json({ ok: true, email: entry.email, tier: entry.tier, amount: entry.amount, welcomeEmail: entry.welcomeEmail || null });
 });
 
