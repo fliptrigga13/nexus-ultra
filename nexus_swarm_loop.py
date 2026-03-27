@@ -52,6 +52,16 @@ except Exception:
     def lint_output(name, output): return 1.0        # permissive fallback
     def build_agent_context(name, bb_outputs): return ""  # permissive fallback
 
+# ── KNOWLEDGE GRAPH (Neuro-Symbolic Memory) ───────────────────────────────────
+try:
+    from nexus_knowledge_graph import get_kg as _get_kg
+    _kg = _get_kg()
+    log_kg_boot = f"[KG] Knowledge graph online — {_kg.get_stats()['nodes']} nodes"
+except Exception as _kge:
+    _kg = None
+    log_kg_boot = f"[KG] Knowledge graph unavailable: {_kge}"
+
+
 # ── CONFIG ────────────────────────────────────────────────────────────────────
 OLLAMA      = "http://127.0.0.1:11434"
 COSMOS      = "http://127.0.0.1:9100"
@@ -1292,6 +1302,23 @@ async def run_swarm_cycle(task: str, bb: RedisBlackboard, mem: Memory, client: h
     except Exception as e:
         log.warning(f"[MEMORY] FAISS lesson injection failed (non-fatal): {e}")
 
+    # ── KG FORESIGHT INJECTION (neuro-symbolic patterns) ──────────────────────
+    # Inject historical KG patterns into cycle context.
+    # All agents receive: top channels, high-readiness pains, conversion blockers,
+    # competitor gaps, reasoning trend, ontology drift signal.
+    if _kg is not None:
+        try:
+            _kg_ctx = _kg.get_supervisor_context(task)
+            if _kg_ctx:
+                context = f"{_kg_ctx}\n\n{context}"
+                # Also inject best conversion path if found (symbolic reasoning)
+                _conv_path = _kg.find_conversion_path()
+                if _conv_path:
+                    context = f"{_conv_path}\n{context}"
+                log.info(f"[KG] Injected {_kg.get_stats()['nodes']} KG nodes as cycle foresight")
+        except Exception as _kge:
+            log.warning(f"[KG] Foresight injection failed (non-fatal): {_kge}")
+
     # ── SCOUT LIVE DATA + COORDINATION GRAPH CONTEXT ─────────────────────────
     # SCOUT: gets live Reddit signals + milestone task prompt.
     # All other generators: get context from their declared reads_from chain
@@ -1604,6 +1631,33 @@ async def run_swarm_cycle(task: str, bb: RedisBlackboard, mem: Memory, client: h
     bb.set("last_mvp", mvp)
     bb.set("last_lesson", lesson)
     bb.set("status", "DONE")
+
+    # ── KNOWLEDGE GRAPH UPDATE (neuro-symbolic ingestion) ──────────────────
+    if _kg is not None:
+        try:
+            # Collect all agent outputs from this cycle for KG ingestion
+            _cycle_outputs = [
+                {"agent": a["name"], "text": a.get("_last_output", "")}
+                for a in AGENTS if a.get("_last_output")
+            ]
+            if not _cycle_outputs:
+                # Fall back to blackboard recent outputs
+                _raw_ctx = bb.get_context(last_n=12)
+                for _line in _raw_ctx.split("\n\n"):
+                    if _line.startswith("[") and "]:" in _line:
+                        _ag = _line.split("]:")
+                        if len(_ag) == 2:
+                            _cycle_outputs.append(
+                                {"agent": _ag[0][1:], "text": _ag[1].strip()}
+                            )
+            _kg.update(
+                agent_outputs=_cycle_outputs,
+                score=final_score,
+                mvp=mvp,
+                cycle_id=str(cycle_id),
+            )
+        except Exception as _kge:
+            log.warning(f"[KG] Update failed (non-blocking): {_kge}")
 
     return final_score, mvp, lesson
 
