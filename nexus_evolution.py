@@ -65,7 +65,7 @@ log = logging.getLogger("EVOLUTION")
 # ── BASE AGENT DEFINITIONS ───────────────────────────────────────────────────
 BASE_AGENTS = {
     "SUPERVISOR": {
-        "model": "llama3.1:8b",
+        "model": "deepseek-r1:14b",
         "base_prompt": "You are the SUPERVISOR. Assess the swarm's state and route tasks optimally. Output [ROUTE: AGENT_NAME] [REASON: why].",
         "fitness": 0.5,
     },
@@ -85,7 +85,7 @@ BASE_AGENTS = {
         "fitness": 0.5,
     },
     "VALIDATOR": {
-        "model": "llama3.1:8b",
+        "model": "deepseek-r1:14b",
         "base_prompt": "You are the VALIDATOR. Check all outputs for correctness. Output [PASS] or [FAIL: specific reason].",
         "fitness": 0.5,
     },
@@ -181,7 +181,13 @@ class GenePool:
         return max(variants, key=lambda v: v.get("fitness", 0)) if variants else {}
 
     def stats(self) -> dict:
-        return {a: {"variants": len(v), "best_fitness": max((x["fitness"] for x in v), default=0)} for a, v in self.pool.items()}
+        return {
+            a: {
+                "variants": len(v),
+                "best_fitness": max((x.get("fitness", 0) for x in v if isinstance(x, dict)), default=0)
+            }
+            for a, v in self.pool.items() if isinstance(v, list)  # skip __meta__ and non-list
+        }
 
 # ── OLLAMA CALL ───────────────────────────────────────────────────────────────
 async def ollama(model: str, prompt: str, client: httpx.AsyncClient, max_tokens: int = 512) -> str:
@@ -355,20 +361,33 @@ async def run_evolution_cycle(gene_pool: GenePool, generation: int, client: http
             return entry_id
 
         if random.random() < MUTATION_RATE:
-            log.info(f"[MUTATE→QUEUED] {agent_name} (fitness={best_fitness:.2f})")
+            log.info(f"[MUTATE] {agent_name} (fitness={best_fitness:.2f})")
             new_prompt = await mutate_prompt(agent_name, best_prompt, agent_weakness, client)
             if len(new_prompt) > 50 and "ERROR" not in new_prompt:
-                _queue_prompt_change("mutation", agent_name, new_prompt, best_fitness, generation)
-                new_variants_created += 1
+                if best_fitness < 0.55:
+                    # AUTO-APPLY: agent is stuck, queuing won't help, apply directly
+                    gene_pool.add_variant(agent_name, new_prompt, best_fitness, generation)
+                    log.info(f"   ✅ AUTO-APPLIED mutation (stuck fitness={best_fitness:.2f})")
+                    new_variants_created += 1
+                else:
+                    # QUEUE: agent performing, protect with approval gate
+                    _queue_prompt_change("mutation", agent_name, new_prompt, best_fitness, generation)
+                    log.info(f"   📋 QUEUED mutation (good fitness={best_fitness:.2f} >= 0.55)")
+                    new_variants_created += 1
         else:
             variants = gene_pool.pool.get(agent_name, [])
             if len(variants) >= 2:
                 parents = random.sample(variants, 2)
-                log.info(f"[CROSSOVER→QUEUED] {agent_name}")
+                log.info(f"[CROSSOVER] {agent_name}")
                 child = await crossover_prompts(agent_name, parents[0]["prompt"], parents[1]["prompt"], client)
                 if len(child) > 50 and "ERROR" not in child:
                     avg_fitness = (parents[0]["fitness"] + parents[1]["fitness"]) / 2
-                    _queue_prompt_change("crossover", agent_name, child, avg_fitness, generation)
+                    if avg_fitness < 0.55:
+                        gene_pool.add_variant(agent_name, child, avg_fitness, generation)
+                        log.info(f"   ✅ AUTO-APPLIED crossover (avg_fitness={avg_fitness:.2f})")
+                    else:
+                        _queue_prompt_change("crossover", agent_name, child, avg_fitness, generation)
+
 
     # 4. FORGE CURRICULUM — generate self-training tasks
     log.info(f"[CURRICULUM] Forging new training tasks from weaknesses...")

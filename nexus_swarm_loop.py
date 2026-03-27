@@ -70,7 +70,8 @@ LITE_THRESHOLD   = 18   # RAM PROTECTION: laptop-safe threshold (free RAM is tig
 CONDUCTOR_ALWAYS = {"SUPERVISOR", "REWARD", "METACOG", "EXECUTIONER"}  # always run — quality gates
 
 LITE_MODEL_MAP = {
-    "deepseek-r1:8b": "gemma3:4b",
+    "deepseek-r1:14b": "deepseek-r1:8b",    # R1 14B → R1 8B when RAM tight
+    "deepseek-r1:8b": "gemma3:4b",           # R1 8B → gemma3:4b when very tight
     "qwen3:8b": "gemma3:4b",
     "qwen2.5-coder:7b": "llama3.2:1b",
     "llama3.1:8b": "llama3.2:1b",
@@ -289,8 +290,8 @@ CORRECT EXAMPLE OUTPUT:
     {
         "name": "VALIDATOR",
         "tier": "CRITIC",
-        "model": "llama3.1:8b",
-        "original_model": "llama3.1:8b",
+        "model": "deepseek-r1:14b",  # UPGRADE: R1 chain-of-thought for evidence demand — catches unsupported claims with actual reasoning
+        "original_model": "deepseek-r1:14b",
         # PATCH 13 (MAR arXiv:2512.20845): Epistemic role = evidence demand only.
         # Distinct from other critics to prevent degeneration-of-thought.
         "role": "ROLE: VALIDATOR — Evidence Auditor. Your ONLY job: demand evidence.\n"
@@ -360,8 +361,8 @@ If concrete failure: [SENTINEL_LOCKDOWN: <exact quote from output> causes <exact
     {
         "name": "METACOG",
         "tier": "CRITIC",
-        "model": "llama3.2:1b",   # FIX Mar23: mistral:7b timing out as end-of-chain critic — llama3.2:1b 5x faster for 1-line verdict
-        "original_model": "llama3.2:1b",
+        "model": "deepseek-r1:8b",   # UPGRADE: R1 8B for reasoning chain audit — much better than llama3.2:1b at identifying logical gaps
+        "original_model": "deepseek-r1:8b",
         # PATCH 13: Epistemic role = reasoning chain audit only.
         "role": "ROLE: METACOG - Reasoning Chain Auditor. Your ONLY job: trace the logic chain.\n"
                 "Do NOT evaluate evidence, security, or mission alignment - other critics do that.\n"
@@ -658,8 +659,9 @@ def extract_and_run_code(agent_output: str) -> str:
 # a 3-4min phi4 call. This eliminates the TimeoutError cascade on EXECUTIONER/METACOG.
 _OLLAMA_SEM_HEAVY = asyncio.Semaphore(1)  # one 14B model at a time (VRAM protection)
 _OLLAMA_SEM_FAST  = asyncio.Semaphore(2)  # critics run independently, up to 2 concurrent
-_FAST_CRITIC_MODELS = {"llama3.2:1b", "llama3.2:latest", "nexus-cosmos:latest", "mistral:7b-instruct-v0.3-q4_K_M"}  # models used by fast critics — get own semaphore lane
+_FAST_CRITIC_MODELS = {"deepseek-r1:8b", "llama3.2:1b", "llama3.2:latest", "nexus-cosmos:latest", "mistral:7b-instruct-v0.3-q4_K_M"}  # models used by fast critics
 _CRITIC_TIMEOUT = {  # per-model timeout for fast critic lane
+    "deepseek-r1:8b":                    90.0,   # R1 reasoning takes a bit longer but worth it
     "llama3.2:1b":                       30.0,   # completes in <5s
     "llama3.2:latest":                   30.0,
     "mistral:7b-instruct-v0.3-q4_K_M":  60.0,   # 15-30s typical, 60s safe ceiling
@@ -1596,6 +1598,12 @@ async def run_swarm_cycle(task: str, bb: RedisBlackboard, mem: Memory, client: h
     if _vp_session_enabled and _vp_session is not None:
         try: _vp_session.close()
         except Exception: pass
+
+    # ── BLACKBOARD PERSISTENCE ─────────────────────────────────────────────
+    bb.set("last_score", final_score)
+    bb.set("last_mvp", mvp)
+    bb.set("last_lesson", lesson)
+    bb.set("status", "DONE")
 
     return final_score, mvp, lesson
 

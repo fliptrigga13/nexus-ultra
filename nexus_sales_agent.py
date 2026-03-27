@@ -26,7 +26,7 @@ REPORT        = BASE / "nexus_niche_report.json"
 QUEUE         = BASE / "nexus_outreach_queue.json"
 SEEN          = BASE / "nexus_outreach_seen.json"
 OLLAMA_URL    = "http://localhost:11434"
-OLLAMA_MODEL  = "llama3.1:8b"   # good balance: persuasive writing quality
+OLLAMA_MODEL  = "qwen2.5:14b"   # good balance: persuasive writing quality
 
 
 def load_json(p: Path, default):
