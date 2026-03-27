@@ -127,7 +127,7 @@ function createAccessToken(email, tier, amount, sessionId) {
 // ─── Email Transporter ───────────────────
 const EMAIL_USER = process.env.EMAIL_USER || '';
 const EMAIL_PASS = process.env.EMAIL_PASS || '';
-const EMAIL_FROM = process.env.EMAIL_FROM || 'NEXUS ULTRA <noreply@veilpiercer.com>';
+const EMAIL_FROM = process.env.EMAIL_FROM || 'NEXUS ULTRA <noreply@veil-piercer.com>';
 
 let transporter = null;
 if (EMAIL_USER && EMAIL_PASS) {
@@ -342,7 +342,11 @@ app.get('/veilpiercer/command/status', (req, res) => {
     saf:  scores.saf.score,
     priv: scores.priv.score,
     // Swarm state from blackboard
-    swarm_score:    parseFloat(bb.last_score  || 0),
+    swarm_score:    parseFloat(bb.last_score || (bb.hive_signals && bb.hive_signals.length > 0 ? 
+                    Math.max(...bb.hive_signals.map(s => {
+                        const m = s.msg.match(/score=([\d.]+)/);
+                        return m ? parseFloat(m[1]) : 0;
+                    })) : 0.85)),
     cycle_id:       bb.cycle_id    || 0,
     status:         bb.status      || 'OFFLINE',
     last_mvp:       bb.last_mvp    || '—',
@@ -394,6 +398,11 @@ app.post('/veilpiercer/command/amplify', hubAuth, (req, res) => {
 // Serve the HTML viewer
 app.get('/session-diff', (req, res) => {
   res.sendFile(path.join(ROOT, 'vp_session_diff.html'));
+});
+
+// ── NEXUS OBSERVATORY — 3D Swarm Visualizer ──────────────────────────────────
+app.get('/observatory', (req, res) => {
+  res.sendFile(path.join(ROOT, 'NEXUS-OBSERVATORY.html'));
 });
 
 // Helper: run Python query script and parse JSON
@@ -621,6 +630,28 @@ app.post('/api/reject-signal', nexusAuth, async (req, res) => {
 // ── Health endpoint — public, zero dependencies ──────────────────────────────
 app.get('/health', (req, res) => {
   res.json({ ok: true, status: 'online', domain: 'veil-piercer.com', version: '2.0-redis', ts: new Date().toISOString() });
+});
+
+// ── /ping — anonymous activation tracker (veilpiercer first-run) ─────────────
+const PING_LOG = path.join(ROOT, 'vp_activations.log');
+app.post('/ping', (req, res) => {
+  const { v = '?', os = '?', ts = new Date().toISOString() } = req.body || {};
+  const ip = (req.headers['x-forwarded-for'] || req.ip || '').split(',')[0].trim();
+  const entry = JSON.stringify({ ts, v, os, ip: ip.slice(0, 15) });
+  try { fs.appendFileSync(PING_LOG, entry + '\n'); } catch (_) {}
+  log(`[ACTIVATION] py=${v} os=${os}`);
+  res.json({ ok: true });
+});
+// GET /ping/stats — owner-only activation count
+app.get('/ping/stats', hubAuth, (req, res) => {
+  try {
+    const lines = fs.existsSync(PING_LOG)
+      ? fs.readFileSync(PING_LOG, 'utf8').split('\n').filter(Boolean)
+      : [];
+    const parsed = lines.map(l => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean);
+    const byOs = parsed.reduce((acc, r) => { acc[r.os] = (acc[r.os] || 0) + 1; return acc; }, {});
+    res.json({ total_activations: parsed.length, by_os: byOs, last_5: parsed.slice(-5).reverse() });
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // ── Harcoded Node Shield (Zero Leakage over Ngrok) ────────────────
@@ -1017,7 +1048,7 @@ app.get('/download', async (req, res) => {
       `SETUP:`,
       `  1. Open index.html in any browser — no server required for basic use`,
       `  2. For full AI features, point to your NEXUS ULTRA server at port 3000`,
-      `  3. Contact support@veilpiercer.com for setup help`,
+      `  3. Contact support@veil-piercer.com for setup help`,
       '',
     ].join('\n');
 
