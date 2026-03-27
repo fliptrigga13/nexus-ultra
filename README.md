@@ -177,6 +177,8 @@ Session: run-bad
 > *"Identical input. Step 1. Immediate fork. The tool pinpoints exactly where and what diverged. run-bad is the classic rogue agent tell: technically on-topic, zero signal, no domain authority."*
 > — Claude Desktop, using VeilPiercer MCP tools
 
+![VeilPiercer session diff — run-good vs run-bad, fork at step 1](assets/diff_card.png)
+
 **The loop:**
 ```
 Agent runs → VeilPiercer traces each step →
