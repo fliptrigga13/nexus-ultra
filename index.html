@@ -2168,7 +2168,7 @@
           });
         }
       </script>
-      <div style="font-size:9px;color:var(--t2);line-height:2;margin-bottom:auto">
+      <div style="font-size:9px;color:var(--t2);line-height:2;margin-bottom:16px">
         &#10003; Per-step trace logging (local SQLite)<br>
         &#10003; Session diff — any two runs<br>
         &#10003; LangChain / CrewAI / Ollama support<br>
@@ -2176,6 +2176,16 @@
         &#10003; LOCK DOWN / AMPLIFY protocols<br>
         &#10007; Hosted dashboard<br>
         &#10007; Team features
+      </div>
+      <div style="border-top:1px solid rgba(0,255,136,.12);padding-top:14px;margin-bottom:auto">
+        <div style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--saf);margin-bottom:10px">After you copy</div>
+        <div style="font-size:9px;color:var(--t2);line-height:1.9;font-family:'Fira Code',monospace">
+          <span style="color:var(--saf)">1.</span> Paste in your terminal &amp; run<br>
+          <span style="color:var(--saf)">2.</span> Add 2 lines to your agent:<br>
+          <span style="color:rgba(0,255,136,.5);padding-left:12px;display:block;margin:4px 0">from veilpiercer.logger import SessionLogger<br>
+          <span style="padding-left:12px;display:block">sl = SessionLogger("my-run")</span></span>
+          <span style="color:var(--saf)">3.</span> Run <span style="color:rgba(0,255,136,.7)">python demo.py</span> to see a live diff
+        </div>
       </div>
     </div>
 
