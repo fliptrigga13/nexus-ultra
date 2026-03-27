@@ -637,29 +637,74 @@ def _queue_code_for_approval(code: str, source_agent: str = "UNKNOWN", status: s
 
 def execute_code(code: str, timeout: int = 10, source_agent: str = "SWARM") -> str:
     """
-    AUTONOMY UPGRADE: If the recent system score is > 0.9, allow small, safe code blocks
-    to execute without human approval to grow the business autonomously.
+    CHRONOS COST GATE — 3-tier utility-based autonomy decision.
+
+    Tier 1 utility >= 0.70  → AUTO-APPROVED  (system healthy, no failures, SHARP)
+    Tier 2 utility >= 0.45  → PENDING        (human review — good but not perfect)
+    Tier 3 utility <  0.45  → DEFERRED       (stale KG, failure history, DRIFT)
+
+    Utility = expected_value - failure_penalty - staleness_cost - metacog_penalty
+    This replaces the naive score > 0.9 check with symbolic KG-aware reasoning.
     """
     try:
-        # Check if last score allows autonomy
+        # ── Safety pattern check (always enforced, pre-gate) ──────────────────
+        BLOCKED_PATTERNS = ("os.remove", "rmdir", "shutil.rmtree", "DROP TABLE",
+                            "subprocess.call", "eval(", "exec(")
+        is_safe = (
+            len(code) < 2000
+            and not any(p in code for p in BLOCKED_PATTERNS)
+        )
+        if not is_safe:
+            log.warning(f"[COST_GATE] BLOCKED: unsafe pattern detected in code from {source_agent}")
+            return "[EXEC BLOCKED]: Unsafe code pattern — permanently blocked."
+
+        # ── CHRONOS cost gate ─────────────────────────────────────────────────
+        if _chronos is not None:
+            gate_result = _chronos.evaluate_action(
+                action_description=f"execute_code from {source_agent}: {code[:60]}",
+                agent=source_agent,
+                expected_value=0.80,   # code execution is high-value but high-risk
+            )
+            utility = gate_result["utility"]
+
+            if utility >= 0.70:
+                # TIER 1 — system is healthy, knowledge is fresh, metacog is SHARP
+                log.info(f"[COST_GATE] TIER-1 AUTO-APPROVE: utility={utility:.3f} agent={source_agent}")
+                return _queue_code_for_approval(code, source_agent=source_agent, status="AUTO-APPROVED")
+
+            elif utility >= 0.45:
+                # TIER 2 — good but not perfect, send for human review
+                log.info(f"[COST_GATE] TIER-2 QUEUE: utility={utility:.3f} agent={source_agent}")
+                return _queue_code_for_approval(code, source_agent=source_agent, status="PENDING")
+
+            else:
+                # TIER 3 — KG shows failure patterns, stale context, or DRIFT/LOOP metacog
+                log.warning(
+                    f"[COST_GATE] TIER-3 DEFERRED: utility={utility:.3f} | "
+                    f"{gate_result['reason']} | agent={source_agent}"
+                )
+                return (
+                    f"[EXEC DEFERRED]: CHRONOS cost gate blocked execution. "
+                    f"utility={utility:.3f} — KG shows {gate_result['reason']}. "
+                    f"Re-run after knowledge refresh."
+                )
+
+        # ── Fallback: no CHRONOS, use legacy score check ──────────────────────
         last_score = 0.0
         if MEMORY_FILE.exists():
             mem_data = json.loads(MEMORY_FILE.read_text(encoding="utf-8"))
             if mem_data:
                 last_score = mem_data[-1].get("score", 0.0)
 
-        # Autonomy Condition: High Trust + Safe Pattern
-        is_safe = len(code) < 1000 and "os.remove" not in code and "rmdir" not in code
-        
         if last_score >= 0.9 and is_safe:
-            log.info(f"[AUTONOMY] Self-executing trusted code block from {source_agent}")
-            # Placeholder for actual execution logic if we wanted to run it here
-            # For now, we still queue it but mark it as 'AUTO-APPROVED' for the EH API to handle
+            log.info(f"[AUTONOMY] Legacy gate: score={last_score:.2f} → AUTO-APPROVED")
             return _queue_code_for_approval(code, source_agent=source_agent, status="AUTO-APPROVED")
-        
+
         return _queue_code_for_approval(code, source_agent=source_agent)
+
     except Exception as e:
-        return f"[EXEC BLOCKED]: Error in autonomy check — {e}"
+        return f"[EXEC BLOCKED]: Cost gate error — {e}"
+
 
 def extract_and_run_code(agent_output: str) -> str:
     """Find [CODE:] blocks in agent output, queue for human approval."""
@@ -1594,12 +1639,28 @@ async def run_swarm_cycle(task: str, bb: RedisBlackboard, mem: Memory, client: h
 
     # ── AUTO-STORE DEPLOYABLE COPY ────────────────────────────────────────
     # Gate: score >= 0.70 AND COPYWRITER produced actual copy (not COPY_NULL).
-    # Removed EXECUTIONER READY gate — EXECUTIONER fails lint too often when
-    # SCOUT signals are from limited sources, blocking all deployment.
+    # CHRONOS cost gate: utility >= 0.35 required before storing deployable copy.
+    # Prevents thrashing bad/stale copy into the deployment queue.
     _copy_out = results.get("COPYWRITER", {}).get("output", "")
     _scout_out = results.get("SCOUT", {}).get("output", "")
     _copy_has_content = _copy_out and "[COPY_NULL" not in _copy_out and len(_copy_out.strip()) > 80
-    if final_score >= 0.70 and _copy_has_content:
+    _deploy_gate_ok = True   # default: allow if CHRONOS not available
+    if _chronos is not None and _copy_has_content:
+        try:
+            _deploy_eval = _chronos.evaluate_action(
+                action_description="store deployable copy to nexus_deployable_copy.json",
+                agent="COPYWRITER",
+                expected_value=0.65,   # writing copy is lower risk than executing code
+            )
+            _deploy_gate_ok = _deploy_eval["utility"] >= 0.35
+            if not _deploy_gate_ok:
+                log.warning(
+                    f"[COST_GATE] Deploy DEFERRED: utility={_deploy_eval['utility']:.3f} "
+                    f"— {_deploy_eval['reason']}"
+                )
+        except Exception as _dge:
+            log.warning(f"[COST_GATE] Deploy gate error (allowing): {_dge}")
+    if final_score >= 0.70 and _copy_has_content and _deploy_gate_ok:
         import re as _re
         _COPY_PATTERNS = [
             (r'\[REDDIT_REPLY:\s*r?/?([A-Za-z0-9_]+)\](.*?)\[/REDDIT_REPLY\]', "REDDIT_REPLY"),
