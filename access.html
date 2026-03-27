@@ -524,7 +524,7 @@
                         <p style="font-size:0.85rem;color:var(--muted);">The NEXUS ULTRA team responds within 24 hours
                         </p>
                     </div>
-                    <a href="mailto:support@veilpiercer.com" class="download-btn"
+                    <a href="mailto:support@veil-piercer.com" class="download-btn"
                         style="padding:10px 20px;font-size:0.85rem;">✉️ Contact Support</a>
                 </div>
             </div>
@@ -633,7 +633,7 @@
                     { icon: '⬡', title: 'Session Diff Viewer', desc: 'Trace exactly where your agents diverged, step by step', badge: 'new', link: NEXUS + '/session-diff' },
                     { icon: '📦', title: 'Download Source Bundle', desc: 'Full 6-agent swarm + all modules', badge: null, link: DL },
                     { icon: '🔑', title: 'Your License', desc: 'Single-domain lifetime license for ' + email, badge: null, link: DL },
-                    { icon: '💬', title: 'Priority Support', desc: 'support@veilpiercer.com - 24hr response', badge: 'included', link: 'mailto:support@veilpiercer.com' },
+                    { icon: '💬', title: 'Priority Support', desc: 'support@veil-piercer.com - 24hr response', badge: 'included', link: 'mailto:support@veil-piercer.com' },
                 ]
             };
 
@@ -734,8 +734,10 @@
         let resultPoller = null;
 
         async function submitSwarmTask() {
+            const token = new URLSearchParams(window.location.search).get('token');
             const task = document.getElementById('task-input').value.trim();
             const context = document.getElementById('task-context').value.trim();
+
             const btn = document.getElementById('task-submit-btn');
             const statusEl = document.getElementById('task-status');
 
