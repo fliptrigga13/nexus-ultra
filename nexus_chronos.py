@@ -198,25 +198,39 @@ class DivergenceIngester:
                     f"{int(time.time()*1000) % 999999}"
                 )
                 prompt_hash = _short_hash(str(row["prompt"] or ""))
+                # Find the original KG fact this divergence traces back to
+                # by matching prompt hash against known condition fields
+                original_fact_id = next(
+                    (nid for nid, d in self.G.nodes(data=True)
+                     if d.get("condition") == prompt_hash
+                     or _short_hash(str(d.get("label", ""))) == prompt_hash),
+                    None
+                )
                 self.G.add_node(node_id, **{
-                    "type":        "FAILURE_MEMORY",
-                    "agent":       row["agent"],
-                    "fork_step":   row["state_ver"],
-                    "condition":   prompt_hash,
-                    "outcome_a":   str(row["response_a"] or "")[:200],
-                    "outcome_b":   str(row["response_b"] or "")[:200],
-                    "session_a":   row["session_a"],
-                    "session_b":   row["session_b"],
-                    "confidence":  0.80,
-                    "last_confirmed": row["ts"] or datetime.now(UTC).isoformat(),
-                    "half_life_hours": 168.0,   # failure memory lives 7 days
-                    "ts":          row["ts"] or datetime.now(UTC).isoformat(),
+                    "type":             "FAILURE_MEMORY",
+                    "agent":            row["agent"],
+                    "fork_step":        row["state_ver"],
+                    "condition":        prompt_hash,
+                    "outcome_a":        str(row["response_a"] or "")[:200],
+                    "outcome_b":        str(row["response_b"] or "")[:200],
+                    "session_a":        row["session_a"],
+                    "session_b":        row["session_b"],
+                    "original_fact_id": original_fact_id,   # traceability link
+                    "confidence":       0.80,
+                    "last_confirmed":   row["ts"] or datetime.now(UTC).isoformat(),
+                    "half_life_hours":  168.0,   # failure memory lives 7 days
+                    "ts":               row["ts"] or datetime.now(UTC).isoformat(),
                 })
+                # Link back to original fact if found
+                if original_fact_id and self.G.has_node(original_fact_id):
+                    self.G.add_edge(node_id, original_fact_id,
+                                    relation="traces_back_to", weight=1)
                 self._last_ingested_rowid = max(self._last_ingested_rowid, row["rowid_a"])
                 ingested += 1
                 log.info(
                     f"  [DIVERGENCE] agent={row['agent']} "
-                    f"state={row['state_ver']} → node {node_id}"
+                    f"state={row['state_ver']} original_fact={original_fact_id} "
+                    f"-> node {node_id}"
                 )
 
             self._save_watermark()
@@ -235,25 +249,31 @@ class DivergenceIngester:
         response_a: str,
         response_b: str,
         confidence: float = 0.80,
+        original_fact_id: Optional[str] = None,
     ) -> str:
         """
         Manually register a divergence when you have two responses
         to the same prompt. Returns the node_id created.
+        original_fact_id: the KG node this failure traces back to.
         """
         node_id = f"DIVERGENCE:{agent}:{_short_hash(prompt)}:{int(time.time())}"
         self.G.add_node(node_id, **{
-            "type":        "FAILURE_MEMORY",
-            "agent":       agent,
-            "fork_step":   0,
-            "condition":   _short_hash(prompt),
-            "outcome_a":   response_a[:200],
-            "outcome_b":   response_b[:200],
-            "confidence":  confidence,
-            "last_confirmed": datetime.now(UTC).isoformat(),
-            "half_life_hours": 168.0,
-            "ts":          datetime.now(UTC).isoformat(),
+            "type":             "FAILURE_MEMORY",
+            "agent":            agent,
+            "fork_step":        0,
+            "condition":        _short_hash(prompt),
+            "outcome_a":        response_a[:200],
+            "outcome_b":        response_b[:200],
+            "original_fact_id": original_fact_id,
+            "confidence":       confidence,
+            "last_confirmed":   datetime.now(UTC).isoformat(),
+            "half_life_hours":  168.0,
+            "ts":               datetime.now(UTC).isoformat(),
         })
-        log.info(f"  [DIVERGENCE] Manual ingestion: {node_id}")
+        if original_fact_id and self.G.has_node(original_fact_id):
+            self.G.add_edge(node_id, original_fact_id,
+                            relation="traces_back_to", weight=1)
+        log.info(f"  [DIVERGENCE] Manual ingestion: {node_id} -> fact={original_fact_id}")
         return node_id
 
 
@@ -309,19 +329,28 @@ class ConflictArbiter:
         fork_a = f"FORK:{node_id}:{agent_a}:{int(time.time())}"
         fork_b = f"FORK:{node_id}:{agent_b}:{int(time.time())+1}"
 
+        conf_a = value_a.get("confidence", 0.5)
+        conf_b = value_b.get("confidence", 0.5)
+        # Weighted fork confidence: mean of both branches.
+        # Low mean = weak disagreement (auto-resolvable).
+        # High mean = both agents are confident but contradicting — strong conflict.
+        fork_confidence = round((conf_a + conf_b) / 2, 4)
+
         self.G.add_node(fork_a, **{
             **value_a,
-            "type": "FORK_NODE",
-            "origin_agent": agent_a,
-            "fork_of": node_id,
-            "ts": ts,
+            "type":            "FORK_NODE",
+            "origin_agent":    agent_a,
+            "fork_of":         node_id,
+            "fork_confidence": fork_confidence,
+            "ts":              ts,
         })
         self.G.add_node(fork_b, **{
             **value_b,
-            "type": "FORK_NODE",
-            "origin_agent": agent_b,
-            "fork_of": node_id,
-            "ts": ts,
+            "type":            "FORK_NODE",
+            "origin_agent":    agent_b,
+            "fork_of":         node_id,
+            "fork_confidence": fork_confidence,
+            "ts":              ts,
         })
 
         # Link forks to original node
@@ -329,13 +358,11 @@ class ConflictArbiter:
             self.G.add_edge(node_id, fork_a, relation="fork_branch", weight=1)
             self.G.add_edge(node_id, fork_b, relation="fork_branch", weight=1)
 
-        # Winner = higher confidence branch
-        conf_a = value_a.get("confidence", 0.5)
-        conf_b = value_b.get("confidence", 0.5)
+        # Winner = higher individual confidence branch
         winner_id = fork_a if conf_a >= conf_b else fork_b
         log.info(
             f"  [ARBITER] FORK created for {node_id} "
-            f"(sim={sim:.2f}, winner={winner_id})"
+            f"(sim={sim:.2f}, fork_confidence={fork_confidence:.3f}, winner={winner_id})"
         )
         return winner_id
 
