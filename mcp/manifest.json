@@ -1,0 +1,81 @@
+{
+  "name": "veilpiercer",
+  "version": "1.0.0",
+  "description": "Per-step tracer for local LLM agent pipelines. Capture what each agent step reads vs produces, then diff two sessions to find exactly where they diverged.",
+  "tools": [
+    {
+      "name": "start_session",
+      "description": "Start a new VeilPiercer trace session. Returns a session_id to use in trace_step calls. Call this at the beginning of an agent run you want to trace.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "description": "Unique name for this session (e.g. 'run-a'). Auto-generated if omitted."
+          },
+          "agent_name": {
+            "type": "string",
+            "description": "Name of the agent or pipeline being traced.",
+            "default": "agent"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "trace_step",
+      "description": "Log one step of an agent pipeline. Captures what the step received (prompt) and produced (response). Call after each agent step.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "description": "Session ID from start_session."
+          },
+          "prompt": {
+            "type": "string",
+            "description": "Input this step received."
+          },
+          "response": {
+            "type": "string",
+            "description": "Output this step produced."
+          },
+          "step_label": {
+            "type": "string",
+            "description": "Human-readable label (e.g. 'COPYWRITER', 'VALIDATOR').",
+            "default": "step"
+          },
+          "model": {
+            "type": "string",
+            "description": "Model used (e.g. 'llama3.1:8b').",
+            "default": "unknown"
+          },
+          "latency_ms": {
+            "type": "number",
+            "description": "Step duration in milliseconds.",
+            "default": 0
+          }
+        },
+        "required": ["session_id", "prompt", "response"]
+      }
+    },
+    {
+      "name": "diff_sessions",
+      "description": "Compare two trace sessions to find where they diverged. Returns fork step, last shared state, and side-by-side step comparison. Use this when two runs of the same pipeline produced different outputs.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_a": {
+            "type": "string",
+            "description": "session_id of the reference (good) run."
+          },
+          "session_b": {
+            "type": "string",
+            "description": "session_id of the run to compare against."
+          }
+        },
+        "required": ["session_a", "session_b"]
+      }
+    }
+  ]
+}

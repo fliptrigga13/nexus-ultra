@@ -128,6 +128,72 @@ Lite-Mode automatically switches to `llama3.2:1b` if GPU thermal headroom drops.
 
 ---
 
+## VeilPiercer — MCP Integration
+
+VeilPiercer exposes per-step agent tracing as native tools for Claude Desktop and Cursor via the [Model Context Protocol](https://modelcontextprotocol.io).
+
+Once registered, Claude can call `start_session`, `trace_step`, and `diff_sessions` directly — no code required.
+
+### Register in Claude Desktop
+
+Edit `%APPDATA%\Claude\claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "veilpiercer": {
+      "command": "python",
+      "args": ["path/to/nexus-ultra/mcp/server.py"]
+    }
+  }
+}
+```
+
+Restart Claude Desktop. VeilPiercer appears in the tools panel.
+
+### Live Demo — Claude Diffed Two Agent Runs
+
+Ask Claude to trace two sessions and diff them. This ran live on Claude Desktop:
+
+```
+Session: run-good
+  Step 1  prompt  → "thread about Ollama debugging"
+  Step 1  response → "Silent divergence is the hardest part —
+                      VeilPiercer captures what each step read vs produced."
+
+Session: run-bad
+  Step 1  prompt  → "thread about Ollama debugging"
+  Step 1  response → "Have you considered better logging tools?"
+```
+
+**VeilPiercer diff output (via Claude):**
+
+| | run-good | run-bad |
+|--|---------|---------|
+| Fork at | — | Step 1 |
+| Last shared state | none — diverged immediately | |
+| Response | Specific, grounded, domain authority | Generic, zero signal |
+
+> *"Identical input. Step 1. Immediate fork. The tool pinpoints exactly where and what diverged. run-bad is the classic rogue agent tell: technically on-topic, zero signal, no domain authority."*
+> — Claude Desktop, using VeilPiercer MCP tools
+
+**The loop:**
+```
+Agent runs → VeilPiercer traces each step →
+Claude Desktop diffs sessions via MCP →
+Claude explains which run went rogue and why
+```
+
+100% local. No cloud. No data leaves your machine.
+
+```bash
+pip install veilpiercer    # free for local use
+```
+
+→ [PyPI](https://pypi.org/project/veilpiercer/) · [MCP Setup](mcp/SETUP.md)
+
+---
+
 ## License
 
 MIT — do whatever you want with it.
