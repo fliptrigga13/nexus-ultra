@@ -862,31 +862,33 @@
         <div class="qc-label">Quick Commands</div>
         <div class="qc-list">
           <button class="qc-btn" onclick="quickCmd('lock down all protocols')">🔴 lock down all protocols</button>
-          <button class="qc-btn" onclick="quickCmd('amplify visibility to maximum')">📡 amplify visibility to
-            max</button>
-          <button class="qc-btn" onclick="quickCmd('lockdown privacy — GDPR audit')">🔒 lockdown privacy — GDPR
-            audit</button>
-          <button class="qc-btn" onclick="quickCmd('amplify safety — deploy in progress')">🛡 amplify safety — deploy
-            active</button>
+          <button class="qc-btn" onclick="quickCmd('amplify visibility to maximum')">📡 amplify visibility to max</button>
+          <button class="qc-btn" onclick="quickCmd('lockdown privacy — GDPR audit')">🔒 lockdown privacy — GDPR audit</button>
+          <button class="qc-btn" onclick="quickCmd('amplify safety — deploy in progress')">🛡 amplify safety — deploy active</button>
           <button class="qc-btn" onclick="quickCmd('what can this be used for?')">💡 what can this be used for?</button>
           <button class="qc-btn" onclick="quickCmd('show me real world impact')">📊 show real world impact</button>
           <button class="qc-btn" onclick="quickCmd('reset to nominal')">↺ reset to nominal</button>
-          <button class="qc-btn" style="border-color:#00ff99;color:#00ff99" onclick="sentinelCmd('spawn_rogues')">🧫
-            sentinel: spawn rogues</button>
-          <button class="qc-btn" style="border-color:#ff3355;color:#ff3355" onclick="sentinelCmd('inject_fault')">⚡
-            sentinel: inject fault</button>
-          <button class="qc-btn" style="border-color:#00eeff;color:#00eeff" onclick="sentinelCmd('clear_fault')">✕
-            sentinel: clear fault</button>
-          <button class="qc-btn" style="border-color:#ffaa00;color:#ffaa00" onclick="sentinelCmd('reset')">↺ sentinel:
-            reset swarm</button>
-          <button class="qc-btn" style="border-color:#00f5e4;color:#00f5e4;margin-top:6px;font-weight:700"
-            onclick="psoCmd('start')">🚀 pso: train swarm</button>
-          <button class="qc-btn" style="border-color:#ff3b5c;color:#ff3b5c" onclick="psoCmd('stop')">🛑 pso: stop
-            training</button>
+        </div>
+      </div>
+
+      <!-- SWARM TASK SUBMISSION -->
+      <div class="swarm-task-panel" id="swarm-task-panel">
+        <div class="rp-section-title" style="margin-top:12px;">⚡ Submit Research Task</div>
+        <div style="font-size:8px;color:var(--t2);padding:4px 0 8px;line-height:1.6;">Tell the swarm what to research or build. Results appear below.</div>
+        <textarea id="st-input" style="width:100%;min-height:60px;background:#06111e;border:1px solid var(--rim2);border-radius:3px;color:var(--t1);font-family:'JetBrains Mono',monospace;font-size:9px;padding:8px;resize:vertical;" placeholder="e.g. What are the biggest risks in my AI agent setup? How should I use VeilPiercer for GDPR compliance?"></textarea>
+        <button onclick="submitSwarmTaskHub()" id="st-btn" style="width:100%;margin-top:6px;padding:7px;background:linear-gradient(135deg,rgba(0,238,255,0.12),rgba(0,255,153,0.08));border:1px solid var(--vis);border-radius:3px;color:var(--vis);font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;cursor:pointer;letter-spacing:1px;transition:all 0.2s;">⚡ SEND TO SWARM</button>
+        <div id="st-status" style="display:none;margin-top:6px;padding:7px 10px;border-radius:3px;font-size:8px;line-height:1.6;"></div>
+        <div id="st-result" style="display:none;margin-top:8px;border:1px solid var(--rim2);border-radius:3px;padding:8px;background:#04111f;">
+          <div style="font-size:7px;letter-spacing:2px;color:var(--t2);margin-bottom:5px;">🔴 LIVE SWARM OUTPUT</div>
+          <div id="st-score" style="font-size:8px;color:var(--saf);margin-bottom:3px;"></div>
+          <div id="st-task-label" style="font-size:7px;color:var(--t2);margin-bottom:5px;"></div>
+          <div id="st-output" style="font-size:9px;color:var(--t1);line-height:1.7;white-space:pre-wrap;"></div>
+          <div id="st-meta" style="font-size:7px;color:var(--t2);margin-top:6px;border-top:1px solid var(--rim);padding-top:5px;"></div>
         </div>
       </div>
 
       <div class="ai-feed" id="ai-feed"></div>
+
     </div>
   </div>
 
@@ -2199,10 +2201,75 @@ Run an AI call or trigger a payment to watch nodes respond in real-time.`, 'syst
         });
     }
 
+    // ── SWARM TASK SUBMISSION (Hub) ───────────────────────────────
+    let hubPoller = null;
+    async function submitSwarmTaskHub() {
+      const token = new URLSearchParams(window.location.search).get('token');
+      const task = (document.getElementById('st-input')?.value || '').trim();
+      const statusEl = document.getElementById('st-status');
+      const btn = document.getElementById('st-btn');
+      if (!task || task.length < 10) {
+        statusEl.style.display = 'block';
+        statusEl.style.background = 'rgba(255,51,85,0.1)';
+        statusEl.style.border = '1px solid rgba(255,51,85,0.3)';
+        statusEl.textContent = '⚠ Enter at least 10 characters.';
+        return;
+      }
+      btn.textContent = '⏳ Queuing...'; btn.disabled = true;
+      statusEl.style.display = 'none';
+      try {
+        const r = await fetch(`${NEXUS}/api/customer-task`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token, task, context: `VeilPiercer buyer — tier: ${BUYER_TIER}` })
+        });
+        const d = await r.json();
+        if (d.ok) {
+          statusEl.style.display = 'block';
+          statusEl.style.background = 'rgba(0,238,255,0.07)';
+          statusEl.style.border = '1px solid rgba(0,238,255,0.2)';
+          statusEl.innerHTML = `✅ Queued at position <strong>#${d.queue_depth}</strong> — est. <strong>~${d.eta_minutes} min</strong>`;
+          document.getElementById('st-result').style.display = 'block';
+          btn.textContent = '⚡ SEND TO SWARM'; btn.disabled = false;
+          addAI('SWARM', `Task submitted: "<em>${task.substring(0, 60)}${task.length > 60 ? '…' : ''}</em>"<br>Results will appear in the panel below.`, 'system');
+          startHubPoller();
+        } else {
+          statusEl.style.display = 'block';
+          statusEl.style.background = 'rgba(255,51,85,0.1)';
+          statusEl.textContent = '❌ ' + (d.error || 'Something went wrong.');
+          btn.textContent = '⚡ SEND TO SWARM'; btn.disabled = false;
+        }
+      } catch {
+        statusEl.style.display = 'block';
+        statusEl.style.background = 'rgba(255,51,85,0.1)';
+        statusEl.textContent = '❌ Could not reach server.';
+        btn.textContent = '⚡ SEND TO SWARM'; btn.disabled = false;
+      }
+    }
+
+    function startHubPoller() {
+      if (hubPoller) clearInterval(hubPoller);
+      hubPoller = setInterval(async () => {
+        try {
+          const r = await fetch(`${NEXUS}/api/result`);
+          const d = await r.json();
+          if (!d.ok) return;
+          const scoreEl = document.getElementById('st-score');
+          const labelEl = document.getElementById('st-task-label');
+          const outEl = document.getElementById('st-output');
+          const metaEl = document.getElementById('st-meta');
+          if (scoreEl) scoreEl.textContent = d.score ? `Score: ${(d.score * 100).toFixed(0)}%` : '';
+          if (labelEl) labelEl.textContent = d.task ? `📋 ${d.task}` : '';
+          if (d.last_output?.text && outEl) outEl.textContent = `[${d.last_output.agent}] ${d.last_output.text}`;
+          if (metaEl) metaEl.textContent = `MVP: ${d.mvp || '—'} · Cycle: ${d.cycle_count || 0} · Queue: ${d.queue_depth || 0} · ${d.ts ? new Date(d.ts).toLocaleTimeString() : ''}`;
+        } catch {}
+      }, 6000);
+    }
+
     // Connect to Sentinel on load
     connectSentinel();
     // Connect to PSO Brain on load (auto-reconnects if Julia is still compiling)
     connectPSO();
+
   </script>
 </body>
 
