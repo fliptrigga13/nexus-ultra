@@ -1206,7 +1206,28 @@
       <div style="font-family:'Inter',sans-serif;font-weight:900;font-size:18px;margin-bottom:10px">Local Install</div>
       <div style="font-family:'Inter',sans-serif;font-weight:900;font-size:64px;letter-spacing:-3px;line-height:1;color:var(--saf);margin-bottom:4px">$0</div>
       <div style="font-size:9px;color:var(--t2);letter-spacing:2px;text-transform:uppercase;margin-bottom:20px">forever &middot; no account needed</div>
-      <div style="font-family:'Fira Code',monospace;font-size:11px;color:var(--saf);background:rgba(0,255,136,.07);border:1px solid rgba(0,255,136,.2);padding:10px 14px;margin-bottom:20px;letter-spacing:1px">$ pip install veilpiercer<br><span style="color:var(--t2)">↳ traces locally, zero cloud</span></div>
+      <button id="pip-copy-btn" onclick="copyPip()" style="width:100%;font-family:'Fira Code',monospace;font-size:11px;color:var(--saf);background:rgba(0,255,136,.07);border:1px solid rgba(0,255,136,.2);padding:10px 14px;margin-bottom:20px;letter-spacing:1px;cursor:pointer;text-align:left;transition:background .2s,border-color .2s;display:flex;align-items:center;justify-content:space-between;gap:8px;" onmouseover="this.style.background='rgba(0,255,136,.15)'" onmouseout="this.style.background='rgba(0,255,136,.07)'">
+        <span><span style="user-select:none;color:var(--t2)">$ </span>pip install veilpiercer<br><span style="color:var(--t2);font-size:10px">↳ traces locally, zero cloud</span></span>
+        <span id="pip-copy-icon" style="color:var(--t2);font-size:10px;white-space:nowrap;flex-shrink:0">⎘ copy</span>
+      </button>
+      <script>
+        function copyPip() {
+          navigator.clipboard.writeText('pip install veilpiercer').then(function() {
+            var btn = document.getElementById('pip-copy-btn');
+            var icon = document.getElementById('pip-copy-icon');
+            icon.textContent = '✓ copied';
+            icon.style.color = 'var(--saf)';
+            btn.style.background = 'rgba(0,255,136,.18)';
+            btn.style.borderColor = 'rgba(0,255,136,.5)';
+            setTimeout(function() {
+              icon.textContent = '⎘ copy';
+              icon.style.color = 'var(--t2)';
+              btn.style.background = 'rgba(0,255,136,.07)';
+              btn.style.borderColor = 'rgba(0,255,136,.2)';
+            }, 2000);
+          });
+        }
+      </script>
       <div style="font-size:9px;color:var(--t2);line-height:2;margin-bottom:auto">
         &#10003; Per-step trace logging (local SQLite)<br>
         &#10003; Session diff — any two runs<br>
