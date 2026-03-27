@@ -352,7 +352,7 @@
       border-left: 1px solid var(--rim);
       display: flex;
       flex-direction: column;
-      overflow: hidden;
+      overflow-y: auto;
     }
 
     .rp-section-title {
@@ -1825,12 +1825,7 @@ At this level you can reconstruct any agent chain from logs and detect model deg
 `;
     document.head.appendChild(sty);
 
-    // ── PITCH PAGE LINK ───────────────────────────────────────────
-    const navLink = document.createElement('a');
-    navLink.id = 'nx-nav-link';
-    navLink.href = '/veilpiercer-pitch.html';
-    navLink.textContent = '← Pitch Page';
-    document.body.appendChild(navLink);
+    // Pitch page link removed
 
     // ── TOAST ─────────────────────────────────────────────────────
     const toastEl = document.createElement('div');
