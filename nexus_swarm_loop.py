@@ -806,7 +806,14 @@ async def ollama_think(model: str, system_prompt: str, context: str, task: str,
     num_predict = _AGENT_TOKEN_BUDGET.get(agent_name.upper(), _DEFAULT_TOKEN_BUDGET)
     # Critics get smaller context — they only need last 2 agent outputs, not full blackboard
     _FAST_CRITICS = {"EXECUTIONER", "METACOG", "VALIDATOR", "SENTINEL_MAGNITUDE"}
-    num_ctx = 1024 if agent_name.upper() in _FAST_CRITICS else 1536
+    # REWARD/SUPERVISOR (optimizer tier) need large context: system prompt alone is ~9K tokens
+    _OPTIMIZER_TIER = {"REWARD", "SUPERVISOR"}
+    if agent_name.upper() in _FAST_CRITICS:
+        num_ctx = 1024
+    elif agent_name.upper() in _OPTIMIZER_TIER:
+        num_ctx = 12000  # FIX: 1536 was silently truncating 9K system prompt before REWARD ever saw [SCORE:] instructions
+    else:
+        num_ctx = 4096   # generators need room for full blackboard context too
     payload = {
         "model": model_str,
         "stream": False,
