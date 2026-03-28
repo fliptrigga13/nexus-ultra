@@ -15,11 +15,14 @@ PID_FILE = BASE / ".nexus_launcher_pids.json"
 # Processes to keep alive — maps name → launch command
 SERVICES = {
     "SWARM":        [PYTHON, "-X", "utf8", "-u", str(BASE / "nexus_swarm_loop.py")],
-    "NOTION-SYNC":  [PYTHON, str(BASE / "nexus_notion_sync.py")],
+    # NOTION-SYNC removed: nexus_notion_reporter.py owns all Notion telemetry now.
+    # nexus_notion_sync.py has a SyntaxError (bare try at line 220) → crash loop.
     "SENTINEL":     [PYTHON, str(BASE / "nexus_internal_sentinel.py")],
     "NODE09":       [PYTHON, str(BASE / "nexus_node09_optimizer.py")],
     "METRICS":      [PYTHON, str(BASE / "nexus_metrics_server.py")],
-    "EVOLUTION":    [PYTHON, str(BASE / "SELF_EVOLUTION_LOOP.py")],
+    # EVOLUTION removed 2026-03-28: SELF_EVOLUTION_LOOP was corrupting nexus_prime_system.txt
+    # and creating duplicate GPU contention. Task Scheduler entry also disabled.
+    # Tombstoned here so guardian never respawns it.
 }
 
 # Log rotation settings
@@ -67,7 +70,7 @@ def find_running(script_fragment: str) -> int | None:
         # Use PowerShell Get-WmiObject instead of wmic (wmic deprecated/missing on Win11)
         result = subprocess.run(
             ["powershell", "-NoProfile", "-Command",
-             f"Get-WmiObject Win32_Process | Where-Object {{$_.CommandLine -like '*{script_fragment}*'}} | Select-Object -ExpandProperty ProcessId"],
+             f"Get-WmiObject Win32_Process | Where-Object {{$_.CommandLine -like '*{script_fragment}*' -and $_.Name -notmatch 'powershell|pwsh'}} | Select-Object -ExpandProperty ProcessId"],
             capture_output=True, text=True, timeout=10
         )
         for line in result.stdout.splitlines():
@@ -144,12 +147,11 @@ def main():
 
     # On first start, find already-running processes (ALL services)
     for name, fragments in [
-        ("SWARM",       "nexus_swarm_loop"),
-        ("NOTION-SYNC", "nexus_notion_sync"),
-        ("SENTINEL",    "nexus_internal_sentinel"),
-        ("NODE09",      "nexus_node09_optimizer"),
-        ("METRICS",     "nexus_metrics_server"),
-        ("EVOLUTION",   "SELF_EVOLUTION_LOOP"),
+        ("SWARM",    "nexus_swarm_loop"),
+        ("SENTINEL", "nexus_internal_sentinel"),
+        ("NODE09",   "nexus_node09_optimizer"),
+        ("METRICS",  "nexus_metrics_server"),
+        ("EVOLUTION","SELF_EVOLUTION_LOOP"),
     ]:
         pid = find_running(fragments)
         if pid:
@@ -176,6 +178,17 @@ def main():
                         wlog(f"FOUND stray {name} PID {existing_pid} — adopting")
                     else:
                         wlog(f"DEAD: {name} — restarting...")
+                        # Clear stale lockfile before launch (crash may have skipped atexit)
+                        if name == "SWARM":
+                            lock = Path(cmd[-1]).parent / ".swarm.lock"
+                            if lock.exists():
+                                try:
+                                    old_pid = int(lock.read_text().strip())
+                                    if not is_alive(old_pid):
+                                        lock.unlink()
+                                        wlog(f"Cleared stale .swarm.lock (dead PID {old_pid})")
+                                except Exception:
+                                    lock.unlink(missing_ok=True)
                         launch(name, cmd)
 
             # Check node server too
