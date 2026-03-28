@@ -1,4 +1,8 @@
 """
+# ⚠️  DO NOT launch this directly — use nexus_watchdog_guardian.py
+# Direct launch is for debugging only. The watchdog owns the lifecycle.
+# Two instances = KG race condition = corrupted saves. You were warned.
+
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║  NEXUS SWARM LOOP — ULTIMATE GOD MODE AUTONOMOUS AGENT SYSTEM               ║
 ║  • Agents reason with Ollama (fully offline, no external API)               ║
@@ -9,7 +13,25 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 """
 
+
+import os, sys
+_LOCKFILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".swarm.lock")
+_my_pid   = os.getpid()
+if os.path.exists(_LOCKFILE):
+    _old_pid = open(_LOCKFILE).read().strip()
+    # Check if that PID is still alive
+    try:
+        os.kill(int(_old_pid), 0)
+        print(f"[LOCKFILE] nexus_swarm_loop is already running (PID {_old_pid}). Refusing to start a duplicate.")
+        print(f"[LOCKFILE] Kill PID {_old_pid} first, or delete .swarm.lock manually.")
+        sys.exit(1)
+    except (ProcessLookupError, ValueError, OSError):
+        pass  # Old PID is dead — stale lock, safe to overwrite (OSError = Windows dead PID)
+open(_LOCKFILE, "w").write(str(_my_pid))
+import atexit; atexit.register(lambda: os.path.exists(_LOCKFILE) and os.remove(_LOCKFILE))
+
 import asyncio
+import hashlib
 import json
 import time
 import random
@@ -165,6 +187,21 @@ root_logger.addHandler(fh)
 log = logging.getLogger("NEXUS-SWARM")
 log.info("--- LOG SYSTEM INITIALIZED ---")
 
+# ── KG INJECTION FILTER — compiled once at module level ───────────────────────
+# Guards the KG write gate. Matches prompt-injection / role-hijack patterns.
+# "you are now" requires a role-swap noun — won't fire on COPYWRITER copy.
+_KG_INJECT_RE = re.compile(
+    r'\[MEMORY_FLAG:'
+    r'|\[INJECT:'
+    r'|\[KG_WRITE:'
+    r'|\[SYSTEM_OVERRIDE:'
+    r'|(?:ignore|forget)\s+(?:all\s+)?(?:previous|prior)\s+'
+    r'(?:instructions?|directives?|rules?)'
+    r'|you\s+are\s+now\s+(?:a\s+)?(?:different|another|new)\s+(?:ai|assistant|agent|system|bot|model)'
+    r'|new\s+(?:directive|prime\s+directive)',
+    re.IGNORECASE
+)
+
 # ── AGENT ROSTER ──────────────────────────────────────────────────────────────
 # God-mode prefix: injected into SUPERVISOR + PLANNER only (the strategic thinkers)
 _GOD_PREFIX = GOD_MODE_PROMPT + "\n\n" if GOD_MODE_PROMPT else ""
@@ -172,13 +209,13 @@ _GOD_PREFIX = GOD_MODE_PROMPT + "\n\n" if GOD_MODE_PROMPT else ""
 # ── ROLE SPECIALIZATION: MAGNITUDE TIERS ──────────────────────────────────────
 GENERATORS = ["COMMANDER", "SCOUT", "COPYWRITER", "CONVERSION_ANALYST"]
 CRITICS    = ["VALIDATOR", "SENTINEL_MAGNITUDE"]
-OPTIMIZERS = ["SUPERVISOR", "REWARD", "OFFER_OPTIMIZER", "CLOSER"]
+OPTIMIZERS = ["SUPERVISOR", "REWARD", "CLOSER"]  # OFFER_OPTIMIZER removed: not in AGENTS, phantom overhead
 
 # Map roles to definitions for the loop
 # ── ROLE SPECIALIZATION: MAGNITUDE TIERS ──────────────────────────────────────
 GENERATORS = ["COMMANDER", "SCOUT", "COPYWRITER", "CONVERSION_ANALYST"]
 CRITICS    = ["VALIDATOR", "SENTINEL_MAGNITUDE"]
-OPTIMIZERS = ["SUPERVISOR", "REWARD", "OFFER_OPTIMIZER", "CLOSER"]
+OPTIMIZERS = ["SUPERVISOR", "REWARD", "CLOSER"]  # OFFER_OPTIMIZER removed: not in AGENTS, phantom overhead
 
 # Map roles to definitions for the loop
 AGENTS = [
@@ -315,7 +352,8 @@ CORRECT EXAMPLE OUTPUT:
         "original_model": "deepseek-r1:14b",
         # PATCH 13 (MAR arXiv:2512.20845): Epistemic role = evidence demand only.
         # Distinct from other critics to prevent degeneration-of-thought.
-        "role": "ROLE: VALIDATOR — Evidence Auditor. Your ONLY job: demand evidence.\n"
+        "role": "Start your response with exactly: [EVIDENCE_CHECK: PASS] or [EVIDENCE_CHECK: FAIL] — then one line.\n\n"
+                "ROLE: VALIDATOR — Evidence Auditor. Your ONLY job: demand evidence.\n"
                 "For every factual claim in the blackboard output, ask: what is the source?\n"
                 "Do NOT evaluate writing quality, tone, or mission alignment — other agents do that.\n"
                 "Output: [EVIDENCE_CHECK: PASS] if all major claims cite a source or are self-evident.\n"
@@ -370,13 +408,12 @@ If concrete failure: [SENTINEL_LOCKDOWN: <exact quote from output> causes <exact
                 "SCOUT: did they produce [BUYER:] signals with readiness scores?\n"
                 "COPYWRITER: did they produce paste-ready [REDDIT_REPLY/EMAIL/DM] copy?\n"
                 "CONVERSION_ANALYST: did they identify [BEST_CHANNEL:] and [CONVERSION_BLOCK:]?\n"
-                "OFFER_OPTIMIZER: did they output [OFFER_STRENGTH/WEAKNESS/TWEAK]?\n"
                 "CLOSER: did they output [FOLLOW_UP_1/2] and [CLOSE_LINE] for warm leads?\n\n"
-                "OUTPUT FORMAT (mandatory — both lines required):\n"
-                "[AGENT_SCORES: COMMANDER=0.X, SCOUT=0.X, COPYWRITER=0.X, CONVERSION_ANALYST=0.X, OFFER_OPTIMIZER=0.X, CLOSER=0.X]\n"
+                "OUTPUT FORMAT — Start your response with EXACTLY these 3 lines first, before any analysis:\n"
                 "[SCORE: 0.XX] (= DIM1*0.40 + DIM2*0.30 + DIM3*0.20 + DIM4*0.10, round to 2 decimals)\n"
+                "[AGENT_SCORES: COMMANDER=0.X, SCOUT=0.X, COPYWRITER=0.X, CONVERSION_ANALYST=0.X, CLOSER=0.X]\n"
                 "[MVP: AGENTNAME] (agent whose output most directly enabled a potential sale)\n"
-                "CRITICAL: A cycle with no buyer target and no copy scores MAX 0.30. A cycle with both scores MIN 0.65.",
+                "Then 1-2 sentences of justification. CRITICAL: A cycle with no buyer target and no copy scores MAX 0.30. A cycle with both scores MIN 0.65.",
         "weight": 1.0,
     },
     {
@@ -385,7 +422,8 @@ If concrete failure: [SENTINEL_LOCKDOWN: <exact quote from output> causes <exact
         "model": "deepseek-r1:8b",   # UPGRADE: R1 8B for reasoning chain audit — much better than llama3.2:1b at identifying logical gaps
         "original_model": "deepseek-r1:8b",
         # PATCH 13: Epistemic role = reasoning chain audit only.
-        "role": "ROLE: METACOG - Reasoning Chain Auditor. Your ONLY job: trace the logic chain.\n"
+        "role": "Start your response with exactly: [METACOG: SHARP] or [METACOG: SHALLOW] or [METACOG: DRIFT] or [METACOG: LOOP] — then one sentence.\n\n"
+                "ROLE: METACOG - Reasoning Chain Auditor. Your ONLY job: trace the logic chain.\n"
                 "Do NOT evaluate evidence, security, or mission alignment - other critics do that.\n"
                 "Ask: did each agent conclusion follow from its premises? Was any step skipped?\n"
                 "Choose exactly ONE verdict and output it as your FIRST line:\n"
@@ -401,7 +439,8 @@ If concrete failure: [SENTINEL_LOCKDOWN: <exact quote from output> causes <exact
         "model": "mistral:7b-instruct-v0.3-q4_K_M",  # RESTORED: gives brutal verdicts without safety refusals; now runs on fast critic semaphore lane
         "original_model": "mistral:7b-instruct-v0.3-q4_K_M",
         # PATCH 13: Epistemic role = spec compliance only.
-        "role": "ROLE: EXECUTIONER — Final Word. Your ONLY job: brutal one-line verdict.\n"
+        "role": "Start your response with exactly: [EXECUTE: READY] or [EXECUTE: REFINE: <gap>] or [EXECUTE: TRASH: <reason>]\n\n"
+                "ROLE: EXECUTIONER — Final Word. Your ONLY job: brutal one-line verdict.\n"
                 "Do NOT evaluate logic, evidence, or security — other critics do that.\n"
                 "One standard: could a VeilPiercer operator paste this output somewhere and get a result TODAY? Yes or no.\n"
                 "[EXECUTE: READY] — specific, deployable, no gaps. Could go live right now.\n"
@@ -707,7 +746,10 @@ def execute_code(code: str, timeout: int = 10, source_agent: str = "SWARM") -> s
 
 
 def extract_and_run_code(agent_output: str) -> str:
-    """Find [CODE:] blocks in agent output, queue for human approval."""
+    """Find [CODE:] blocks in agent output, route through execute_code() CHRONOS gate.
+    Previously called _queue_code_for_approval() directly — bypassing the cost gate.
+    Now all code blocks go through the 3-tier utility check before queuing.
+    """
     pattern = r'\[CODE:\](.*?)\[/CODE:\]'
     blocks = re.findall(pattern, agent_output, re.DOTALL)
     if not blocks:
@@ -716,7 +758,8 @@ def extract_and_run_code(agent_output: str) -> str:
         return ""
     results = []
     for i, code in enumerate(blocks[:2]):
-        results.append(_queue_code_for_approval(code.strip(), source_agent="DEVELOPER"))
+        # Route through CHRONOS cost gate (execute_code handles safety + utility check)
+        results.append(execute_code(code.strip(), source_agent="DEVELOPER"))
     return "\n".join(results)
 
 # ── P6: DUAL SEMAPHORE GATE — fixes critic timeout cascade ───────────────────
@@ -746,7 +789,7 @@ _AGENT_TOKEN_BUDGET = {
     "CONVERSION_ANALYST": 600,
     "OFFER_OPTIMIZER":    500,
     "REWARD":            1200,   # INCREASE: needs 1200 for 4 dims + 6 agent scores + [AGENT_SCORES:]/[SCORE:]/[MVP:] without truncation
-    "VALIDATOR":          400,   # short evidence verdicts
+    "VALIDATOR":          900,   # FIX: deepseek-r1:14b uses thinking tokens — 400 was consumed by chain-of-thought, leaving nothing for [EVIDENCE_CHECK:] tag
     "SENTINEL_MAGNITUDE": 400,   # CLEAR or LOCKDOWN
     "METACOG":            150,   # FIX: one-line verdict only — 150 tokens is plenty, was timing out at 400
     "EXECUTIONER":        120,   # FIX: one-line verdict only — 120 tokens, was timing out at 320
@@ -948,7 +991,7 @@ def _structural_score(output: str) -> float:
     if not output or len(output) < 20:
         return 0.1
     score = 0.30  # base: produced something
-    out_upper = output[:2000]  # cap to first 2000 chars for speed
+    out_upper = output[:4000]  # expanded: deepseek-r1 emits CoT before required tags; 2000 missed them
     for tag, weight in _SIGNAL_WEIGHTS.items():
         if tag in out_upper:
             score += weight
@@ -1249,12 +1292,18 @@ async def run_swarm_lifecycle(agent, context, task, client, bb):
         _mem_core.parse_output(str(output), agent=name)
 
     # [VP-SESSION-DIFF]: Log step so runs are diffable
+    # state_version is a semantic hash of agent+task[:200] — stable across cycles
+    # for the same agent running the same task structure. This allows the
+    # DivergenceIngester JOIN to find true cross-cycle divergences.
+    # (Old: f"v{cycle_id}" produced unique vcycle_* per cycle → never matched.)
     if _vp_session_enabled and _vp_session is not None:
         try:
+            _sv_raw = f"{name}:{task[:200]}"
+            _state_version = hashlib.sha256(_sv_raw.encode()).hexdigest()[:12]
             _vp_session.log_step(
                 prompt=f"{task}\n\n{context}"[:4000],
                 response=str(output),
-                state_version=f"v{bb.get('cycle_id', 'unknown')}",
+                state_version=_state_version,
                 model=str(agent.get("model", "")),
                 latency_ms=int(elapsed * 1000),
             )
@@ -1480,13 +1529,17 @@ async def run_swarm_cycle(task: str, bb: RedisBlackboard, mem: Memory, client: h
     # Hard lockdown (0.00): real security violations (injection, exfiltration, self-mod)
     # Soft warning (-0.3 penalty): logic gaps, incomplete outputs, minor contradictions
     _HARD_LOCKDOWN_TRIGGERS = [
-        "exfiltrat", "inject", "self-modif", "rm -rf", "subprocess", "eval(", "os.remove"
+        "exfiltrat", "self-modif", "rm -rf", "subprocess", "eval(", "os.remove"
     ]
     for r in crit_results:
         out = r["output"]
         if "[SENTINEL_LOCKDOWN" in out:
-            out_lower = out.lower()
-            is_security = any(t in out_lower for t in _HARD_LOCKDOWN_TRIGGERS)
+            # Extract only the content inside the [SENTINEL_LOCKDOWN: ...] tag.
+            # Checking out_lower would false-positive on SENTINEL's own description
+            # of what it was looking for (e.g. "checked for injection patterns").
+            _lockdown_match = re.search(r'\[SENTINEL_LOCKDOWN:\s*(.+?)(?:\]|$)', out, re.DOTALL)
+            _evidence = _lockdown_match.group(1).lower() if _lockdown_match else ""
+            is_security = any(t in _evidence for t in _HARD_LOCKDOWN_TRIGGERS)
             if is_security:
                 log.warning(f"🚨 HARD LOCKDOWN (security): {out[:200]}")
                 return 0.0, "SENTINEL", f"Security violation: {out}"
@@ -1707,7 +1760,9 @@ async def run_swarm_cycle(task: str, bb: RedisBlackboard, mem: Memory, client: h
                         pass
             # Cap file at 200 entries (keep newest)
             _existing = _existing[-200:]
-            _deploy_file.write_text(json.dumps(_existing, indent=2, ensure_ascii=False), encoding="utf-8")
+            _deploy_tmp = _deploy_file.with_suffix(".tmp")
+            _deploy_tmp.write_text(json.dumps(_existing, indent=2, ensure_ascii=False), encoding="utf-8")
+            _deploy_tmp.replace(_deploy_file)  # atomic rename — reporter can't read partial JSON
             log.info(f"[DEPLOY] ✅ Stored {len(_deployable)} deployable copy block(s) → nexus_deployable_copy.json (score={final_score:.2f})")
         else:
             log.info(f"[DEPLOY] Score={final_score:.2f} + READY, but no extractable copy blocks in COPYWRITER output")
@@ -1726,23 +1781,54 @@ async def run_swarm_cycle(task: str, bb: RedisBlackboard, mem: Memory, client: h
     # ── KNOWLEDGE GRAPH UPDATE (neuro-symbolic ingestion) ──────────────────
     if _kg is not None:
         try:
-            # Collect all agent outputs from this cycle for KG ingestion
+            # Collect full untruncated outputs from the results dict for this cycle
             _cycle_outputs = [
-                {"agent": a["name"], "text": a.get("_last_output", "")}
-                for a in AGENTS if a.get("_last_output")
+                {"agent": name, "text": r.get("output", "")}
+                for name, r in results.items()
+                if isinstance(r, dict) and r.get("output")
             ]
-            if not _cycle_outputs:
-                # Fall back to blackboard recent outputs
-                _raw_ctx = bb.get_context(last_n=12)
-                for _line in _raw_ctx.split("\n\n"):
-                    if _line.startswith("[") and "]:" in _line:
-                        _ag = _line.split("]:")
-                        if len(_ag) == 2:
-                            _cycle_outputs.append(
-                                {"agent": _ag[0][1:], "text": _ag[1].strip()}
-                            )
+
+            # ── KG_FILTER: injection / role-hijack gate ────────────────────
+            # SENTINEL outputs are trusted; all others are scanned.
+            # Blocked entries become FAILURE_MEMORY nodes instead of KG facts.
+            _cycle_outputs_clean = []
+            _kg_blocked = []
+            for _kgf_entry in _cycle_outputs:
+                _kgf_agent = _kgf_entry.get("agent", "UNKNOWN")
+                _kgf_text  = _kgf_entry.get("text", "")
+                if _kgf_agent.upper() in ("SENTINEL_MAGNITUDE", "SENTINEL"):
+                    _cycle_outputs_clean.append(_kgf_entry)
+                    continue
+                _hit = _KG_INJECT_RE.search(_kgf_text)
+                if _hit:
+                    _kg_blocked.append({
+                        "agent":   _kgf_agent,
+                        "pattern": _hit.group(0)[:60],
+                        "preview": _kgf_text[:200],
+                    })
+                else:
+                    _cycle_outputs_clean.append(_kgf_entry)
+
+            if _kg_blocked:
+                log.warning(
+                    f"[KG_FILTER] 🚨 Blocked {len(_kg_blocked)} injection attempt(s): "
+                    + ", ".join(f"{b['agent']}({b['pattern']!r})" for b in _kg_blocked)
+                )
+                for _blk in _kg_blocked:
+                    _fm_node = f"FAILURE_MEMORY:KG_FILTER:{cycle_id}:{_blk['agent']}"
+                    _kg.G.add_node(
+                        _fm_node,
+                        type="failure_memory",
+                        label=f"KG injection blocked: {_blk['agent']}",
+                        pattern=_blk["pattern"],
+                        preview=_blk["preview"],
+                        cycle=str(cycle_id),
+                        ts=datetime.now(UTC).isoformat(),
+                    )
+                _kg._save()
+
             _kg.update(
-                agent_outputs=_cycle_outputs,
+                agent_outputs=_cycle_outputs_clean,
                 score=final_score,
                 mvp=mvp,
                 cycle_id=str(cycle_id),
