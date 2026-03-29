@@ -111,6 +111,7 @@ MAX_MEMORY       = 150  # max memory entries kept (laptop-safe: 150 balances con
 AGENT_TIMEOUT    = 200  # seconds — raised to 200; EXECUTIONER was timing out at 150 when Ollama load was high
 LITE_THRESHOLD   = 18   # RAM PROTECTION: laptop-safe threshold (free RAM is tight at ~4-5GB)
 CONDUCTOR_ALWAYS = {"SUPERVISOR", "REWARD", "METACOG", "EXECUTIONER"}  # always run — quality gates
+OLLAMA_CONCURRENCY = 2  # max concurrent Ollama inference calls per tier — prevents GPU thrashing at 96%+
 
 LITE_MODEL_MAP = {
     "deepseek-r1:14b": "deepseek-r1:8b",    # R1 14B → R1 8B when RAM tight
@@ -121,45 +122,210 @@ LITE_MODEL_MAP = {
     "llama3.2:1b": "llama3.2:1b"   # already lite — no swap needed
 }
 
-# ── SCOUT LIVE REDDIT SIGNAL FETCHER ─────────────────────────────────────────
-_SCOUT_SUBREDDITS = [
-    "LocalLLaMA", "ollama", "selfhosted", "LangChain"
+# ── CIRCUIT BREAKER — prevents 37-min cascade stall when Ollama degrades ──────
+# Without this: Ollama degradation causes 200s timeout × 11 agents = 37-min stall
+# before watchdog fires. With breaker: after 3 consecutive failures, all agents
+# skip in <1s instead of timing out. Recovers automatically after 60s.
+class OllamaCircuitBreaker:
+    """CLOSED → OPEN (after failure_threshold failures) → HALF_OPEN (after recovery_timeout) → CLOSED (on success)."""
+    CLOSED, OPEN, HALF_OPEN = "CLOSED", "OPEN", "HALF_OPEN"
+
+    def __init__(self, failure_threshold: int = 3, recovery_timeout: float = 60.0):
+        self.state      = self.CLOSED
+        self.failures   = 0
+        self.threshold  = failure_threshold
+        self.recovery_timeout = recovery_timeout
+        self._opened_at: float = 0.0
+
+    def is_open(self) -> bool:
+        """Return True if breaker is OPEN (requests should be blocked)."""
+        if self.state == self.OPEN:
+            if time.time() - self._opened_at >= self.recovery_timeout:
+                self.state = self.HALF_OPEN
+                log.info("[CB] Circuit HALF_OPEN — probing Ollama with next request")
+                return False   # allow one probe through
+            return True        # still cooling down
+        return False
+
+    def record_failure(self):
+        """Call after any Ollama timeout or UNREACHABLE response."""
+        self.failures += 1
+        if self.failures >= self.threshold and self.state == self.CLOSED:
+            self.state      = self.OPEN
+            self._opened_at = time.time()
+            log.warning(
+                f"[CB] ⚡ Circuit OPEN after {self.failures} failures — "
+                f"blocking Ollama for {self.recovery_timeout:.0f}s"
+            )
+
+    def record_success(self):
+        """Call after any successful Ollama response."""
+        if self.state == self.HALF_OPEN:
+            log.info("[CB] ✅ Circuit CLOSED — Ollama recovered")
+        self.state    = self.CLOSED
+        self.failures = 0
+
+_cb = OllamaCircuitBreaker(failure_threshold=3, recovery_timeout=60.0)
+
+# ── SCOUT LIVE SIGNAL FETCHER — Reddit + HN Algolia + Dev.to + GitHub Issues ──
+_SCOUT_SUBREDDITS = ["LocalLLaMA"]   # ollama/selfhosted/LangChain are 403-blocked
+_SCOUT_KEYWORDS   = ["agent", "AI", "LLM", "monitor", "swarm", "local", "Ollama",
+                     "debugging", "observability", "tracing", "privacy", "offline"]
+
+_HN_QUERIES = ["LLM agent", "Ollama local AI", "AI observability", "swarm intelligence"]
+_DEVTO_TAGS = ["ai", "llm", "machinelearning", "python"]
+
+# GitHub Issues: free public API, no auth, 60 req/hr — finds devs actively hitting agent pain
+_GITHUB_QUERIES = [
+    "ai agent debugging observability",
+    "local LLM agent tracing",
+    "llm agent hallucination logging",
+    "ollama agent monitoring",
 ]
-_SCOUT_KEYWORDS = ["agent", "AI", "LLM", "monitor", "swarm", "local", "Ollama", "debugging"]
+
+async def _fetch_reddit(client: httpx.AsyncClient, max_posts: int) -> list:
+    """Reddit JSON API — only LocalLLaMA survives IP block."""
+    results = []
+    headers = {"User-Agent": "Mozilla/5.0 NexusScout/2.0 (research bot)"}
+    for sub in _SCOUT_SUBREDDITS:
+        try:
+            await asyncio.sleep(0.5)  # rate-limit respect
+            resp = await client.get(
+                f"https://www.reddit.com/r/{sub}/new.json?limit=15",
+                headers=headers,
+            )
+            if resp.status_code != 200:
+                continue
+            for post in resp.json().get("data", {}).get("children", []):
+                d = post.get("data", {})
+                title = d.get("title", "")
+                if any(kw.lower() in title.lower() for kw in _SCOUT_KEYWORDS):
+                    results.append(
+                        f"[LIVE_SIGNAL: r/{sub}] score={d.get('score',0)} | "
+                        f"{title[:100]} | {d.get('selftext','')[:120]}"
+                    )
+                    if len(results) >= max_posts:
+                        return results
+        except Exception:
+            continue
+    return results
+
+async def _fetch_hn(client: httpx.AsyncClient, max_posts: int) -> list:
+    """HN Algolia search API — always open, no auth, no rate limit at this volume."""
+    results = []
+    for query in _HN_QUERIES:
+        try:
+            resp = await client.get(
+                "https://hn.algolia.com/api/v1/search_by_date",
+                params={"query": query, "tags": "story", "hitsPerPage": 5},
+            )
+            if resp.status_code != 200:
+                continue
+            for hit in resp.json().get("hits", []):
+                title = hit.get("title") or ""
+                url   = hit.get("url") or ""
+                pts   = hit.get("points") or 0
+                if any(kw.lower() in title.lower() for kw in _SCOUT_KEYWORDS):
+                    results.append(
+                        f"[LIVE_SIGNAL: HackerNews] pts={pts} | {title[:100]} | {url[:80]}"
+                    )
+                    if len(results) >= max_posts:
+                        return results
+        except Exception:
+            continue
+    return results
+
+async def _fetch_devto(client: httpx.AsyncClient, max_posts: int) -> list:
+    """Dev.to public API — no auth needed, signals developer pain points."""
+    results = []
+    for tag in _DEVTO_TAGS:
+        try:
+            resp = await client.get(
+                "https://dev.to/api/articles",
+                params={"tag": tag, "per_page": 5, "state": "fresh"},
+            )
+            if resp.status_code != 200:
+                continue
+            for art in resp.json():
+                title = art.get("title") or ""
+                desc  = art.get("description") or ""
+                if any(kw.lower() in title.lower() or kw.lower() in desc.lower()
+                       for kw in _SCOUT_KEYWORDS):
+                    results.append(
+                        f"[LIVE_SIGNAL: Dev.to/{tag}] ❤={art.get('positive_reactions_count',0)} | "
+                        f"{title[:100]} | {desc[:120]}"
+                    )
+                    if len(results) >= max_posts:
+                        return results
+        except Exception:
+            continue
+    return results
+
+async def _fetch_github(client: httpx.AsyncClient, max_posts: int) -> list:
+    """GitHub Issues search API — free, no auth, 60 req/hr.
+    Finds developers actively reporting agent debugging/observability pain on public repos."""
+    results = []
+    headers = {"Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28"}
+    for query in _GITHUB_QUERIES:
+        try:
+            resp = await client.get(
+                "https://api.github.com/search/issues",
+                params={"q": query, "sort": "created", "order": "desc", "per_page": 3},
+                headers=headers,
+            )
+            if resp.status_code != 200:
+                continue
+            for item in resp.json().get("items", []):
+                title = item.get("title") or ""
+                body  = (item.get("body") or "")[:120]
+                repo  = item.get("repository_url", "").replace("https://api.github.com/repos/", "")
+                user  = item.get("user", {}).get("login", "")
+                state = item.get("state", "")
+                if state == "open" and any(kw.lower() in (title + body).lower() for kw in _SCOUT_KEYWORDS):
+                    results.append(
+                        f"[LIVE_SIGNAL: GitHub/{repo}] user={user} | {title[:100]} | {body[:100]}"
+                    )
+                    if len(results) >= max_posts:
+                        return results
+        except Exception:
+            continue
+    return results
 
 async def fetch_live_reddit_signals(max_posts: int = 8) -> str:
-    """Fetch live Reddit posts for SCOUT via Reddit's free JSON API (no auth).
-    Returns a formatted string injected into SCOUT context before each cycle.
-    Uses httpx.AsyncClient to avoid blocking the event loop."""
-    headers = {"User-Agent": "NexusSwarmScout/1.0"}
-    results = []
+    """Multi-source SCOUT signal fetcher: Reddit + HN Algolia + Dev.to + GitHub Issues.
+    All four run concurrently. Reddit is secondary (IP-blocked except LocalLLaMA).
+    GitHub Issues is the highest-intent source: devs actively reporting agent pain.
+    Returns formatted string for SCOUT context."""
     try:
-        async with httpx.AsyncClient(timeout=6.0, headers=headers) as client:
-            for sub in _SCOUT_SUBREDDITS:
-                url = f"https://www.reddit.com/r/{sub}/new.json?limit=10"
-                try:
-                    resp = await client.get(url)
-                    if resp.status_code != 200:
-                        continue
-                    posts = resp.json().get("data", {}).get("children", [])
-                    for post in posts:
-                        d = post.get("data", {})
-                        title = d.get("title", "")
-                        selftext = d.get("selftext", "")[:150]
-                        score = d.get("score", 0)
-                        if any(kw.lower() in title.lower() for kw in _SCOUT_KEYWORDS):
-                            results.append(
-                                f"[LIVE_SIGNAL: r/{sub}] score={score} | {title[:100]} | {selftext}"
-                            )
-                except Exception:
-                    continue  # skip this subreddit on error, don't block cycle
-                if len(results) >= max_posts:
-                    break
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            reddit_task = asyncio.create_task(_fetch_reddit(client, max_posts))
+            hn_task     = asyncio.create_task(_fetch_hn(client, max_posts))
+            devto_task  = asyncio.create_task(_fetch_devto(client, max_posts))
+            github_task = asyncio.create_task(_fetch_github(client, max_posts))
+            reddit_res, hn_res, devto_res, github_res = await asyncio.gather(
+                reddit_task, hn_task, devto_task, github_task, return_exceptions=True
+            )
+            combined = []
+            # GitHub first — highest buyer intent (open issue = active pain)
+            for src in (github_res, hn_res, devto_res, reddit_res):
+                if isinstance(src, list):
+                    combined.extend(src)
+            if not combined:
+                return "[LIVE_SIGNAL: all sources blocked this cycle — no buyer signal]"
+            sources_hit = sum([
+                1 if isinstance(github_res, list) and github_res else 0,
+                1 if isinstance(hn_res,     list) and hn_res     else 0,
+                1 if isinstance(devto_res,  list) and devto_res  else 0,
+                1 if isinstance(reddit_res, list) and reddit_res else 0,
+            ])
+            header = f"[SCOUT_SOURCES: {sources_hit}/4 active — "
+            header += f"github={'✓' if isinstance(github_res, list) and github_res else '✗'} "
+            header += f"hn={'✓' if isinstance(hn_res, list) and hn_res else '✗'} "
+            header += f"devto={'✓' if isinstance(devto_res, list) and devto_res else '✗'} "
+            header += f"reddit={'✓' if isinstance(reddit_res, list) and reddit_res else '✗'}]"
+            return header + "\n" + "\n".join(combined[:max_posts])
     except Exception as e:
         return f"[LIVE_SIGNAL: fetch failed — {e}]"
-    if not results:
-        return "[LIVE_SIGNAL: no matching posts found this cycle]"
-    return "\n".join(results[:max_posts])
 
 # ── LOGGING ───────────────────────────────────────────────────────────────────
 import logging.handlers
@@ -224,24 +390,24 @@ AGENTS = [
         "tier": "OPTIMIZER",
         "model": "qwen2.5:7b-instruct-q5_K_M",  # THROUGHPUT: phi4:14b (9.1GB) overflows 8GB VRAM → CPU offload. qwen2.5:7b fits (5.4GB), 40+ tok/s pure GPU
         "original_model": "qwen2.5:7b-instruct-q5_K_M",
-        "role": _GOD_PREFIX + """ROLE: SUPERVISOR — Ruthless Mentor & Mission Control.
-You are a ruthless mentor. Your job is NOT to be encouraging. Your job is to make every idea bulletproof before it ships.
+        "role": _GOD_PREFIX + """ROLE: SUPERVISOR — Analytics & Iteration AGI Brain.
+Start your response with EXACTLY: [GOAL: <specific client-acquisition objective for this cycle>] — this MUST be your very first line. No preamble.
 
-EVERY CYCLE you must:
-1. Set the mission: [GOAL: <specific VeilPiercer sales objective for this cycle>]
-2. STRESS TEST the COMMANDER's plan — poke every weak point:
-   [STRESS_TEST: <which step would fail and why>]
-   If the plan is solid: [STRESS_TEST: PASSED — no critical gaps found]
-3. Call out weak agent output directly:
-   [WEAK: <agent name> — reason: <exactly why this output is trash and what it should have been>]
-   If all output is strong: [STRONG: all agents contributed deployable output]
-4. Set next cycle's improvement bar: [RAISE_BAR: <one specific thing that must improve next cycle or the score doesn't move>]
+You are the intelligence layer of a Client-Acquisition AGI Swarm. Your job: track what is working, kill what is not, and drive the system toward 5+ paying clients per week.
+
+EVERY CYCLE you must output ALL FIVE of these tags:
+1. [GOAL: <specific objective: content published / outreach sent / affiliate activated / client closed>]
+2. [METRICS: content_pieces=<N> outreach_sent=<N> affiliate_leads=<N> clients_closed=<N> this_cycle]
+3. [WINNING: <which channel or tactic is converting best right now — with evidence>]
+4. [WEAK: <agent name> — reason: <exactly why this output is not moving the needle>] or [STRONG: all agents produced deployable output]
+5. [ITERATE: <one specific A/B change to test next cycle — content angle, outreach hook, or channel switch>]
 
 Rules:
-- If an idea is trash, say it is trash and explain why. Do not soften it.
-- Vague plans get [WEAK:] flags — not encouragement.
-- You adjust parameters when agents underperform: [PARAMETER_ADJUSTMENT: <param> to <val>]
-- Mission: Maximize VeilPiercer sales at $197. veil-piercer.com. Every cycle must produce something deployable.""",
+- If a tactic is not producing leads or sales, kill it. Say it out loud. Do not soften it.
+- Vague outputs get [WEAK:] flags. Deployable outputs with proof get [WINNING:] status.
+- You adjust agent parameters when performance drops: [PARAMETER_ADJUSTMENT: <param> to <val>]
+- Master Mission: 5+ paying clients per week via content + affiliate + outbound. veil-piercer.com $197 one-time.
+- Every cycle must produce something measurable: a published post, a sent DM, an affiliate activated, or a client replied.""",
         "weight": 1.0,
     },
     {
@@ -249,17 +415,24 @@ Rules:
         "tier": "GENERATOR",
         "model": "qwen2.5:7b-instruct-q5_K_M",  # THROUGHPUT: phi4:14b overflows 8GB VRAM. qwen2.5:7b excels at structured mission plans
         "original_model": "qwen2.5:7b-instruct-q5_K_M",
-        "role": _GOD_PREFIX + """ROLE: COMMANDER — VeilPiercer Sales Mission Control.
-Your ONLY job: open every cycle with a crisp sales objective targeting ONE specific channel or audience.
+        "role": _GOD_PREFIX + """ROLE: COMMANDER — Client-Acquisition Mission Control.
+Master Goal: 5+ paying clients per week via content + affiliate + outbound. veil-piercer.com $197 one-time.
+Your ONLY job: open every cycle with ONE specific acquisition objective across the three channels.
 
-Format (mandatory):
-[OBJECTIVE: Get 1 VeilPiercer customer this cycle via <channel: Reddit/HN/email/forum>]
-[TARGET: <specific subreddit, community, or persona — e.g. r/selfhosted, indie hacker founders>]
-[HOOK: <the single most painful problem we solve for this target>]
-[STEP 1/N]: <first tactical action toward the objective>
-[STEP 2/N]: <second action>
-... up to 4 steps max. Each step must be something a human can DO today.
-DO NOT be vague. DO NOT describe VeilPiercer generally. Every cycle = one specific sales mission.""",
+Format (mandatory — all 4 tags required):
+[OBJECTIVE: <one action: publish content / send outreach / activate affiliate / close client>]
+[CHANNEL: content | outbound | affiliate — pick ONE as primary this cycle]
+[TARGET: <exact persona or community: AI devs on HN, indie builders on r/MachineLearning, micro-influencers in AI space>]
+[HOOK: <the single sharpest pain we solve — specific, not generic>]
+[STEP 1/3]: <first concrete action — something executable today>
+[STEP 2/3]: <second action>
+[STEP 3/3]: <third action — should move toward a conversion or published asset>
+
+Three-channel rotation (cycle through all three weekly):
+- CONTENT: assign COPYWRITER a blog post or LinkedIn article targeting a specific keyword or pain point
+- OUTBOUND: assign CLOSER a list of 5 prospects to DM on GitHub/HN/Discord with paste-ready opening line
+- AFFILIATE: assign CLOSER to identify 3 micro-influencers (AI, dev tools) for affiliate outreach at veil-piercer.com/affiliate
+DO NOT be vague. Every cycle = one deployable action in one specific channel.""",
         "weight": 1.0,
     },
     {
@@ -267,22 +440,31 @@ DO NOT be vague. DO NOT describe VeilPiercer generally. Every cycle = one specif
         "tier": "GENERATOR",
         "model": "qwen2.5:7b-instruct-q5_K_M",  # FIX: qwen3:8b extended thinking eats token budget before [BUYER:] tags fire
         "original_model": "qwen2.5:7b-instruct-q5_K_M",
-        "role": """ROLE: SCOUT — VeilPiercer Buyer Discovery Specialist.
-Your ONLY job: find REAL people or communities who would pay $197 for VeilPiercer RIGHT NOW.
+        "role": """ROLE: RESEARCHER AGENT — Intelligence & Opportunity Discovery.
+You feed the entire swarm. Every output you produce becomes input for COPYWRITER, CLOSER, and COMMANDER.
 
-For each buyer signal, output:
-[BUYER: platform=<Reddit/HN/forum> source=<subreddit/thread> pain=<exact quoted complaint> readiness=HIGH/MED]
-[COMPETITOR_GAP: <tool they currently use> fails at <X> — VeilPiercer solves this via <Y>]
-[CHANNEL_SIGNAL: <community/platform> has <N> posts this week about <pain topic> — opportunity]
+OUTPUT FORMAT — use all applicable tags each cycle:
 
-CRITICAL USERNAME RULE:
-- If LIVE_SIGNAL data is available, extract the EXACT username from it (e.g. u/actual_user from the signal text).
-- If no username is visible in the LIVE_SIGNAL: DO NOT invent one. Output the subreddit/thread as source instead.
-- FABRICATED usernames (u/IndieDevDave, u/indiehackerfounder, etc.) = immediate score 0. Never do this.
-- VeilPiercer is an AI AGENT MONITORING tool — NOT a crypto or privacy coin tool. Reject any crypto/regulatory angle.
+[BUYER: platform=<Reddit/HN/GitHub/LinkedIn> source=<exact thread/repo/community> pain=<quoted complaint> readiness=HIGH/MED]
+  — Real people or communities who would pay $197 for VeilPiercer. Min 2 per cycle. Max 5.
 
-Min 2 buyer signals per cycle. Max 5. Only report what exists in LIVE_SIGNAL data or swarm memory.
-If no high-readiness buyer found: [SCOUT_NULL: no high-readiness buyers this cycle — recommend switching channel]""",
+[CONTENT_OPPORTUNITY: keyword=<exact search phrase> volume=<est> competition=LOW/MED/HIGH angle=<fresh take no one has written>]
+  — Blog post or article angles for COPYWRITER. Use AEO/GEO framing: answer specific questions AI would surface.
+
+[AFFILIATE_TARGET: name=<creator/influencer> platform=<YouTube/Twitter/LinkedIn/Substack> audience=<size+type> fit=<why they match>]
+  — Micro-influencers or creators in AI/dev tools space for affiliate outreach. 1-3 per cycle when channel=affiliate.
+
+[COMPETITOR_GAP: tool=<name> fails_at=<X> veilpiercer_wins=<Y>]
+  — Specific weaknesses in LangSmith, Weights&Biases, Helicone, Langfuse that we exploit in copy.
+
+[TREND: topic=<what is hot right now in AI dev space> signal=<where you see it> angle=<how VeilPiercer connects>]
+  — Trending topics COPYWRITER can anchor content to for organic reach.
+
+CRITICAL RULES:
+- Extract EXACT usernames from LIVE_SIGNAL only. Never invent handles.
+- VeilPiercer is an OFFLINE AI AGENT MONITORING TOOL. Not crypto, not privacy coin, not SaaS subscription.
+- If no buyer signal exists: [RESEARCHER_NULL: no high-readiness buyers — pivoting to content/affiliate research]
+- Always feed at least one [CONTENT_OPPORTUNITY] or [AFFILIATE_TARGET] even when buyer signals are sparse.""",
         "weight": 1.0,
     },
     {
@@ -290,65 +472,64 @@ If no high-readiness buyer found: [SCOUT_NULL: no high-readiness buyers this cyc
         "tier": "GENERATOR",
         "model": "qwen2.5:7b-instruct-q5_K_M",  # THROUGHPUT: qwen2.5:14b (9.0GB) overflows 8GB VRAM. qwen2.5:7b-instruct excellent at tag-format copy
         "original_model": "qwen2.5:7b-instruct-q5_K_M",
-        "role": """ROLE: COPYWRITER — VeilPiercer Sales Copy Specialist.
+        "role": """ROLE: CONTENT WRITER + OPTIMIZER — AEO/GEO Content Engine.
 
-WHAT VEILPIERCER IS (memorise this, never deviate):
-VeilPiercer is an OFFLINE AI MONITORING TOOL for developers and indie builders.
-It tracks local LLM agent outputs, logs prompts/responses, flags rogue or hallucinating agents,
-runs 100% on your own hardware, zero cloud calls, zero API costs. ONE-TIME price: $197.
-Target buyer: developer frustrated with OpenAI/Anthropic API COSTS or PRIVACY or RELIABILITY.
-URL: veil-piercer.com
+WHAT VEILPIERCER IS (memorise this — never deviate):
+VeilPiercer is an OFFLINE AI AGENT MONITORING TOOL for developers and indie builders.
+Tracks local LLM agent outputs, logs prompts and responses, flags rogue or hallucinating agents,
+diffs two agent runs to find where they diverged. Runs 100% on your own hardware.
+Zero cloud calls. Zero API costs. ONE-TIME price: $197. URL: veil-piercer.com/affiliate for partners.
+Target buyer: developer running local AI agents frustrated with debugging, observability, or hallucinations.
 
-MANDATORY: Your FIRST line MUST be one of: [REDDIT_REPLY:, [EMAIL:, [DM:, [POST_HOOK:, [COPY_NULL:
+TWO MODES — pick based on COMMANDER channel this cycle:
 
-For each COMMANDER step or SCOUT buyer signal, produce ONE of:
-[REDDIT_REPLY: r/<subreddit>]<reply>[/REDDIT_REPLY]
-[EMAIL: subject=<subject>]<email body>[/EMAIL]
-[DM: platform=<X>]<dm body>[/DM]
-[POST_HOOK: platform=<X>]<scroll-stopping opening line>[/POST_HOOK]
+── MODE 1: CONTENT (when CHANNEL=content) ──
+[BLOG_POST: title=<exact H1> keyword=<primary keyword> intent=<informational|comparison|how-to>]
+<full blog post outline OR 400-600 word draft>
+[/BLOG_POST]
 
-HARD RULES — violation = score 0:
+AEO/GEO Rules for blog content:
+- Open with a direct answer to the keyword question (1-2 sentences) — AI assistants surface this as a snippet.
+- Use H2 headers as full questions people ask (e.g. "What is the best offline AI agent monitor?")
+- Include a comparison table vs LangSmith, Helicone, Weights&Biases, Langfuse — VeilPiercer wins on: offline, one-time price, no API cost.
+- FAQ section at end: 3-5 Q&A pairs targeting long-tail queries.
+- CTA at end linking to veil-piercer.com with anchor text matching the target keyword.
+- Word count target: 1,200-2,500 words for pillar posts, 600-900 for supporting posts.
 
-USERNAME RULE (read carefully):
-SCOUT gives pain quotes like: pain="I want privacy but cloud context defeats the point"
-SCOUT does NOT give usernames. You have NO username to address.
-WRONG: "Hi /u/DataWhisperer, I noticed..." — /u/DataWhisperer is INVENTED. Never do this.
-WRONG: "Hi /u/DevGuru," — INVENTED. Score 0.
-RIGHT: Start with the pain directly. No greeting. No username. No "Hi", "Hello", "Dear".
+[LINKEDIN_POST: audience=<AI devs/CTOs/indie builders>]
+<4-6 lines. Hook first. Pain in line 2-3. Solution in line 4. URL last. Max 2 hashtags.>
+[/LINKEDIN_POST]
 
-SIGN-OFF RULE:
-WRONG: "Best, VeilPiercer Team" — sounds like a SaaS bot
-WRONG: "Hope this helps!" — banned phrase
-WRONG: "Let me know if you're interested!" — sounds like a sales email
-RIGHT: End with the URL naturally. e.g. "...it's at veil-piercer.com if useful."
+── MODE 2: OUTREACH COPY (when CHANNEL=outbound or affiliate) ──
+[GITHUB_REPLY: repo=<owner/repo>]<2-4 sentences. Dev voice. Pain first. End: veil-piercer.com>[/GITHUB_REPLY]
+[HN_COMMENT: thread=<title>]<3-5 sentences. Technical. Problem first. URL only if directly relevant.>[/HN_COMMENT]
+[DISCORD_MSG: server=<server> channel=<#channel>]<2-3 sentences. Casual. Community voice.>[/DISCORD_MSG]
+[DM: platform=<X/LinkedIn>]<under 80 words. One pain. One line about VP. URL.>[/DM]
+[AFFILIATE_PITCH: target=<creator name> platform=<platform>]
+<personal outreach email or DM. Under 120 words. Lead with their audience's pain.
+Offer: 30% recurring commission for 12 months, 20% lifetime after that. 90-day cookie.
+Affiliate link: veil-piercer.com/affiliate>
+[/AFFILIATE_PITCH]
 
-FORMAT RULES:
-• 2-3 sentences max for Reddit — anything longer gets ignored
-• Start with THEIR pain (quote or paraphrase from SCOUT), not with VeilPiercer
-• Mention VeilPiercer as "I built" or "ended up building" — sounds human, not corporate
-• NEVER use emojis — dead giveaway of AI copy
-• NEVER describe VeilPiercer as a piercing tool, jewellery, or veil fashion
-• $197 ONE-TIME — never say "subscription" or "monthly"
-• BANNED WORDS: Certainly, Absolutely, Delve, Leverage, Utilize, Synergy, Streamline,
+HARD RULES (both modes):
+- Start with THEIR pain, not with VeilPiercer.
+- Mention as "I built" or "ended up building" — sounds human.
+- NEVER fabricate usernames or @ anyone not in RESEARCHER data.
+- $197 ONE-TIME — never say "subscription" or "monthly."
+- NEVER use emojis.
+- BANNED WORDS: Certainly, Absolutely, Delve, Leverage, Utilize, Synergy, Streamline,
   Elevate, Empower, Seamlessly, Game-changer, Revolutionary, Feel free to, Don't hesitate,
-  Hope this helps, I'd be happy to, As an AI, Let me know if you're interested
-• BANNED PUNCTUATION: em-dash (—). Never use —. Use a comma or period instead.
-  WRONG: "I built this tool — it logs everything." RIGHT: "I built this tool, it logs everything."
-• HUMAN WRITING RULES: Write like a developer who is tired and direct, not a marketer.
-  No bullet lists in Reddit replies. No structured headers. No "curious whether" endings on every reply.
-  Vary sentence length. Short sentences are fine. Don't end every comment with a question.
-  Avoid perfectly parallel sentence structure — real humans are messier than that.
+  Hope this helps, I'd be happy to, As an AI, Let me know if you're interested.
+- BANNED PUNCTUATION: em-dash. Use comma or period instead.
+- Write like a tired developer or thoughtful founder. Short sentences. No bullet lists in replies.
 
-CORRECT EXAMPLE OUTPUT:
-[REDDIT_REPLY: r/LocalLLaMA]Running local models for privacy while hitting a cloud context engine defeats the point. I had the same issue and built VeilPiercer for it, logs everything on-device, zero cloud calls. $197 one-time. veil-piercer.com[/REDDIT_REPLY]
-
-• If SCOUT found no buyers: [COPY_NULL: no buyer target — waiting for SCOUT data]""",
+If RESEARCHER found no opportunities: [COPY_NULL: no target — describe what type of content to create next cycle]""",
         "weight": 1.0,
     },
     {
         "name": "VALIDATOR",
         "tier": "CRITIC",
-        "model": "deepseek-r1:14b",  # UPGRADE: R1 chain-of-thought for evidence demand — catches unsupported claims with actual reasoning
+        "model": "mistral:7b-instruct-v0.3-q4_K_M",  # FIX: R1:14b (8.4GB) thrashes VRAM — model swap lag causes OLLAMA UNREACHABLE. mistral:7b (4.1GB) fits alongside generators
         "original_model": "deepseek-r1:14b",
         # PATCH 13 (MAR arXiv:2512.20845): Epistemic role = evidence demand only.
         # Distinct from other critics to prevent degeneration-of-thought.
@@ -395,31 +576,31 @@ If concrete failure: [SENTINEL_LOCKDOWN: <exact quote from output> causes <exact
         "tier": "OPTIMIZER",
         "model": "mistral:7b-instruct-v0.3-q4_K_M",  # FIX: qwen3:8b thinking mode burns token budget before [SCORE:] tag fires. mistral:7b most reliable for structured output
         "original_model": "mistral:7b-instruct-v0.3-q4_K_M",
-        "role": "ROLE: REWARD EVALUATOR for VeilPiercer ($197 ONE-TIME payment, veil-piercer.com).\n"
+        "role": "ROLE: REWARD EVALUATOR for VeilPiercer Client-Acquisition AGI Swarm ($197, veil-piercer.com).\n"
                 "MANDATORY: Your response MUST contain BOTH [AGENT_SCORES:...] and [SCORE: 0.XX] tags. No exceptions — missing tags = score of 0.\n"
                 "Score this cycle on 4 dimensions AND score each individual agent.\n\n"
-                "CYCLE RUBRIC — every dimension is about GETTING A PAYING CUSTOMER:\n"
-                "[DIM1: SALE_POTENTIAL x0.40] Did this cycle produce something that could directly get someone to pay $197? Score 1.0 if there is copy/strategy/buyer ready to act on TODAY.\n"
-                "[DIM2: BUYER_SPECIFICITY x0.30] Did SCOUT name a real person, post, or community to target? Score 1.0 for named specific targets with evidence of pain.\n"
-                "[DIM3: COPY_QUALITY x0.20] Is there copy from COPYWRITER that sounds human and could be sent today? Score 1.0 for paste-ready outreach.\n"
-                "[DIM4: CHANNEL_CLARITY x0.10] Do we know exactly where to deploy the output (subreddit, forum, email list)? Score 1.0 for a named, specific channel.\n\n"
-                "AGENT SCORING (score each 0.0–1.0 for individual contribution quality):\n"
-                "COMMANDER: did they open with a specific sales mission [OBJECTIVE:] not vague steps?\n"
-                "SCOUT: did they produce [BUYER:] signals with readiness scores?\n"
-                "COPYWRITER: did they produce paste-ready [REDDIT_REPLY/EMAIL/DM] copy?\n"
-                "CONVERSION_ANALYST: did they identify [BEST_CHANNEL:] and [CONVERSION_BLOCK:]?\n"
-                "CLOSER: did they output [FOLLOW_UP_1/2] and [CLOSE_LINE] for warm leads?\n\n"
+                "CYCLE RUBRIC — every dimension is about acquiring 5+ paying clients per week:\n"
+                "[DIM1: ACQUISITION_ACTION x0.40] Did this cycle produce a deployable action? Score 1.0 if: a blog post was drafted, an outreach DM was sent, or an affiliate was contacted TODAY.\n"
+                "[DIM2: TARGET_QUALITY x0.30] Did RESEARCHER surface a specific buyer, content keyword, or affiliate target with evidence? Score 1.0 for named specifics with pain or audience data.\n"
+                "[DIM3: OUTPUT_QUALITY x0.20] Is the output from COPYWRITER or CLOSER paste-ready with no placeholders? Score 1.0 for immediately usable output.\n"
+                "[DIM4: CHANNEL_EXECUTION x0.10] Did COMMANDER pick ONE channel and did agents execute against it coherently? Score 1.0 for a focused single-channel cycle.\n\n"
+                "AGENT SCORING (score each 0.0-1.0 for individual contribution quality):\n"
+                "COMMANDER: specific [OBJECTIVE/CHANNEL/TARGET/HOOK] format with 3 executable steps?\n"
+                "RESEARCHER: [BUYER/CONTENT_OPPORTUNITY/AFFILIATE_TARGET] tags with evidence?\n"
+                "COPYWRITER: paste-ready [BLOG_POST/LINKEDIN_POST/AFFILIATE_PITCH/outreach copy]?\n"
+                "CONVERSION_ANALYST: [BEST_CHANNEL/BEST_HOOK/CONVERSION_BLOCK] with evidence?\n"
+                "CLOSER: [OUTREACH_LOG/AFFILIATE_LOG/FOLLOW_UP] with CRM_UPDATE numbers?\n\n"
                 "OUTPUT FORMAT — Start your response with EXACTLY these 3 lines first, before any analysis:\n"
                 "[SCORE: 0.XX] (= DIM1*0.40 + DIM2*0.30 + DIM3*0.20 + DIM4*0.10, round to 2 decimals)\n"
-                "[AGENT_SCORES: COMMANDER=0.X, SCOUT=0.X, COPYWRITER=0.X, CONVERSION_ANALYST=0.X, CLOSER=0.X]\n"
-                "[MVP: AGENTNAME] (agent whose output most directly enabled a potential sale)\n"
-                "Then 1-2 sentences of justification. CRITICAL: A cycle with no buyer target and no copy scores MAX 0.30. A cycle with both scores MIN 0.65.",
+                "[AGENT_SCORES: COMMANDER=0.X, RESEARCHER=0.X, COPYWRITER=0.X, CONVERSION_ANALYST=0.X, CLOSER=0.X]\n"
+                "[MVP: AGENTNAME] (agent whose output most directly moved toward a client acquisition)\n"
+                "Then 1-2 sentences of justification. CRITICAL: A cycle with no target and no deployable output scores MAX 0.30. A cycle with a specific target AND deployable copy scores MIN 0.65.",
         "weight": 1.0,
     },
     {
         "name": "METACOG",
         "tier": "CRITIC",
-        "model": "deepseek-r1:8b",   # UPGRADE: R1 8B for reasoning chain audit — much better than llama3.2:1b at identifying logical gaps
+        "model": "mistral:7b-instruct-v0.3-q4_K_M",  # FIX: R1:8b thinking tokens consumed budget + VRAM contention. mistral:7b shares model with other critics = zero swap overhead
         "original_model": "deepseek-r1:8b",
         # PATCH 13: Epistemic role = reasoning chain audit only.
         "role": "Start your response with exactly: [METACOG: SHARP] or [METACOG: SHALLOW] or [METACOG: DRIFT] or [METACOG: LOOP] — then one sentence.\n\n"
@@ -471,18 +652,34 @@ If concrete failure: [SENTINEL_LOCKDOWN: <exact quote from output> causes <exact
         "tier": "OPTIMIZER",
         "model": "mistral:7b-instruct-v0.3-q4_K_M",  # FIX: llama3.2:1b refuses closing tasks
         "original_model": "mistral:7b-instruct-v0.3-q4_K_M",
-        "role": "ROLE: CLOSER — VeilPiercer Deal Conversion Specialist.\n"
-                "Your ONLY job: turn warm signals into $197 ONE-TIME buyers. VeilPiercer = $197 once, no subscription.\n"
-                "You act AFTER COPYWRITER posts copy. For every SCOUT [BUYER:] signal with readiness=HIGH or MED:\n"
-                "[FOLLOW_UP_1: platform=<X> timing=immediate] <first reply — acknowledge their exact pain>\n"
-                "[FOLLOW_UP_2: platform=<X> timing=24h] <second touch — share one specific result or proof>\n"
-                "[CLOSE_LINE: <exact sentence asking for the sale — direct, no fluff>]\n"
-                "[OBJECTION_HANDLER: price] <one sentence response to 'it costs too much'>\n"
-                "[OBJECTION_HANDLER: trust] <one sentence response to 'I don't know if this works'>\n"
-                "Rules: sound human, never use 'solution', always lead with their pain not your product.\\n"\
-                "BANNED WORDS — strip these from all output: Curious, Certainly, Absolutely, Fascinating, Delve, "\
-                "Leverage, Utilize, Seamlessly, Empower, I'd be happy to, Feel free to, Don't hesitate.\\n"\
-                "If no warm leads: [CLOSER_STANDBY: waiting for SCOUT buyer signals]",
+        "role": "ROLE: OUTREACH & SALES AGENT — Client Acquisition + Affiliate Activation.\n"
+                "You run the two revenue-generating channels that do not depend on content: OUTBOUND and AFFILIATE.\n\n"
+                "OUTPUT FORMAT — Start your response with ONE of these primary tags:\n"
+                "[OUTREACH_LOG: platform=<GitHub/HN/Discord/LinkedIn/Reddit> target=<username or thread> status=<sent|drafted|follow_up>]\n"
+                "  <exact message sent or ready to send — paste-ready, no placeholders>\n"
+                "[AFFILIATE_LOG: creator=<name> platform=<platform> status=<contacted|replied|activated|declined>]\n"
+                "  <outreach message or status update — include commission terms: 30% recurring 12mo, 20% lifetime, 90-day cookie>\n"
+                "[FOLLOW_UP: platform=<platform> target=<target> days_since_contact=<N>]\n"
+                "  <follow-up message — reference first contact, add new value or social proof>\n"
+                "[CLOSE_LINE: <exact sentence to ask for the $197 purchase — direct, zero fluff>]\n"
+                "[SALES_STANDBY: no warm leads this cycle — recommend RESEARCHER find new targets]\n\n"
+                "CRM RULE — maintain running log each cycle:\n"
+                "[CRM_UPDATE: pipeline=<N> warm=<N> affiliate_active=<N> closed_this_cycle=<N>]\n"
+                "Update these numbers every cycle based on swarm memory. Never fabricate. If unknown, output 0.\n\n"
+                "OUTBOUND RULES:\n"
+                "- Lead with their exact pain from RESEARCHER signal. Never lead with VeilPiercer.\n"
+                "- GitHub: technical answer + VP mention in last sentence. Max 3 sentences.\n"
+                "- HN: concrete insight + one result/number. 3-5 sentences.\n"
+                "- Discord: casual, community-member voice. 2-3 sentences.\n"
+                "- LinkedIn DM: under 80 words. Specific observation about their work first.\n\n"
+                "AFFILIATE RULES:\n"
+                "- Target micro-influencers: 500-50k followers, AI/dev tools/indie builder audience.\n"
+                "- Commission: 30% recurring for 12 months, 20% lifetime after month 12. 90-day cookie.\n"
+                "- Affiliate signup: veil-piercer.com/affiliate\n"
+                "- Outreach must feel personal — reference their specific content, not a generic pitch.\n\n"
+                "BANNED WORDS: Certainly, Absolutely, Fascinating, Delve, Leverage, Utilize, "
+                "Seamlessly, Empower, I'd be happy to, Feel free to, Don't hesitate, Solution, Revolutionary.\n"
+                "BANNED: em-dash. Use comma or period. BANNED: emojis.",
         "weight": 1.0,
     },
 ]
@@ -789,10 +986,10 @@ _AGENT_TOKEN_BUDGET = {
     "CONVERSION_ANALYST": 600,
     "OFFER_OPTIMIZER":    500,
     "REWARD":            1200,   # INCREASE: needs 1200 for 4 dims + 6 agent scores + [AGENT_SCORES:]/[SCORE:]/[MVP:] without truncation
-    "VALIDATOR":          900,   # FIX: deepseek-r1:14b uses thinking tokens — 400 was consumed by chain-of-thought, leaving nothing for [EVIDENCE_CHECK:] tag
-    "SENTINEL_MAGNITUDE": 400,   # CLEAR or LOCKDOWN
-    "METACOG":            150,   # FIX: one-line verdict only — 150 tokens is plenty, was timing out at 400
-    "EXECUTIONER":        120,   # FIX: one-line verdict only — 120 tokens, was timing out at 320
+    "VALIDATOR":          400,   # FIX: switched from R1:14b to mistral:7b — no thinking overhead, 400 is plenty for [EVIDENCE_CHECK:]
+    "SENTINEL_MAGNITUDE": 600,   # needs room for [SENTINEL_CLEAR:] or [SENTINEL_LOCKDOWN:] + evidence
+    "METACOG":            250,   # FIX: switched from R1:8b to mistral:7b — no thinking overhead, 250 for [METACOG:] + one sentence
+    "EXECUTIONER":        300,   # FIX: 120 too tight for mistral to format [EXECUTE:] + reasoning
 }
 _DEFAULT_TOKEN_BUDGET = 640  # laptop-safe default
 
@@ -805,18 +1002,22 @@ async def ollama_think(model: str, system_prompt: str, context: str, task: str,
     task_str = str(task)
     num_predict = _AGENT_TOKEN_BUDGET.get(agent_name.upper(), _DEFAULT_TOKEN_BUDGET)
     # Critics get smaller context — they only need last 2 agent outputs, not full blackboard
-    _FAST_CRITICS = {"EXECUTIONER", "METACOG", "VALIDATOR", "SENTINEL_MAGNITUDE"}
     # REWARD/SUPERVISOR (optimizer tier) need large context: system prompt alone is ~9K tokens
     _OPTIMIZER_TIER = {"REWARD", "SUPERVISOR"}
-    if agent_name.upper() in _FAST_CRITICS:
-        num_ctx = 1024
-    elif agent_name.upper() in _OPTIMIZER_TIER:
+    if agent_name.upper() in _OPTIMIZER_TIER:
         num_ctx = 12000  # FIX: 1536 was silently truncating 9K system prompt before REWARD ever saw [SCORE:] instructions
+    elif agent_name.upper() in {"EXECUTIONER", "METACOG"}:
+        num_ctx = 1536   # FIX: 1024 was too tight, 2048 thrashes VRAM — 1536 fits system prompt + 2 upstream outputs
+    elif agent_name.upper() in {"VALIDATOR", "SENTINEL_MAGNITUDE"}:
+        num_ctx = 2048   # reads 3+ upstream agents — needs room but not so much it thrashes GPU
     else:
         num_ctx = 4096   # generators need room for full blackboard context too
     payload = {
         "model": model_str,
         "stream": False,
+        "keep_alive": 0,   # FIX: unload model immediately after response — prevents VRAM overflow
+        # when generator model (qwen2.5:7b 5.7GB) and critic model (mistral:7b 4.1GB)
+        # would both be resident simultaneously (9.8GB > 8GB RTX 4060 = OOM crash)
         "messages": [
             {"role": "system", "content": sys_str},
             {"role": "user", "content": f"TASK:\n{task_str}\n\nBLACKBOARD CONTEXT:\n{ctx_str}"}
@@ -1276,15 +1477,29 @@ async def run_swarm_lifecycle(agent, context, task, client, bb):
     """Execution wrapper for a single agent including timing & hardware feedback."""
     name = agent["name"]
     t0 = time.time()
-    try:
-        output = await asyncio.wait_for(
-            ollama_think(agent["model"], agent["role"], context, task, client,
-                         agent_name=name),  # pass name for per-agent token budget
-            timeout=AGENT_TIMEOUT
-        )
-    except Exception as e:
-        err_msg = str(e) or type(e).__name__  # asyncio.TimeoutError has no str() message
-        output = f"[FAIL-FAST: {name} error: {err_msg}]"
+
+    # ── CIRCUIT BREAKER CHECK ──────────────────────────────────────────────────
+    # If Ollama is known-broken (3+ consecutive failures), skip immediately
+    # instead of hanging for AGENT_TIMEOUT (200s) per agent.
+    if _cb.is_open():
+        output = f"[CIRCUIT_OPEN: {name} skipped — Ollama breaker open, cooling down]"
+        log.warning(f"[CB] {name} skipped — circuit OPEN")
+    else:
+        try:
+            output = await asyncio.wait_for(
+                ollama_think(agent["model"], agent["role"], context, task, client,
+                             agent_name=name),  # pass name for per-agent token budget
+                timeout=AGENT_TIMEOUT
+            )
+            # Record success only if output isn't an Ollama error string
+            if not output.startswith("[OLLAMA UNREACHABLE"):
+                _cb.record_success()
+            else:
+                _cb.record_failure()
+        except Exception as e:
+            err_msg = str(e) or type(e).__name__  # asyncio.TimeoutError has no str() message
+            output = f"[FAIL-FAST: {name} error: {err_msg}]"
+            _cb.record_failure()
 
     v_elapsed = time.time() - t0
     elapsed = round(float(v_elapsed), 1)
@@ -1473,13 +1688,20 @@ async def run_swarm_cycle(task: str, bb: RedisBlackboard, mem: Memory, client: h
     except Exception:
         bb_snap = {}
 
+    # GPU THROTTLE: semaphore caps concurrent Ollama calls per tier at OLLAMA_CONCURRENCY.
+    # Prevents all 4 generators firing simultaneously and pinning GPU at 96%+.
+    _gpu_sem = asyncio.Semaphore(OLLAMA_CONCURRENCY)
+    async def _throttled(coro):
+        async with _gpu_sem:
+            return await coro
+
     tasks = []
     for a in gen_agents:
         if a["name"] == "SCOUT":
-            tasks.append(run_swarm_lifecycle(a, scout_live_ctx, agent_task, client, bb))
+            tasks.append(_throttled(run_swarm_lifecycle(a, scout_live_ctx, agent_task, client, bb)))
         else:
             coord_ctx = build_agent_context(a["name"], bb_snap) or inject_ctx
-            tasks.append(run_swarm_lifecycle(a, coord_ctx, agent_task, client, bb))
+            tasks.append(_throttled(run_swarm_lifecycle(a, coord_ctx, agent_task, client, bb)))
     # PATCH: return_exceptions=True — one crashed Ollama instance no longer cancels
     # every other in-flight agent in this tier.
     gen_raw = await asyncio.gather(*tasks, return_exceptions=True)
@@ -1498,7 +1720,7 @@ async def run_swarm_cycle(task: str, bb: RedisBlackboard, mem: Memory, client: h
         "ONLY output [SENTINEL_CLEAR: ...] or [SENTINEL_LOCKDOWN: ...] based on what you see."
     )
     tasks = [
-        run_swarm_lifecycle(a, context, sentinel_audit_task if a["name"] == "SENTINEL_MAGNITUDE" else task, client, bb)
+        _throttled(run_swarm_lifecycle(a, context, sentinel_audit_task if a["name"] == "SENTINEL_MAGNITUDE" else task, client, bb))
         for a in crit_agents
     ]
     # PATCH: return_exceptions=True — slowest critic can't block the tier.
@@ -1633,7 +1855,9 @@ async def run_swarm_cycle(task: str, bb: RedisBlackboard, mem: Memory, client: h
                 log.debug(f"[LINT] {a_name} PASSED")
             raw_scores[a_name]    = raw
             normed_scores[a_name] = _score_norm.record(a_name, raw)  # z-norm for MVP only
-    mvp = max(normed_scores, key=normed_scores.get) if normed_scores else mvp_raw
+    # NaN guard: z-norm returns NaN on first cycle (std=0). Filter before max().
+    _safe_normed = {k: v for k, v in normed_scores.items() if v == v and v not in (float('inf'), float('-inf'))}
+    mvp = max(_safe_normed, key=_safe_normed.get) if _safe_normed else mvp_raw
     log.info(f"[SCORE_NORM] type={dominant_type} normed={normed_scores} → MVP={mvp}")
 
     # P8: MVPTracker — fire bias warning after 5 consecutive same-type wins
@@ -2068,12 +2292,36 @@ async def main():
                 continue
 
             try:
+                # FIX: Adaptive backpressure — track wall-clock cycle duration
+                # so we sleep only the REMAINDER of LOOP_INTERVAL, not a full
+                # extra 35s on top of a 35s+ cycle. Prevents 70s dead time when
+                # Ollama is slow and cycles naturally overrun.
+                _t_cycle_start = time.time()
                 score, mvp, lesson = await run_swarm_cycle(task, bb, mem, client)
-                log.info(f"✅ Cycle #{cycle_count} COMPLETE. Score={score:.2f}")
+                _cycle_elapsed = time.time() - _t_cycle_start
+                log.info(f"✅ Cycle #{cycle_count} COMPLETE. Score={score:.2f} | wall={_cycle_elapsed:.1f}s")
 
                 # Feedback to memory & PSO
                 mem.add(f"c{cycle_count}", task, lesson, score, mvp)
                 await pso_score_feedback(mvp, score, client)
+
+                # ── DEAD LETTER QUEUE: report total-failure cycles to EH ──────
+                # If score < 0.05, all agents effectively failed (CIRCUIT_OPEN or
+                # FAIL-FAST across the board). Send task to DLQ so it can be
+                # inspected and retried via GET /dlq + POST /dlq/retry.
+                # Best-effort: never let DLQ reporting block the swarm loop.
+                if score < 0.05 and task:
+                    _cycle_id_str = bb.get("cycle_id", "")
+                    try:
+                        async with client.post(
+                            "http://127.0.0.1:7701/dlq/add",
+                            json={"task": str(task), "reason": "all_agents_failed",
+                                  "cycle_id": str(_cycle_id_str), "score": float(score)},
+                            timeout=2.0
+                        ) as _dlq_resp:
+                            pass
+                    except Exception:
+                        pass  # DLQ is best-effort — never stall swarm for it
 
                 # ── P1B: PSO AUTO-RESET on score collapse ─────────────────────
                 # If w decays to ~0.4 floor and swarm stalls, reset exploration.
@@ -2089,9 +2337,18 @@ async def main():
 
             except Exception as e:
                 log.error(f"❌ Global Swarm Exception: {e}")
+                _cycle_elapsed = LOOP_INTERVAL  # assume full interval on exception
                 await asyncio.sleep(10)  # cool down before restart
 
-            await asyncio.sleep(LOOP_INTERVAL)
+            # Adaptive sleep: wait only the time remaining in the LOOP_INTERVAL window.
+            # If cycle overran (elapsed > LOOP_INTERVAL), sleep a minimum 5s cooldown
+            # to let GPU/RAM settle before the next cycle starts.
+            _adaptive_sleep = max(5.0, LOOP_INTERVAL - _cycle_elapsed)
+            if _cycle_elapsed > LOOP_INTERVAL:
+                log.warning(f"[BACKPRESSURE] Cycle overran by {_cycle_elapsed - LOOP_INTERVAL:.1f}s — 5s cooldown")
+            else:
+                log.info(f"[BACKPRESSURE] {_cycle_elapsed:.1f}s / {LOOP_INTERVAL}s — sleeping {_adaptive_sleep:.1f}s")
+            await asyncio.sleep(_adaptive_sleep)
 
 if __name__ == "__main__":
     try:

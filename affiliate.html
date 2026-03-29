@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VeilPiercer Affiliate Program — Earn 30% Recurring Commission</title>
+  <meta name="description" content="Join the VeilPiercer affiliate program. Earn 30% recurring commission for 12 months, 20% lifetime after that. 90-day cookie. Promote the offline AI agent monitor developers actually need.">
+  <meta property="og:title" content="VeilPiercer Affiliate Program — Earn 30% Recurring Commission">
+  <meta property="og:description" content="Promote VeilPiercer to your dev audience. $197 one-time product. 30% recurring for 12 months, 20% lifetime. 90-day cookie window.">
+  <meta property="og:url" content="https://veil-piercer.com/affiliate">
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;700;900&family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --black: #040608;
+      --void: #080c10;
+      --panel: #0c1219;
+      --rim: #14222e;
+      --rim2: #1e3448;
+      --vis: #00e5ff;
+      --saf: #00ff88;
+      --priv: #c84dff;
+      --warn: #ff9500;
+      --gold: #ffd100;
+      --t1: #ddeaf5;
+      --t2: #4a6a80;
+      --t3: #1e3448;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--t1);
+      font-family: 'Fira Code', monospace;
+      overflow-x: hidden;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      z-index: 9998;
+    }
+
+    /* ── NAV ── */
+    #nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      padding: 0 48px;
+      height: 54px;
+      background: rgba(4, 6, 8, .92);
+      border-bottom: 1px solid var(--rim);
+      backdrop-filter: blur(24px);
+    }
+
+    .n-logo {
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 900;
+      font-size: 12px;
+      letter-spacing: 5px;
+      color: var(--vis);
+      text-decoration: none;
+    }
+
+    .n-right {
+      margin-left: auto;
+      display: flex;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .n-right a {
+      font-size: 9px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--t2);
+      text-decoration: none;
+      transition: color .2s;
+    }
+
+    .n-right a:hover { color: var(--vis); }
+
+    .n-cta {
+      font-family: 'Unbounded', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      padding: 8px 22px;
+      background: var(--vis);
+      color: var(--black);
+      text-decoration: none;
+      margin-left: 16px;
+      transition: all .15s;
+    }
+
+    .n-cta:hover { background: #fff; transform: translateY(-1px); }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 48px 80px;
+      position: relative;
+      border-bottom: 1px solid var(--rim);
+    }
+
+    #hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(200, 77, 255, 0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-eyebrow {
+      font-size: 9px;
+      letter-spacing: 4px;
+      color: var(--priv);
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .hero-title {
+      font-family: 'Unbounded', sans-serif;
+      font-size: clamp(36px, 6vw, 72px);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -1px;
+      color: var(--t1);
+      margin-bottom: 12px;
+    }
+
+    .hero-title span { color: var(--priv); }
+
+    .hero-sub {
+      font-size: clamp(28px, 4vw, 48px);
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 300;
+      color: var(--vis);
+      margin-bottom: 32px;
+      letter-spacing: -0.5px;
+    }
+
+    .hero-body {
+      font-size: 14px;
+      color: var(--t2);
+      max-width: 640px;
+      margin: 0 auto 48px;
+      line-height: 1.7;
+    }
+
+    .hero-cta {
+      display: inline-block;
+      font-family: 'Unbounded', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      padding: 18px 48px;
+      background: var(--priv);
+      color: #fff;
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: all .2s;
+      position: relative;
+    }
+
+    .hero-cta:hover {
+      background: #d966ff;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(200, 77, 255, 0.4);
+    }
+
+    /* ── COMMISSION NUMBERS ── */
+    #commission {
+      padding: 100px 48px;
+      border-bottom: 1px solid var(--rim);
+    }
+
+    .sec-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .sec-label {
+      font-size: 9px;
+      letter-spacing: 4px;
+      color: var(--t2);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .sec-title {
+      font-family: 'Unbounded', sans-serif;
+      font-size: clamp(22px, 3vw, 36px);
+      font-weight: 700;
+      color: var(--t1);
+      margin-bottom: 48px;
+      line-height: 1.2;
+    }
+
+    .commission-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--rim);
+      margin-bottom: 60px;
+    }
+
+    .c-card {
+      background: var(--panel);
+      padding: 48px 36px;
+      position: relative;
+    }
+
+    .c-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+    }
+
+    .c-card.gold::before { background: var(--gold); }
+    .c-card.priv::before { background: var(--priv); }
+    .c-card.vis::before { background: var(--vis); }
+
+    .c-number {
+      font-family: 'Unbounded', sans-serif;
+      font-size: clamp(40px, 5vw, 64px);
+      font-weight: 900;
+      margin-bottom: 4px;
+      line-height: 1;
+    }
+
+    .c-card.gold .c-number { color: var(--gold); }
+    .c-card.priv .c-number { color: var(--priv); }
+    .c-card.vis .c-number { color: var(--vis); }
+
+    .c-label {
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--t2);
+      margin-bottom: 20px;
+    }
+
+    .c-desc {
+      font-size: 13px;
+      color: var(--t2);
+      line-height: 1.6;
+    }
+
+    /* ── EARNINGS CALCULATOR ── */
+    #calculator {
+      padding: 100px 48px;
+      border-bottom: 1px solid var(--rim);
+      background: var(--void);
+    }
+
+    .calc-wrapper {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .calc-row {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .calc-label {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--t2);
+      width: 200px;
+      flex-shrink: 0;
+    }
+
+    input[type=range] {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 2px;
+      background: var(--rim2);
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      background: var(--priv);
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .calc-val {
+      font-family: 'Unbounded', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--priv);
+      width: 80px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .calc-result {
+      background: var(--panel);
+      border: 1px solid var(--rim2);
+      border-top: 2px solid var(--priv);
+      padding: 36px;
+      margin-top: 8px;
+    }
+
+    .calc-result-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--rim);
+      font-size: 12px;
+    }
+
+    .calc-result-row:last-child { border-bottom: none; }
+
+    .calc-result-row .r-label { color: var(--t2); letter-spacing: 1px; }
+    .calc-result-row .r-val { font-family: 'Unbounded', sans-serif; font-weight: 700; }
+
+    .r-val.gold { color: var(--gold); font-size: 20px; }
+    .r-val.priv { color: var(--priv); }
+    .r-val.vis { color: var(--vis); }
+
+    /* ── HOW IT WORKS ── */
+    #how {
+      padding: 100px 48px;
+      border-bottom: 1px solid var(--rim);
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--rim);
+      margin-top: 48px;
+    }
+
+    .step {
+      background: var(--panel);
+      padding: 40px 28px;
+    }
+
+    .step-num {
+      font-family: 'Unbounded', sans-serif;
+      font-size: 36px;
+      font-weight: 900;
+      color: var(--rim2);
+      margin-bottom: 20px;
+      line-height: 1;
+    }
+
+    .step-title {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--vis);
+      margin-bottom: 12px;
+    }
+
+    .step-body {
+      font-size: 12px;
+      color: var(--t2);
+      line-height: 1.7;
+    }
+
+    /* ── PROGRAM DETAILS ── */
+    #details {
+      padding: 100px 48px;
+      border-bottom: 1px solid var(--rim);
+      background: var(--void);
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--rim);
+      margin-top: 48px;
+    }
+
+    .detail-block {
+      background: var(--panel);
+      padding: 40px 36px;
+    }
+
+    .detail-block h3 {
+      font-size: 9px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--t2);
+      margin-bottom: 20px;
+    }
+
+    .detail-item {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+      font-size: 13px;
+      color: var(--t2);
+      line-height: 1.5;
+    }
+
+    .detail-item .di-key {
+      color: var(--vis);
+      flex-shrink: 0;
+      min-width: 100px;
+      font-size: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    /* ── WHO WE WANT ── */
+    #who {
+      padding: 100px 48px;
+      border-bottom: 1px solid var(--rim);
+    }
+
+    .who-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 48px;
+    }
+
+    .who-card {
+      border: 1px solid var(--rim);
+      padding: 32px 28px;
+      background: var(--panel);
+      transition: border-color .2s;
+    }
+
+    .who-card:hover { border-color: var(--priv); }
+
+    .who-card .wc-icon {
+      font-size: 9px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--priv);
+      margin-bottom: 16px;
+    }
+
+    .who-card h4 {
+      font-family: 'Unbounded', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--t1);
+      margin-bottom: 12px;
+    }
+
+    .who-card p {
+      font-size: 12px;
+      color: var(--t2);
+      line-height: 1.6;
+    }
+
+    /* ── APPLY CTA ── */
+    #apply {
+      padding: 120px 48px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #apply::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(200, 77, 255, 0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .apply-title {
+      font-family: 'Unbounded', sans-serif;
+      font-size: clamp(28px, 4vw, 52px);
+      font-weight: 900;
+      color: var(--t1);
+      margin-bottom: 16px;
+      line-height: 1.1;
+    }
+
+    .apply-sub {
+      font-size: 14px;
+      color: var(--t2);
+      max-width: 560px;
+      margin: 0 auto 48px;
+      line-height: 1.7;
+    }
+
+    .apply-form {
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    .form-row {
+      margin-bottom: 16px;
+    }
+
+    .form-row input,
+    .form-row textarea,
+    .form-row select {
+      width: 100%;
+      background: var(--panel);
+      border: 1px solid var(--rim2);
+      color: var(--t1);
+      font-family: 'Fira Code', monospace;
+      font-size: 13px;
+      padding: 14px 20px;
+      outline: none;
+      transition: border-color .2s;
+      -webkit-appearance: none;
+    }
+
+    .form-row input::placeholder,
+    .form-row textarea::placeholder { color: var(--t2); }
+
+    .form-row input:focus,
+    .form-row textarea:focus,
+    .form-row select:focus { border-color: var(--priv); }
+
+    .form-row textarea { resize: vertical; min-height: 100px; }
+
+    .form-row select option { background: var(--panel); }
+
+    .submit-btn {
+      width: 100%;
+      font-family: 'Unbounded', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      padding: 18px;
+      background: var(--priv);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all .2s;
+      margin-top: 8px;
+    }
+
+    .submit-btn:hover {
+      background: #d966ff;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(200, 77, 255, 0.4);
+    }
+
+    .form-note {
+      font-size: 11px;
+      color: var(--t2);
+      margin-top: 16px;
+      line-height: 1.6;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 40px 48px;
+      border-top: 1px solid var(--rim);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--t2);
+    }
+
+    footer a { color: var(--t2); text-decoration: none; transition: color .2s; }
+    footer a:hover { color: var(--vis); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      #nav { padding: 0 20px; }
+      #hero, #commission, #calculator, #how, #details, #who, #apply { padding: 80px 24px; }
+      .commission-grid { grid-template-columns: 1fr; }
+      .steps { grid-template-columns: 1fr 1fr; }
+      .details-grid { grid-template-columns: 1fr; }
+      .who-grid { grid-template-columns: 1fr; }
+      .calc-row { flex-wrap: wrap; }
+      .calc-label { width: 100%; }
+      footer { flex-direction: column; gap: 16px; text-align: center; }
+    }
+
+    @media (max-width: 600px) {
+      .steps { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAV -->
+  <nav id="nav">
+    <a href="/" class="n-logo">VEILPIERCER</a>
+    <div class="n-right">
+      <a href="/">Product</a>
+      <a href="/affiliate.html" style="color: var(--priv);">Affiliates</a>
+      <a href="/#pricing" class="n-cta">Get Access →</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div style="position: relative; z-index: 1; max-width: 860px;">
+      <div class="hero-eyebrow">[ AFFILIATE PROGRAM ]</div>
+      <h1 class="hero-title">Earn Real Money<br><span>Promoting a Tool<br>Devs Actually Use</span></h1>
+      <div class="hero-sub">30% recurring. 90-day cookie.</div>
+      <p class="hero-body">
+        VeilPiercer is an offline AI agent monitor that sells itself to developers.
+        You send traffic. We handle the sale. You collect commissions every month,
+        for a year, then forever at 20%. No subscriptions to maintain. No churn to worry about.
+        A $197 one-time product with a commission structure built for long-term partners.
+      </p>
+      <a href="#apply" class="hero-cta">Apply to Join →</a>
+    </div>
+  </section>
+
+  <!-- COMMISSION STRUCTURE -->
+  <section id="commission">
+    <div class="sec-inner">
+      <div class="sec-label">[ COMMISSION STRUCTURE ]</div>
+      <h2 class="sec-title">Three numbers that matter.</h2>
+      <div class="commission-grid">
+        <div class="c-card gold">
+          <div class="c-number">30%</div>
+          <div class="c-label">Months 1 — 12</div>
+          <p class="c-desc">
+            Earn $59.10 on every $197 sale for the first 12 months after the customer's purchase.
+            Recurring on every renewal or upsell within that window.
+          </p>
+        </div>
+        <div class="c-card priv">
+          <div class="c-number">20%</div>
+          <div class="c-label">Month 13 — Forever</div>
+          <p class="c-desc">
+            After month 12, your commission drops to 20% but it never expires.
+            Customers you send stay attributed to you for life.
+          </p>
+        </div>
+        <div class="c-card vis">
+          <div class="c-number">90</div>
+          <div class="c-label">Day Cookie Window</div>
+          <p class="c-desc">
+            If someone clicks your link and buys within 90 days, you get credit.
+            Long enough to account for developers who research before committing.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EARNINGS CALCULATOR -->
+  <section id="calculator">
+    <div class="calc-wrapper">
+      <div class="sec-label">[ EARNINGS CALCULATOR ]</div>
+      <h2 class="sec-title" style="margin-bottom: 40px;">What does your audience convert to?</h2>
+
+      <div class="calc-row">
+        <span class="calc-label">Monthly visitors</span>
+        <input type="range" id="visitors" min="100" max="50000" step="100" value="5000">
+        <span class="calc-val" id="visitors-val">5,000</span>
+      </div>
+      <div class="calc-row">
+        <span class="calc-label">Click-through rate</span>
+        <input type="range" id="ctr" min="1" max="15" step="0.5" value="3">
+        <span class="calc-val" id="ctr-val">3%</span>
+      </div>
+      <div class="calc-row">
+        <span class="calc-label">Conversion rate</span>
+        <input type="range" id="cvr" min="1" max="20" step="0.5" value="4">
+        <span class="calc-val" id="cvr-val">4%</span>
+      </div>
+
+      <div class="calc-result">
+        <div class="calc-result-row">
+          <span class="r-label">Monthly clicks</span>
+          <span class="r-val vis" id="res-clicks">150</span>
+        </div>
+        <div class="calc-result-row">
+          <span class="r-label">Monthly sales</span>
+          <span class="r-val vis" id="res-sales">6</span>
+        </div>
+        <div class="calc-result-row">
+          <span class="r-label">Monthly commission (yr 1)</span>
+          <span class="r-val priv" id="res-monthly">$354.60</span>
+        </div>
+        <div class="calc-result-row">
+          <span class="r-label">Year 1 total</span>
+          <span class="r-val gold" id="res-yearly">$4,255</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how">
+    <div class="sec-inner">
+      <div class="sec-label">[ HOW IT WORKS ]</div>
+      <h2 class="sec-title">Four steps from application to payout.</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">01</div>
+          <div class="step-title">Apply</div>
+          <p class="step-body">Fill out the form below. We review all applications within 48 hours. No minimum follower count — we care about audience fit, not audience size.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <div class="step-title">Get your link</div>
+          <p class="step-body">Once approved, you receive a unique tracking link and access to the affiliate dashboard. 90-day cookie is set on first click.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <div class="step-title">Promote</div>
+          <p class="step-body">Share in your content, newsletter, YouTube descriptions, GitHub readme, wherever your audience asks about AI agent tooling. We provide copy templates if needed.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">04</div>
+          <div class="step-title">Get paid</div>
+          <p class="step-body">Payouts via PayPal or bank transfer on the 1st of each month. Minimum threshold $25. Commissions tracked in real time in your dashboard.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROGRAM DETAILS -->
+  <section id="details">
+    <div class="sec-inner">
+      <div class="sec-label">[ PROGRAM DETAILS ]</div>
+      <h2 class="sec-title">The full terms, plainly stated.</h2>
+      <div class="details-grid">
+        <div class="detail-block">
+          <h3>Commission</h3>
+          <div class="detail-item">
+            <span class="di-key">Year 1 Rate</span>
+            <span>30% of every sale ($59.10 per $197 purchase)</span>
+          </div>
+          <div class="detail-item">
+            <span class="di-key">Year 2+</span>
+            <span>20% lifetime — attributed customers never expire</span>
+          </div>
+          <div class="detail-item">
+            <span class="di-key">Cookie</span>
+            <span>90 days from first click</span>
+          </div>
+          <div class="detail-item">
+            <span class="di-key">Attribution</span>
+            <span>Last-click. If they click your link, you own the sale.</span>
+          </div>
+          <div class="detail-item">
+            <span class="di-key">Payout</span>
+            <span>Monthly on the 1st. $25 minimum. PayPal or bank transfer.</span>
+          </div>
+          <div class="detail-item">
+            <span class="di-key">Refunds</span>
+            <span>Commission reversed on refunded purchases only.</span>
+          </div>
+        </div>
+        <div class="detail-block">
+          <h3>Eligibility &amp; Rules</h3>
+          <div class="detail-item">
+            <span class="di-key">Who qualifies</span>
+            <span>Any creator, developer, newsletter writer, YouTuber, or community owner with an AI or dev tools audience.</span>
+          </div>
+          <div class="detail-item">
+            <span class="di-key">Self-purchase</span>
+            <span>Not eligible for commission. Affiliates can still purchase at full price separately.</span>
+          </div>
+          <div class="detail-item">
+            <span class="di-key">Coupon stacking</span>
+            <span>Commission applies to post-discount price. Affiliates may not create unauthorized coupons.</span>
+          </div>
+          <div class="detail-item">
+            <span class="di-key">Disclosure</span>
+            <span>FTC-compliant disclosure required in all promotional content.</span>
+          </div>
+          <div class="detail-item">
+            <span class="di-key">Termination</span>
+            <span>We reserve the right to terminate agreements with 30 days notice. Earned commissions are always paid.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO WE WANT -->
+  <section id="who">
+    <div class="sec-inner">
+      <div class="sec-label">[ IDEAL PARTNERS ]</div>
+      <h2 class="sec-title">We want partners whose audience already has the problem.</h2>
+      <div class="who-grid">
+        <div class="who-card">
+          <div class="wc-icon">[ 01 ]</div>
+          <h4>AI Dev YouTubers</h4>
+          <p>Tutorial creators covering LangChain, CrewAI, local LLMs, Ollama, AutoGen. Your audience is already building agents and hitting the debugging wall VeilPiercer solves.</p>
+        </div>
+        <div class="who-card">
+          <div class="wc-icon">[ 02 ]</div>
+          <h4>Dev Tool Newsletters</h4>
+          <p>Substack or email newsletters covering indie dev, AI tooling, local AI, self-hosted software. A one-paragraph mention to 5k engaged subscribers converts better than ads to 500k passive ones.</p>
+        </div>
+        <div class="who-card">
+          <div class="wc-icon">[ 03 ]</div>
+          <h4>GitHub / OSS Maintainers</h4>
+          <p>If you maintain a repo that interacts with LLMs, a link in your readme to VeilPiercer is a natural fit. Your users are the exact buyer profile.</p>
+        </div>
+        <div class="who-card">
+          <div class="wc-icon">[ 04 ]</div>
+          <h4>Indie Builder Communities</h4>
+          <p>Discord servers, Slack groups, subreddit moderators in the indie hacker, AI builder, or developer productivity space. If your members ask "how do I debug my agents," that is the moment.</p>
+        </div>
+        <div class="who-card">
+          <div class="wc-icon">[ 05 ]</div>
+          <h4>LinkedIn Creators</h4>
+          <p>AI and developer content creators on LinkedIn with an engaged following. A case study post about agent monitoring converts well to technical decision-makers.</p>
+        </div>
+        <div class="who-card">
+          <div class="wc-icon">[ 06 ]</div>
+          <h4>Course Creators</h4>
+          <p>If you teach AI agent development, prompt engineering, or local LLM workflows, VeilPiercer fits naturally as a recommended tool in your curriculum.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- APPLY -->
+  <section id="apply">
+    <div style="position: relative; z-index: 1; max-width: 600px; margin: 0 auto;">
+      <div class="sec-label" style="text-align: center; margin-bottom: 12px;">[ APPLICATION ]</div>
+      <h2 class="apply-title">Ready to partner<br>with us?</h2>
+      <p class="apply-sub">
+        Applications reviewed within 48 hours. We approve partners based on audience fit, not size.
+        If your audience builds with AI agents, you qualify.
+      </p>
+
+      <form class="apply-form" action="mailto:laurenflipo1388@gmail.com" method="GET" enctype="text/plain"
+            onsubmit="return handleApply(event)">
+        <div class="form-row">
+          <input type="text" name="name" placeholder="Your name" required autocomplete="name">
+        </div>
+        <div class="form-row">
+          <input type="email" name="email" placeholder="Email address" required autocomplete="email">
+        </div>
+        <div class="form-row">
+          <input type="url" name="website" placeholder="Website, YouTube, Substack, or GitHub URL" required>
+        </div>
+        <div class="form-row">
+          <select name="platform" required>
+            <option value="" disabled selected>Primary platform</option>
+            <option value="youtube">YouTube</option>
+            <option value="newsletter">Newsletter (Substack / Beehiiv / other)</option>
+            <option value="linkedin">LinkedIn</option>
+            <option value="github">GitHub / OSS</option>
+            <option value="twitter">X / Twitter</option>
+            <option value="discord">Discord Community</option>
+            <option value="blog">Blog / Website</option>
+            <option value="podcast">Podcast</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <input type="text" name="audience_size" placeholder="Approximate audience size (e.g. 3,200 subscribers)">
+        </div>
+        <div class="form-row">
+          <textarea name="pitch" placeholder="Why is your audience a fit for VeilPiercer? (2-3 sentences)" required></textarea>
+        </div>
+        <button type="submit" class="submit-btn">Submit Application →</button>
+        <p class="form-note">
+          By submitting you agree to the VeilPiercer Affiliate Program terms.
+          You will receive a response within 48 hours at the email address provided.
+        </p>
+      </form>
+
+      <div id="apply-success" style="display:none; margin-top: 32px; padding: 32px; background: var(--panel); border: 1px solid var(--saf); border-top: 2px solid var(--saf);">
+        <div style="font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--saf); margin-bottom: 12px;">[ APPLICATION SENT ]</div>
+        <p style="font-size: 13px; color: var(--t2); line-height: 1.7;">
+          Your application has been received. We will review it and respond within 48 hours.
+          Check your inbox — including spam.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <span>VEILPIERCER — $197 ONE-TIME. veil-piercer.com</span>
+    <div style="display: flex; gap: 24px;">
+      <a href="/">Product</a>
+      <a href="/affiliate.html">Affiliates</a>
+      <a href="/terms.html">Terms</a>
+      <a href="/privacy.html">Privacy</a>
+      <a href="mailto:laurenflipo1388@gmail.com">Contact</a>
+    </div>
+  </footer>
+
+  <script>
+    // ── CALCULATOR ──
+    const visitors = document.getElementById('visitors');
+    const ctr = document.getElementById('ctr');
+    const cvr = document.getElementById('cvr');
+
+    function updateCalc() {
+      const v = parseInt(visitors.value);
+      const c = parseFloat(ctr.value) / 100;
+      const cv = parseFloat(cvr.value) / 100;
+
+      const clicks = Math.round(v * c);
+      const sales = Math.round(clicks * cv);
+      const monthly = sales * 197 * 0.30;
+      const yearly = monthly * 12;
+
+      document.getElementById('visitors-val').textContent = v.toLocaleString();
+      document.getElementById('ctr-val').textContent = (parseFloat(ctr.value)).toFixed(1) + '%';
+      document.getElementById('cvr-val').textContent = (parseFloat(cvr.value)).toFixed(1) + '%';
+      document.getElementById('res-clicks').textContent = clicks.toLocaleString();
+      document.getElementById('res-sales').textContent = sales.toLocaleString();
+      document.getElementById('res-monthly').textContent = '$' + monthly.toFixed(2);
+      document.getElementById('res-yearly').textContent = '$' + Math.round(yearly).toLocaleString();
+    }
+
+    visitors.addEventListener('input', updateCalc);
+    ctr.addEventListener('input', updateCalc);
+    cvr.addEventListener('input', updateCalc);
+    updateCalc();
+
+    // ── APPLY FORM ──
+    function handleApply(e) {
+      e.preventDefault();
+      const form = e.target;
+      const data = new FormData(form);
+      const subject = encodeURIComponent('VeilPiercer Affiliate Application — ' + (data.get('name') || 'New Applicant'));
+      const body = encodeURIComponent(
+        'Name: ' + (data.get('name') || '') + '\n' +
+        'Email: ' + (data.get('email') || '') + '\n' +
+        'Website: ' + (data.get('website') || '') + '\n' +
+        'Platform: ' + (data.get('platform') || '') + '\n' +
+        'Audience Size: ' + (data.get('audience_size') || '') + '\n\n' +
+        'Why a fit:\n' + (data.get('pitch') || '')
+      );
+      window.location.href = 'mailto:laurenflipo1388@gmail.com?subject=' + subject + '&body=' + body;
+      form.style.display = 'none';
+      document.getElementById('apply-success').style.display = 'block';
+      return false;
+    }
+  </script>
+
+</body>
+</html>
