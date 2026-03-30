@@ -1,87 +1,114 @@
-# NEXUS ULTRA ⚡
-### *Your workflows, as a brain that learns, forgets, and corrects itself.*
+# NEXUS ULTRA
 
-**SINGLE-Clarity** — One brain. Your work. $0 per cycle. 100% local.
+**A fully local, autonomous multi-agent swarm using Notion MCP as its real-time operating surface.**
 
-[![Demo](https://img.shields.io/badge/Live_Demo-Loom-00e5ff?style=flat-square)](https://www.loom.com/share/887b9464508240ecbd4adb1c07a26ae0)
-[![pip](https://img.shields.io/badge/pip_install-veilpiercer-00ff88?style=flat-square)](https://pypi.org/project/veilpiercer/)
+[![Notion MCP Challenge](https://img.shields.io/badge/Notion_MCP_Challenge-2026-black?style=flat-square)](https://dev.to/challenges/notion-2026-03-04)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Loom-00e5ff?style=flat-square)](https://www.loom.com/share/887b9464508240ecbd4adb1c07a26ae0)
+[![Live Dashboard](https://img.shields.io/badge/Live_Notion-Dashboard-orange?style=flat-square)](https://www.notion.so/332f17fe54c68111ba0bc4746bb1cdd5)
 [![License](https://img.shields.io/badge/license-MIT-white?style=flat-square)](LICENSE)
 
-> **📊 [Live Dashboard →](https://www.notion.so/332f17fe54c68111ba0bc4746bb1cdd5)**  Auto-refreshes every 35s · PEAK tier · RTX 4060 · $0/cycle
-> **📄 [Pattern Report →](https://www.notion.so/333f17fe54c6811287dfd66abedf6455)**  314 signals · 4 failure patterns · confidence 0.82–0.91
+> 📄 **[DEV.to Article →](https://dev.to/fliptrigga13/the-brand-gravity-anomaly-uncovering-ai-developer-friction-with-a-5-organ-swarm-and-notion-mcp-4hoh)**
+> 📊 **[Live Notion Dashboard →](https://www.notion.so/332f17fe54c68111ba0bc4746bb1cdd5)** — auto-refreshes every 35s
+> 🔍 **[Pattern Report →](https://www.notion.so/333f17fe54c6811287dfd66abedf6455)** — 314 signals, 4 failure patterns
 
 ---
 
-## 🎬 Live Demo
+## What This Is
 
-> 11 agents. 1,885+ cycles logged to Notion. Fully autonomous. Watch it run in real time:
+NEXUS ULTRA is a self-directing research swarm that monitors live developer discussions (GitHub Issues, Reddit, HackerNews, DEV.to), scores signals against a typed knowledge graph, and writes every cycle's results into three Notion databases via JSON-RPC 2.0 over stdio — in real time, at $0/cycle, with no external APIs.
 
-**[▶ Watch the live demo on Loom](https://www.loom.com/share/887b9464508240ecbd4adb1c07a26ae0)**
+The Notion integration is not a log dump. It is the operating surface. Every cycle updates the live dashboard, agent leaderboard, and signal feed. Judges can click the links above and see the swarm's current state.
 
----
+**What it found:** Across 314 real developer failure signals, the same 4 failure patterns appeared consistently regardless of framework:
 
-## What Is NEXUS ULTRA?
-
-NEXUS ULTRA is a **self-evolving, multi-agent AI swarm** built on the SINGLE-Clarity architecture. It runs entirely on local hardware — no cloud, no API costs, no subscriptions.
-
-11 specialized agents collaborate in timed cycles, scouting live signals from Reddit and HackerNews, writing outreach copy, critiquing each other's outputs, and logging every cycle to Notion via MCP in real time.
-
-```
-GENERATOR tier  →  COMMANDER · SCOUT · COPYWRITER · CONVERSION_ANALYST
-CRITIC tier     →  VALIDATOR · SENTINEL_MAGNITUDE · METACOG · EXECUTIONER
-OPTIMIZER tier  →  SUPERVISOR · REWARD · CLOSER
-     ↑                                                          |
-     └──────────── scores, lessons, memory, KG injection ──────┘
-```
-
-Every cycle, the REWARD agent scores performance. Top lessons are promoted into the next cycle's context. The swarm rewrites its own operating instructions based on what works.
+| Pattern | Confidence |
+|---------|-----------|
+| Observability Black Hole (no visibility into agent state) | 0.91 |
+| Tool Call Silent Failure (fails with no logs or errors) | 0.87 |
+| Multi-Agent Trace Fragmentation (can't isolate which agent failed) | 0.84 |
+| Hallucination With No Audit Trail (fabricated execution paths) | 0.82 |
 
 ---
 
-## SINGLE-Clarity Architecture
+## Live Metrics
 
-SINGLE-Clarity is the cognitive system powering NEXUS ULTRA. It is not a framework or SaaS product — it is a **unified local brain** with five layered organs.
+| Metric | Value |
+|--------|-------|
+| Total cycles logged (all DBs) | 4,215 |
+| Total scored cycles | 2,173 |
+| INTEL research cycles | 116 |
+| All-time peak score | 0.950 |
+| Knowledge graph nodes | 39,634 (36,794 FAILURE_MEMORY) |
+| Signals processed | 314 (285 GitHub Issues + 29 HN) |
+| Cost per cycle | $0.00 |
 
-| | |
-|---|---|
-| **One Brain** | Single source of truth across all agents — `nexus_kg.json` |
-| **Your Work** | Runs locally, $0 cloud, no API dependency |
-| **Self-Calibrating** | 1,885+ cycles in production — smarter every run |
+---
 
-### The Five Organs
+## Architecture — Five Organs
+
+NEXUS ULTRA runs on five organs:
 
 | Organ | Role | Description |
-|---|---|---|
-| **KG** | Memory | Knowledge Graph — typed, time-aware, 9,000+ nodes |
-| **CHRONOS** | Brain | Temporal confidence engine — half-lives and decay |
-| **Swarm** | Nervous System | 11 agents, 3 tiers, self-scored cycles |
-| **VeilPiercer** | Immune System | Divergence detection, session tracing, FAILURE_MEMORY |
-| **NeuralMind** | Interface | Force-directed KG graph, swarm health display |
+|-------|------|-------------|
+| **KG** | Memory | Knowledge Graph — 39,634 typed nodes, confidence-weighted, with half-life decay |
+| **CHRONOS** | Temporal Memory | Cost gate — only fires a cycle when utility justifies it (threshold: 0.45) |
+| **Swarm** | Execution | 11 agents, 3 tiers, 35-second cycles, self-scored with REWARD |
+| **VeilPiercer** | Immune System | Per-step tracing, divergence detection, FAILURE_MEMORY logging |
+| **NeuralMind** | Visualization | Force-directed KG graph + live swarm health display |
 
-**Core Thesis:** Most agent systems are stateless between runs. SINGLE-Clarity is not. It has persistent memory with decay, a temporal confidence engine, divergence detection, and a self-correcting reward loop. The swarm does not start fresh — it starts from where it left off, with a calibrated view of what it knows, what is fading, and what it got wrong.
+### Agent Tiers
+
+```
+GENERATOR tier  →  COMMANDER · SCOUT-LIVE · COPYWRITER · CONVERSION_ANALYST
+CRITIC tier     →  VALIDATOR · SENTINEL_MAGNITUDE · METACOG · EXECUTIONER
+OPTIMIZER tier  →  SUPERVISOR · REWARD
+```
+
+### Scoring Formula
+
+```
+Score = DIM1 (task execution)  × 0.40
+      + DIM2 (signal quality)  × 0.30
+      + DIM3 (synthesis depth) × 0.20
+      + DIM4 (channel clarity) × 0.10
+```
+
+Score triggers the Notion write. Only cycles scoring above threshold are logged to the Live Log database.
 
 ---
 
-## Why Not Just Use ChatGPT?
+## Notion MCP Integration
 
-| | NEXUS ULTRA | ChatGPT / Claude |
-|--|-------------|-----------------|
-| Your prompts stay private | ✅ | ❌ sent to servers |
-| Works with no internet | ✅ | ❌ |
-| Monthly cost | $0 | $20+/mo |
-| Learns from your sessions | ✅ persistent KG | ❌ resets |
-| You own the model | ✅ | ❌ |
-| Multi-agent reasoning | ✅ 11 agents | ❌ single model |
-| Notion live reporting | ✅ via MCP | ❌ |
+Every swarm cycle writes to three Notion databases via [Model Context Protocol](https://developers.notion.com/docs/mcp) using JSON-RPC 2.0 over stdio:
 
----
+```json
+{
+  "jsonrpc": "2.0",
+  "method": "tools/call",
+  "params": {
+    "name": "notion_create_page",
+    "arguments": {
+      "database_id": "1d7f17fe54c6820b91ba0158dd5fdea3",
+      "properties": {
+        "Cycle ID": { "title": [{ "text": { "content": "cycle_1774827325" } }] },
+        "Score":    { "number": 0.950 },
+        "Pattern":  { "select": { "name": "OBSERVABILITY" } },
+        "Agent":    { "select": { "name": "REWARD" } }
+      }
+    }
+  },
+  "id": "req_8847"
+}
+```
 
-## Hardware Requirements
+**Three databases:**
+- **Live Log** — every cycle: score, agent, pattern, cycle type
+- **Agent Leaderboard** — all 11 agents ranked per cycle
+- **Signal Feed** — live developer signals from GitHub/Reddit/HN
 
-- **GPU:** NVIDIA RTX 3060 12GB minimum / RTX 4060+ recommended
-- **RAM:** 16GB+
-- **Storage:** ~50GB free (models)
-- **OS:** Windows 10/11, Linux (WSL2 supported)
+**Two dedicated processes:**
+- `nexus_notion_reporter.py` — writes cycle data, runs separately from swarm loop (Notion failure never stops the swarm)
+- `nexus_notion_dashboard.py` — rewrites the [Live Status page](https://www.notion.so/332f17fe54c68111ba0bc4746bb1cdd5) every 35 seconds
 
 ---
 
@@ -103,105 +130,34 @@ pip install httpx requests python-dotenv psutil
 **3. Configure `.env`**
 ```bash
 cp .env.example .env
-# Add your NOTION_TOKEN and NOTION_DATABASE_ID
+# Add your NOTION_TOKEN and database IDs
 ```
 
-**4. Launch the swarm**
+**4. Launch**
 ```bash
-python nexus_swarm_loop.py
-```
-
-The watchdog guardian auto-restarts on crash. Notion sync starts automatically.
-
----
-
-## Notion MCP Integration
-
-Every swarm cycle is logged to Notion in real time via the [Model Context Protocol](https://modelcontextprotocol.io).
-
-**What gets pushed (every ~35 seconds):**
-- 🔄 Cycle score, MVP agent, cycle type
-- 🏆 Agent leaderboard — all 11 agents scored per cycle
-- 🎯 Buyer intelligence signals from Reddit/HN scout
-
-**Setup:**
-
-1. Create a Notion integration at [notion.so/my-integrations](https://www.notion.so/my-integrations)
-2. Add your token and database IDs to `.env`:
-```
-NOTION_TOKEN=ntn_your_token_here
-NOTION_CYCLES_DB=your_database_id
-NOTION_AGENTS_DB=your_agents_db_id
-NOTION_BUYERS_DB=your_buyers_db_id
-```
-3. Run the sync services:
-```bash
-python nexus_notion_sync.py      # cycle reports + leaderboard
-python nexus_notion_reporter.py  # swarm cycle log
+python nexus_watchdog_guardian.py   # manages all processes, auto-restarts on crash
 ```
 
 ---
 
-## VeilPiercer — MCP Tools for Claude Desktop
+## Hardware
 
-VeilPiercer exposes per-step agent tracing as native tools for Claude Desktop via the [Model Context Protocol](https://modelcontextprotocol.io).
-
-Once registered, Claude can call `start_session`, `trace_step`, and `diff_sessions` directly — no code required.
-
-### Register in Claude Desktop
-
-Edit `%APPDATA%\Claude\claude_desktop_config.json`:
-
-```json
-{
-  "mcpServers": {
-    "veilpiercer": {
-      "command": "python",
-      "args": ["path/to/nexus-ultra/mcp/server.py"]
-    }
-  }
-}
-```
-
-Restart Claude Desktop. VeilPiercer appears in the tools panel.
-
-### Available MCP Tools
-
-| Tool | What it does |
-|------|-------------|
-| `start_session` | Start a new trace session for an agent run |
-| `trace_step` | Log one agent step — captures prompt in, response out |
-| `diff_sessions` | Compare two sessions — returns fork step and side-by-side divergence |
-
-### Example — Claude diffs two agent runs
-
-```
-start_session(session_id="run-a", agent_name="outreach-swarm")
-trace_step(session_id="run-a", step_label="COPYWRITER", prompt="...", response="...")
-
-start_session(session_id="run-b", agent_name="outreach-swarm")
-trace_step(session_id="run-b", step_label="COPYWRITER", prompt="...", response="...")
-
-diff_sessions(session_a="run-a", session_b="run-b")
-```
-
-**Output:** Fork at Step 1. Last shared state. Side-by-side response comparison.
-
-100% local. SQLite-backed. No data leaves your machine.
-
-```bash
-pip install veilpiercer    # free for local use
-```
-
-→ [PyPI](https://pypi.org/project/veilpiercer/) · [MCP Setup Guide](mcp/SETUP.md)
+- **GPU:** NVIDIA RTX 3060 12GB minimum / RTX 4060+ recommended  
+- **RAM:** 16GB+
+- **Storage:** ~50GB free (models)
+- **OS:** Windows 10/11, Linux (WSL2 supported)
 
 ---
 
-## Security
+## Resilience
 
-- All sensitive endpoints require an API token via `x-nexus-token` header
-- Token stored in `.env` — never committed to version control
-- Localhost = full control | LAN = read-only | Internet = blocked
+| Failure | Handler | Behavior |
+|---------|---------|----------|
+| Crash + stale lockfile | Watchdog | Detects dead PID, clears lock, restarts clean |
+| Partial KG write | Atomic rename | `.tmp → os.rename()` — crash leaves `.tmp`, not corrupt KG |
+| Injection in agent output | KG_FILTER gate | Blocked → written as `FAILURE_MEMORY` node |
+| Notion API failure | Isolated process | Bridge failure never stops swarm execution |
+| Double launch | Lockfile | New swarm detects `.swarm.lock`, exits cleanly |
 
 ---
 
@@ -211,45 +167,29 @@ pip install veilpiercer    # free for local use
 |------|--------|
 | Prompt injection via task queue | ✅ PASS — KG_FILTER blocked + logged as FAILURE_MEMORY |
 | Social engineering (disable security for VIP) | ✅ PASS — METACOG rejected |
-| Modelfile tampering detection | ✅ PASS — hash mismatch caught |
 | 100% offline operation | ✅ PASS — zero external dependencies |
 | Duplicate swarm launch | ✅ PASS — lockfile enforced, watchdog adopts existing PID |
 
 ---
 
-## Failure Handling
+## VeilPiercer — Observability Layer
 
-| Failure | Handler | Behavior |
-|---|---|---|
-| Manual double-launch | Lockfile | New swarm detects `.swarm.lock`, exits clean |
-| Crash + stale lockfile | Watchdog | Detects dead PID, clears lock, restarts clean |
-| Partial KG write | Atomic rename | `.tmp → os.rename()` — crash leaves `.tmp`, not corrupt KG |
-| Injection in agent output | KG_FILTER gate | Blocked → written as `FAILURE_MEMORY` node |
-| SENTINEL false lockdown | Evidence extraction | Checks only extracted `[SENTINEL_LOCKDOWN:]` content |
+VeilPiercer is the immune system organ. Per-step tracing for local LLM stacks, session diffing, divergence detection. Runs entirely local, SQLite-backed.
 
----
+Also exposed as MCP tools for Claude Desktop via `mcp/server.py`.
 
-## Glossary
+```bash
+pip install veilpiercer
+```
 
-| Term | Definition |
-|---|---|
-| KG | Knowledge Graph — `nexus_kg.json`, single source of truth |
-| CHRONOS | Temporal confidence engine — half-lives and decay rates |
-| VeilPiercer | Divergence detection and per-step session tracing |
-| FAILURE_MEMORY | Long half-life KG node (168h) — logs past failures for avoidance |
-| COST_GATE | Cycle utility threshold — swarm only runs when utility > 0.45 |
-| Lint / tag check | Structural scoring — verifies required tags in agent outputs |
-| KG_FILTER | Injection gate between swarm output and KG write |
-| SINGLE-Clarity | One brain. Your work. |
+→ [PyPI](https://pypi.org/project/veilpiercer/) · [MCP Setup](mcp/SETUP.md)
 
 ---
 
 ## License
 
-MIT — do whatever you want with it.
+MIT
 
 ---
 
-*Built on: Ollama · Python · Qwen3 · Phi-4 · Llama · Notion MCP*
-
-*SINGLE-Clarity architecture · March 2026*
+*Built by Lauren Flipo — RTX 4060, Ollama, Python, Notion MCP — fully local, $0/cycle — March 2026*
