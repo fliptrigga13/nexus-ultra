@@ -7,6 +7,9 @@
 [![pip](https://img.shields.io/badge/pip_install-veilpiercer-00ff88?style=flat-square)](https://pypi.org/project/veilpiercer/)
 [![License](https://img.shields.io/badge/license-MIT-white?style=flat-square)](LICENSE)
 
+> **📊 [Live Dashboard →](https://www.notion.so/332f17fe54c68111ba0bc4746bb1cdd5)**  Auto-refreshes every 35s · PEAK tier · RTX 4060 · $0/cycle
+> **📄 [Pattern Report →](https://www.notion.so/333f17fe54c6811287dfd66abedf6455)**  314 signals · 4 failure patterns · confidence 0.82–0.91
+
 ---
 
 ## 🎬 Live Demo
